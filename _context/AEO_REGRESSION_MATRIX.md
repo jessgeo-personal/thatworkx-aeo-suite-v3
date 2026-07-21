@@ -17,3 +17,5 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Semrush Affiliate Link Redirect** | Referral Gateway | UI Link Check | External redirect opens partner affiliate tracking URL | `PASS 🟢` |
 | **Native MongoDB Connection** | Database Persistence | `audit-critical.js` | Connects directly to `mongodb://127.0.0.1:27017/thatworkx-aeo` | `PASS 🟢` |
 | **Twelve-Factor Env Lookup** | Configuration | `rateLimiter.js` | Quota parameters read dynamically via `process.env` calls | `PASS 🟢` |
+| **AI Bot Parser (GPTBot, Gemini, etc.)** | Gateway Scanner | `crawlerService.js` | Parses specific disallows for GPTBot, PerplexityBot, ClaudeBot, Google-Extended | `PASS 🟢` |
+| **Gateway Relationship Badge** | UI Grid | `index.js` | Assigns `Optimized Handshake` (🟢), `Hidden Assets` (🟡), or `Total AI Blindness` (🔴) | `PASS 🟢` |

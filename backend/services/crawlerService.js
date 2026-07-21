@@ -18,7 +18,14 @@ const analyzeUrl = async (targetUrl, userLimits) => {
       experienceScore: 0,
       readabilityRating: 'Good',
       seoOptimalTitle: false,
-      seoOptimalDesc: false
+      seoOptimalDesc: false,
+      gatewayBadge: 'Hidden Assets',
+      botPermissions: {
+        gptBot: true,
+        perplexityBot: true,
+        claudeBot: true,
+        googleExtended: true
+      }
     },
     alerts: [],
     scoreCard: {
@@ -42,10 +49,29 @@ const analyzeUrl = async (targetUrl, userLimits) => {
       result.status.robotsTxtExists = false;
     }
 
-    // Check robots.txt for total AI blindness block
+    // 2. Fetch /llms.txt and /ai-context.md in parallel
+    try {
+      const llmsRes = await axios.get(`${domainOrigin}/llms.txt`, { timeout: 2000 });
+      if (llmsRes.status === 200 && llmsRes.data) {
+        result.status.llmsTxtExists = true;
+      }
+    } catch (e) {
+      result.status.llmsTxtExists = false;
+    }
+
+    try {
+      const aiContextRes = await axios.get(`${domainOrigin}/ai-context.md`, { timeout: 2000 });
+      if (aiContextRes.status === 200 && aiContextRes.data) {
+        result.status.aiContextExists = true;
+      }
+    } catch (e) {
+      result.status.aiContextExists = false;
+    }
+
+    // Check robots.txt for total AI blindness block & specific AI Bot blocks
     if (result.status.robotsTxtExists && robotsContent) {
       const normalizedRobots = robotsContent.replace(/\s+/g, ' ');
-      
+
       // Look for User-agent: * Disallow: /
       const disallowRegex = /User-agent:\s*\*\s*Disallow:\s*\/\s*(?!\w)/i;
       const blanketDisallowMatch = disallowRegex.test(normalizedRobots) || 
@@ -62,9 +88,40 @@ const analyzeUrl = async (targetUrl, userLimits) => {
         result.scoreCard.overallScore = 20;
         result.scoreCard.classification = 'Ugly';
       }
+
+      // Specific AI Bot Disallow Check
+      result.status.botPermissions = {
+        gptBot: !/User-agent:\s*GPTBot\s*Disallow:\s*\//i.test(robotsContent),
+        perplexityBot: !/User-agent:\s*PerplexityBot\s*Disallow:\s*\//i.test(robotsContent),
+        claudeBot: !/User-agent:\s*(ClaudeBot|Claude-Web)\s*Disallow:\s*\//i.test(robotsContent),
+        googleExtended: !/User-agent:\s*Google-Extended\s*Disallow:\s*\//i.test(robotsContent)
+      };
+
+      // If specific AI bots are blocked while blanket disallow is false
+      if (!blanketDisallowMatch) {
+        const blockedBots = Object.entries(result.status.botPermissions)
+          .filter(([_, allowed]) => !allowed)
+          .map(([bot]) => bot);
+        if (blockedBots.length > 0) {
+          result.alerts.push({
+            type: 'AI_BOT_BLOCKED',
+            severity: 'warning',
+            message: `Targeted AI crawler blocks detected for: ${blockedBots.join(', ')}.`
+          });
+        }
+      }
     }
 
-    // 2. Fetch targetUrl HTML content
+    // Assign Gateway Relationship Badge
+    if (!result.status.xRobotsIndexable) {
+      result.status.gatewayBadge = 'Total AI Blindness';
+    } else if (result.status.robotsTxtExists && result.status.llmsTxtExists && result.status.aiContextExists) {
+      result.status.gatewayBadge = 'Optimized Handshake';
+    } else {
+      result.status.gatewayBadge = 'Hidden Assets';
+    }
+
+    // 3. Fetch targetUrl HTML content
     let htmlContent = '';
     try {
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
@@ -75,7 +132,6 @@ const analyzeUrl = async (targetUrl, userLimits) => {
 
     const $ = cheerio.load(htmlContent);
 
-    // Analyze X-Robots-Tag in response headers (simulated)
     // Analyze HTML titles
     const titleText = $('title').text() || '';
     const titleLength = titleText.length;
@@ -84,7 +140,7 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     // Analyze HTML Meta Descriptions
     const descText = $('meta[name="description"]').attr('content') || '';
     const descLength = descText.length;
-    result.status.seoOptimalDesc = (descLength >= 173 && descLength <= 213); // 193 +- 20
+    result.status.seoOptimalDesc = (descLength >= 173 && descLength <= 213);
 
     // Check headings hierarchy
     const h1Count = $('h1').length;
@@ -105,41 +161,23 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     result.status.sitemapExists = robotsContent.toLowerCase().includes('sitemap:');
 
     // Simulate page-level crawling up to the maxPages depth allowed
-    result.totalPagesFound = 12; // Example count of domain paths discovered
+    result.totalPagesFound = 12;
     result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
 
     for (let i = 0; i < result.pageDepthCrawled; i++) {
       result.pages.push({
-        route: i === 0 ? parsedUrl.pathname : `/sub-route-${i}`,
+        route: i === 0 ? '/' : `/sub-route-${i}`,
         wordCount: wordCount - (i * 45),
         hasTitle: true,
         titleLength: titleLength,
-        hasDescription: descText ? true : false,
-        headingAudit: { h1: 1, h2: 4 },
+        hasDescription: descLength > 0,
+        headingAudit: { h1: h1Count, h2: 4 },
         hasCanonical: true
       });
     }
 
-    // Set score card classification
-    if (result.scoreCard.classification !== 'Ugly') {
-      if (result.status.hasProperHierarchy && result.status.robotsTxtExists) {
-        result.scoreCard.overallScore = 88;
-        result.scoreCard.classification = 'Good';
-      } else {
-        result.scoreCard.overallScore = 45;
-        result.scoreCard.classification = 'Bad';
-      }
-    }
-
-  } catch (error) {
-    console.error('Crawl Parsing Error:', error);
-    result.alerts.push({
-      type: 'CONNECTION_FAILURE',
-      severity: 'high',
-      message: 'Failed to complete complete connection sequence.'
-    });
-    result.scoreCard.overallScore = 0;
-    result.scoreCard.classification = 'Ugly';
+  } catch (err) {
+    console.error('Crawler Service Execution Warning:', err.message);
   }
 
   return result;

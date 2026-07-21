@@ -81,6 +81,36 @@
     <section id="panel-visualize" class="product-panel active">
       <div class="scan-results-grid" id="scan-results" style="display: none;">
         
+        <!-- Gateway Relationship Badge & AI Bot Matrix Card -->
+        <div class="dashboard-card glassmorphic col-span-3" id="gateway-grid-card">
+          <div class="gateway-header flex justify-between items-center">
+            <h3>Gateway Relationship Grid</h3>
+            <span id="gateway-badge" class="gateway-badge badge-handshake">🟢 Optimized Handshake</span>
+          </div>
+          <div class="bot-matrix-grid mt-4">
+            <div class="bot-status-item">
+              <span class="bot-icon">🤖</span>
+              <span class="bot-name">GPTBot (OpenAI)</span>
+              <span class="bot-perm" id="perm-gptbot">🟢 Allowed</span>
+            </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">🔍</span>
+              <span class="bot-name">PerplexityBot</span>
+              <span class="bot-perm" id="perm-perplexity">🟢 Allowed</span>
+            </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">🧠</span>
+              <span class="bot-name">ClaudeBot (Anthropic)</span>
+              <span class="bot-perm" id="perm-claudebot">🟢 Allowed</span>
+            </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">💎</span>
+              <span class="bot-name">Google-Extended (Gemini)</span>
+              <span class="bot-perm" id="perm-geminibot">🟢 Allowed</span>
+            </div>
+          </div>
+        </div>
+        
         <!-- Score Overview Card -->
         <div class="dashboard-card glassmorphic text-center" id="score-card">
           <h3>Domain Visibility Score</h3>

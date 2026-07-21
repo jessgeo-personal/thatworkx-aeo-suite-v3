@@ -138,6 +138,29 @@ function displayScanResults(results) {
 
   document.getElementById('crawled-pages-text').innerText = `Crawled ${results.pageDepthCrawled} of ${results.totalPagesFound} discovered paths`;
 
+  // Gateway Relationship Badge
+  const gwBadge = document.getElementById('gateway-badge');
+  if (gwBadge && results.status.gatewayBadge) {
+    if (results.status.gatewayBadge === 'Optimized Handshake') {
+      gwBadge.innerText = '🟢 Optimized Handshake';
+      gwBadge.className = 'gateway-badge badge-handshake';
+    } else if (results.status.gatewayBadge === 'Total AI Blindness') {
+      gwBadge.innerText = '🔴 Total AI Blindness';
+      gwBadge.className = 'gateway-badge badge-blindness';
+    } else {
+      gwBadge.innerText = '🟡 Hidden Assets';
+      gwBadge.className = 'gateway-badge badge-hidden';
+    }
+  }
+
+  // AI Bot Permissions Matrix
+  if (results.status.botPermissions) {
+    updateBotPerm('perm-gptbot', results.status.botPermissions.gptBot);
+    updateBotPerm('perm-perplexity', results.status.botPermissions.perplexityBot);
+    updateBotPerm('perm-claudebot', results.status.botPermissions.claudeBot);
+    updateBotPerm('perm-geminibot', results.status.botPermissions.googleExtended);
+  }
+
   // Checklist Items Status Update
   updateChecklistStatus('chk-robots', results.status.robotsTxtExists);
   updateChecklistStatus('chk-llmstxt', results.status.llmsTxtExists);
@@ -189,6 +212,19 @@ function updateChecklistStatus(elementId, value) {
     el.innerText = '🔴';
   } else {
     el.innerText = '🟡';
+  }
+}
+
+function updateBotPerm(elementId, isAllowed) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    if (isAllowed) {
+      el.innerText = '🟢 Allowed';
+      el.style.color = '#4ade80';
+    } else {
+      el.innerText = '🔴 Disallowed';
+      el.style.color = '#f87171';
+    }
   }
 }
 
