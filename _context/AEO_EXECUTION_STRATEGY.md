@@ -66,3 +66,10 @@ Because the codebase is new, the QA agent does not have to worry about breaking 
    * Update `AEO_MASTER_PROJECT_PLAN.md` and `AEO_CHANGELOG.md` with current session progress.
    * Print terminal warning: `⚠️ CONTEXT CAPACITY REACHED (75%+). Please issue /exit and launch a fresh session.`
 
+---
+
+## 🔄 AUTOMATED SPRINT DOCUMENTATION LIFECYCLE HOOKS
+
+1. **SPRINT START HOOK**: Before any coding or BDD spec generation begins for a new Sprint, the Control Agent must mandate that the Docs Agent updates `_context/AEO_MASTER_PROJECT_PLAN.md`, setting the active Sprint status badge to `[IN PROGRESS 🟡]`.
+2. **SPRINT END HOOK**: Upon passing all BDD integration tests, the Control Agent must mandate that the Docs Agent updates `_context/AEO_MASTER_PROJECT_PLAN.md` setting the active Sprint status badge to `[DONE 🟢]`, appends entry notes to `_context/AEO_CHANGELOG.md`, and updates `_context/AEO_REGRESSION_MATRIX.md` PRIOR TO executing the git commit and push to remote dev.
+

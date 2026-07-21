@@ -132,6 +132,44 @@
           </div>
         </div>
 
+        <!-- Machine Text Simulator Viewport Card -->
+        <div class="dashboard-card glassmorphic col-span-3" id="simulator-card">
+          <div class="flex justify-between items-center mb-2">
+            <h3>Machine Text Simulator Viewport (Raw LLM Ingestion Stream)</h3>
+            <span class="density-badge" id="density-badge">Content Density: --%</span>
+          </div>
+          <p class="text-sm text-muted mb-2">This is the sanitized text stream extracted directly from raw HTML by LLM pre-processors after stripping DOM scripts, styles, and markup noise.</p>
+          <div class="code-viewport-box font-mono" id="machine-preview-box">Awaiting scan execution...</div>
+        </div>
+
+        <!-- AIOptimize Remediation Teaser Accordion -->
+        <div class="dashboard-card glassmorphic col-span-3" id="remediation-teaser-card">
+          <h3>AIOptimize Remediation Teaser</h3>
+          <p class="text-sm text-muted mb-3">Recommended automated fixes to elevate your machine visibility score:</p>
+          <div class="teaser-accordion">
+            <div class="accordion-item">
+              <div class="accordion-header" onclick="toggleAccordion('acc-1')">
+                <span>⚡ Fix SPA Hydration Traps (Cloudflare Worker Edge Proxy)</span>
+                <span class="acc-icon" id="acc-1-icon">+</span>
+              </div>
+              <div class="accordion-body" id="acc-1-body" style="display: none;">
+                <p>Bypass client-side rendering locks by dynamically serving pre-rendered static HTML or flat text manifests to machine crawlers at the network edge.</p>
+                <button class="teaser-btn mt-2" onclick="switchProduct('optimize')">Generate Edge Worker in AI Optimize →</button>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <div class="accordion-header" onclick="toggleAccordion('acc-2')">
+                <span>📄 Deploy Missing Machine Manifests (/llms.txt & /ai-context.md)</span>
+                <span class="acc-icon" id="acc-2-icon">+</span>
+              </div>
+              <div class="accordion-body" id="acc-2-body" style="display: none;">
+                <p>Eliminate data starvation by providing flat-text manifests that outline your corporate identity, key products, and canonical documentation links.</p>
+                <button class="teaser-btn mt-2" onclick="switchProduct('optimize')">Build Context Manifests →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Metric Details Checklist -->
         <div class="dashboard-card glassmorphic col-span-3">
           <h3>AEO Structural Integrity Audit Checklist</h3>

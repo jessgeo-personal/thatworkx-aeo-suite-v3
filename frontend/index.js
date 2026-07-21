@@ -161,6 +161,17 @@ function displayScanResults(results) {
     updateBotPerm('perm-geminibot', results.status.botPermissions.googleExtended);
   }
 
+  // Level 2 Content Density & Machine Simulator Viewport
+  const densityBadge = document.getElementById('density-badge');
+  if (densityBadge && results.status.contentDensityRatio !== undefined) {
+    densityBadge.innerText = `Content Density: ${results.status.contentDensityRatio}%`;
+  }
+
+  const previewBox = document.getElementById('machine-preview-box');
+  if (previewBox && results.status.machinePreview) {
+    previewBox.innerText = results.status.machinePreview;
+  }
+
   // Checklist Items Status Update
   updateChecklistStatus('chk-robots', results.status.robotsTxtExists);
   updateChecklistStatus('chk-llmstxt', results.status.llmsTxtExists);
@@ -224,6 +235,20 @@ function updateBotPerm(elementId, isAllowed) {
     } else {
       el.innerText = '🔴 Disallowed';
       el.style.color = '#f87171';
+    }
+  }
+}
+
+function toggleAccordion(accId) {
+  const body = document.getElementById(`${accId}-body`);
+  const icon = document.getElementById(`${accId}-icon`);
+  if (body) {
+    if (body.style.display === 'none' || !body.style.display) {
+      body.style.display = 'block';
+      if (icon) icon.innerText = '−';
+    } else {
+      body.style.display = 'none';
+      if (icon) icon.innerText = '+';
     }
   }
 }

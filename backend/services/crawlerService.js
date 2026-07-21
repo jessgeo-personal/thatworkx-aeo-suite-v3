@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const url = require('url');
+const { parseHtmlMetrics } = require('./parserService');
 
 const analyzeUrl = async (targetUrl, userLimits) => {
   const result = {
@@ -20,6 +21,11 @@ const analyzeUrl = async (targetUrl, userLimits) => {
       seoOptimalTitle: false,
       seoOptimalDesc: false,
       gatewayBadge: 'Hidden Assets',
+      contentDensityRatio: 0,
+      spaTrapDetected: false,
+      jsonLdExists: false,
+      jsonLdTypes: [],
+      machinePreview: '',
       botPermissions: {
         gptBot: true,
         perplexityBot: true,
@@ -97,7 +103,6 @@ const analyzeUrl = async (targetUrl, userLimits) => {
         googleExtended: !/User-agent:\s*Google-Extended\s*Disallow:\s*\//i.test(robotsContent)
       };
 
-      // If specific AI bots are blocked while blanket disallow is false
       if (!blanketDisallowMatch) {
         const blockedBots = Object.entries(result.status.botPermissions)
           .filter(([_, allowed]) => !allowed)
@@ -121,13 +126,29 @@ const analyzeUrl = async (targetUrl, userLimits) => {
       result.status.gatewayBadge = 'Hidden Assets';
     }
 
-    // 3. Fetch targetUrl HTML content
+    // 3. Fetch targetUrl HTML content & parse Level 2 Metrics
     let htmlContent = '';
     try {
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
       htmlContent = mainRes.data;
     } catch (e) {
-      htmlContent = `<html><body><h1>Mock Content for ${targetUrl}</h1><p>Failed to retrieve live content. Displaying simulation layout.</p></body></html>`;
+      htmlContent = `<html><body><div id="app"><h1>Mock Content for ${targetUrl}</h1><p>Failed to retrieve live content. Displaying simulation layout.</p></div></body></html>`;
+    }
+
+    // Run Level 2 Parser Service
+    const parsedMetrics = parseHtmlMetrics(htmlContent);
+    result.status.contentDensityRatio = parsedMetrics.contentDensityRatio;
+    result.status.spaTrapDetected = parsedMetrics.spaTrapDetected;
+    result.status.jsonLdExists = parsedMetrics.jsonLdExists;
+    result.status.jsonLdTypes = parsedMetrics.jsonLdTypes;
+    result.status.machinePreview = parsedMetrics.machinePreview;
+
+    if (parsedMetrics.spaTrapDetected) {
+      result.alerts.push({
+        type: 'SPA_TRAP_DETECTED',
+        severity: 'warning',
+        message: 'Heavy Client-Side Rendering (SPA Trap) detected. AI bots will see an empty container without JavaScript execution.'
+      });
     }
 
     const $ = cheerio.load(htmlContent);
@@ -147,8 +168,7 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     result.status.hasProperHierarchy = (h1Count === 1);
 
     // Analyze text length & word counts
-    const bodyText = $('body').text() || '';
-    const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+    const wordCount = parsedMetrics.wordCount;
     if (wordCount < 500) {
       result.status.readabilityRating = 'Data Starvation';
     } else if (wordCount > 2500) {
@@ -167,7 +187,7 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     for (let i = 0; i < result.pageDepthCrawled; i++) {
       result.pages.push({
         route: i === 0 ? '/' : `/sub-route-${i}`,
-        wordCount: wordCount - (i * 45),
+        wordCount: Math.max(10, wordCount - (i * 45)),
         hasTitle: true,
         titleLength: titleLength,
         hasDescription: descLength > 0,

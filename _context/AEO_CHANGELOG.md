@@ -4,7 +4,16 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
-## [Unreleased] - Sprint 4 (Level 1 Gateway Scanners & Handshake Analysis)
+## [Unreleased] - Sprint 5 (Level 2 Content Density, JS Hydration & AIOptimize Teaser)
+
+### Added
+- **DOM Noise Stripper & Content Density Calculator**: Created `parserService.js` to strip HTML scripts, styles, navs, and footers, calculating raw text byte ratios.
+- **Client-Side JS Hydration / SPA Trap Detector**: Added automatic detection for empty container JS framework traps (`#root`, `#app`, `#_next`).
+- **JSON-LD Schema Extractor**: Extracted and validated JSON-LD `@type` definitions.
+- **Machine Text Simulator Viewport**: Rendered live raw text preview box in `index.html` showing sanitized text stream LLMs consume.
+- **AIOptimize Remediation Teaser Accordion**: Implemented interactive teaser accordion in the dashboard UI guiding users to remediation tools.
+
+## [1.3.0-sprint4] - 2026-07-21
 
 ### Added
 - **Level 1 Gateway Scanner Engine**: Added programmatic text parsing for `robots.txt`, `/llms.txt`, and `/ai-context.md` in `crawlerService.js`.

@@ -19,3 +19,6 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Twelve-Factor Env Lookup** | Configuration | `rateLimiter.js` | Quota parameters read dynamically via `process.env` calls | `PASS 🟢` |
 | **AI Bot Parser (GPTBot, Gemini, etc.)** | Gateway Scanner | `crawlerService.js` | Parses specific disallows for GPTBot, PerplexityBot, ClaudeBot, Google-Extended | `PASS 🟢` |
 | **Gateway Relationship Badge** | UI Grid | `index.js` | Assigns `Optimized Handshake` (🟢), `Hidden Assets` (🟡), or `Total AI Blindness` (🔴) | `PASS 🟢` |
+| **DOM Noise Stripper & Density** | Content Density | `parserService.js` | Strips DOM noise and calculates raw text byte ratio percentage | `PASS 🟢` |
+| **SPA Hydration Trap Detector** | SPA Trap | `parserService.js` | Detects empty container JS framework traps (`#root`, `#app`) | `PASS 🟢` |
+| **Machine Text Simulator Viewport** | UI Viewport | `index.js` | Displays raw text stream LLMs consume in `<pre>` viewport box | `PASS 🟢` |
