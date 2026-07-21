@@ -28,3 +28,7 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **User Registration & Hashing** | Auth Controller | `authController.js` | Hashes passwords with SHA256 and persists user records to native MongoDB | `PASS 🟢` |
 | **User Login & Session Token** | Auth Controller | `authController.js` | Authenticates credentials and returns signed session Bearer tokens | `PASS 🟢` |
 | **Top Bar Auth Indicator & Modal** | UI Component | `index.html` | Renders top navigation Sign In trigger and interactive auth-modal overlay | `PASS 🟢` |
+| **Sidebar Citation Attribution Widget** | UI Sidebar | `index.html` | Renders `AI Visibility & Share of Voice` sidebar card with affiliate link binding | `PASS 🟢` |
+| **End-to-End Vitest Module Suite** | Automated Tests | `servicesAndControllers.test.js` | 14/14 tests pass covering generator, parser, auth & crawler gating | `PASS 🟢` |
+| **Twelve-Factor Staging Pre-Flight** | Deployment Package | `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` | Validates environment variables and container deployment blueprint | `PASS 🟢` |
+

@@ -4,7 +4,14 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
-## [Unreleased] - Sprint 7 (Subscription Gates, Auth & Compute Shielding)
+## [1.6.0-sprint8] - 2026-07-21
+
+### Added
+- **Citation Attribution Sidebar Callout**: Rendered `AI Visibility & Share of Voice` callout box in master sidebar panel of `index.html` with zero-overhead partner affiliate referral link binding (`Semrush Generative AI Citation Tracking`).
+- **Comprehensive E2E Vitest Regression Suite**: Added `backend/tests/servicesAndControllers.test.js` covering `generatorService.js`, `parserService.js`, and `authController.js` alongside `bddGating.test.js` (14/14 tests passing).
+- **Twelve-Factor Staging Deployment Guide**: Created `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` documenting environment configuration parameters, container spec, and zero-downtime staging deployment steps.
+
+## [1.5.1-sprint7] - 2026-07-21
 
 ### Added
 - **Authentication Controller**: Created `authController.js` handling user registration, SHA256 password hashing, and token issuance against native MongoDB (`mongodb://127.0.0.1:27017/thatworkx-aeo`).

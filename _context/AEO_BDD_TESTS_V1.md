@@ -109,3 +109,24 @@ This document defines the business-logic integration tests in Given/When/Then fo
   Then the component displays a Call-to-Action block detailing the affiliate tracking network
   And the user-accessible link routes the user externally via an affiliate tracking URL directly to partner platform suites (e.g., Semrush's Generative AI Engine Tracking utilities)
   And the application does not execute local scraper checks for live search engine share-of-voice data
+
+---
+
+## Feature 7: End-to-End Vitest Regression Suite
+
+### Scenario 7.1: Comprehensive Backend Endpoint and Module Test Coverage
+  Given the full application codebase across Sprints 1 through 8
+  When the automated Vitest test runner is executed against all service modules (`crawlerService.js`, `parserService.js`, `generatorService.js`, `authController.js`, `rateLimiter.js`)
+  Then all unit and integration test assertions pass cleanly with 0 failures
+  And all 32 core capabilities and quota boundaries function without backward regression
+
+---
+
+## Feature 8: Twelve-Factor Staging Deployment Pre-Flight
+
+### Scenario 8.1: Environment Variable and Pre-Flight Staging Audit
+  Given the digital staging environment configuration for DigitalOcean App Platform (`.do/app.yaml`)
+  When the deployment validator inspects environment variables (`PORT`, `MONGO_URI`, `JWT_SECRET`, `NODE_ENV`, `RATE_LIMIT_FREE_DAILY`)
+  Then all required 12-factor environment keys are validated
+  And the staging pre-flight checklist (`DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md`) is verified ready for zero-downtime container launch
+

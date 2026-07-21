@@ -14,7 +14,7 @@
 * **Sprint 5**: Level 2 Content Density, JS Hydration & AIOptimize Teaser — `[ DONE 🟢 ]`
 * **Sprint 6**: Level 3 Context Maps & AEO Remediation Generators — `[ DONE 🟢 ]`
 * **Sprint 7**: Pro & Enterprise Subscription Gates — `[ DONE 🟢 ]`
-* **Sprint 8**: Citation Attribution Engine & Final Staging/Prod Release — `[ BACKLOG ⚪ ]`
+* **Sprint 8**: Citation Attribution Engine & Final Staging/Prod Release — `[ DONE 🟢 ]`
 
 ---
 
@@ -53,4 +53,4 @@
 | 29 | Site EEAT: Trust Signals (Organization Schema) | AI Optimize | `IN PROGRESS 🟡` | Sprint 5 |
 | 30 | Site EEAT: Authority Metrics & Abstention Risk | AI Visualize | `BACKLOG ⚪` | Sprint 7 |
 | 31 | Cloudflare Worker Edge Proxy Generator (Shopify Hook) | AI Optimize | `BACKLOG ⚪` | Sprint 6 |
-| 32 | Semrush Generative AI Citation Tracking Affiliate Redirect | AI Socialize | `BACKLOG ⚪` | Sprint 8 |
+| 32 | Semrush Generative AI Citation Tracking Affiliate Redirect | AI Socialize | `DONE 🟢` | Sprint 8 |
