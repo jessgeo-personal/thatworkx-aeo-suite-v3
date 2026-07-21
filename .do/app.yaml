@@ -1,0 +1,29 @@
+# DigitalOcean App Platform Spec file for Staging Environment
+name: aeo-audit-tool-v3
+region: nyc
+services:
+  - name: aeo-server
+    github:
+      repo: thatworkx/aeo-audit-tool-v3
+      branch: staging
+      deploy_on_push: true
+    source_dir: /
+    dockerfile_path: Dockerfile
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 5000
+    routes:
+      - path: /
+    envs:
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: staging
+      - key: MONGODB_URI
+        scope: RUN_TIME
+        value: ${aeo-db.DATABASE_URL}
+databases:
+  - name: aeo-db
+    engine: MONGODB
+    version: "6.0"
+    num_nodes: 1
+    size_slug: db-s-1vcpu-1gb

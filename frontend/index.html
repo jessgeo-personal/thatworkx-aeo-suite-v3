@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thatworkx AEO Suite - AI Engine Optimization Workspace</title>
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-symbol">🌐</span>
+      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+    </div>
+    
+    <div class="toggle-container">
+      <button class="toggle-btn active" id="btn-visualize" onclick="switchProduct('visualize')">AI Visualize (Inquire)</button>
+      <button class="toggle-btn" id="btn-optimize" onclick="switchProduct('optimize')">AI Optimize (Treat)</button>
+    </div>
+
+    <div class="tier-badge-container">
+      <span class="tier-label">Plan:</span>
+      <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+        <option value="AIVisualize Free">AIVisualize Free</option>
+        <option value="AIVisualize Pro">AIVisualize Pro</option>
+        <option value="AIVisualize ENT">AIVisualize ENT</option>
+        <option value="AIOptimize Free">AIOptimize Free</option>
+        <option value="AIOptimize Pro">AIOptimize Pro</option>
+        <option value="AIOptimize ENT">AIOptimize ENT</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Main Application Workspace -->
+  <main class="app-container">
+
+    <!-- Input Form Segment -->
+    <section class="scan-input-card glassmorphic">
+      <h2>Analyze Your AI Search Index Footprint</h2>
+      <p class="subtitle">Evaluate and optimize your web presence structure for AI bots, RAG chunkers, and answer engines.</p>
+      
+      <form id="scan-form" onsubmit="executeScan(event)" class="form-layout">
+        <div class="input-wrapper">
+          <span class="input-icon">🔗</span>
+          <input type="url" id="target-url" placeholder="https://yourdomain.com" required value="https://example.com">
+        </div>
+        
+        <div class="options-wrapper" id="headless-checkbox-wrapper" style="display: none;">
+          <label class="checkbox-container">
+            <input type="checkbox" id="headless-checkbox">
+            <span class="checkmark"></span>
+            Execute On-Demand Headless Sweep (Puppeteer)
+          </label>
+        </div>
+
+        <button type="submit" class="submit-btn glowing-btn" id="submit-btn">
+          <span id="btn-text">Initiate Scan</span>
+          <div class="btn-loader" id="btn-loader" style="display: none;"></div>
+        </button>
+      </form>
+    </section>
+
+    <!-- Error/Upgrade Modal Alert Container -->
+    <div id="alert-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card glassmorphic border-glow-amber">
+        <span class="modal-close" onclick="closeAlertModal()">×</span>
+        <div class="modal-icon">⚠️</div>
+        <h3 id="modal-title">Quota Limit Exceeded</h3>
+        <p id="modal-message">You have used all your daily scan credits. Upgrade to unlock deeper crawlers and headless sweeps.</p>
+        <button class="upgrade-btn-action glowing-btn-amber" onclick="triggerUpgrade()">Upgrade Subscription Now</button>
+      </div>
+    </div>
+
+    <!-- THREAD A: AI Visualize Viewport -->
+    <section id="panel-visualize" class="product-panel active">
+      <div class="scan-results-grid" id="scan-results" style="display: none;">
+        
+        <!-- Score Overview Card -->
+        <div class="dashboard-card glassmorphic text-center" id="score-card">
+          <h3>Domain Visibility Score</h3>
+          <div class="score-circle-container">
+            <div class="score-circle">
+              <span class="score-value" id="overall-score">--</span>
+              <span class="score-label">/ 100</span>
+            </div>
+          </div>
+          <h4 id="classification-badge" class="badge-good">GOOD</h4>
+          <p id="crawled-pages-text">Crawled 0 of 0 pages</p>
+        </div>
+
+        <!-- Alert Notification Panel -->
+        <div class="dashboard-card glassmorphic col-span-2" id="alerts-card">
+          <h3>Security & Bot Access Gateway Flags</h3>
+          <div id="alerts-container">
+            <div class="alert-empty">No critical firewall or gateway warnings. Your crawler corridors are clear.</div>
+          </div>
+        </div>
+
+        <!-- Metric Details Checklist -->
+        <div class="dashboard-card glassmorphic col-span-3">
+          <h3>AEO Structural Integrity Audit Checklist</h3>
+          <div class="checklist-grid">
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-robots">❓</span>
+              <div class="checklist-info">
+                <strong>robots.txt file</strong>
+                <p>Ensures search engines and LLM crawlers are directed properly.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-llmstxt">❓</span>
+              <div class="checklist-info">
+                <strong>llms.txt file map</strong>
+                <p>Answer.ai specification to provide flat-text summaries to models.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-aicontext">❓</span>
+              <div class="checklist-info">
+                <strong>ai-context.md file</strong>
+                <p>Proprietary flat file context mapping tool for system prompts.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-sitemap">❓</span>
+              <div class="checklist-info">
+                <strong>Sitemap sitemap.xml</strong>
+                <p>Lists website routes to map structural web tree indexing.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-heading">❓</span>
+              <div class="checklist-info">
+                <strong>Heading Hierarchy</strong>
+                <p>Ensures clean recursive chunking (Exactly 1 H1 heading per page).</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-title">❓</span>
+              <div class="checklist-info">
+                <strong>Title Lengthsweetspot</strong>
+                <p>Ensures semantic focus (AEO sweet spot: 75 to 125 characters).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pages Crawled Route Map -->
+        <div class="dashboard-card glassmorphic col-span-3">
+          <h3>Scanned Routes Directory Path</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>Word Count</th>
+                  <th>Canonical URL</th>
+                  <th>Structure</th>
+                </tr>
+              </thead>
+              <tbody id="scanned-routes-tbody">
+                <tr>
+                  <td colspan="4" class="text-center">No routes crawled yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="welcome-placeholder text-center" id="scan-placeholder">
+        <div class="placeholder-icon animate-pulse-slow">🔍</div>
+        <h3>Ready to Auditing</h3>
+        <p>Submit a URL above to inspect your brand's AI search index configuration.</p>
+      </div>
+    </section>
+
+    <!-- THREAD A & B: AI Optimize Viewport (Interactive Generation Sandbox) -->
+    <section id="panel-optimize" class="product-panel">
+      <div class="optimize-workspace-grid">
+        
+        <!-- Sidebar Controls -->
+        <div class="dashboard-card glassmorphic">
+          <h3>Remediation Controls</h3>
+          <p class="subtitle">Select your optimization sandbox asset tool.</p>
+          
+          <div class="control-menu">
+            <button class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">🛡️ Robots.txt Optimizer</button>
+            <button class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">☁️ Cloudflare Edge Worker</button>
+            <button class="control-menu-item" id="menu-schema" onclick="switchOptimizeTool('schema')">📦 JSON-LD Schema Generator</button>
+          </div>
+        </div>
+
+        <!-- Workspace Canvas -->
+        <div class="dashboard-card glassmorphic col-span-2">
+          
+          <!-- Robots Sandbox -->
+          <div id="opt-tool-robots" class="optimize-tool-view active">
+            <h3>Interactive Bot Permission Sandbox</h3>
+            <p class="subtitle">Toggle access sliders to block low-rent scrapers while keeping chat assistants active.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="slider-row">
+                <label>Allow GPTBot (ChatGPT)</label>
+                <input type="checkbox" id="chk-opt-gpt" checked onchange="generateRobotsTxt()">
+              </div>
+              <div class="slider-row">
+                <label>Allow ClaudeBot (Anthropic)</label>
+                <input type="checkbox" id="chk-opt-claude" checked onchange="generateRobotsTxt()">
+              </div>
+              <div class="slider-row">
+                <label>Allow PerplexityBot</label>
+                <input type="checkbox" id="chk-opt-perplexity" checked onchange="generateRobotsTxt()">
+              </div>
+              <div class="slider-row">
+                <label>Allow Generic AI Scrapers</label>
+                <input type="checkbox" id="chk-opt-generic" onchange="generateRobotsTxt()">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>robots.txt Sandbox</span>
+                <button class="copy-btn" onclick="copyToClipboard('code-robots')">Click to Copy</button>
+              </div>
+              <pre class="code-view" id="code-robots"></pre>
+            </div>
+          </div>
+
+          <!-- Cloudflare Worker Sandbox -->
+          <div id="opt-tool-cloudflare" class="optimize-tool-view">
+            <h3>Cloudflare Edge Workaround Track</h3>
+            <p class="subtitle">Bypass locked CMS file uploads on Shopify subdomains. Proxy your AI files at the network edge.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Your Root Brand Domain:</label>
+                <input type="text" id="cf-origin" value="https://brand.com" oninput="generateCloudflareWorker()">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>Cloudflare Worker Script</span>
+                <button class="copy-btn" onclick="copyToClipboard('code-cf')">Click to Copy</button>
+              </div>
+              <pre class="code-view lang-js" id="code-cf"></pre>
+            </div>
+          </div>
+
+          <!-- JSON-LD Sandbox -->
+          <div id="opt-tool-schema" class="optimize-tool-view">
+            <h3>Deterministic Entity JSON-LD Schema</h3>
+            <p class="subtitle">Define core organizational credentials to insulate against competitor brand mashups.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Company Legal Name:</label>
+                <input type="text" id="schema-name" value="Thatworkx Inc." oninput="generateJsonLd()">
+              </div>
+              <div class="input-row">
+                <label>Corporate Support Email:</label>
+                <input type="email" id="schema-email" value="support@thatworkx.com" oninput="generateJsonLd()">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>Organization JSON-LD</span>
+                <button class="copy-btn" onclick="copyToClipboard('code-schema')">Click to Copy</button>
+              </div>
+              <pre class="code-view lang-json" id="code-schema"></pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- THREAD C: AI Socialize Viewport (External Trust Anchor & Semrush Redirect) -->
+    <section id="panel-socialize" class="product-panel">
+      <div class="socialize-container">
+        <div class="dashboard-card glassmorphic col-span-3 text-center">
+          <div class="placeholder-icon animate-pulse-slow">🔗</div>
+          <h3>AI Visibility Tracking & Share of Voice</h3>
+          
+          <div class="affiliate-alert-box glassmorphic border-glow-sky">
+            <p class="affiliate-badge">PARTNER SUITE INTEGRATION</p>
+            <p class="affiliate-description">
+              Technical layout optimized for machine crawling. To continually log your live brand citation percentages and tracking keywords across ChatGPT Search, Claude, and Perplexity engines, activate your account validation token with our verified network analytics tracking partners.
+            </p>
+            <a href="https://www.semrush.com/affiliate-redirect-placeholder" target="_blank" class="affiliate-btn glowing-btn">
+              Connect to Semrush AI Tracking Tools
+            </a>
+          </div>
+
+          <div class="socialize-guide-grid">
+            <div class="guide-card glassmorphic">
+              <h4>1. Social Attribution Play</h4>
+              <p>Tether high-velocity external content like LinkedIn posts directly to your domain map within <code>/llms.txt</code> to verify authorship.</p>
+            </div>
+            <div class="guide-card glassmorphic">
+              <h4>2. Citation Referrals</h4>
+              <p>Ensure that search assistants display clickable backlinks directly referencing your owned catalog urls rather than competitor summaries.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>© 2026 Thatworkx AEO Suite. Built for machine-first search landscapes.</p>
+  </footer>
+
+  <script src="index.js"></script>
+</body>
+</html>
