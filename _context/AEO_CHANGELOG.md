@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Top Navigation Auth Trigger**: Rendered top bar `Sign In` / User Account button in `index.html`.
 - **Authentication Modal Overlay**: Built `auth-modal` overlay supporting seamless switching between Sign In and Account Registration modes.
 
+### Fixed
+- **Frontend User Logout Handler**: Added profile button click logout trigger in `index.js`, clearing JWT token, resetting top navigation button to `🔑 Sign In`, and restoring public guest tier UI state.
+
 ## [1.5.0-sprint6] - 2026-07-21
 
 ### Added

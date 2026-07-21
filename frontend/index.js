@@ -453,9 +453,26 @@ async function generateEdgeSnippets() {
 
 // --- Auth & Session Controllers ---
 let authMode = 'login';
+let isAuthenticated = false;
 
 function openAuthModal() {
+  if (isAuthenticated) {
+    if (confirm(`Currently signed in as ${currentEmail}. Would you like to log out?`)) {
+      handleLogout();
+    }
+    return;
+  }
   document.getElementById('auth-modal').style.display = 'flex';
+}
+
+function handleLogout() {
+  localStorage.removeItem('aeo_auth_token');
+  isAuthenticated = false;
+  currentEmail = 'user@thatworkx.com';
+  document.getElementById('auth-btn').innerText = '🔑 Sign In';
+  document.getElementById('user-tier-selector').value = 'AIVisualize Free';
+  updateUserTier();
+  alert('Logged out successfully.');
 }
 
 function closeAuthModal() {
@@ -510,6 +527,7 @@ async function handleAuthSubmit(event) {
     }
 
     currentEmail = data.user.email;
+    isAuthenticated = true;
     document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
     if (data.user.subscription_tier) {
       document.getElementById('user-tier-selector').value = data.user.subscription_tier;
@@ -534,6 +552,7 @@ async function checkAuthSession() {
     const data = await res.json();
     if (data.authenticated && data.user) {
       currentEmail = data.user.email;
+      isAuthenticated = true;
       document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
       if (data.user.subscription_tier) {
         document.getElementById('user-tier-selector').value = data.user.subscription_tier;
