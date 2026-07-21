@@ -1,7 +1,7 @@
+const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env.development') });
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');

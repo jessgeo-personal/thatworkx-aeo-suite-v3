@@ -4,9 +4,15 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
----
+## [Unreleased] - Sprint 3 (Unified Dashboard UI & API Bindings)
 
-## [Unreleased] - Sprint 2 (Native Loopback MongoDB & Twelve-Factor Rules)
+### Added
+- **Unified Dashboard UI Shell**: Built SPA layout at `aeo.thatworkx.com` with smooth tab toggling between `AI Visualize (Inquire)` and `AI Optimize (Treat)`.
+- **Form API Bindings**: Connected single-page URL submission form directly to `POST /api/scan`.
+- **Real-Time Progress & Overlays**: Implemented loading animations and `LIMIT_EXCEEDED` / `HEADLESS_FORBIDDEN` high-contrast modal overlays.
+- **Pre-Flight Staging Checklist**: Documented mandatory environment variables for DigitalOcean cloud injection.
+
+## [1.1.0-sprint2] - 2026-07-20
 
 ### Added
 - **Native Bare-Metal MongoDB Integration**: Configured loopback URI `mongodb://127.0.0.1:27017/thatworkx-aeo` for local operations.
