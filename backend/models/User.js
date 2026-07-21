@@ -6,6 +6,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  password_hash: {
+    type: String,
+    default: ''
+  },
   subscription_tier: {
     type: String,
     enum: [

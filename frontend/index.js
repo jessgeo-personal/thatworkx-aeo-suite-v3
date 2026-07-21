@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   generateJsonLd();
   generateManifests();
   generateEdgeSnippets();
+  checkAuthSession();
   
   // Synchronize tier with backend
   updateUserTier();
@@ -447,6 +448,99 @@ async function generateEdgeSnippets() {
     if (d2.code) document.getElementById('code-htaccess').innerText = d2.code;
   } catch (err) {
     console.error('Error generating edge snippets:', err);
+  }
+}
+
+// --- Auth & Session Controllers ---
+let authMode = 'login';
+
+function openAuthModal() {
+  document.getElementById('auth-modal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  const title = document.getElementById('auth-modal-title');
+  const subtitle = document.getElementById('auth-modal-subtitle');
+  const btnText = document.getElementById('auth-btn-text');
+  const toggleMsg = document.getElementById('auth-toggle-msg');
+  const toggleBtn = document.getElementById('auth-toggle-btn');
+
+  if (authMode === 'register') {
+    title.innerText = 'Create your Thatworkx AEO Account';
+    subtitle.innerText = 'Unlock multi-page crawlers and custom edge proxy generation.';
+    btnText.innerText = 'Register Account';
+    toggleMsg.innerText = 'Already have an account?';
+    toggleBtn.innerText = 'Sign In';
+  } else {
+    title.innerText = 'Sign In to Thatworkx AEO';
+    subtitle.innerText = 'Access your multi-page crawler credits and custom edge routing scripts.';
+    btnText.innerText = 'Sign In';
+    toggleMsg.innerText = "Don't have an account?";
+    toggleBtn.innerText = 'Register Account';
+  }
+}
+
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+  const email = document.getElementById('auth-email').value;
+  const password = document.getElementById('auth-password').value;
+
+  const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Authentication failed');
+      return;
+    }
+
+    if (data.token) {
+      localStorage.setItem('aeo_auth_token', data.token);
+    }
+
+    currentEmail = data.user.email;
+    document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
+    if (data.user.subscription_tier) {
+      document.getElementById('user-tier-selector').value = data.user.subscription_tier;
+    }
+
+    closeAuthModal();
+    alert(`Successfully ${authMode === 'register' ? 'registered' : 'signed in'} as ${data.user.email}`);
+  } catch (err) {
+    console.error('Auth submit error:', err);
+    alert('Connection error during authentication.');
+  }
+}
+
+async function checkAuthSession() {
+  const token = localStorage.getItem('aeo_auth_token');
+  if (!token) return;
+
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.authenticated && data.user) {
+      currentEmail = data.user.email;
+      document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
+      if (data.user.subscription_tier) {
+        document.getElementById('user-tier-selector').value = data.user.subscription_tier;
+      }
+    }
+  } catch (err) {
+    console.error('Check session error:', err);
   }
 }
 

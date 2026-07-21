@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
 const { generateLlmsTxt, generateAiContextMd, generateCloudflareWorkerJs, generateShopifyLiquid, generateHtaccess } = require('./services/generatorService');
+const { registerUser, loginUser, getCurrentUser } = require('./controllers/authController');
 const User = require('./models/User');
 const ScanLog = require('./models/ScanLog');
 const DomainProfile = require('./models/DomainProfile');
@@ -124,6 +125,11 @@ app.post('/api/user/tier', async (req, res) => {
     res.status(500).json({ error: 'Failed to update subscription plan' });
   }
 });
+
+// Authentication & Session Routes
+app.post('/api/auth/register', registerUser);
+app.post('/api/auth/login', loginUser);
+app.get('/api/auth/me', getCurrentUser);
 
 // Endpoint to build Level 3 Context Maps and Remediation Scripts
 app.post('/api/generator/build', async (req, res) => {

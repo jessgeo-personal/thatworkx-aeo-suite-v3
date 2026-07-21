@@ -4,7 +4,15 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
-## [Unreleased] - Sprint 6 (Level 3 Context Maps & AEO Remediation Generators)
+## [Unreleased] - Sprint 7 (Subscription Gates, Auth & Compute Shielding)
+
+### Added
+- **Authentication Controller**: Created `authController.js` handling user registration, SHA256 password hashing, and token issuance against native MongoDB (`mongodb://127.0.0.1:27017/thatworkx-aeo`).
+- **Auth Routes**: Added `POST /api/auth/register`, `POST /api/auth/login`, and `GET /api/auth/me` endpoints in `server.js`.
+- **Top Navigation Auth Trigger**: Rendered top bar `Sign In` / User Account button in `index.html`.
+- **Authentication Modal Overlay**: Built `auth-modal` overlay supporting seamless switching between Sign In and Account Registration modes.
+
+## [1.5.0-sprint6] - 2026-07-21
 
 ### Added
 - **Backend Generator Engine**: Scaffolded `generatorService.js` to compile `/llms.txt`, `/ai-context.md`, Cloudflare Worker JS, Shopify Liquid, and WordPress `.htaccess` code.

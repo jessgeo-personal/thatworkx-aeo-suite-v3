@@ -25,3 +25,6 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Machine Context Manifest Builder** | Generator Engine | `generatorService.js` | Compiles flat-text `/llms.txt` and `/ai-context.md` markdown manifests | `PASS 🟢` |
 | **Edge Script Generator (Shopify/Htaccess)** | Generator Engine | `generatorService.js` | Compiles Cloudflare Worker JS, Shopify Liquid, and WordPress `.htaccess` | `PASS 🟢` |
 | **One-Click Manifest File Download** | UI Utility | `index.js` | Triggers client-side `.txt` and `.md` file download from code viewport | `PASS 🟢` |
+| **User Registration & Hashing** | Auth Controller | `authController.js` | Hashes passwords with SHA256 and persists user records to native MongoDB | `PASS 🟢` |
+| **User Login & Session Token** | Auth Controller | `authController.js` | Authenticates credentials and returns signed session Bearer tokens | `PASS 🟢` |
+| **Top Bar Auth Indicator & Modal** | UI Component | `index.html` | Renders top navigation Sign In trigger and interactive auth-modal overlay | `PASS 🟢` |

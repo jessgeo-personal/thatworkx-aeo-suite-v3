@@ -24,16 +24,19 @@
       <button class="toggle-btn" id="btn-optimize" onclick="switchProduct('optimize')">AI Optimize (Treat)</button>
     </div>
 
-    <div class="tier-badge-container">
-      <span class="tier-label">Plan:</span>
-      <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
-        <option value="AIVisualize Free">AIVisualize Free</option>
-        <option value="AIVisualize Pro">AIVisualize Pro</option>
-        <option value="AIVisualize ENT">AIVisualize ENT</option>
-        <option value="AIOptimize Free">AIOptimize Free</option>
-        <option value="AIOptimize Pro">AIOptimize Pro</option>
-        <option value="AIOptimize ENT">AIOptimize ENT</option>
-      </select>
+    <div class="header-actions flex items-center gap-3">
+      <div class="tier-badge-container">
+        <span class="tier-label">Plan:</span>
+        <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+          <option value="AIVisualize Free">AIVisualize Free</option>
+          <option value="AIVisualize Pro">AIVisualize Pro</option>
+          <option value="AIVisualize ENT">AIVisualize ENT</option>
+          <option value="AIOptimize Free">AIOptimize Free</option>
+          <option value="AIOptimize Pro">AIOptimize Pro</option>
+          <option value="AIOptimize ENT">AIOptimize ENT</option>
+        </select>
+      </div>
+      <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
     </div>
   </header>
 
@@ -74,6 +77,35 @@
         <h3 id="modal-title">Quota Limit Exceeded</h3>
         <p id="modal-message">You have used all your daily scan credits. Upgrade to unlock deeper crawlers and headless sweeps.</p>
         <button class="upgrade-btn-action glowing-btn-amber" onclick="triggerUpgrade()">Upgrade Subscription Now</button>
+      </div>
+    </div>
+
+    <!-- Authentication & Registration Modal Overlay -->
+    <div id="auth-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card glassmorphic border-glow-sky">
+        <span class="modal-close" onclick="closeAuthModal()">×</span>
+        <div class="modal-icon">🔐</div>
+        <h3 id="auth-modal-title">Sign In to Thatworkx AEO</h3>
+        <p id="auth-modal-subtitle" class="text-sm text-muted">Access your multi-page crawler credits and custom edge routing scripts.</p>
+
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="auth-form-layout mt-3">
+          <div class="input-row-full">
+            <label>Email Address:</label>
+            <input type="email" id="auth-email" required placeholder="user@example.com">
+          </div>
+          <div class="input-row-full mt-2">
+            <label>Password:</label>
+            <input type="password" id="auth-password" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="submit-btn glowing-btn mt-4" id="auth-submit-btn">
+            <span id="auth-btn-text">Sign In</span>
+          </button>
+        </form>
+
+        <div class="auth-toggle-footer mt-3 flex justify-center items-center gap-2">
+          <span id="auth-toggle-msg" class="text-sm text-muted">Don't have an account?</span>
+          <button class="link-btn text-sm" id="auth-toggle-btn" onclick="toggleAuthMode()">Register Account</button>
+        </div>
       </div>
     </div>
 
