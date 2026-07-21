@@ -5,6 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
+const { generateLlmsTxt, generateAiContextMd, generateCloudflareWorkerJs, generateShopifyLiquid, generateHtaccess } = require('./services/generatorService');
 const User = require('./models/User');
 const ScanLog = require('./models/ScanLog');
 const DomainProfile = require('./models/DomainProfile');
@@ -121,6 +122,40 @@ app.post('/api/user/tier', async (req, res) => {
   } catch (error) {
     console.error('Update Plan Route Error:', error);
     res.status(500).json({ error: 'Failed to update subscription plan' });
+  }
+});
+
+// Endpoint to build Level 3 Context Maps and Remediation Scripts
+app.post('/api/generator/build', async (req, res) => {
+  try {
+    const { domainName, targetType } = req.body;
+    const cleanDomain = domainName ? domainName.replace(/^https?:\/\//, '').split('/')[0] : 'example.com';
+
+    let code = '';
+    switch (targetType) {
+      case 'llms':
+        code = generateLlmsTxt(cleanDomain);
+        break;
+      case 'aiContext':
+        code = generateAiContextMd(cleanDomain);
+        break;
+      case 'cloudflare':
+        code = generateCloudflareWorkerJs(cleanDomain);
+        break;
+      case 'shopify':
+        code = generateShopifyLiquid(cleanDomain);
+        break;
+      case 'htaccess':
+        code = generateHtaccess(cleanDomain);
+        break;
+      default:
+        code = generateLlmsTxt(cleanDomain);
+    }
+
+    res.json({ success: true, domain: cleanDomain, targetType, code });
+  } catch (err) {
+    console.error('Generator Route Error:', err);
+    res.status(500).json({ error: 'Failed to generate remediation code' });
   }
 });
 

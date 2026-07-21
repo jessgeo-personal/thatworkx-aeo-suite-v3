@@ -22,3 +22,6 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **DOM Noise Stripper & Density** | Content Density | `parserService.js` | Strips DOM noise and calculates raw text byte ratio percentage | `PASS 🟢` |
 | **SPA Hydration Trap Detector** | SPA Trap | `parserService.js` | Detects empty container JS framework traps (`#root`, `#app`) | `PASS 🟢` |
 | **Machine Text Simulator Viewport** | UI Viewport | `index.js` | Displays raw text stream LLMs consume in `<pre>` viewport box | `PASS 🟢` |
+| **Machine Context Manifest Builder** | Generator Engine | `generatorService.js` | Compiles flat-text `/llms.txt` and `/ai-context.md` markdown manifests | `PASS 🟢` |
+| **Edge Script Generator (Shopify/Htaccess)** | Generator Engine | `generatorService.js` | Compiles Cloudflare Worker JS, Shopify Liquid, and WordPress `.htaccess` | `PASS 🟢` |
+| **One-Click Manifest File Download** | UI Utility | `index.js` | Triggers client-side `.txt` and `.md` file download from code viewport | `PASS 🟢` |

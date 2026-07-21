@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   generateRobotsTxt();
   generateCloudflareWorker();
   generateJsonLd();
+  generateManifests();
+  generateEdgeSnippets();
   
   // Synchronize tier with backend
   updateUserTier();
@@ -388,3 +390,63 @@ function copyToClipboard(elementId) {
     console.error('Failed to copy text:', err);
   });
 }
+
+// Download file utility
+function downloadFile(elementId, filename) {
+  const content = document.getElementById(elementId).innerText;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// Level 3 Manifests Generator
+async function generateManifests() {
+  const domain = document.getElementById('manifest-domain')?.value || 'example.com';
+  try {
+    const res1 = await fetch('/api/generator/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domainName: domain, targetType: 'llms' })
+    });
+    const d1 = await res1.json();
+    if (d1.code) document.getElementById('code-llmstxt').innerText = d1.code;
+
+    const res2 = await fetch('/api/generator/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domainName: domain, targetType: 'aiContext' })
+    });
+    const d2 = await res2.json();
+    if (d2.code) document.getElementById('code-aicontext').innerText = d2.code;
+  } catch (err) {
+    console.error('Error generating manifests:', err);
+  }
+}
+
+// Level 3 Multi-Platform Edge Snippets Generator
+async function generateEdgeSnippets() {
+  const domain = document.getElementById('edge-domain')?.value || 'example.com';
+  try {
+    const res1 = await fetch('/api/generator/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domainName: domain, targetType: 'shopify' })
+    });
+    const d1 = await res1.json();
+    if (d1.code) document.getElementById('code-shopify').innerText = d1.code;
+
+    const res2 = await fetch('/api/generator/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domainName: domain, targetType: 'htaccess' })
+    });
+    const d2 = await res2.json();
+    if (d2.code) document.getElementById('code-htaccess').innerText = d2.code;
+  } catch (err) {
+    console.error('Error generating edge snippets:', err);
+  }
+}
+

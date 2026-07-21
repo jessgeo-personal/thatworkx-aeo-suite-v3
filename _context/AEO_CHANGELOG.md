@@ -4,7 +4,15 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
-## [Unreleased] - Sprint 5 (Level 2 Content Density, JS Hydration & AIOptimize Teaser)
+## [Unreleased] - Sprint 6 (Level 3 Context Maps & AEO Remediation Generators)
+
+### Added
+- **Backend Generator Engine**: Scaffolded `generatorService.js` to compile `/llms.txt`, `/ai-context.md`, Cloudflare Worker JS, Shopify Liquid, and WordPress `.htaccess` code.
+- **Generator API Endpoint**: Added `POST /api/generator/build` route in `server.js`.
+- **AIOptimize Treat Workspace Drawers**: Rendered interactive code drawers for `/llms.txt`, `/ai-context.md`, Shopify Liquid, and WordPress `.htaccess` in `index.html`.
+- **One-Click File Downloading & Copy**: Added `downloadFile(elementId, filename)` utility in `index.js` enabling instant `.txt` and `.md` manifest downloads.
+
+## [1.4.0-sprint5] - 2026-07-21
 
 ### Added
 - **DOM Noise Stripper & Content Density Calculator**: Created `parserService.js` to strip HTML scripts, styles, navs, and footers, calculating raw text byte ratios.

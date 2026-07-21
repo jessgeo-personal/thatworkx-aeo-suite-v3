@@ -261,7 +261,9 @@
           
           <div class="control-menu">
             <button class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">🛡️ Robots.txt Optimizer</button>
+            <button class="control-menu-item" id="menu-manifests" onclick="switchOptimizeTool('manifests')">📄 /llms.txt & /ai-context.md Manifests</button>
             <button class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">☁️ Cloudflare Edge Worker</button>
+            <button class="control-menu-item" id="menu-edge" onclick="switchOptimizeTool('edge')">⚡ Shopify & WordPress Edge Script</button>
             <button class="control-menu-item" id="menu-schema" onclick="switchOptimizeTool('schema')">📦 JSON-LD Schema Generator</button>
           </div>
         </div>
@@ -345,6 +347,70 @@
                 <button class="copy-btn" onclick="copyToClipboard('code-schema')">Click to Copy</button>
               </div>
               <pre class="code-view lang-json" id="code-schema"></pre>
+            </div>
+          </div>
+
+          <!-- /llms.txt & /ai-context.md Manifests Sandbox -->
+          <div id="opt-tool-manifests" class="optimize-tool-view">
+            <h3>Machine Context Manifest Generators</h3>
+            <p class="subtitle">Generate canonical flat-text markdown files to provide AI crawlers with structured system descriptions.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="manifest-domain" value="example.com" oninput="generateManifests()">
+              </div>
+            </div>
+
+            <div class="code-viewport-container mb-4">
+              <div class="code-header">
+                <span>/llms.txt Manifest File</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-llmstxt')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-llmstxt', 'llms.txt')">Download .txt</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-llmstxt"></pre>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>/ai-context.md Corporate Manifest</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-aicontext')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-aicontext', 'ai-context.md')">Download .md</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-aicontext"></pre>
+            </div>
+          </div>
+
+          <!-- Multi-Platform Edge Routing Sandbox -->
+          <div id="opt-tool-edge" class="optimize-tool-view">
+            <h3>Shopify Liquid & WordPress .htaccess Edge Routing Snippets</h3>
+            <p class="subtitle">Deploy machine text routes without breaking storefront CMS permissions.</p>
+
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="edge-domain" value="example.com" oninput="generateEdgeSnippets()">
+              </div>
+            </div>
+
+            <div class="code-viewport-container mb-4">
+              <div class="code-header">
+                <span>Shopify Liquid Header Snippet (theme.liquid)</span>
+                <button class="copy-btn" onclick="copyToClipboard('code-shopify')">Click to Copy</button>
+              </div>
+              <pre class="code-view lang-js" id="code-shopify"></pre>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>WordPress .htaccess Rewrite Rules</span>
+                <button class="copy-btn" onclick="copyToClipboard('code-htaccess')">Click to Copy</button>
+              </div>
+              <pre class="code-view" id="code-htaccess"></pre>
             </div>
           </div>
 
