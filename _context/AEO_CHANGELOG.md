@@ -4,6 +4,11 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.13.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Scanned Routes Count Badge**: Embedded a dynamic badge at the top of the "Scanned Routes Directory Path" card visual showing "Pulled X of Y pages" matching the crawl results.
+
 ## [1.12.0-sprint8-patch] - 2026-07-22
 
 ### Added

@@ -195,6 +195,11 @@ function displayScanResults(results) {
 
   document.getElementById('crawled-pages-text').innerText = `Crawled ${results.pageDepthCrawled} of ${results.totalPagesFound} discovered paths`;
 
+  const routesCountEl = document.getElementById('scanned-routes-count');
+  if (routesCountEl) {
+    routesCountEl.innerText = `Pulled ${results.pageDepthCrawled} of ${results.totalPagesFound} pages`;
+  }
+
   // Gateway Relationship Badge
   const gwBadge = document.getElementById('gateway-badge');
   if (gwBadge && results.status.gatewayBadge) {
