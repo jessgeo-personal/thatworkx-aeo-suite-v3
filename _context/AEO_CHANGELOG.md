@@ -4,6 +4,11 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.12.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Multi-Agent Pod Manifest**: Established the 5 distinct agent persona roles (Control, PO, QA, Engineering, Docs) in [AEO_MULTI_AGENT_POD_MANIFEST.md](file:///D:/MyApps/aeo-audit-tool-v3/_context/AEO_MULTI_AGENT_POD_MANIFEST.md) and locked their communication/execution constraints.
+
 ## [1.11.0-sprint8-patch] - 2026-07-22
 
 ### Added

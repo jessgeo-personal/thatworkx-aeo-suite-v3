@@ -43,6 +43,8 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Safe Mode Scan Cooldown Timer** | Scan Input UI | `index.html` & `index.js` | Disables whole-site scan for 60s and displays countdown timer with help popup | `PASS 🟢` |
 | **On-Demand Single Page Auditing** | Scanned Paths UI | `index.js` & `server.js` | Bypasses cooldown lock to scan individual routes and updates row dynamically | `PASS 🟢` |
 | **Subdomain-Insensitive Domain Matching** | Crawler Engine | `crawlerService.js` | Strips www. prefix from host comparisons to match absolute internal links | `PASS 🟢` |
+| **Multi-Agent Pod Manifest Lock** | Quality Control | `AEO_MULTI_AGENT_POD_MANIFEST.md` | Declares roles, communication rules, and constraint bounds for 5 agents | `PASS 🟢` |
+| **Multi-Agent Persona Protocol** | Interface Output | Chat Console | Outputs responses prefixed with active agent headers and actor tracking | `PASS 🟢` |
 
 
 
