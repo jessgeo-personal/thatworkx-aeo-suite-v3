@@ -85,27 +85,90 @@
       <div class="modal-card glassmorphic border-glow-sky">
         <span class="modal-close" onclick="closeAuthModal()">×</span>
         <div class="modal-icon">🔐</div>
-        <h3 id="auth-modal-title">Sign In to Thatworkx AEO</h3>
-        <p id="auth-modal-subtitle" class="text-sm text-muted">Access your multi-page crawler credits and custom edge routing scripts.</p>
+        <h3 id="auth-modal-title">Authenticate to Thatworkx AEO</h3>
+        <p id="auth-modal-subtitle" class="text-sm text-muted mb-4">Access your multi-page crawler credits and custom edge routing scripts.</p>
 
-        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="auth-form-layout mt-3">
+        <!-- Tabs Container -->
+        <div class="auth-tabs" id="auth-tabs-container">
+          <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')">New User</button>
+        </div>
+
+        <!-- Login Form Panel -->
+        <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)" class="auth-form-layout">
           <div class="input-row-full">
             <label>Email Address:</label>
-            <input type="email" id="auth-email" required placeholder="user@example.com">
+            <input type="email" id="login-email" required placeholder="user@example.com">
           </div>
-          <div class="input-row-full mt-2">
-            <label>Password:</label>
-            <input type="password" id="auth-password" required placeholder="••••••••">
+          
+          <div class="opt-in-message">
+            <input type="checkbox" id="login-opt-in" required checked>
+            <label for="login-opt-in">I agree to my data being stored and used by Thatworkx Solutions.</label>
           </div>
-          <button type="submit" class="submit-btn glowing-btn mt-4" id="auth-submit-btn">
-            <span id="auth-btn-text">Sign In</span>
+
+          <button type="submit" class="submit-btn glowing-btn mt-4" id="login-submit-btn">
+            <span>Request Login OTP</span>
           </button>
         </form>
 
-        <div class="auth-toggle-footer mt-3 flex justify-center items-center gap-2">
-          <span id="auth-toggle-msg" class="text-sm text-muted">Don't have an account?</span>
-          <button class="link-btn text-sm" id="auth-toggle-btn" onclick="toggleAuthMode()">Register Account</button>
-        </div>
+        <!-- Register Form Panel -->
+        <form id="register-form-panel" onsubmit="handleRequestRegisterOtp(event)" class="auth-form-layout" style="display: none;">
+          <div class="flex gap-2">
+            <div class="w-1/2">
+              <label>First Name*:</label>
+              <input type="text" id="reg-firstname" required placeholder="Jane">
+            </div>
+            <div class="w-1/2">
+              <label>Last Name*:</label>
+              <input type="text" id="reg-lastname" required placeholder="Doe">
+            </div>
+          </div>
+          
+          <div class="mt-2">
+            <label>Email Address*:</label>
+            <input type="email" id="reg-email" required placeholder="jane.doe@example.com">
+          </div>
+          
+          <div class="mt-2">
+            <label>Phone Number*:</label>
+            <input type="tel" id="reg-phone" required placeholder="+1 (555) 123-4567">
+          </div>
+          
+          <div class="flex gap-2 mt-2">
+            <div class="w-1/2">
+              <label>Company (Optional):</label>
+              <input type="text" id="reg-company" placeholder="Acme Corp">
+            </div>
+            <div class="w-1/2">
+              <label>Country:</label>
+              <input type="text" id="reg-country" placeholder="United States">
+            </div>
+          </div>
+
+          <div class="opt-in-message">
+            <input type="checkbox" id="reg-opt-in" required>
+            <label for="reg-opt-in">I agree to my data being stored and used by Thatworkx Solutions.</label>
+          </div>
+
+          <button type="submit" class="submit-btn glowing-btn mt-4" id="register-submit-btn">
+            <span>Register & Send OTP</span>
+          </button>
+        </form>
+
+        <!-- OTP Verification Panel -->
+        <form id="otp-verify-panel" onsubmit="handleOtpVerification(event)" class="auth-form-layout" style="display: none;">
+          <p class="text-sm text-center text-muted mb-3" id="otp-verify-prompt">Please enter the 6-digit OTP code sent to your email.</p>
+          
+          <div class="text-center mb-2">
+            <label class="block mb-2 font-semibold">Verification Code:</label>
+            <input type="text" id="otp-code-input" required placeholder="000000" pattern="\d{6}" maxlength="6" class="text-center font-mono" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.35rem; max-width: 180px; margin: 0 auto; display: block;">
+          </div>
+          
+          <div class="flex gap-2 mt-4">
+            <button type="button" class="teaser-btn w-1/2" style="background-color: var(--dark-800); border: 1px solid var(--glass-border); padding: 0.8rem; border-radius: 6px; color: #ffffff; cursor: pointer;" onclick="cancelOtpVerification()">Cancel</button>
+            <button type="submit" class="submit-btn glowing-btn w-1/2" id="otp-submit-btn">Verify Code</button>
+          </div>
+        </form>
       </div>
     </div>
 

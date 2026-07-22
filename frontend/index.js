@@ -457,6 +457,7 @@ async function generateEdgeSnippets() {
 // --- Auth & Session Controllers ---
 let authMode = 'login';
 let isAuthenticated = false;
+let pendingEmail = '';
 
 function openAuthModal() {
   if (isAuthenticated) {
@@ -465,6 +466,12 @@ function openAuthModal() {
     }
     return;
   }
+  
+  // Reset modal state
+  pendingEmail = '';
+  document.getElementById('otp-code-input').value = '';
+  switchAuthTab('login');
+  
   document.getElementById('auth-modal').style.display = 'flex';
 }
 
@@ -482,46 +489,163 @@ function closeAuthModal() {
   document.getElementById('auth-modal').style.display = 'none';
 }
 
-function toggleAuthMode() {
-  authMode = authMode === 'login' ? 'register' : 'login';
-  const title = document.getElementById('auth-modal-title');
-  const subtitle = document.getElementById('auth-modal-subtitle');
-  const btnText = document.getElementById('auth-btn-text');
-  const toggleMsg = document.getElementById('auth-toggle-msg');
-  const toggleBtn = document.getElementById('auth-toggle-btn');
+function switchAuthTab(tabName) {
+  authMode = tabName;
+  
+  const loginTab = document.getElementById('tab-login');
+  const registerTab = document.getElementById('tab-register');
+  const loginForm = document.getElementById('login-form-panel');
+  const registerForm = document.getElementById('register-form-panel');
+  const otpPanel = document.getElementById('otp-verify-panel');
+  const tabsContainer = document.getElementById('auth-tabs-container');
 
-  if (authMode === 'register') {
-    title.innerText = 'Create your Thatworkx AEO Account';
-    subtitle.innerText = 'Unlock multi-page crawlers and custom edge proxy generation.';
-    btnText.innerText = 'Register Account';
-    toggleMsg.innerText = 'Already have an account?';
-    toggleBtn.innerText = 'Sign In';
+  tabsContainer.style.display = 'flex';
+  otpPanel.style.display = 'none';
+
+  if (tabName === 'login') {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.style.display = 'flex';
+    registerForm.style.display = 'none';
   } else {
-    title.innerText = 'Sign In to Thatworkx AEO';
-    subtitle.innerText = 'Access your multi-page crawler credits and custom edge routing scripts.';
-    btnText.innerText = 'Sign In';
-    toggleMsg.innerText = "Don't have an account?";
-    toggleBtn.innerText = 'Register Account';
+    loginTab.classList.remove('active');
+    registerTab.classList.add('active');
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'flex';
   }
 }
 
-async function handleAuthSubmit(event) {
+async function handleRequestLoginOtp(event) {
   event.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  const password = document.getElementById('auth-password').value;
+  const email = document.getElementById('login-email').value.trim();
+  const optIn = document.getElementById('login-opt-in').checked;
 
-  const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+  if (!optIn) {
+    alert('You must agree to the data storage and usage policies of Thatworkx Solutions.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('login-submit-btn');
+  submitBtn.disabled = true;
 
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email })
     });
 
     const data = await res.json();
+    
+    if (res.status === 404 || data.error === 'USER_NOT_FOUND') {
+      alert('Email address not found. Redirecting to New User registration.');
+      switchAuthTab('register');
+      document.getElementById('reg-email').value = email;
+      return;
+    }
+
     if (!res.ok) {
-      alert(data.error || 'Authentication failed');
+      alert(data.error || 'Failed to request login OTP.');
+      return;
+    }
+
+    // Advance to OTP input panel
+    pendingEmail = email;
+    document.getElementById('auth-tabs-container').style.display = 'none';
+    document.getElementById('login-form-panel').style.display = 'none';
+    document.getElementById('otp-verify-panel').style.display = 'flex';
+    document.getElementById('otp-verify-prompt').innerText = `Please enter the 6-digit OTP code sent to: ${email}`;
+
+    if (data.dev_otp) {
+      console.log(`[DEV OTP ALERT]: Code is ${data.dev_otp}`);
+      alert(`[SIMULATION] Verification Code sent: ${data.dev_otp}`);
+      document.getElementById('otp-code-input').value = data.dev_otp;
+    }
+  } catch (err) {
+    console.error('Request Login OTP Error:', err);
+    alert('Connection error. Could not request verification OTP.');
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function handleRequestRegisterOtp(event) {
+  event.preventDefault();
+  const email = document.getElementById('reg-email').value.trim();
+  const firstName = document.getElementById('reg-firstname').value.trim();
+  const lastName = document.getElementById('reg-lastname').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const company = document.getElementById('reg-company').value.trim();
+  const country = document.getElementById('reg-country').value.trim();
+  const optIn = document.getElementById('reg-opt-in').checked;
+
+  if (!optIn) {
+    alert('You must agree to the data storage and usage policies of Thatworkx Solutions.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('register-submit-btn');
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: phone,
+        company,
+        country,
+        opt_in: optIn
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || 'Failed to register account.');
+      return;
+    }
+
+    // Advance to OTP input panel
+    pendingEmail = email;
+    document.getElementById('auth-tabs-container').style.display = 'none';
+    document.getElementById('register-form-panel').style.display = 'none';
+    document.getElementById('otp-verify-panel').style.display = 'flex';
+    document.getElementById('otp-verify-prompt').innerText = `Please enter the 6-digit verification code sent to: ${email}`;
+
+    if (data.dev_otp) {
+      console.log(`[DEV OTP ALERT]: Code is ${data.dev_otp}`);
+      alert(`[SIMULATION] Verification Code sent: ${data.dev_otp}`);
+      document.getElementById('otp-code-input').value = data.dev_otp;
+    }
+  } catch (err) {
+    console.error('Request Register OTP Error:', err);
+    alert('Connection error. Could not request registration OTP.');
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function handleOtpVerification(event) {
+  event.preventDefault();
+  const otp = document.getElementById('otp-code-input').value.trim();
+  const submitBtn = document.getElementById('otp-submit-btn');
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: pendingEmail, otp })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || 'Invalid OTP code.');
       return;
     }
 
@@ -537,12 +661,25 @@ async function handleAuthSubmit(event) {
     }
 
     closeAuthModal();
-    alert(`Successfully ${authMode === 'register' ? 'registered' : 'signed in'} as ${data.user.email}`);
+    alert(`Successfully authenticated as ${data.user.email}`);
   } catch (err) {
-    console.error('Auth submit error:', err);
-    alert('Connection error during authentication.');
+    console.error('Verify OTP Error:', err);
+    alert('Connection error. Verification failed.');
+  } finally {
+    submitBtn.disabled = false;
   }
 }
+
+function cancelOtpVerification() {
+  switchAuthTab(authMode);
+}
+
+// Bind to window scope for onclick & onsubmit event calls
+window.switchAuthTab = switchAuthTab;
+window.handleRequestLoginOtp = handleRequestLoginOtp;
+window.handleRequestRegisterOtp = handleRequestRegisterOtp;
+window.handleOtpVerification = handleOtpVerification;
+window.cancelOtpVerification = cancelOtpVerification;
 
 async function checkAuthSession() {
   const token = localStorage.getItem('aeo_auth_token');
@@ -565,4 +702,5 @@ async function checkAuthSession() {
     console.error('Check session error:', err);
   }
 }
+
 

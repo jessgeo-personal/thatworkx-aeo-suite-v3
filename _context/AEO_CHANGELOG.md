@@ -4,6 +4,17 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.7.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **One-Time Password (OTP) Authentication System**: Shifted user login/registration from password-based hashing to a secure email OTP verification cycle.
+- **Backend OTP & Stripe compatible API Endpoints**:
+  - `POST /api/auth/register` (Alias for `requestRegisterOtp` doing deduplication checks and sending verification code).
+  - `POST /api/auth/login` (Alias for `requestLoginOtp` verifying existence and sending login code).
+  - `POST /api/auth/verify-otp` (Checks verification code, sets `is_verified = true`, and returns signed Bearer session token).
+- **Double-Tab Authentication Modal UI**: Redesigned the auth modal in `index.html` and `index.js` to feature tabs for "Sign In" and "New User" (capturing Company, Phone, Country, Name, and Opt-In checkbox), plus a numeric OTP entry panel.
+- **Mongoose User Model Upgrade**: Expanded schema with `person`, `organization`, `notification`, and `subscription` blocks for Stripe integration readiness.
+
 ## [1.6.1-patch] - 2026-07-22
 
 ### Changed

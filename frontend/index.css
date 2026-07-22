@@ -980,3 +980,95 @@ body {
 .link-btn:hover {
   color: #7dd3fc;
 }
+
+/* Auth tabs styling */
+.auth-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--dark-700);
+}
+.auth-tab-btn {
+  background: none;
+  border: none;
+  color: var(--dark-400);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+.auth-tab-btn:hover {
+  color: #ffffff;
+}
+.auth-tab-btn.active {
+  color: var(--primary-400);
+  border-bottom-color: var(--primary-400);
+}
+
+.opt-in-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  color: var(--dark-400);
+  margin-top: 1rem;
+  cursor: pointer;
+}
+.opt-in-message input {
+  margin-top: 0.15rem;
+}
+
+.auth-form-layout {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.auth-form-layout label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--dark-300);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+.auth-form-layout input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  background-color: rgba(2, 6, 23, 0.8);
+  color: #ffffff;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+.auth-form-layout input:focus {
+  border-color: var(--primary-400);
+}
+
+.flex { display: flex; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.justify-center { justify-content: center; }
+.w-1\/2 { width: 50%; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.border-b { border-bottom-width: 1px; }
+.text-center { text-align: center; }
+.text-muted { color: var(--dark-400); }
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.85rem; }
+.font-semibold { font-weight: 600; }
+.block { display: block; }
+

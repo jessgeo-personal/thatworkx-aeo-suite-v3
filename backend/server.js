@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
 const { generateLlmsTxt, generateAiContextMd, generateCloudflareWorkerJs, generateShopifyLiquid, generateHtaccess } = require('./services/generatorService');
-const { registerUser, loginUser, getCurrentUser } = require('./controllers/authController');
+const { registerUser, loginUser, getCurrentUser, verifyOtp } = require('./controllers/authController');
 const User = require('./models/User');
 const ScanLog = require('./models/ScanLog');
 const DomainProfile = require('./models/DomainProfile');
@@ -134,6 +134,7 @@ app.post('/api/user/tier', async (req, res) => {
 // Authentication & Session Routes
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
+app.post('/api/auth/verify-otp', verifyOtp);
 app.get('/api/auth/me', getCurrentUser);
 
 // Endpoint to build Level 3 Context Maps and Remediation Scripts

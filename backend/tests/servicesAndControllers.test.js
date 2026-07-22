@@ -1,6 +1,6 @@
 const { generateLlmsTxt, generateAiContextMd, generateCloudflareWorkerJs, generateShopifyLiquid, generateHtaccess } = require('../services/generatorService');
 const { parseHtmlMetrics } = require('../services/parserService');
-const { registerUser, loginUser, getCurrentUser } = require('../controllers/authController');
+const { registerUser, loginUser, getCurrentUser, verifyOtp } = require('../controllers/authController');
 const User = require('../models/User');
 
 describe('Services & Controllers Unit Regression Suite', () => {
@@ -78,22 +78,56 @@ describe('Services & Controllers Unit Regression Suite', () => {
   });
 
   describe('Auth Controller Unit Tests', () => {
-    it('Should fail registration if email or password missing', async () => {
+    it('Should fail registration if email or details are missing', async () => {
       const req = { body: {} };
       const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       await registerUser(req, res);
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Email and password are required' }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Email, First Name, Last Name, and Phone Number are required fields.' }));
     });
 
-    it('Should fail login with invalid password', async () => {
-      const mockUser = { email: 'user@test.com', password_hash: 'wronghash' };
-      User.findOne = vi.fn().mockResolvedValue(mockUser);
-      const req = { body: { email: 'user@test.com', password: 'secretpassword' } };
+    it('Should successfully request registration OTP', async () => {
+      User.findOne = vi.fn().mockResolvedValue(null);
+      User.prototype.save = vi.fn().mockImplementation(async function() { return this; });
+
+      const req = {
+        body: {
+          email: 'newuser@test.com',
+          first_name: 'John',
+          last_name: 'Doe',
+          phone_number: '1234567890',
+          opt_in: true
+        }
+      };
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
+      await registerUser(req, res);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, message: 'OTP sent to email address successfully.' }));
+    });
+
+    it('Should fail login OTP request if email does not exist', async () => {
+      User.findOne = vi.fn().mockResolvedValue(null);
+      const req = { body: { email: 'nonexistent@test.com' } };
       const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
       await loginUser(req, res);
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Invalid email or password' }));
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'USER_NOT_FOUND' }));
+    });
+
+    it('Should verify correct OTP and return session token', async () => {
+      const mockUser = {
+        email: 'user@test.com',
+        otp_code: '123456',
+        otp_expires_at: new Date(Date.now() + 600000),
+        is_verified: false,
+        save: vi.fn().mockImplementation(async function() { return this; })
+      };
+      User.findOne = vi.fn().mockResolvedValue(mockUser);
+      const req = { body: { email: 'user@test.com', otp: '123456' } };
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
+      await verifyOtp(req, res);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, token: expect.any(String) }));
     });
   });
 

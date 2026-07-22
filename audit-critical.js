@@ -88,29 +88,44 @@ async function runAudit() {
   let authToken = null;
 
   try {
-    // Attempt authentication (Login / Register fallback)
+    // Attempt authentication (Login / Register fallback followed by OTP verify)
     try {
-      const loginRes = await axios.post(`${serverUrl}/api/auth/login`, {
-        email: auditEmail,
-        password: auditPassword
-      }, { timeout: 3000 });
-      if (loginRes.data && loginRes.data.token) {
-        authToken = loginRes.data.token;
-      }
-    } catch (loginErr) {
+      let otp = null;
       try {
-        const regRes = await axios.post(`${serverUrl}/api/auth/register`, {
-          email: auditEmail,
-          password: auditPassword
+        const loginRes = await axios.post(`${serverUrl}/api/auth/login`, {
+          email: auditEmail
         }, { timeout: 3000 });
-        if (regRes.data && regRes.data.token) {
-          authToken = regRes.data.token;
+        if (loginRes.data && loginRes.data.dev_otp) {
+          otp = loginRes.data.dev_otp;
         }
-      } catch (regErr) {
-        // Fallback mock token generation
-        const payload = { email: auditEmail, tier: 'AIVisualize Pro', issuedAt: Date.now() };
-        authToken = Buffer.from(JSON.stringify(payload)).toString('base64');
+      } catch (loginErr) {
+        try {
+          const regRes = await axios.post(`${serverUrl}/api/auth/register`, {
+            email: auditEmail,
+            first_name: 'Audit',
+            last_name: 'PM',
+            phone_number: '1234567890',
+            opt_in: true
+          }, { timeout: 3000 });
+          if (regRes.data && regRes.data.dev_otp) {
+            otp = regRes.data.dev_otp;
+          }
+        } catch (regErr) {
+          // Handled below by fallback
+        }
       }
+
+      if (otp) {
+        const verifyRes = await axios.post(`${serverUrl}/api/auth/verify-otp`, {
+          email: auditEmail,
+          otp: otp
+        }, { timeout: 3000 });
+        if (verifyRes.data && verifyRes.data.token) {
+          authToken = verifyRes.data.token;
+        }
+      }
+    } catch (authErr) {
+      // Fallback below
     }
 
     if (!authToken) {

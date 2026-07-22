@@ -25,11 +25,12 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Machine Context Manifest Builder** | Generator Engine | `generatorService.js` | Compiles flat-text `/llms.txt` and `/ai-context.md` markdown manifests | `PASS 🟢` |
 | **Edge Script Generator (Shopify/Htaccess)** | Generator Engine | `generatorService.js` | Compiles Cloudflare Worker JS, Shopify Liquid, and WordPress `.htaccess` | `PASS 🟢` |
 | **One-Click Manifest File Download** | UI Utility | `index.js` | Triggers client-side `.txt` and `.md` file download from code viewport | `PASS 🟢` |
-| **User Registration & Hashing** | Auth Controller | `authController.js` | Hashes passwords with SHA256 and persists user records to native MongoDB | `PASS 🟢` |
-| **User Login & Session Token** | Auth Controller | `authController.js` | Authenticates credentials and returns signed session Bearer tokens | `PASS 🟢` |
+| **OTP User Registration & Deduplication** | Auth Controller | `authController.js` | Checks existence and sends registration verification OTP | `PASS 🟢` |
+| **OTP User Login Request** | Auth Controller | `authController.js` | Generates and sends OTP if user profile exists | `PASS 🟢` |
+| **OTP Code Verification & Token Issue** | Auth Controller | `authController.js` | Validates OTP and issues JWT Bearer session token | `PASS 🟢` |
 | **Top Bar Auth Indicator & Modal** | UI Component | `index.html` | Renders top navigation Sign In trigger and interactive auth-modal overlay | `PASS 🟢` |
 | **Sidebar Citation Attribution Widget** | UI Sidebar | `index.html` | Renders `AI Visibility & Share of Voice` sidebar card with affiliate link binding | `PASS 🟢` |
-| **End-to-End Vitest Module Suite** | Automated Tests | `servicesAndControllers.test.js` | 14/14 tests pass covering generator, parser, auth & crawler gating | `PASS 🟢` |
+| **End-to-End Vitest Module Suite** | Automated Tests | `servicesAndControllers.test.js` | 16/16 tests pass covering generator, parser, OTP auth & crawler gating | `PASS 🟢` |
 | **Twelve-Factor Staging Pre-Flight** | Deployment Package | `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` | Validates environment variables and container deployment blueprint | `PASS 🟢` |
 | **URL Optional Protocol Input** | Input Validation | `index.js` & `server.js` | User can submit URL with or without http/https protocol prefix | `PASS 🟢` |
 

@@ -6,10 +6,6 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  password_hash: {
-    type: String,
-    default: ''
-  },
   subscription_tier: {
     type: String,
     enum: [
@@ -33,6 +29,40 @@ const UserSchema = new mongoose.Schema({
   last_active_date: {
     type: Date,
     default: Date.now
+  },
+
+  // OTP auth details
+  otp_code: {
+    type: String,
+    default: ''
+  },
+  otp_expires_at: {
+    type: Date,
+    default: null
+  },
+  is_verified: {
+    type: Boolean,
+    default: false
+  },
+
+  // Stripe compatible custom fields
+  person: {
+    first_name: { type: String, default: '' },
+    last_name: { type: String, default: '' },
+    phone_number: { type: String, default: '' },
+    country: { type: String, default: '' }
+  },
+  organization: {
+    company_name: { type: String, default: '' }
+  },
+  notification: {
+    email_alerts: { type: Boolean, default: true },
+    sms_alerts: { type: Boolean, default: false }
+  },
+  subscription: {
+    stripe_customer_id: { type: String, default: '' },
+    stripe_subscription_id: { type: String, default: '' },
+    status: { type: String, default: 'inactive' } // active, trialing, past_due, canceled, inactive
   }
 });
 
