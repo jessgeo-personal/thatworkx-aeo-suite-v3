@@ -46,6 +46,8 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Multi-Agent Pod Manifest Lock** | Quality Control | `AEO_MULTI_AGENT_POD_MANIFEST.md` | Declares roles, communication rules, and constraint bounds for 5 agents | `PASS 🟢` |
 | **Multi-Agent Persona Protocol** | Interface Output | Chat Console | Outputs responses prefixed with active agent headers and actor tracking | `PASS 🟢` |
 | **Scanned Routes Count Badge** | Scanned Paths UI | `index.html` & `index.js` | Displays "Pulled X of Y pages" at the top of the Scanned Routes card | `PASS 🟢` |
+| **AIOptimize Tabbed Remediation Controls** | Sandbox UI | `index.html` & `index.css` | Combines vertical controls sidebar into a unified card with horizontal header tabs | `PASS 🟢` |
+| **Semrush Direct Query Interpolation** | Referral Gate | `index.js` | Parses the scanned domain from the results and updates the link with it | `PASS 🟢` |
 
 
 

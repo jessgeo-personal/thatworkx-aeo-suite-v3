@@ -337,6 +337,18 @@ function displayScanResults(results) {
     `;
     tbody.appendChild(row);
   });
+
+  // Update Semrush link with target URL hostname
+  const semrushBtn = document.getElementById('semrush-direct-btn');
+  if (semrushBtn && results.url) {
+    try {
+      const parsed = new URL(results.url);
+      const host = parsed.hostname;
+      semrushBtn.href = `https://www.semrush.com/analytics/overview/?search=${host}&utm_source=thatworkx_aeo&utm_medium=affiliate&utm_campaign=share_of_voice`;
+    } catch (e) {
+      // Fallback if URL parsing fails
+    }
+  }
 }
 
 function updateChecklistStatus(elementId, value) {

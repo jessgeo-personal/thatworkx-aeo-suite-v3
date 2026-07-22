@@ -365,39 +365,33 @@
 
     <!-- THREAD A & B: AI Optimize Viewport (Interactive Generation Sandbox) -->
     <section id="panel-optimize" class="product-panel">
-      <div class="optimize-workspace-grid">
+      <div class="dashboard-card glassmorphic">
         
-        <!-- Sidebar Controls -->
-        <div class="dashboard-card glassmorphic">
-          <h3>Remediation Controls</h3>
-          <p class="subtitle">Select your optimization sandbox asset tool.</p>
-          
-          <div class="control-menu">
+        <!-- Remediation Header & Tabs Row -->
+        <div class="optimize-header-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <!-- Tabs container -->
+          <div class="optimize-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">🛡️ Robots.txt Optimizer</button>
-            <button class="control-menu-item" id="menu-manifests" onclick="switchOptimizeTool('manifests')">📄 /llms.txt & /ai-context.md Manifests</button>
-            <button class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">☁️ Cloudflare Edge Worker</button>
-            <button class="control-menu-item" id="menu-edge" onclick="switchOptimizeTool('edge')">⚡ Shopify & WordPress Edge Script</button>
-            <button class="control-menu-item" id="menu-schema" onclick="switchOptimizeTool('schema')">📦 JSON-LD Schema Generator</button>
+            <button class="control-menu-item" id="menu-manifests" onclick="switchOptimizeTool('manifests')">📄 /llms.txt & /ai-context.md</button>
+            <button class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">☁️ Cloudflare Worker</button>
+            <button class="control-menu-item" id="menu-edge" onclick="switchOptimizeTool('edge')">⚡ Edge Script</button>
+            <button class="control-menu-item" id="menu-schema" onclick="switchOptimizeTool('schema')">📦 JSON-LD Generator</button>
           </div>
 
-          <!-- THREAD A: AI Visibility Tracking & Share of Voice Sidebar Callout Box -->
-          <div class="sidebar-callout-box mt-4 glassmorphic border-glow-sky" id="sidebar-share-of-voice">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xl">📈</span>
-              <h4 class="text-sm font-semibold text-white">AI Visibility & Share of Voice</h4>
+          <!-- Semrush Quick Trigger Link -->
+          <div class="optimize-semrush-action" style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="text-align: right; display: flex; flex-direction: column;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: #ffffff;">AI Visibility & Share of Voice</span>
+              <span style="font-size: 0.7rem; color: var(--dark-400);">No local compute overhead</span>
             </div>
-            <p class="text-xs text-muted mb-3" style="color: var(--dark-300); font-size: 0.8rem; line-height: 1.4;">
-              Track live brand citation percentages & keyword SOV across ChatGPT, Claude & Perplexity without local compute overhead.
-            </p>
-            <a href="https://www.semrush.com/?utm_source=thatworkx_aeo&utm_medium=affiliate&utm_campaign=share_of_voice" target="_blank" rel="noopener noreferrer" class="affiliate-btn glowing-btn text-xs w-full text-center block py-2 rounded" style="width: 100%; box-sizing: border-border-box; display: block; text-align: center;">
-              Track Citations on Semrush →
+            <a id="semrush-direct-btn" href="https://www.semrush.com/?utm_source=thatworkx_aeo&utm_medium=affiliate&utm_campaign=share_of_voice" target="_blank" rel="noopener noreferrer" class="affiliate-btn glowing-btn text-xs" style="padding: 0.6rem 1rem; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center;">
+              Track on Semrush ↗
             </a>
           </div>
         </div>
 
-        <!-- Workspace Canvas -->
-        <div class="dashboard-card glassmorphic col-span-2">
-          
+        <!-- Workspace Canvas Views -->
+        <div class="optimize-body-content">
           <!-- Robots Sandbox -->
           <div id="opt-tool-robots" class="optimize-tool-view active">
             <h3>Interactive Bot Permission Sandbox</h3>
@@ -540,8 +534,8 @@
               <pre class="code-view" id="code-htaccess"></pre>
             </div>
           </div>
-
         </div>
+
       </div>
     </section>
 

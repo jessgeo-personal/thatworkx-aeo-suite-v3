@@ -4,6 +4,12 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.14.0-sprint8-patch] - 2026-07-22
+
+### Changed
+- **Optimize Tabbed Layout Refactor**: Combined the vertical remediation controls sidebar and the workspace canvas card into a single unified workspace card. Buttons are now styled as horizontal tabs at the top of the canvas.
+- **Semrush Link Direct Interpolation**: Moved "AI Visibility & Share of Voice" to the top-right header row. Updated the dynamic click trigger to automatically parse the scanned domain from the results and pre-fill Semrush's search query parameter on click.
+
 ## [1.13.0-sprint8-patch] - 2026-07-22
 
 ### Added
