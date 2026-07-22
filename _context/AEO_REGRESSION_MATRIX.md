@@ -48,6 +48,7 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Scanned Routes Count Badge** | Scanned Paths UI | `index.html` & `index.js` | Displays "Pulled X of Y pages" at the top of the Scanned Routes card | `PASS 🟢` |
 | **AIOptimize Tabbed Remediation Controls** | Sandbox UI | `index.html` & `index.css` | Combines vertical controls sidebar into a unified card with horizontal header tabs | `PASS 🟢` |
 | **Semrush Direct Query Interpolation** | Referral Gate | `index.js` | Parses the scanned domain from the results and updates the link with it | `PASS 🟢` |
+| **Semrush Redirection Safety Disclaimer Modal** | Referral Gate | `index.html` & `index.js` | Shows a safety/terms modal warning users when they trigger the Semrush affiliate link | `PASS 🟢` |
 
 
 

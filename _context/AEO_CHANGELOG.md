@@ -4,6 +4,15 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.15.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Semrush Disclaimer Modal**: Introduced `#semrush-disclaimer-modal` to present a safety/terms disclaimer warning users that they are navigating to a third-party affiliate site where their AEO subscription package does not apply. Includes secondary confirmation and cancel button hooks.
+
+### Changed
+- **Affiliate Section Relocation**: Moved the "AI Visibility & Share of Voice" section from the tab row into a dedicated dashed card positioned at the bottom of the AI Optimize section (below the main workspace card).
+- **Semrush Tool Destination Alignment**: Updated target destination from the SEO Overview dashboard to Semrush's official AI Visibility product landing page (`/ai-visibility/`).
+
 ## [1.14.0-sprint8-patch] - 2026-07-22
 
 ### Changed

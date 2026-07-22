@@ -338,13 +338,13 @@ function displayScanResults(results) {
     tbody.appendChild(row);
   });
 
-  // Update Semrush link with target URL hostname
-  const semrushBtn = document.getElementById('semrush-direct-btn');
-  if (semrushBtn && results.url) {
+  // Update Semrush link in confirmation modal with affiliate campaign tags
+  const semrushConfirmBtn = document.getElementById('semrush-confirm-proceed-btn');
+  if (semrushConfirmBtn && results.url) {
     try {
       const parsed = new URL(results.url);
       const host = parsed.hostname;
-      semrushBtn.href = `https://www.semrush.com/analytics/overview/?search=${host}&utm_source=thatworkx_aeo&utm_medium=affiliate&utm_campaign=share_of_voice`;
+      semrushConfirmBtn.href = `https://www.semrush.com/ai-visibility/?utm_source=thatworkx_aeo&utm_medium=affiliate&utm_campaign=share_of_voice`;
     } catch (e) {
       // Fallback if URL parsing fails
     }
@@ -1014,5 +1014,23 @@ function closeHelpModal() {
 window.showHelpModal = showHelpModal;
 window.closeHelpModal = closeHelpModal;
 window.auditSinglePage = auditSinglePage;
+
+function openSemrushDisclaimer(event) {
+  if (event) event.preventDefault();
+  const modal = document.getElementById('semrush-disclaimer-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeSemrushDisclaimer() {
+  const modal = document.getElementById('semrush-disclaimer-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+window.openSemrushDisclaimer = openSemrushDisclaimer;
+window.closeSemrushDisclaimer = closeSemrushDisclaimer;
 
 
