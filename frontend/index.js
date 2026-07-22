@@ -131,6 +131,14 @@ async function executeScan(event) {
     // Populate Results Board
     displayScanResults(data.results);
 
+    // Hide onboarding hero and show normal navigation headers + scan inputs
+    const onboardingHero = document.getElementById('onboarding-hero');
+    if (onboardingHero) onboardingHero.style.display = 'none';
+    const scanInputCard = document.getElementById('scan-input-card');
+    if (scanInputCard) scanInputCard.style.display = 'block';
+    const toggleHeader = document.getElementById('toggle-container-header');
+    if (toggleHeader) toggleHeader.style.display = 'flex';
+
     // Trigger Anti-Blocking Cooldown Safe Mode
     startCooldown(60);
 
@@ -1032,5 +1040,61 @@ function closeSemrushDisclaimer() {
 
 window.openSemrushDisclaimer = openSemrushDisclaimer;
 window.closeSemrushDisclaimer = closeSemrushDisclaimer;
+
+let modalProductMode = 'visualize'; // Default onboarding modal target
+
+function openUrlModal(mode) {
+  modalProductMode = mode;
+  const modal = document.getElementById('url-ingest-modal');
+  const title = document.getElementById('url-modal-title');
+  const subtitle = document.getElementById('url-modal-subtitle');
+  const icon = document.getElementById('url-modal-icon');
+  
+  if (modal) {
+    if (mode === 'visualize') {
+      title.innerText = "Let's show you what AI can see";
+      subtitle.innerText = "Enter your domain URL to inspect crawl visibility and protocol blocks.";
+      icon.innerText = "🔍";
+    } else if (mode === 'optimize') {
+      title.innerText = "Optimizing for AI-Ready & AI-First";
+      subtitle.innerText = "Enter your domain URL to generate custom schema, robots, and workers.";
+      icon.innerText = "⚡";
+    }
+    modal.style.display = 'flex';
+  }
+}
+
+function closeUrlModal() {
+  const modal = document.getElementById('url-ingest-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+async function handleModalScanSubmit(event) {
+  event.preventDefault();
+  
+  const modalUrl = document.getElementById('modal-target-url').value.trim();
+  if (!modalUrl) return;
+  
+  // Close modal
+  closeUrlModal();
+  
+  // Set main input value
+  const mainInput = document.getElementById('target-url');
+  if (mainInput) {
+    mainInput.value = modalUrl;
+  }
+  
+  // Route state to correct active product panel BEFORE executing scan
+  switchProduct(modalProductMode);
+  
+  // Run scan using the main scan trigger
+  await executeScan(event);
+}
+
+window.openUrlModal = openUrlModal;
+window.closeUrlModal = closeUrlModal;
+window.handleModalScanSubmit = handleModalScanSubmit;
 
 

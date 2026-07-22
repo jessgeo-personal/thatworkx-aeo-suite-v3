@@ -19,7 +19,7 @@
       <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
     </div>
     
-    <div class="toggle-container">
+    <div class="toggle-container" id="toggle-container-header" style="display: none;">
       <button class="toggle-btn active" id="btn-visualize" onclick="switchProduct('visualize')">AI Visualize (Inquire)</button>
       <button class="toggle-btn" id="btn-optimize" onclick="switchProduct('optimize')">AI Optimize (Treat)</button>
     </div>
@@ -43,8 +43,57 @@
   <!-- Main Application Workspace -->
   <main class="app-container">
 
+    <!-- Educational Onboarding Hero -->
+    <section id="onboarding-hero" class="onboarding-card glassmorphic">
+      <div class="onboarding-hero-content">
+        <h1>Do you know if AI can see you?</h1>
+        <p class="onboarding-subtext">
+          Your brand presence is defined by what you make public. Right now, an estimated <strong>35% of the internet</strong> is unknowingly blocking AI crawlers through CDN, edge proxy, and firewall misconfigurations.
+        </p>
+        <h2 class="onboarding-call-to-action">What would you like to do today? Let's start here...</h2>
+
+        <div class="onboarding-cards-grid">
+          <!-- Card 1: AIVisualize -->
+          <div class="onboarding-select-card card-visualize-bg" onclick="openUrlModal('visualize')">
+            <div class="card-icon">🔍</div>
+            <h3>Let's show you what AI can see</h3>
+            <ul class="card-feature-list">
+              <li>Are you blocking out AI?</li>
+              <li>Is your web presence optimized for AI?</li>
+              <li>Is your content AI-Ready?</li>
+              <li>Are you setup to be AI-First?</li>
+            </ul>
+            <button class="teaser-btn w-full mt-auto">Inspect Crawl Visibility →</button>
+          </div>
+
+          <!-- Card 2: AIOptimize -->
+          <div class="onboarding-select-card card-optimize-bg" onclick="openUrlModal('optimize')">
+            <div class="card-icon">⚡</div>
+            <h3>If you already know that you are AI-ready, let's show you how to be Optimized for AI</h3>
+            <ul class="card-feature-list">
+              <li>Optimizing for AI-Ready</li>
+              <li>Optimizing for AI-First</li>
+            </ul>
+            <button class="teaser-btn w-full mt-auto">Configure Assets & Schema →</button>
+          </div>
+
+          <!-- Card 3: AISocialize -->
+          <div class="onboarding-select-card card-socialize-bg coming-soon-card">
+            <div class="coming-soon-badge">COMING SOON</div>
+            <div class="card-icon">🔗</div>
+            <h3>Go further, ensure your social footprint is Optimized for AI</h3>
+            <ul class="card-feature-list">
+              <li>Domain AI-ready for social?</li>
+              <li>Elevate Social to AI-Ready</li>
+            </ul>
+            <button class="teaser-btn w-full mt-auto" disabled style="opacity: 0.5; cursor: not-allowed;">Build Social Trust Bridges</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Input Form Segment -->
-    <section class="scan-input-card glassmorphic">
+    <section class="scan-input-card glassmorphic" id="scan-input-card" style="display: none;">
       <h2>Analyze Your AI Search Index Footprint</h2>
       <p class="subtitle">Evaluate and optimize your web presence structure for AI bots, RAG chunkers, and answer engines.</p>
       
@@ -626,6 +675,32 @@
           I Understand, Proceed →
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- URL Ingest Modal -->
+  <div id="url-ingest-modal" class="modal-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 1000;">
+    <div class="modal-card glassmorphic border-glow-sky" style="text-align: left; max-width: 500px; padding: 2.5rem 2rem;">
+      <span class="modal-close" onclick="closeUrlModal()">×</span>
+      <div class="modal-icon" style="text-align: center; margin-bottom: 0.8rem; font-size: 2.2rem;" id="url-modal-icon">🔍</div>
+      <h3 style="text-align: center; margin-bottom: 0.5rem; color: #ffffff;" id="url-modal-title">Let's show you what AI can see</h3>
+      <p style="text-align: center; font-size: 0.85rem; color: var(--dark-400); margin-bottom: 1.5rem;" id="url-modal-subtitle">Enter your domain URL to inspect crawl visibility and protocol blocks.</p>
+      
+      <form id="modal-scan-form" onsubmit="handleModalScanSubmit(event)" class="form-layout" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-wrapper" style="width: 100%;">
+          <span class="input-icon">🔗</span>
+          <input type="text" id="modal-target-url" placeholder="https://example.com" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 1rem;">
+          <button type="button" class="control-menu-item" onclick="closeUrlModal()" style="padding: 0.6rem 1.5rem; text-align: center; border-radius: 8px; width: 100%;">
+            Cancel
+          </button>
+          <button type="submit" class="submit-btn glowing-btn text-xs" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; width: 100%;" id="modal-submit-btn">
+            <span>Start Audit</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

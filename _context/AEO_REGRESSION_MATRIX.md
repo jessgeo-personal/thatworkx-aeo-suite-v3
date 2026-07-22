@@ -49,6 +49,8 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **AIOptimize Tabbed Remediation Controls** | Sandbox UI | `index.html` & `index.css` | Combines vertical controls sidebar into a unified card with horizontal header tabs | `PASS 🟢` |
 | **Semrush Direct Query Interpolation** | Referral Gate | `index.js` | Parses the scanned domain from the results and updates the link with it | `PASS 🟢` |
 | **Semrush Redirection Safety Disclaimer Modal** | Referral Gate | `index.html` & `index.js` | Shows a safety/terms modal warning users when they trigger the Semrush affiliate link | `PASS 🟢` |
+| **Educational Onboarding Homepage Hero** | Onboarding UI | `index.html` & `index.css` | Displays educational landing page citing the 35% blocking statistic | `PASS 🟢` |
+| **URL Ingest Modal & Dashboard Router** | Onboarding UI | `index.html` & `index.js` | Launches ingestion modal on card clicks and routes state to appropriate dashboard | `PASS 🟢` |
 
 
 

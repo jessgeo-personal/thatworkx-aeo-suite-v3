@@ -32,7 +32,14 @@
          └── content.md (Long-Form Case Studies & Narrative Vault)
 
 ## Product Strategy
-* The idea is to provide 3 products that work together to complete the AI-first approach, focused on different business roles that are required to work together to ensure an entity's web presence is optimized for AEO/GEO.
+* **Top-of-Funnel Onboarding Hook:** Educate incoming users that an estimated **35% of the internet is unknowingly blocking AI crawlers** through CDN, edge proxy, and firewall misconfigurations. The user journey starts with this question to create immediate diagnostic urgency.
+* **The 3-Pillar Onboarding Route:** The homepage guides visitors through three distinct action cards:
+  1. **AI Visualize (Inquire):** Inspect visibility and check if you are blocking out AI.
+  2. **AI Optimize (Treat):** Correct visibility gaps and configure your assets to be AI-Ready and AI-First.
+  3. **AI Socialize (Amplify):** Enhance external trust anchors and connect social signatures to your domain.
+* **AI-Ready vs. AI-First Categorization:**
+  - **AI-Ready:** Enforces baseline access parameters (CDN config, Robots.txt splits, x-robots tags, heading structure, SSL trust).
+  - **AI-First:** Establishes semantic, machine-readable manifest trees (`/llms.txt`, `/ai-context.md`, flat-text folder workspaces).
 
 * Free vs. paid: Features included in the free versions are to give users an understanding of their web presence status with regards to AEO/GEO and what they can get if they upgrade to Pro or Enterprise.  Free versions will not have heavy headless browser runs or AI summaries.  They will include programmatic and text parsed pulls only.  Free versions will also have limited tries per day and limited scope as well.  Pro versions will include higher limits per day (tries per day and number of pages) and include a certain number of headless runs per day.  Enteprise version will be for hardcore users with custom limits.  Headless runs should be done only on-demand, but if the run is made, it should update the whole site in one go and have timeouts.
 

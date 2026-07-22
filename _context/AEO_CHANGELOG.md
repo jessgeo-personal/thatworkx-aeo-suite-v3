@@ -4,6 +4,17 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.16.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Educational Onboarding Hero Layout**: Overhauled landing experience by displaying a new full-width hero `#onboarding-hero` posing the question "Do you know if AI can see you?" and citing the 35% blocking statistic.
+- **Onboarding Cards Selection Grid**: Built three large responsive action cards representing AIVisualize, AIOptimize, and AISocialize with feature checklists and coming soon markers.
+- **URL Ingestion modal**: Integrated `#url-ingest-modal` triggering dynamic URL audits on Card click.
+
+### Changed
+- **Pivoted Landing Experience**: Hidden the main crawler scanner card `#scan-input-card` and main product selection tabs from the navigation header by default until the first audit run finishes.
+- **Product Strategy realign**: Updated `_context/AEO_BUSINESS_STRATEGY.md` with new onboarding flows and AI-ready vs AI-first framework.
+
 ## [1.15.0-sprint8-patch] - 2026-07-22
 
 ### Added
