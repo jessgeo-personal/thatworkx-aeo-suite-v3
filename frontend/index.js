@@ -46,15 +46,49 @@ function switchProduct(productName) {
   }
 }
 
+// Optimize master tracks switcher
+function switchOptimizeTrack(trackNum) {
+  // Update master track buttons active state
+  document.querySelectorAll('.optimize-master-tabs .control-menu-item').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`btn-track${trackNum}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Toggle sub-tab selectors
+  if (trackNum === 1) {
+    document.getElementById('optimize-track1-subtabs').style.display = 'block';
+    document.getElementById('optimize-track2-subtabs').style.display = 'none';
+    switchOptimizeTool('robots');
+  } else {
+    document.getElementById('optimize-track1-subtabs').style.display = 'none';
+    document.getElementById('optimize-track2-subtabs').style.display = 'block';
+    switchOptimizeTool('llmstxt');
+  }
+}
+
 // Optimize tool panels switcher
 function switchOptimizeTool(toolName) {
   activeOptimizeTool = toolName;
-  document.querySelectorAll('.control-menu-item').forEach(item => item.classList.remove('active'));
-  document.getElementById(`menu-${toolName}`).classList.add('active');
+  document.querySelectorAll('.optimize-tabs .control-menu-item').forEach(item => item.classList.remove('active'));
+  
+  const activeMenu = document.getElementById(`menu-${toolName}`);
+  if (activeMenu) {
+    activeMenu.classList.add('active');
+  }
 
   document.querySelectorAll('.optimize-tool-view').forEach(view => view.classList.remove('active'));
-  document.getElementById(`opt-tool-${toolName}`).classList.add('active');
+  const activeView = document.getElementById(`opt-tool-${toolName}`);
+  if (activeView) {
+    activeView.classList.add('active');
+  }
+  
+  // Trigger file content generation if target domain is active
+  if (['llmstxt', 'aicontext', 'about', 'docs', 'content', 'sitemap'].includes(toolName)) {
+    generateTrack2File(toolName);
+  }
 }
+
+window.switchOptimizeTrack = switchOptimizeTrack;
+window.switchOptimizeTool = switchOptimizeTool;
 
 // Quota and plan sync
 async function updateUserTier() {
@@ -244,11 +278,102 @@ function displayScanResults(results) {
 
   // Checklist Items Status Update
   updateChecklistStatus('chk-robots', results.status.robotsTxtExists);
+  updateChecklistStatus('chk-sitemap', results.status.sitemapExists);
+  updateChecklistStatus('chk-xrobots', results.status.xRobotsIndexable);
+  updateChecklistStatus('chk-spatrap', !results.status.spaTrapDetected);
+  updateChecklistStatus('chk-ssl', results.url ? results.url.startsWith('https') : false);
+  
+  updateChecklistStatus('chk-title', results.status.seoOptimalTitle);
+  updateChecklistStatus('chk-desc', results.status.seoOptimalDesc);
+  updateChecklistStatus('chk-heading', results.status.hasProperHierarchy);
+  updateChecklistStatus('chk-readability', results.status.readabilityRating === 'Optimal');
+  
   updateChecklistStatus('chk-llmstxt', results.status.llmsTxtExists);
   updateChecklistStatus('chk-aicontext', results.status.aiContextExists);
-  updateChecklistStatus('chk-sitemap', results.status.sitemapExists);
-  updateChecklistStatus('chk-heading', results.status.hasProperHierarchy);
-  updateChecklistStatus('chk-title', results.status.seoOptimalTitle);
+  updateChecklistStatus('chk-schema', results.status.jsonLdExists);
+  
+  const narrativeFilesOk = (results.status.aboutTxtExists && results.status.docsTxtExists && results.status.contentTxtExists);
+  updateChecklistStatus('chk-narrative-files', narrativeFilesOk);
+
+  // Content density val
+  const densityValEl = document.getElementById('density-val');
+  if (densityValEl && results.status.contentDensityRatio !== undefined) {
+    densityValEl.innerText = `${results.status.contentDensityRatio}%`;
+  }
+
+  // Section 1 Status Badge
+  const secStatus1 = document.getElementById('sec-status-1');
+  if (secStatus1) {
+    const isAllBotAllowed = results.status.botPermissions && 
+                             results.status.botPermissions.gptBot && 
+                             results.status.botPermissions.perplexityBot && 
+                             results.status.botPermissions.claudeBot && 
+                             results.status.botPermissions.googleExtended;
+    if (results.status.robotsTxtExists && isAllBotAllowed) {
+      secStatus1.innerText = '🟢 Pass';
+      secStatus1.className = 'gateway-badge badge-handshake';
+    } else if (results.status.robotsTxtExists && !isAllBotAllowed) {
+      secStatus1.innerText = '🟡 Partial Block';
+      secStatus1.className = 'gateway-badge badge-hidden';
+    } else {
+      secStatus1.innerText = '🔴 Blocked / Missing';
+      secStatus1.className = 'gateway-badge badge-blindness';
+    }
+  }
+
+  // Section 2 Status Badge
+  const secStatus2 = document.getElementById('sec-status-2');
+  if (secStatus2) {
+    const sitemapOk = results.status.sitemapExists;
+    const xRobotsOk = results.status.xRobotsIndexable;
+    const spaOk = !results.status.spaTrapDetected;
+    const sslOk = results.url ? results.url.startsWith('https') : false;
+    
+    if (sitemapOk && xRobotsOk && spaOk && sslOk) {
+      secStatus2.innerText = '🟢 Optimized';
+      secStatus2.className = 'gateway-badge badge-handshake';
+    } else if (!xRobotsOk) {
+      secStatus2.innerText = '🔴 Blocked (x-robots)';
+      secStatus2.className = 'gateway-badge badge-blindness';
+    } else {
+      secStatus2.innerText = '🟡 Needs Optimization';
+      secStatus2.className = 'gateway-badge badge-hidden';
+    }
+  }
+
+  // Section 3 Status Badge
+  const secStatus3 = document.getElementById('sec-status-3');
+  if (secStatus3) {
+    const titleOk = results.status.seoOptimalTitle;
+    const descOk = results.status.seoOptimalDesc;
+    const headingOk = results.status.hasProperHierarchy;
+    const readabilityOk = results.status.readabilityRating === 'Optimal';
+    
+    if (titleOk && descOk && headingOk && readabilityOk) {
+      secStatus3.innerText = '🟢 AI-Ready';
+      secStatus3.className = 'gateway-badge badge-handshake';
+    } else {
+      secStatus3.innerText = '🟡 Quality Alerts';
+      secStatus3.className = 'gateway-badge badge-hidden';
+    }
+  }
+
+  // Section 4 Status Badge
+  const secStatus4 = document.getElementById('sec-status-4');
+  if (secStatus4) {
+    const llmsOk = results.status.llmsTxtExists;
+    const contextOk = results.status.aiContextExists;
+    const schemaOk = results.status.jsonLdExists;
+    const narrativeOk = (results.status.aboutTxtExists && results.status.docsTxtExists && results.status.contentTxtExists);
+    
+    if (llmsOk && contextOk && schemaOk && narrativeOk) {
+      secStatus4.innerText = '🟢 AI-First';
+      secStatus4.className = 'gateway-badge badge-handshake';
+    } else {
+      secStatus4.innerText = '🟡 Missing Manifests';
+      secStatus4.className = 'gateway-badge badge-hidden';
+    }
+  }
 
   // Alerts
   const alertsContainer = document.getElementById('alerts-container');
@@ -1093,8 +1218,32 @@ async function handleModalScanSubmit(event) {
   await executeScan(event);
 }
 
+async function generateTrack2File(type) {
+  const domainInput = document.getElementById(`${type}-domain`) || document.getElementById('target-url');
+  let domain = domainInput ? domainInput.value || 'example.com' : 'example.com';
+  domain = domain.replace(/^https?:\/\//i, '').split('/')[0];
+  
+  const codeEl = document.getElementById(`code-${type}`);
+  if (!codeEl) return;
+  
+  try {
+    const res = await fetch('/api/generator/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domainName: domain, targetType: type })
+    });
+    const d = await res.json();
+    if (d.code) {
+      codeEl.innerText = d.code;
+    }
+  } catch (err) {
+    console.error(`Error generating ${type}:`, err);
+  }
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
+window.generateTrack2File = generateTrack2File;
 
 

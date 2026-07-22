@@ -51,9 +51,7 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Semrush Redirection Safety Disclaimer Modal** | Referral Gate | `index.html` & `index.js` | Shows a safety/terms modal warning users when they trigger the Semrush affiliate link | `PASS 🟢` |
 | **Educational Onboarding Homepage Hero** | Onboarding UI | `index.html` & `index.css` | Displays educational landing page citing the 35% blocking statistic | `PASS 🟢` |
 | **URL Ingest Modal & Dashboard Router** | Onboarding UI | `index.html` & `index.js` | Launches ingestion modal on card clicks and routes state to appropriate dashboard | `PASS 🟢` |
-
-
-
-
-
-
+| **AIVisualize 4 Section Grid Cards** | Dashboard UI | `index.html` | Groups diagnostic results into Section 1-4 cards with pass/fail metrics | `PASS 🟢` |
+| **AIOptimize Master Track Layout** | Sandbox UI | `index.html` | Separates remediation tools into Track 1 (Page Fixes) and Track 2 (File Generators) | `PASS 🟢` |
+| **Track 2 Extended File Generators** | Generator Engine | `generatorService.js` | Generates /about.md, /docs.md, /content.md, and sitemap.xml files | `PASS 🟢` |
+| **Section 4 Narrative Manifest Check** | Crawler Engine | `crawlerService.js` | Audits existence of about.md, docs.md, and content.md on target domain origin | `PASS 🟢` |

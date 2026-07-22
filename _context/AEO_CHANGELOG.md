@@ -4,6 +4,18 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.17.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Track 2 Expanded Manifest Generators**: Added generator methods in `generatorService.js` and server routes in `server.js` for `/about.md`, `/docs.md`, `/content.md`, and `sitemap.xml`.
+- **BDD Integration Suite for Categorization**: Created `backend/tests/bdd/dashboardCategorization.test.js` to assert Section 4 crawling and Track 2 generation.
+- **Narrative Manifest Dynamic Crawl**: Updated `crawlerService.js` to run live http fetch checks on target domain origins for `/about.md`, `/docs.md`, and `/content.md`.
+
+### Changed
+- **AIVisualize Sections Refactor**: Reorganized metrics and checklist items into 4 distinct educational cards matching Section 1 (Are you blocking out AI?), Section 2 (Is web presence optimized?), Section 3 (Is content AI-Ready?), and Section 4 (Are you setup to be AI-First?).
+- **AIOptimize Master Tracks Refactor**: Overhauled workspace canvas to separate functions into two master rows: Track 1 (AI-Ready Page Fixes) and Track 2 (AI-First File Generators) with horizontal sub-tabs and 6 dedicated canvas view generator drawers.
+- **Strategy & Plan Update**: Integrated metric and visual track divisions across `AEO_USER_CAPABILITIES_V1.md`, `AEO_BUSINESS_STRATEGY.md`, and `AEO_MASTER_PROJECT_PLAN.md`.
+
 ## [1.16.0-sprint8-patch] - 2026-07-22
 
 ### Added

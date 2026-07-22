@@ -1,0 +1,16 @@
+[DIRECTIVE: FEATURE]
+TASK TITLE: Implementing RESEND API For OTP email sendouts
+PRIORITY: Medium
+
+---
+
+DESCRIPTION OF REQUESTED CHANGE:
+I would like to implement the OTP email sendouts using the Resent API that I have.  Remove the current mock flow which fills in the OTP automatically and performs authentication and Implement the required changes to recieve the email notification. Confirm where I should provide the RESEND API details for authentication and format of the email that should be sent.  I have a sample email that was sent earlier.
+
+EXPECTED PIPELINE EXECUTION:
+1. Stage 1: Print plain-English BDD test cases and file modification list, then HALT for my 'APPROVED' signal.
+2. Stage 2 & 3: Implement code and run automated Vitest passes.
+3. Stage 4: Sync AEO_CHANGELOG.md, AEO_REGRESSION_MATRIX.md, and AEO_MASTER_PROJECT_PLAN.md.
+4. Stage 5 & 6: Verify integrity and execute Git commit + push to remote 'dev' branch.
+
+Begin Stage 1 Pre-Flight Analysis now and await my approval.

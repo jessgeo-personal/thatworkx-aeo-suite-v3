@@ -82,6 +82,9 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
       robotsTxtExists: false,
       llmsTxtExists: false,
       aiContextExists: false,
+      aboutTxtExists: false,
+      docsTxtExists: false,
+      contentTxtExists: false,
       sitemapExists: false,
       xRobotsIndexable: true,
       hasProperHierarchy: true,
@@ -141,6 +144,33 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
       }
     } catch (e) {
       result.status.aiContextExists = false;
+    }
+
+    try {
+      const aboutRes = await axios.get(`${domainOrigin}/about.md`, { timeout: 2000 });
+      if (aboutRes.status === 200 && aboutRes.data) {
+        result.status.aboutTxtExists = true;
+      }
+    } catch (e) {
+      result.status.aboutTxtExists = false;
+    }
+
+    try {
+      const docsRes = await axios.get(`${domainOrigin}/docs.md`, { timeout: 2000 });
+      if (docsRes.status === 200 && docsRes.data) {
+        result.status.docsTxtExists = true;
+      }
+    } catch (e) {
+      result.status.docsTxtExists = false;
+    }
+
+    try {
+      const contentRes = await axios.get(`${domainOrigin}/content.md`, { timeout: 2000 });
+      if (contentRes.status === 200 && contentRes.data) {
+        result.status.contentTxtExists = true;
+      }
+    } catch (e) {
+      result.status.contentTxtExists = false;
     }
 
     // Check robots.txt for total AI blindness block & specific AI Bot blocks

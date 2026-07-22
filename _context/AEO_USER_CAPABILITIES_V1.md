@@ -3,6 +3,26 @@
 ## OBJECTIVE OF THE DOCUMENT
 To create an extensive list of capabilities currently being built for the AEO offerings from Thatworkx and relating it to how USer would use it, and the benefits they will gain from it.  This should help us to map it to relevant products AIVisualize, AIOptimize or AISocialize, and what needs to be made paid vs. free - in order to hook and keep users.
 
+## DASHBOARD CONTAINER TRACK CATEGORIZATIONS
+
+To guide the user along an educational onboarding path, all capabilities and diagnostic results are dynamically grouped into the following visual containers:
+
+### 🔍 AIVisualize Sections (The Inquiry Grid)
+* **Section 1: Are you blocking out AI?**
+  - Audits robots.txt existence and addresses specific crawl permissions for GPTBot, PerplexityBot, ClaudeBot, and Google-Extended to prevent domain invisibility.
+* **Section 2: Is your web presence optimized for AI?**
+  - Audits XML sitemaps, HTTP response headers (x-robots-tag), Single Page App (SPA) hydration traps, and HTTPS SSL secure encryption.
+* **Section 3: Is your content AI-Ready?**
+  - Assesses title tag length sweet spots, meta description presence, heading nesting outline trees, and Flesch readability ratings (content density vs boilerplate noise).
+* **Section 4: Are you setup to be AI-First?**
+  - Audits presence of machine directories (`/llms.txt`), corporate profiles (`/ai-context.md`), narrative profiles (`/about.md`, `/docs.md`, `/content.md`), and deterministic JSON-LD schema.
+
+### ⚡ AIOptimize Tracks (The Remediation Sandbox)
+* **Track 1: AI-Ready Page Fixes**
+  - Interactive sandboxes for Robots.txt editing, Cloudflare WAF Workers (SPA bypass), Edge Scripts (custom header injection), and organization JSON-LD entity schema.
+* **Track 2: AI-First File Generators**
+  - Dynamic copy-pasteable generators for `/llms.txt`, `/ai-context.md`, `/about.md`, `/docs.md`, `/content.md`, and sitemap.xml files.
+
 ## FILE DEFINITIONS
 * 1. **ai-context.md (Proprietary AI Visualize Manifest):**This custom template flattens your entire brand copy page-by-page while incorporating a custom user-injected Brand Mission statement.
 * 2. **llms.txt (Answer.ai Community Standard Specification):**  This template maps your domain map and actively registers high-velocity external assets (like LinkedIn posts or testimonials) handled by AI Socialize to solidify brand attribution.

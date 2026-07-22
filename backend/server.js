@@ -5,7 +5,17 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
-const { generateLlmsTxt, generateAiContextMd, generateCloudflareWorkerJs, generateShopifyLiquid, generateHtaccess } = require('./services/generatorService');
+const {
+  generateLlmsTxt,
+  generateAiContextMd,
+  generateCloudflareWorkerJs,
+  generateShopifyLiquid,
+  generateHtaccess,
+  generateAboutMd,
+  generateDocsMd,
+  generateContentMd,
+  generateSitemapXml
+} = require('./services/generatorService');
 const { registerUser, loginUser, getCurrentUser, verifyOtp } = require('./controllers/authController');
 const User = require('./models/User');
 const ScanLog = require('./models/ScanLog');
@@ -153,10 +163,24 @@ app.post('/api/generator/build', async (req, res) => {
     let code = '';
     switch (targetType) {
       case 'llms':
+      case 'llmstxt':
         code = generateLlmsTxt(cleanDomain);
         break;
       case 'aiContext':
+      case 'aicontext':
         code = generateAiContextMd(cleanDomain);
+        break;
+      case 'about':
+        code = generateAboutMd(cleanDomain);
+        break;
+      case 'docs':
+        code = generateDocsMd(cleanDomain);
+        break;
+      case 'content':
+        code = generateContentMd(cleanDomain);
+        break;
+      case 'sitemap':
+        code = generateSitemapXml(cleanDomain);
         break;
       case 'cloudflare':
         code = generateCloudflareWorkerJs(cleanDomain);

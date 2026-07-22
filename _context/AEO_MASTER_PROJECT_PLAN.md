@@ -24,40 +24,40 @@ All core MSP capabilities, backend REST API endpoints, gateway scanners, remedia
 
 ### 📋 Phase 1 Capabilities Matrix (32 Capabilities Audit)
 
-| # | Capability Name | Target Product | Status | Sprint Assigned |
+| # | Capability Name | Target Product | Dashboard visual container | Sprint Assigned |
 | :- | :--- | :--- | :--- | :--- |
-| 1 | Robots.txt File Analysis & Protocol Gate Audit | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 2 | CDN / Edge Firewall Blocking Check | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 3 | X-Robots-Tag Server Headers Inspection | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 4 | `/llms.txt` Machine Directory Map Audit | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 5 | Page AI-Bot Readability & Text Extraction | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 6 | Heavy Client-Side Rendering (JS Frameworks) Warning | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 7 | `ai-context.md` Availability & Protocol Verification | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 8 | `ai-context.md` Markdown Manifest Generator | AI Optimize | `DONE 🟢` | Sprint 6 |
-| 9 | JSON-LD Schema Availability & Entity Builder | AI Optimize | `DONE 🟢` | Sprint 5 |
-| 10 | `/llms.txt` Social & External Citation Updates | AI Socialize | `DONE 🟢` | Sprint 8 |
-| 11 | Markdown Files Coverage (`README.md`, `about.md`, `docs.md`) | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 12 | Canonical URL Pointer & Duplicate Content Audit | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 13 | Internal Link Navigation Crawl & Count Analysis | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 14 | HTML Title Tag Length Sweetspot (75-125 chars) | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 15 | HTML Meta Description Length Sweetspot (193 chars) | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 16 | Heading Hierarchy (Single H1 / Sequential H2) Audit | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 17 | Token Load & Syntactic Complexity (Flesch Score) | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 18 | QA Patterns & FAQ Schema Parity Ratio Analysis | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 19 | Factual Density Analysis | Archive | `ARCHIVED 📁` | Legacy |
-| 20 | Citation Potential Analysis | AI Socialize | `DONE 🟢` | Sprint 8 |
-| 21 | Structured Answers Analysis | Archive | `ARCHIVED 📁` | Legacy |
-| 22 | AI Accessibility (HTML5 Semantic Wrappers) | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 23 | Page EEAT: Experience Indicators & Media Count | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 24 | Page EEAT: Expertise (Author Info & Credentials) | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 25 | Page EEAT: Authority (External & Authority Links) | AI Visualize | `DONE 🟢` | Sprint 5 |
-| 26 | Page EEAT: Trust (SSL, Contact Info, Privacy Policy) | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 27 | Site EEAT: Domain Age Estimation | AI Visualize | `DONE 🟢` | Sprint 7 |
-| 28 | Site EEAT: Site Structure & Essential Pages Mapping | AI Visualize | `DONE 🟢` | Sprint 4 |
-| 29 | Site EEAT: Trust Signals (Organization Schema) | AI Optimize | `DONE 🟢` | Sprint 5 |
-| 30 | Site EEAT: Authority Metrics & Abstention Risk | AI Visualize | `DONE 🟢` | Sprint 7 |
-| 31 | Cloudflare Worker Edge Proxy Generator (Shopify Hook) | AI Optimize | `DONE 🟢` | Sprint 6 |
-| 32 | Semrush Generative AI Citation Tracking Affiliate Redirect | AI Socialize | `DONE 🟢` | Sprint 8 |
+| 1 | Robots.txt File Analysis & Protocol Gate Audit | AI Visualize | Section 1: Are you blocking out AI? | Sprint 4 |
+| 2 | CDN / Edge Firewall Blocking Check | AI Visualize | Section 1: Are you blocking out AI? | Sprint 4 |
+| 3 | X-Robots-Tag Server Headers Inspection | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 4 |
+| 4 | `/llms.txt` Machine Directory Map Audit | AI Visualize | Section 4: Are you setup to be AI-First? | Sprint 4 |
+| 5 | Page AI-Bot Readability & Text Extraction | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 6 | Heavy Client-Side Rendering (JS Frameworks) Warning | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 5 |
+| 7 | `ai-context.md` Availability & Protocol Verification | AI Visualize | Section 4: Are you setup to be AI-First? | Sprint 4 |
+| 8 | `ai-context.md` Markdown Manifest Generator | AI Optimize | Track 2: AI-First File Generators | Sprint 6 |
+| 9 | JSON-LD Schema Availability & Entity Builder | AI Optimize | Track 1: AI-Ready Page Fixes | Sprint 5 |
+| 10 | `/llms.txt` Social & External Citation Updates | AI Socialize | Section 4: Are you setup to be AI-First? | Sprint 8 |
+| 11 | Markdown Files Coverage (`README.md`, `about.md`, `docs.md`) | AI Visualize | Section 4: Are you setup to be AI-First? | Sprint 4 |
+| 12 | Canonical URL Pointer & Duplicate Content Audit | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 4 |
+| 13 | Internal Link Navigation Crawl & Count Analysis | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 4 |
+| 14 | HTML Title Tag Length Sweetspot (75-125 chars) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 4 |
+| 15 | HTML Meta Description Length Sweetspot (193 chars) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 4 |
+| 16 | Heading Hierarchy (Single H1 / Sequential H2) Audit | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 4 |
+| 17 | Token Load & Syntactic Complexity (Flesch Score) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 18 | QA Patterns & FAQ Schema Parity Ratio Analysis | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 19 | Factual Density Analysis | Archive | N/A (Archived) | Legacy |
+| 20 | Citation Potential Analysis | AI Socialize | Section 4: Are you setup to be AI-First? | Sprint 8 |
+| 21 | Structured Answers Analysis | Archive | N/A (Archived) | Legacy |
+| 22 | AI Accessibility (HTML5 Semantic Wrappers) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 4 |
+| 23 | Page EEAT: Experience Indicators & Media Count | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 24 | Page EEAT: Expertise (Author Info & Credentials) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 25 | Page EEAT: Authority (External & Authority Links) | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 5 |
+| 26 | Page EEAT: Trust (SSL, Contact Info, Privacy Policy) | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 4 |
+| 27 | Site EEAT: Domain Age Estimation | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 7 |
+| 28 | Site EEAT: Site Structure & Essential Pages Mapping | AI Visualize | Section 2: Is your web presence optimized for AI? | Sprint 4 |
+| 29 | Site EEAT: Trust Signals (Organization Schema) | AI Optimize | Track 1: AI-Ready Page Fixes | Sprint 5 |
+| 30 | Site EEAT: Authority Metrics & Abstention Risk | AI Visualize | Section 3: Is your content AI-Ready? | Sprint 7 |
+| 31 | Cloudflare Worker Edge Proxy Generator (Shopify Hook) | AI Optimize | Track 1: AI-Ready Page Fixes | Sprint 6 |
+| 32 | Semrush Generative AI Citation Tracking Affiliate Redirect | AI Socialize | Section 4: Are you setup to be AI-First? | Sprint 8 |
 
 ---
 

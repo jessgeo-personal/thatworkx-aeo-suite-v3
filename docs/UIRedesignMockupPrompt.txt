@@ -1,0 +1,20 @@
+[DIRECTIVE: FRONTEND UI REDESIGN & CANVA TEMPLATE MIGRATION]
+ACTORS: Control Agent, Thread A (Frontend/UI Agent), QA Agent
+TARGET: public/index.html, public/index.css, public/index.js
+
+---
+
+OBJECTIVE:
+Redesign the frontend UI layout and visual styling for 'aeo.thatworkx.com' based on the newly uploaded Canva mockups located in '_context/mockups/'.
+
+CONSTRAINTS & SAFETY RULES:
+1. PRESERVE FUNCTIONALITY: Do NOT modify or break backend API bindings (POST /api/scan, POST /api/generator, POST /api/auth).
+2. PRESERVE EVENT HANDLERS: Retain all existing DOM element IDs and JavaScript event listeners (e.g., '#auth-modal-trigger', '#scan-form', '#tab-visualize', '#tab-optimize').
+3. STYLE INJECTION: Update HTML structure and CSS classes in 'public/index.html' and 'public/index.css' to match the layout, card curvature, spacing, and typography in '_context/mockups/' and '_context/design-tokens.json'.
+
+EXECUTION STEPS:
+1. Thread A scans the mockups in '_context/mockups/' and updates CSS & HTML templates.
+2. Run Vitest regression suite to guarantee zero UI component breakages.
+3. Docs Agent logs the UI update in 'AEO_CHANGELOG.md' and commits changes to 'dev'.
+
+Begin UI layout re-alignment now and report back once complete.

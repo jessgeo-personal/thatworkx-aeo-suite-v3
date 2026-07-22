@@ -1,0 +1,22 @@
+[DIRECTIVE: Change RequestUser management and login options change from password to OTP]
+TASK TITLE: login and register options change with shift to OneTimePassword(OTP)
+PRIORITY: High 
+---
+
+DESCRIPTION OF REQUESTED CHANGE:
+I want user login to change from the current option where password is created and asked for at login.  Going forward I want to use OneTimePasswords being sent to the person's email address which is verified each time the person tries to login.
+
+I want the login flow to be as follows.
+1. When the user clicks on the login button the modal has 2 tabs, first which is login, and the second would be New User.  
+2. On the login tab, there only needs to be email address asked, while the new user tab asks for Company(Optional) firstName(Mandatory), lastName(Mandatory), emailAddress(Mandatory), PhoneNumber(mandatory) and country.  Both tabs should have an optin message at the bottom that clearly mentions that the person is agreeing to their data being stored and used by Thatworkx Solutions.
+3. For the new user, as soon as the submit button is clicked, a dedupe using email address is required to confirm the person has not registered before and to resist creating a duplicate.  An OTP verification of Email is required before moving forward.  If verification fails (due to wrong OTP or stoppage of the process at that point), then the person should be marked as unverified.  IF verified, the person will have logged in successfully for the first time.
+4. For an old user, they can fill in their email address which is checked with our list of users and if the email address exists there, then an OTP is sent, for login.  IF the email address does not exist in our user list, then the person should be notified in the modal and the person should be asked to fill in the details.
+5. Please keep in mind that we will be managing subscriptions using stripe and this userlist, so include person, organization, notification, and subscription fields to ensure compatibility.
+
+EXPECTED PIPELINE EXECUTION:
+1. Stage 1: Print plain-English BDD test cases and file modification list, then HALT for my 'APPROVED' signal.
+2. Stage 2 & 3: Implement code and run automated Vitest passes.
+3. Stage 4: Sync AEO_CHANGELOG.md, AEO_REGRESSION_MATRIX.md, and AEO_MASTER_PROJECT_PLAN.md.
+4. Stage 5 & 6: Verify integrity and execute Git commit + push to remote 'dev' branch.
+
+Begin Stage 1 Pre-Flight Analysis now and await my approval.

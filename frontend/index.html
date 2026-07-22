@@ -231,36 +231,6 @@
     <section id="panel-visualize" class="product-panel active">
       <div class="scan-results-grid" id="scan-results" style="display: none;">
         
-        <!-- Gateway Relationship Badge & AI Bot Matrix Card -->
-        <div class="dashboard-card glassmorphic col-span-3" id="gateway-grid-card">
-          <div class="gateway-header flex justify-between items-center">
-            <h3>Gateway Relationship Grid</h3>
-            <span id="gateway-badge" class="gateway-badge badge-handshake">🟢 Optimized Handshake</span>
-          </div>
-          <div class="bot-matrix-grid mt-4">
-            <div class="bot-status-item">
-              <span class="bot-icon">🤖</span>
-              <span class="bot-name">GPTBot (OpenAI)</span>
-              <span class="bot-perm" id="perm-gptbot">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">🔍</span>
-              <span class="bot-name">PerplexityBot</span>
-              <span class="bot-perm" id="perm-perplexity">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">🧠</span>
-              <span class="bot-name">ClaudeBot (Anthropic)</span>
-              <span class="bot-perm" id="perm-claudebot">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">💎</span>
-              <span class="bot-name">Google-Extended (Gemini)</span>
-              <span class="bot-perm" id="perm-geminibot">🟢 Allowed</span>
-            </div>
-          </div>
-        </div>
-        
         <!-- Score Overview Card -->
         <div class="dashboard-card glassmorphic text-center" id="score-card">
           <h3>Domain Visibility Score</h3>
@@ -282,88 +252,173 @@
           </div>
         </div>
 
-        <!-- Machine Text Simulator Viewport Card -->
-        <div class="dashboard-card glassmorphic col-span-3" id="simulator-card">
-          <div class="flex justify-between items-center mb-2">
-            <h3>Machine Text Simulator Viewport (Raw LLM Ingestion Stream)</h3>
-            <span class="density-badge" id="density-badge">Content Density: --%</span>
+        <!-- Section 1: Are you blocking out AI? -->
+        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-1">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <h3 style="margin: 0; color: #ffffff;">🔒 Section 1: Are you blocking out AI?</h3>
+            <span class="gateway-badge badge-handshake" id="sec-status-1">Scanning...</span>
           </div>
-          <p class="text-sm text-muted mb-2">This is the sanitized text stream extracted directly from raw HTML by LLM pre-processors after stripping DOM scripts, styles, and markup noise.</p>
-          <div class="code-viewport-box font-mono" id="machine-preview-box">Awaiting scan execution...</div>
-        </div>
-
-        <!-- AIOptimize Remediation Teaser Accordion -->
-        <div class="dashboard-card glassmorphic col-span-3" id="remediation-teaser-card">
-          <h3>AIOptimize Remediation Teaser</h3>
-          <p class="text-sm text-muted mb-3">Recommended automated fixes to elevate your machine visibility score:</p>
-          <div class="teaser-accordion">
-            <div class="accordion-item">
-              <div class="accordion-header" onclick="toggleAccordion('acc-1')">
-                <span>⚡ Fix SPA Hydration Traps (Cloudflare Worker Edge Proxy)</span>
-                <span class="acc-icon" id="acc-1-icon">+</span>
-              </div>
-              <div class="accordion-body" id="acc-1-body" style="display: none;">
-                <p>Bypass client-side rendering locks by dynamically serving pre-rendered static HTML or flat text manifests to machine crawlers at the network edge.</p>
-                <button class="teaser-btn mt-2" onclick="switchProduct('optimize')">Generate Edge Worker in AI Optimize →</button>
-              </div>
+          <p class="text-sm text-muted mb-4">Evaluates baseline bot access disallow parameters, CDN firewalls, and gateway crawler block configurations.</p>
+          
+          <div class="bot-matrix-grid">
+            <div class="bot-status-item">
+              <span class="bot-icon">🤖</span>
+              <span class="bot-name">GPTBot (OpenAI)</span>
+              <span class="bot-perm" id="perm-gptbot">🟢 Allowed</span>
             </div>
-            <div class="accordion-item">
-              <div class="accordion-header" onclick="toggleAccordion('acc-2')">
-                <span>📄 Deploy Missing Machine Manifests (/llms.txt & /ai-context.md)</span>
-                <span class="acc-icon" id="acc-2-icon">+</span>
-              </div>
-              <div class="accordion-body" id="acc-2-body" style="display: none;">
-                <p>Eliminate data starvation by providing flat-text manifests that outline your corporate identity, key products, and canonical documentation links.</p>
-                <button class="teaser-btn mt-2" onclick="switchProduct('optimize')">Build Context Manifests →</button>
-              </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">🔍</span>
+              <span class="bot-name">PerplexityBot</span>
+              <span class="bot-perm" id="perm-perplexity">🟢 Allowed</span>
+            </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">🧠</span>
+              <span class="bot-name">ClaudeBot (Anthropic)</span>
+              <span class="bot-perm" id="perm-claudebot">🟢 Allowed</span>
+            </div>
+            <div class="bot-status-item">
+              <span class="bot-icon">💎</span>
+              <span class="bot-name">Google-Extended</span>
+              <span class="bot-perm" id="perm-geminibot">🟢 Allowed</span>
             </div>
           </div>
-        </div>
-
-        <!-- Metric Details Checklist -->
-        <div class="dashboard-card glassmorphic col-span-3">
-          <h3>AEO Structural Integrity Audit Checklist</h3>
-          <div class="checklist-grid">
+          
+          <div class="checklist-grid mt-4" style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
             <div class="checklist-item">
               <span class="checklist-status" id="chk-robots">❓</span>
               <div class="checklist-info">
                 <strong>robots.txt file</strong>
-                <p>Ensures search engines and LLM crawlers are directed properly.</p>
+                <p>Public access routing document directing scrapers and chat models.</p>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-llmstxt">❓</span>
-              <div class="checklist-info">
-                <strong>llms.txt file map</strong>
-                <p>Answer.ai specification to provide flat-text summaries to models.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-aicontext">❓</span>
-              <div class="checklist-info">
-                <strong>ai-context.md file</strong>
-                <p>Proprietary flat file context mapping tool for system prompts.</p>
-              </div>
-            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Is your web presence optimized for AI? -->
+        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-2">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <h3 style="margin: 0; color: #ffffff;">🌐 Section 2: Is your web presence optimized for AI?</h3>
+            <span class="gateway-badge badge-handshake" id="sec-status-2">Scanning...</span>
+          </div>
+          <p class="text-sm text-muted mb-4">Audits network rendering protocols, server-level crawl indexability configurations, and secure connection trust.</p>
+          
+          <div class="checklist-grid">
             <div class="checklist-item">
               <span class="checklist-status" id="chk-sitemap">❓</span>
               <div class="checklist-info">
                 <strong>Sitemap sitemap.xml</strong>
-                <p>Lists website routes to map structural web tree indexing.</p>
+                <p>Ensures sitemap is indexable so AI agents can query your path structures.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-xrobots">❓</span>
+              <div class="checklist-info">
+                <strong>x-robots-tag headers</strong>
+                <p>Verifies HTTP headers are not instructing LLM crawler agents to ignore page indexation.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-spatrap">❓</span>
+              <div class="checklist-info">
+                <strong>SPA Hydration Trap</strong>
+                <p>Passes checks if DOM is flat-text pre-rendered instead of locked behind empty JS client containers.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-ssl">❓</span>
+              <div class="checklist-info">
+                <strong>HTTPS SSL secure</strong>
+                <p>Verifies active 256-bit secure encryption and domain TLS trust certification.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Is your content AI-Ready? -->
+        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-3">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <h3 style="margin: 0; color: #ffffff;">📝 Section 3: Is your content AI-Ready?</h3>
+            <span class="gateway-badge badge-handshake" id="sec-status-3">Scanning...</span>
+          </div>
+          <p class="text-sm text-muted mb-4">Validates content readability scores, metadata sweetspot lengths, and heading outline hierarchies.</p>
+          
+          <div class="checklist-grid">
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-title">❓</span>
+              <div class="checklist-info">
+                <strong>Title length range</strong>
+                <p>Verifies title is not truncated and fits semantic sweet spots (75 to 125 characters).</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-desc">❓</span>
+              <div class="checklist-info">
+                <strong>Meta Description range</strong>
+                <p>Checks meta description is present and within range (173 to 213 characters).</p>
               </div>
             </div>
             <div class="checklist-item">
               <span class="checklist-status" id="chk-heading">❓</span>
               <div class="checklist-info">
                 <strong>Heading Hierarchy</strong>
-                <p>Ensures clean recursive chunking (Exactly 1 H1 heading per page).</p>
+                <p>Checks outline sequence (exactly 1 H1 and linear H1 -> H2 -> H3 nesting) for chunkers.</p>
               </div>
             </div>
             <div class="checklist-item">
-              <span class="checklist-status" id="chk-title">❓</span>
+              <span class="checklist-status" id="chk-readability">❓</span>
               <div class="checklist-info">
-                <strong>Title Lengthsweetspot</strong>
-                <p>Ensures semantic focus (AEO sweet spot: 75 to 125 characters).</p>
+                <strong>Flesch Readability Score</strong>
+                <p>Assesses factual sentence density and word count to guard against agent truncation.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Raw Ingestion viewport -->
+          <div class="mt-4 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="flex justify-between items-center mb-2">
+              <h4 style="margin: 0; color: #ffffff; font-size: 0.95rem;">Raw LLM Ingestion Stream Viewport</h4>
+              <span class="density-badge" id="density-badge">Content Density: --%</span>
+            </div>
+            <p class="text-sm text-muted mb-2">This is the sanitized text stream extracted directly from raw HTML by LLM pre-processors after stripping DOM scripts, styles, and markup noise.</p>
+            <div class="code-viewport-box font-mono" id="machine-preview-box" style="max-height: 150px; font-size: 0.75rem; background: rgba(15, 23, 42, 0.5);">Awaiting scan execution...</div>
+          </div>
+        </div>
+
+        <!-- Section 4: Are you setup to be AI-First? -->
+        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-4">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <h3 style="margin: 0; color: #ffffff;">🚀 Section 4: Are you setup to be AI-First?</h3>
+            <span class="gateway-badge badge-handshake" id="sec-status-4">Scanning...</span>
+          </div>
+          <p class="text-sm text-muted mb-4">Audits system-level AI manifest maps, entity microdata configurations, and narrative profile files.</p>
+          
+          <div class="checklist-grid">
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-llmstxt">❓</span>
+              <div class="checklist-info">
+                <strong>llms.txt file map</strong>
+                <p>Standardized directory details summarizing system parameters and link paths.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-aicontext">❓</span>
+              <div class="checklist-info">
+                <strong>ai-context.md file</strong>
+                <p>Master flat file mapping trust credentials, E-E-A-T anchors, and corporate records.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-schema">❓</span>
+              <div class="checklist-info">
+                <strong>JSON-LD Schema Markup</strong>
+                <p>Insulates brand authority from competitor identity dilution.</p>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-status" id="chk-narrative-files">❓</span>
+              <div class="checklist-info">
+                <strong>Secondary Manifests</strong>
+                <p>Verifies presence of supporting profiles (about.md, docs.md, and content.md).</p>
               </div>
             </div>
           </div>
@@ -416,15 +471,35 @@
     <section id="panel-optimize" class="product-panel">
       <div class="dashboard-card glassmorphic">
         
-        <!-- Remediation Header & Tabs Row -->
-        <div class="optimize-header-row" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
-          <!-- Tabs container -->
+        <!-- Master Track Selection Row -->
+        <div class="optimize-master-tabs" style="display: flex; gap: 1rem; border-bottom: 2px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <button class="control-menu-item active" id="btn-track1" style="padding: 0.8rem 1.8rem; border-radius: 8px; font-weight: 700; font-size: 1rem;" onclick="switchOptimizeTrack(1)">
+            ⚙️ Track 1: AI-Ready Page Fixes
+          </button>
+          <button class="control-menu-item" id="btn-track2" style="padding: 0.8rem 1.8rem; border-radius: 8px; font-weight: 700; font-size: 1rem;" onclick="switchOptimizeTrack(2)">
+            📄 Track 2: AI-First File Generators
+          </button>
+        </div>
+
+        <!-- Track 1 Sub-tabs Row (AI-Ready Page Fixes) -->
+        <div id="optimize-track1-subtabs" class="optimize-header-row" style="padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
           <div class="optimize-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">🛡️ Robots.txt Optimizer</button>
-            <button class="control-menu-item" id="menu-manifests" onclick="switchOptimizeTool('manifests')">📄 /llms.txt & /ai-context.md</button>
             <button class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">☁️ Cloudflare Worker</button>
             <button class="control-menu-item" id="menu-edge" onclick="switchOptimizeTool('edge')">⚡ Edge Script</button>
             <button class="control-menu-item" id="menu-schema" onclick="switchOptimizeTool('schema')">📦 JSON-LD Generator</button>
+          </div>
+        </div>
+
+        <!-- Track 2 Sub-tabs Row (AI-First File Generators) -->
+        <div id="optimize-track2-subtabs" class="optimize-header-row" style="display: none; padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
+          <div class="optimize-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="control-menu-item" id="menu-llmstxt" onclick="switchOptimizeTool('llmstxt')">📄 /llms.txt Generator</button>
+            <button class="control-menu-item" id="menu-aicontext" onclick="switchOptimizeTool('aicontext')">📝 /ai-context.md</button>
+            <button class="control-menu-item" id="menu-about" onclick="switchOptimizeTool('about')">ℹ️ /about.md Profile</button>
+            <button class="control-menu-item" id="menu-docs" onclick="switchOptimizeTool('docs')">📚 /docs.md Specs</button>
+            <button class="control-menu-item" id="menu-content" onclick="switchOptimizeTool('content')">✍️ /content.md Case Studies</button>
+            <button class="control-menu-item" id="menu-sitemap" onclick="switchOptimizeTool('sitemap')">🗺️ sitemap.xml Optimizer</button>
           </div>
         </div>
 
@@ -509,21 +584,21 @@
             </div>
           </div>
 
-          <!-- /llms.txt & /ai-context.md Manifests Sandbox -->
-          <div id="opt-tool-manifests" class="optimize-tool-view">
-            <h3>Machine Context Manifest Generators</h3>
-            <p class="subtitle">Generate canonical flat-text markdown files to provide AI crawlers with structured system descriptions.</p>
+          <!-- /llms.txt Generator Sandbox -->
+          <div id="opt-tool-llmstxt" class="optimize-tool-view">
+            <h3>📄 /llms.txt Manifest File Generator</h3>
+            <p class="subtitle">Generate canonical flat-text directory indexes to summarize product offerings and system routes for models.</p>
             
             <div class="sandbox-controls-grid">
               <div class="input-row">
                 <label>Target Domain Name:</label>
-                <input type="text" id="manifest-domain" value="example.com" oninput="generateManifests()">
+                <input type="text" id="llmstxt-domain" value="example.com" oninput="generateTrack2File('llmstxt')">
               </div>
             </div>
 
-            <div class="code-viewport-container mb-4">
+            <div class="code-viewport-container">
               <div class="code-header">
-                <span>/llms.txt Manifest File</span>
+                <span>/llms.txt Manifest</span>
                 <div>
                   <button class="copy-btn" onclick="copyToClipboard('code-llmstxt')">Click to Copy</button>
                   <button class="copy-btn" onclick="downloadFile('code-llmstxt', 'llms.txt')">Download .txt</button>
@@ -531,16 +606,125 @@
               </div>
               <pre class="code-view" id="code-llmstxt"></pre>
             </div>
+          </div>
+
+          <!-- /ai-context.md Generator Sandbox -->
+          <div id="opt-tool-aicontext" class="optimize-tool-view">
+            <h3>📝 /ai-context.md Corporate Manifest Generator</h3>
+            <p class="subtitle">Establish legal entity identifiers, geography definitions, and EEAT brand profile linkages.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="aicontext-domain" value="example.com" oninput="generateTrack2File('aicontext')">
+              </div>
+            </div>
 
             <div class="code-viewport-container">
               <div class="code-header">
-                <span>/ai-context.md Corporate Manifest</span>
+                <span>/ai-context.md Profile</span>
                 <div>
                   <button class="copy-btn" onclick="copyToClipboard('code-aicontext')">Click to Copy</button>
                   <button class="copy-btn" onclick="downloadFile('code-aicontext', 'ai-context.md')">Download .md</button>
                 </div>
               </div>
               <pre class="code-view" id="code-aicontext"></pre>
+            </div>
+          </div>
+
+          <!-- /about.md Profile Sandbox -->
+          <div id="opt-tool-about" class="optimize-tool-view">
+            <h3>ℹ️ /about.md Corporate Profile Generator</h3>
+            <p class="subtitle">Insulate brand history, funding parameters, leadership, and founding timeline profiles from model hallucination.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="about-domain" value="example.com" oninput="generateTrack2File('about')">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>/about.md Corporate Profile</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-about')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-about', 'about.md')">Download .md</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-about"></pre>
+            </div>
+          </div>
+
+          <!-- /docs.md Sandbox -->
+          <div id="opt-tool-docs" class="optimize-tool-view">
+            <h3>📚 /docs.md Technical Specification Generator</h3>
+            <p class="subtitle">Outline software base architectures, developer requirements, endpoints, and deployment parameters.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="docs-domain" value="example.com" oninput="generateTrack2File('docs')">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>/docs.md Technical Specification</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-docs')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-docs', 'docs.md')">Download .md</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-docs"></pre>
+            </div>
+          </div>
+
+          <!-- /content.md Sandbox -->
+          <div id="opt-tool-content" class="optimize-tool-view">
+            <h3>✍️ /content.md Case Studies & Whitepapers Generator</h3>
+            <p class="subtitle">Collate case studies, brand papers, and thought leadership articles for high-margin vector ingestion.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="content-domain" value="example.com" oninput="generateTrack2File('content')">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>/content.md Narrative Manifest</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-content')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-content', 'content.md')">Download .md</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-content"></pre>
+            </div>
+          </div>
+
+          <!-- sitemap.xml Sandbox -->
+          <div id="opt-tool-sitemap" class="optimize-tool-view">
+            <h3>🗺️ sitemap.xml Manifest Optimizer</h3>
+            <p class="subtitle">Ensure search engine crawlers and model indexers crawl and consume your machine context manifests.</p>
+            
+            <div class="sandbox-controls-grid">
+              <div class="input-row">
+                <label>Target Domain Name:</label>
+                <input type="text" id="sitemap-domain" value="example.com" oninput="generateTrack2File('sitemap')">
+              </div>
+            </div>
+
+            <div class="code-viewport-container">
+              <div class="code-header">
+                <span>sitemap.xml Manifest Map</span>
+                <div>
+                  <button class="copy-btn" onclick="copyToClipboard('code-sitemap')">Click to Copy</button>
+                  <button class="copy-btn" onclick="downloadFile('code-sitemap', 'sitemap.xml')">Download .xml</button>
+                </div>
+              </div>
+              <pre class="code-view" id="code-sitemap"></pre>
             </div>
           </div>
 

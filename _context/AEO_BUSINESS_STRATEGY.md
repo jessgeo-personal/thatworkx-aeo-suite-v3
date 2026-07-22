@@ -8,6 +8,25 @@
 ### Objective
 * Though most people will come to AEO/GEO with the intention of being listed and cited at the top of any Answer engine across AI summaries, the objective of the AEO and whatever our tools provide is to be confident that their web presense is optimized, accessible, credible and citable when a question comes through.  We do not want brand, content or personal data to end up with hallucinative or muddled answers due to a lack of well formed, attributable content.  In order to acheive this, we support businesses and individuals with tools that can continously monitor and maintain web presences and content with an AI-first approach to content publishing and maintenance.
 
+### Dashboard Container Track Categorizations
+To guide the user along an educational onboarding path, all capabilities and diagnostic results are dynamically grouped into the following visual containers:
+
+#### 🔍 AIVisualize Sections (The Inquiry Grid)
+* **Section 1: Are you blocking out AI?**
+  - Audits robots.txt existence and addresses specific crawl permissions for GPTBot, PerplexityBot, ClaudeBot, and Google-Extended to prevent domain invisibility.
+* **Section 2: Is your web presence optimized for AI?**
+  - Audits XML sitemaps, HTTP response headers (x-robots-tag), Single Page App (SPA) hydration traps, and HTTPS SSL secure encryption.
+* **Section 3: Is your content AI-Ready?**
+  - Assesses title tag length sweet spots, meta description presence, heading nesting outline trees, and Flesch readability ratings (content density vs boilerplate noise).
+* **Section 4: Are you setup to be AI-First?**
+  - Audits presence of machine directories (`/llms.txt`), corporate profiles (`/ai-context.md`), narrative profiles (`/about.md`, `/docs.md`, `/content.md`), and deterministic JSON-LD schema.
+
+#### ⚡ AIOptimize Tracks (The Remediation Sandbox)
+* **Track 1: AI-Ready Page Fixes**
+  - Interactive sandboxes for Robots.txt editing, Cloudflare WAF Workers (SPA bypass), Edge Scripts (custom header injection), and organization JSON-LD entity schema.
+* **Track 2: AI-First File Generators**
+  - Dynamic copy-pasteable generators for `/llms.txt`, `/ai-context.md`, `/about.md`, `/docs.md`, `/content.md`, and sitemap.xml files.
+
 ### What is AI-first when it comes to AEO/GEO
 * AI-first involves creating websites keeping in mind the limitations of AI-bots and RAG systems in being token economical, content intensive and credibility enforcing.  The alternative is to create the following framework that will parallely support AI-bots and RAG systems with this file heirarchy:
 

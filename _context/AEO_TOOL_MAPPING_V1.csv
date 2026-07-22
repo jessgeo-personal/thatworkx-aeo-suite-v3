@@ -1,0 +1,127 @@
+﻿Type,Diagnostic Metric,Description,Per Page/Site/Post,AIFirst,AIVisualize Free,AIV Pro,AIV Enteprise,AIOptimize Free,AIO Pro,AIO Ent,AISocialize
+Robots.txt,Robots.txt file availability and existence,,Site,Yes,X,X,X,X,X,X,
+Robots.txt,Robots.txt AI-bot and User-Agent status,,Site,Yes,X,X,X,X,X,X,
+Robots.txt,Robots.txt creation/modification,,Site,Yes,Upgrade to AIVIsualize Pro,X,X,X,X,X,
+Robots.txt,Robots.txt addition based on providers,,Site,Yes,Upgrade to AIVIsualize Pro,X,X,X,X,X,
+Robots.txt,Robots.txt references a sitemap.xml,,Site,Yes,X,X,X,X,X,X,
+Robots.txt,Robots.txt ai-context.md addition based on providers,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,X,
+Robots.txt,The explicit * Disallow,Check robots.txt for Useragent: * ; Disallow: /.  This needs to be immediately updated.,Site,Yes,X,X,X,,,,
+Quick Status Check,Optimized HandShake/Hidden Assets/Total AI Blindness,UserFiles Exist + Listed in Robots.txt,page,Yes,X,X,X,,,,
+Quick Status Check,HIDDEN ASSETS (Fix),Files Exist + Unmentioned in Robots,Page,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+Quick Status Check,TOTAL AI BLINDNESS(Fix),Files Exist + Blanket Disallow Active,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+CDN/EDGE Firewll,CDN/EdgeFirewall Blocking check,,Site,No,X,,,X,,,
+CDN/EDGE Firewll,CDN/Edge Firewall fixing blocks based on providers,,Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+Cloudflare workaround,Cloudflare based alt markdown setup,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+Cloudflare workaround,Cloudflare based alt markdown file creation,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+Cloudflare workaround,Cloud-flare based alt markedown maintenance,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,
+X-Robots-Tag Headers,X-Robots-Tag Headers check,,Page,No,X,,,,,,X
+X-Robots-Tag Headers,X-Robots-Tag Headers monitoring,,Page,No,Upgrade to AIV Pro hook,X,X,,,,Upgrade to AIV Pro hook
+X-Robots-Tag Headers,X-Robots-Tag Headers fix,,Page,No,Try AIO hook,Try AIO hook,Try AIO hook,X,X,X,Try AIO Hook
+llms.txt,llms.txt file availability and existence,,Site,Yes,X,X,X,,,,X
+llms.txt,llms.txt AI-bot and User-Agent status,,Site,Yes,X,X,X,,,,X
+llms.txt,llms.txt simple sample - if file does not exist,,Site,Yes,X,X,X,,,,X
+llms.txt,llms.txt creation/modification,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,Upgrade to AIO Pro hook
+llms.txt,llms.txt addition based on providers,,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X,Upgrade to AIO Pro hook
+llms.txt,llms.txt updates from social posts,,Post,Yes,,,,,,,X
+llms.txt,llms.txt updates from public sources like news reports,,Post,Yes,,,,,,,X
+llms.txt,llms.txt updates from reddit and other forums,,Post,Yes,,,,,,,X
+ai-context.md,ai-context.md file availability and existence,,Site,Yes,X,X,X,,,,
+ai-context.md,ai-context.md AI-bot and User-Agent status,,Site,Yes,X,X,X,,,,
+ai-context.md,ai-context.md availablility in robots.txt,,Site,Yes,X,X,X,,,,
+ai-context.md,ai-context.md basic file availability,,Site,Yes,X,X,X,,,,
+ai-context.md,ai-context.md simple sample,,Site,Yes,Upgrade to AIV Pro hook,X,X,,,,
+,ai-context.md addition based on providers,,Site,Yes,X,X,X,,,,
+ai-context.md,ai-context.md creation/modification/maintenance,create/continously monitor and help modify the ai-context.md with existing content on the web site,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),
+ai-context.md/github,ai-context.md creation/monitoring from github,create/continously monitor and help modify the ai-context.md with existing content in github,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),
+llms.txt/ai-context.md,ai-context.md mention in llms.txt,,Site,Yes,X,X,X,,,,
+robots.txt/ai-context.md,ai-context.md mention in robots.txt,,Site,Yes,X,X,X,,,,
+Sitemap.xml/ai-context.md,ai-context.md mention in sitemap.xml,,Site,Yes,X,X,X,,,,
+about.md,about.md check,,Site,Yes,X,X,X,,,,
+about.md,about.md simple sample,,Site,Yes,Upgrade to AIV Pro hook,X,X,,,,
+about.md,about.md creation,create/continously monitor and help modify the about.md with existing content on the about site,Site,Yes,,,,X,X (Headless browser),X (Headless browser),
+llms.txt/about.md,about.md mention in llms.txt,,Site,Yes,X,X,X,,,,
+Sitemap.xml/about.md,about.md mention in sitemap.xml,,Site,Yes,X,X,X,,,,
+README.md,README.md check,"Audits this file to ensure an AI tool can immediately understand the underlying engineering stack and directory mapping of the site.  Feeds vector databases verified corporate facts regarding ownership, explicit market categorization, and core offerings. This structural isolation is exactly what prevents answer models from triggering ""brand mashups"" where your company's products are accidentally blended with data from direct competitors.",Site,Yes,X,X,X,,,,
+README.md,README.md simple sample,,Site,Yes,Upgrade to AIV Pro hook,X,X,,,,
+README.md,README.md creation,"creates a README.md file based on input from the stack, github or directly from the user",Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),
+README.md,README.md Updates,"monitors and notifies users about updates that needs to be made to the README.md file based on changes to the stack, github or directly from the User",Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),
+llms.txt/README.md,README.md mention in llms.txt,,Site,Yes,X,X,X,,,,
+Sitemap.xml/README.md,README.md mention in Sitemap.xml,,Site,Yes,X,X,X,,,,
+docs.md,docs.md check,,Site,Yes,X,X,X,,,,X
+docs.md,docs.md simple sample,,Site,Yes,Upgrade to AIV Pro hook,X,X,,,,X
+docs.md,docs.md creation/updates,"monitors and notifies users about updates that needs to be made to the doc.md file based on media posts, changes to website, github etc.",Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),Upgrade to AIO Pro hook
+llms.txt/docs.md,docs.md mention in llms.txt,,Site,Yes,X,X,X,,,,X
+Sitemap.xml/docs.md,docs.md mention in Sitemap.xml,,Site,Yes,X,X,X,,,,X
+sitemap.xml,sitemap.xml check and structure,,Site,Yes,X,X,X,,,,
+sitemap.xml,Sitemap.xml simple sample,,Site,Yes,Upgrade to AIV Pro hook,X,X,,,,
+sitemap.xml,sitemap.xml  creation and maintenance,"with product pages, services pages, FAQs, essential pages etc.",Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X,X (Headless browser),X (Headless browser),
+ai-bot readability,ai-bot readable content from actual webpage,"Shows what the content on the page looks like when ai-bots strip away all the markups and tags.  Content could be lost in pop-ups, ",Page,Yes,(Upto 3 pages),(upto 40 pages),X,,,,
+ai-bot readability,ai-bot readable content from ai-context.md,Shows what the ai-bots can read from the ai-context.md file (primarily focusing on showing if there is enough content when compared to the actual webpage),Site,Yes,X,X,X,,,,
+Heavy page analysis,Heavy page analysis:  too much markup notification,,Page,No,X,X,X,,,,
+Heavy page analysis,Heavy page analysis: heavy client side rendering notification,,Page,No,X,X,X,,,,
+Heavy page analysis/ ai-bot readibility,Heavy page analysis: using puppeteer to source content,This is to show content that is being missed by ai-bots due to the page being too heavy. Would use a headless browser - very premium,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (Shows number of pages that are too heavy),X (Headless browser),X (Headless browser),
+JSON-LD Schema,JSON-LD Schema availability and existence (per page),,Page,Yes,X,X,X,,,,
+JSON-LD Schema,JSON-LD Schema creation/modification(per page),,Page,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows if JSON-LD exists, and what might be missing)",X (Headless browser),X (Headless browser),
+JSON-LD Schema,JSON-LD Schema workarounds,,Page,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows if JSON-LD exists, and what might be missing)",X (Headless browser),X (Headless browser),
+CanonicalURL,HasCanonical and CanonicalURL analysis (per page),,Page,No,X,X,X,,,,X
+Internal Links,Internal Links analysis - count(Per page),pulls all the links on the individual pages and shows a count,Page,No,X,,,,,,
+Internal Links,Internal Links analysis - valid and accessible(Per page),pulls all the links from individual pages and follows them through to see if they exist,Page,No,Upgrade to AIV Pro hook,X,X,,,,
+HTML Structure Analysis,Title existence along with count (per page),,Page,No,X,X,X,,,,
+HTML Structure Analysis,Title length optimization (per page),75-125 characters is the sweetspot,Page,No,X,X,X,,,,
+HTML Structure Analysis,Meta Description & Description Length(per page),193 characters(plus or minus 20) for the AI Sweet spot,Page,No,X,X,X,,,,
+HTML Structure Analysis,Headings Hierarchy analysis (per page),"confirms number of H1, H2, H3 etc.  Ideal is only one and only 1 H1 per page, and multiple H2s. ",,No,X,,,,,,
+Readability analysis,Token Load Analysis (per page),"* Low Volume: < 500 words, Data Starvation: The page lacks enough dense, descriptive text nodes to build multi-dimensional vector embeddings, making it difficult for an LLM to match highly specific intents.
+* Ideal Volume: 500 – 1,200 words, The Semantic Sweet Spot: Long enough to establish complete factual context and distinct entities, but concise enough to guarantee fast ingestion without hitting bot fetch limits.
+* Medium Volume: 1,201 – 2,500 words, Boundary Territory: Perfectly fine for deeply informative pages, but approaches the threshold where fast-moving chat-scrapers may selectively extract the top half of the file.
+* High volume: > 2,500 words, Truncation & Attention Risk: Triggers risk of ""loss in the middle."" Severe risk that an inbound scraper's fetch utility truncates the text data block mid-way to conserve its execution runtime.",Page,No,(Upto 3 pages) Upgrade to AIV Pro hook,X (upto 40 pages),X,,,,
+Readability analysis,Token Load Optimization (per page),,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (shows content count without headless browser),X (Headless browser),X (Headless browser),
+Readability analysis,Syntactic Complexity: Flesch Score: (Per page),"* Too simple: > 75, Semantic Dilution: The phrasing is overly basic or conversational. While easy to tokenize, it often lacks the dense technical descriptors or specific terminology needed for entity mapping.
+* Ideal: 50 – 75, Optimal Tokenization: Clear, punchy sentence logic. The distance between grammatical subjects and action verbs is tight, ensuring highly accurate latent-space processing.
+* Good: 35 – 49, Balanced Density: Standard professional or technical copy. Well within the capabilities of standard foundation models without straining parser utilities.
+* Risk: 15 – 34, Parse Tree Stretching: Sentences contain heavy nesting and structural dependency loops. Smaller edge models or quick RAG pipelines may scramble the exact causal relationships of your facts.
+* Critical Risk: < 15, Syntactic Blockage: Wall-to-wall academic or corporate jargon with endless sentence lengths. High risk of model confusion and mischaracterization during automated analysis.",Page,No,X (upto 3 pages),X (upto 40 pages),X,,,,
+Readability analysis,Syntactic Complexity: Flesch Score: Optimization (Per page),,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,?,?,?,
+Readability analysis,Vector Layout: No. of Words/Paragraph(per page),"* Ideal: 30 – 60 words, Atomic Vector Isolation: Each paragraph represents a single, clean, high-signal concept. When converted to a vector coordinate, it maps to a precise location in latent space, ensuring highly accurate prompt retrieval.
+* Low Dilution: 61 – 90 words, Acceptable Density: The paragraph introduces minor secondary context elements, but remains stable as long as the content centers tightly around one primary topic entity.
+* High Dilution: > 90 words, Vector Blurring / Wall of Text: The paragraph crams multiple distinct facts, prices, or product features into one massive string block. The resulting vector coordinate is mathematically muddled, causing the page to lose out to competitors on precise questions.",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+QA Patterns,Has FAQ Schema (yes/no) (per page),"Confirms if there is a valid JSON-LD FAQ schema existing on the page.  If yes, then the Question count and Answer count will source the data from those forms.",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+QA Patterns,FAQ Schema recommendation (per page),,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (shows content count without headless browser),X (Headless browser),X (Headless browser),
+QA Patterns,Question Count (correctly formatted) (Per page),"how many explicit, grammatically framed interrogative strings (Why, How, What, Can I) exist within your headings (## H2, ### H3) or JSON-LD schema formatted.  More questions the better",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+QA Patterns,Question Count (not correctly formatted)(Per page),"Count of explicity grammatically framed interrogative strings  (Why, How, What, Can I) exist outside of headings (## H2, ### H3) ",Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (shows content count without headless browser),X (Headless browser),X (Headless browser),
+QA Patterns,Answer Count (correctly formatted) (Per page),"how many explicit, JSON-LD Schema formatted answers or lines after grammatically framed interrogative strings (Why, How, What, Can I) exist within your headings (## H2, ### H3).  Questions and answers counts should match.",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+QA Patterns,Answer/Question parity ratio(Per page)," - Ratio == 1.00 ───> [ PASS ] 🟢 DOM Injection Secure
+- Ratio < 1.00  ───> [ WARNING ] 🟡 Layout Extraction Leak (Some answers are hidden)
+- Ratio == 0.00 ───> [ CRITICAL FAIL ] 🔴 Ghost Answer Trap (Questions exist, but bots see 0 answers)",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+QA Patterns,Answer/Question parity ratio corrections (Per page),,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (shows content count without headless browser),X (Headless browser),X (Headless browser),
+AI Accessibility,Has Semantic tags(per page),"Semantic tags are specialized HTML5 layout wrappers—such as <main>, <nav>, <article>, <section>, and <footer>—that explicitly declare the function of a code container.",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+AI Accessibility,IsMobileFriendly(per page),"1. Checks for width=device-width and initial-scale=1
+2. Checks if there are structural text tags and text behind hidden tags and calculates the Hidden Text Ration which if >25%(which means more that 25% of the factual sentences are hidden behind desktop only wrappers), then it raises a warning badge.",Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (shows pointers on how to be mobile friendly),X (Headless browser),X (Headless browser),
+AI Accessibility,Heading Counts (Per page),"Checks the number of H1, H2, H3, H4 etc.  Ideally there should only be one H1 header",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+AI Accessibility,Has Proper Heirarchy (Per page),"Checks if the heirarchy  H1->H2->H3->H4 etc is followed  and there is for example, no H3 without an H2 etc.",Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,X
+AI Accessibility,Images without Alt (per page),Checks all the image tags and confirms how many of them have got Alt texts.   Lower the better,Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,X
+Page Level EEAT,Experience analysis: Experience Indicators,"This metric tracks the frequency of explicit linguistic signs indicating first-hand human involvement, real-world testing, operational implementation, or case observations.",Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows count, upgrade for headless browser)",X (Headless browser),X (Headless browser),
+Page Level EEAT,Experience analysis: Media Count,The absolute count of valid rich media elements—specifically embedded graphics (<img> elements) and video assets (<video> frames or nested iframes)—rendered inside the target page layout.,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows count, upgrade for headless browser)",X (Headless browser),X (Headless browser),
+Page Level EEAT,Expertise analysis: has Author Info,"Before verifying expertise, the tool must check for an explicit author identity node in the HTML text.",Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows count, upgrade for headless browser)",X (Headless browser),X (Headless browser),X
+Page Level EEAT,Expertise analysis: credential Mentions,"An identity statement like ""Written by Jane Doe"" answers the identity question, but it doesn't prove expertise to an AI model. To establish trust, the text must include clear Credential Mentions near that name.",Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,"X (shows count, upgrade for headless browser)",X (Headless browser),X (Headless browser),X
+Page Level EEAT,Authoritativeness analysis:  external Links (scan per page),The backend string engine scans the entire page DOM for outbound hypermedia anchors (<a> tags) ,Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,
+Page Level EEAT,Authoritativeness analysis:  external Links (Valid per page),The backend string engine scans the entire page DOM for outbound hypermedia anchors (<a> tags) and evaluates their absolute destinations.,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X(list of links),X(Validate links),X(Validate Links),X
+Page Level EEAT,Authoritativeness analysis:  authority Links(Valid per page),The tool checks if your content references trusted pillars of global knowledge—the exact locations AI engines use to double-check facts. - Premium,Page,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X(list of links),X(Validate links),X(Validate Links),X
+Page Level EEAT,Authoritativeness analysis:  last Updated,The tool verifies that the page explicitly states its modification history in a machine-readable format.,Page,No,X (upto 3 pages),X(upto 40 pages),X,,,,X
+Page Level EEAT,trustworthiness analysis: is Secure(check),"If a website lacks a valid transport encryption layer, automated scrapers flag the domain as unsafe, immediately dropping its passages from active retrieval consideration.",Site,No,X,X,X,,,,
+Page Level EEAT,trustworthiness analysis: is Secure(how to Fix),"option to upgrade to SSL, or move to cloudlfare",Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (SSL upgrade or Cloudflare suggestion),X (SSL upgrade or Cloudflare guided),X (SSL upgrade or Cloudflare guided),
+Page Level EEAT,trustworthiness analysis: has Contact Info(check),"An anonymous site with zero explicit ownership, touchpoint data, or communication anchors is heavily penalized by algorithm re-rankers to prevent the spread of fabricated or unverified corporate profiles.",Site,No,X,X,X,,,,
+Page Level EEAT,trustworthiness analysis: has Contact Info(how to optimize),,Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (listed contact info),X (Headless browser) - hidden contact info,X (Headless browser) - hidden contact info,
+Page Level EEAT,trustworthiness analysis: has Privacy Policy,verifying that a domain openly outlines its regulatory data governance practices before displaying its text snippets as authoritative source citations.,Site,No,X,X,X,,,,
+Page Level EEAT,trustworthiness analysis: has Privacy Policy(templatized sample per country),,Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (sample privacy info),X (monitoring and per country sample),X (monitoring and per country sample),
+Site-level EEAT,Domain Age: Age Estimate,Checks provider for age since when the domain is available,Site,No,X,X,X,,,,
+Site-level EEAT,Site Structure: sitemap.xml availability,Checks if the sitemap.xml (or sitemap_index.xml) is referenced in robots.txt and is accessible,Site,Yes,X,X,X,X,,,
+Site-level EEAT,Site Structure: Key pages found,"If your core entity hubs (like your primary service definitions, product indices, or about pages) are buried under unlinked dynamic pathways, the scraper's token budget will run out before it discovers your core brand narrative.",Site,Yes,X (pages mapped against essential pages),X (pages mapped against essential pages),X (pages mapped against essential pages),X (listing of other potential key pages without headless),X (listing of other potential key pages with headless and suggestions to fix),X (listing of other potential key pages with headless and suggestions to fix),
+Site-level EEAT,Site Structure: Missing Pages,The system isolates which labels in the essentialEntityNodes library returned a count of zero during the initial sitemap parsing phase.,Site,Yes,X (pages missing against essential pages),X (pages missing against essential pages),X (pages missing against essential pages),,,,
+Site-level EEAT,Site Structure: Missing Pages(Fix),,Site,Yes,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X (listing of other potential key pages without headless or templates to fill in),X (listing of other potential key pages with headless and suggestions to fix or templates to fill in),X (listing of other potential key pages with headless and suggestions to fix or templates to fill in),
+Site-level EEAT,Trust Signals: has Organization Schema,,Site,No,X,X,X,,,,
+Site-level EEAT,Trust Signals: has Organization Schema (view and Optimize),,Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X(present Organization schema - upgrade for suggestions),X,X,
+Site-level EEAT,Trust Signals: has Email Visible To AI,looks for mailto in the aherfs (mention fix),Site,No,X,X,X,,,,
+Site-level EEAT,Trust Signals: has Phone Visible To AI,looks for tel: in the aherfs(mention Fix),Site,No,X,X,X,,,,
+Site-level EEAT,Trust Signals: has Author Bios,checking for Author and experience markers,Site,No,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,Upgrade to AIO Pro hook,X(shows what is listed as Author and experience markers),X (Headless browser) - hidden  Author and experience markers,X (Headless browser) - hidden  Author and experience markers,
+Site-level EEAT,Authority Metrics: Authority Status,"Optimized Anchor, Information Isolation or Abstention Risk",Site,No,X ( Upgrade to AIO Pro hook),X ( Upgrade to AIO Pro hook),X ( Upgrade to AIO Pro hook),,,,
+Site-level EEAT,Authority Metrics: Diagnostic Summary,,Site,No,X ( Upgrade to AIO Pro hook),X ( Upgrade to AIO Pro hook),X ( Upgrade to AIO Pro hook),,,,
