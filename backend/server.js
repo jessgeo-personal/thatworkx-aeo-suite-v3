@@ -29,7 +29,7 @@ mongoose.connect(mongoURI)
 // Endpoint to execute URL scan with rate-limiting and tier-gating active
 app.post('/api/scan', checkTierLimits, async (req, res) => {
   try {
-    let { targetUrl, headless } = req.body;
+    let { targetUrl, headless, singlePagePath } = req.body;
 
     if (!targetUrl) {
       return res.status(400).json({ error: 'Target URL is required' });
@@ -41,7 +41,14 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     }
 
     // Run crawler analysis service
-    const scanResults = await analyzeUrl(targetUrl, req.userLimits);
+    const scanResults = await analyzeUrl(targetUrl, req.userLimits, singlePagePath);
+
+    if (singlePagePath) {
+      return res.status(200).json({
+        success: true,
+        singlePage: scanResults.singlePage
+      });
+    }
 
     // Save scan transaction tracking metrics
     const user = req.userRecord;

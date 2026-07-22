@@ -67,6 +67,12 @@
           <div class="btn-loader" id="btn-loader" style="display: none;"></div>
         </button>
       </form>
+      
+      <!-- Scan Cooldown Alert Banner -->
+      <div id="scan-cooldown-container" style="display: none; align-items: center; justify-content: center; margin-top: 1rem; gap: 8px; font-size: 0.85rem; color: #facc15; background: rgba(234, 179, 8, 0.05); border: 1px solid rgba(234, 179, 8, 0.2); padding: 0.5rem 1rem; border-radius: 6px; width: fit-content; margin-left: auto; margin-right: auto;">
+        <span id="scan-cooldown-message">Next whole-site scan available in 60s</span>
+        <button class="info-help-btn" onclick="showHelpModal('cooldown')" aria-label="Cooldown Help" style="margin-left: 4px; background: rgba(234, 179, 8, 0.15); border-color: rgba(234, 179, 8, 0.4); color: #facc15;">?</button>
+      </div>
     </section>
 
     <!-- Error/Upgrade Modal Alert Container -->

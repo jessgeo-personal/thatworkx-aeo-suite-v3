@@ -39,6 +39,10 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Canonical URL Visibility & Warnings** | Scanned Paths UI | `index.js` & `crawlerService.js` | Displays raw canonical string values and marks missing items in red | `PASS 🟢` |
 | **Heading Hierarchy Validations** | Scanned Paths UI | `index.js` & `crawlerService.js` | Runs hierarchy checks and renders `✓` or `✗` status marks | `PASS 🟢` |
 | **Informational Help Modal Overlays** | Scanned Paths UI | `index.html` & `index.js` | Opens popups outlining relevance of Word Count, Canonical, and Structure | `PASS 🟢` |
+| **Polite Crawling Throttle Delay** | Crawler Engine | `crawlerService.js` | Runs 150ms delay between sub-page fetches to prevent Shopify blocks | `PASS 🟢` |
+| **Safe Mode Scan Cooldown Timer** | Scan Input UI | `index.html` & `index.js` | Disables whole-site scan for 60s and displays countdown timer with help popup | `PASS 🟢` |
+| **On-Demand Single Page Auditing** | Scanned Paths UI | `index.js` & `server.js` | Bypasses cooldown lock to scan individual routes and updates row dynamically | `PASS 🟢` |
+
 
 
 

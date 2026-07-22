@@ -3,6 +3,11 @@ let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
 let currentEmail = 'user@thatworkx.com'; // Default user session email
 
+// Cooldown variables for Anti-Blocking Safe Mode
+let cooldownActive = false;
+let cooldownTimeRemaining = 0;
+let cooldownInterval = null;
+
 // Initialize page content
 document.addEventListener('DOMContentLoaded', () => {
   generateRobotsTxt();
@@ -80,6 +85,11 @@ async function updateUserTier() {
 async function executeScan(event) {
   event.preventDefault();
 
+  if (cooldownActive) {
+    alert(`Whole-site scan is locked. Next scan available in ${cooldownTimeRemaining}s. You can still audit individual pages below.`);
+    return;
+  }
+
   let urlInput = document.getElementById('target-url').value.trim();
   if (urlInput && !/^https?:\/\//i.test(urlInput)) {
     urlInput = 'https://' + urlInput;
@@ -121,14 +131,55 @@ async function executeScan(event) {
     // Populate Results Board
     displayScanResults(data.results);
 
+    // Trigger Anti-Blocking Cooldown Safe Mode
+    startCooldown(60);
+
   } catch (error) {
     console.error('Connection failure during scan submission:', error);
     alert('Failed to connect to backend scan services.');
   } finally {
-    btnText.style.display = 'block';
     btnLoader.style.display = 'none';
-    submitBtn.disabled = false;
+    if (cooldownActive) {
+      btnText.style.display = 'block';
+      btnText.innerText = `Scan Locked (${cooldownTimeRemaining}s)`;
+      submitBtn.disabled = true;
+    } else {
+      btnText.style.display = 'block';
+      submitBtn.disabled = false;
+    }
   }
+}
+
+function startCooldown(seconds) {
+  if (cooldownInterval) {
+    clearInterval(cooldownInterval);
+  }
+  cooldownActive = true;
+  cooldownTimeRemaining = seconds;
+  
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  const cooldownContainer = document.getElementById('scan-cooldown-container');
+  const cooldownMessage = document.getElementById('scan-cooldown-message');
+  
+  submitBtn.disabled = true;
+  cooldownContainer.style.display = 'flex';
+  btnText.innerText = `Scan Locked (${cooldownTimeRemaining}s)`;
+  
+  cooldownInterval = setInterval(() => {
+    cooldownTimeRemaining -= 1;
+    btnText.innerText = `Scan Locked (${cooldownTimeRemaining}s)`;
+    cooldownMessage.innerText = `Next whole-site scan available in ${cooldownTimeRemaining}s`;
+    
+    if (cooldownTimeRemaining <= 0) {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+      cooldownActive = false;
+      submitBtn.disabled = false;
+      btnText.innerText = 'Initiate Scan';
+      cooldownContainer.style.display = 'none';
+    }
+  }, 1000);
 }
 
 // Display analysis parameters on the dashboard
@@ -218,14 +269,19 @@ function displayScanResults(results) {
   results.pages.forEach(p => {
     const row = document.createElement('tr');
     
-    // Page paths with direct go to page button
+    // Page paths with direct go to page and audit individual page buttons
     const fullPageUrl = p.canonicalUrl || `${cleanBaseUrl.replace(/\/$/, '')}${p.route}`;
     const pathHtml = `
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
         <code style="color: var(--sky-color); font-weight: 500;">${p.route}</code>
-        <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
-          Go to page ↗
-        </a>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
+            Go to page ↗
+          </a>
+          <button class="direct-link-btn audit-page-btn" onclick="auditSinglePage(event, '${p.route}', this)" title="Re-analyze this individual page live">
+            Audit Page 🔄
+          </button>
+        </div>
       </div>
     `;
 
@@ -790,8 +846,135 @@ const helpContent = {
         <li><strong style="color: #f87171;">✗ Crossmark:</strong> Indicates violations, such as multiple H1s, 0 H1s, or skipped levels.</li>
       </ul>
     `
+  },
+  cooldown: {
+    title: 'Rate-Limit Safe Mode (Anti-Blocking Protection)',
+    icon: '⏳',
+    body: `
+      <p>To protect your target domain (especially platforms like Shopify or WooCommerce) from being flagged by server firewalls or security overlays (like Cloudflare), successive whole-site scans are subject to a safety cooldown period.</p>
+      <ul style="margin-left: 1.5rem; margin-top: 0.8rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 8px;">
+        <li><strong>Server Protection:</strong> Spacing out crawls ensures target servers don't classify the crawler as a Denial of Service (DoS) attack, avoiding IP bans.</li>
+        <li><strong>On-Demand Auditing:</strong> During the countdown, you can still audit individual sub-pages from the Scanned Paths table below immediately by clicking the 🔄 re-analyze button on that specific row, completely bypassing the cooldown lock!</li>
+      </ul>
+    `
   }
 };
+
+async function auditSinglePage(event, route, buttonEl) {
+  event.preventDefault();
+  
+  if (!isAuthenticated) {
+    alert('Please sign in to access page auditing tools.');
+    return;
+  }
+
+  const inputUrlVal = document.getElementById('target-url').value.trim();
+  const cleanBaseUrl = inputUrlVal 
+    ? (inputUrlVal.startsWith('http') ? inputUrlVal : `https://${inputUrlVal}`)
+    : '';
+
+  if (!cleanBaseUrl) {
+    alert('Target domain URL is required.');
+    return;
+  }
+
+  const originalHtml = buttonEl.innerHTML;
+  buttonEl.disabled = true;
+  buttonEl.innerHTML = 'Auditing...';
+  buttonEl.style.opacity = '0.6';
+
+  try {
+    const response = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: currentEmail,
+        targetUrl: cleanBaseUrl,
+        singlePagePath: route
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error || 'Failed to analyze page.');
+      return;
+    }
+
+    if (data.success && data.singlePage) {
+      const row = buttonEl.closest('tr');
+      if (row) {
+        const p = data.singlePage;
+        
+        const fullPageUrl = p.canonicalUrl || `${cleanBaseUrl.replace(/\/$/, '')}${p.route}`;
+        const pathHtml = `
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+            <code style="color: var(--sky-color); font-weight: 500;">${p.route}</code>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
+                Go to page ↗
+              </a>
+              <button class="direct-link-btn audit-page-btn" onclick="auditSinglePage(event, '${p.route}', this)" title="Re-analyze this individual page live">
+                Audit Page 🔄
+              </button>
+            </div>
+          </div>
+        `;
+
+        let wordCountHtml = '';
+        if (p.wordCount < 500) {
+          wordCountHtml = `<span class="wc-pill wc-pill-red" title="Data Starvation (< 500 words)">${p.wordCount} words (Low)</span>`;
+        } else if (p.wordCount >= 500 && p.wordCount <= 1200) {
+          wordCountHtml = `<span class="wc-pill wc-pill-green" title="Semantic Sweet Spot (500 - 1,200 words)">${p.wordCount} words (Ideal)</span>`;
+        } else if (p.wordCount > 1200 && p.wordCount <= 2500) {
+          wordCountHtml = `<span class="wc-pill wc-pill-yellow" title="Boundary Territory (1,201 - 2,500 words)">${p.wordCount} words (Moderate)</span>`;
+        } else {
+          wordCountHtml = `<span class="wc-pill wc-pill-red" title="Truncation Risk (> 2,500 words)">${p.wordCount} words (High)</span>`;
+        }
+
+        let canonicalHtml = '';
+        if (p.hasCanonical && p.canonicalUrl) {
+          canonicalHtml = `<code style="font-size: 0.8rem; word-break: break-all; color: var(--dark-300);">${p.canonicalUrl}</code>`;
+          row.style.background = 'transparent';
+        } else {
+          canonicalHtml = `<span class="wc-pill wc-pill-red" style="font-weight: bold; padding: 4px 10px;">✗ Missing (Diluted)</span>`;
+          row.style.background = 'rgba(239, 68, 68, 0.03)';
+        }
+
+        const isOk = p.headingAudit ? p.headingAudit.isHierarchyValid : true;
+        const h1Count = p.headingAudit ? p.headingAudit.h1 : 1;
+        const h2Count = p.headingAudit ? p.headingAudit.h2 : 0;
+        
+        const statusIcon = isOk 
+          ? `<span style="color: #4ade80; font-weight: bold; margin-right: 6px;" title="Proper hierarchy followed">✓</span>` 
+          : `<span style="color: #f87171; font-weight: bold; margin-right: 6px;" title="Hierarchy Violated! (Requires exactly 1 H1 and linear sequence)">✗</span>`;
+        
+        const structureHtml = `
+          <div style="display: flex; align-items: center; gap: 4px;">
+            ${statusIcon}
+            <span class="${isOk ? '' : 'text-danger-glow'}" style="font-size: 0.85rem;">
+              ${h1Count} H1 / ${h2Count} H2
+            </span>
+          </div>
+        `;
+
+        row.innerHTML = `
+          <td>${pathHtml}</td>
+          <td>${wordCountHtml}</td>
+          <td>${canonicalHtml}</td>
+          <td>${structureHtml}</td>
+        `;
+      }
+    }
+  } catch (error) {
+    console.error('Audit Page Error:', error);
+    alert('Network error auditing page.');
+  } finally {
+    buttonEl.disabled = false;
+    buttonEl.innerHTML = originalHtml;
+    buttonEl.style.opacity = '1';
+  }
+}
 
 function showHelpModal(type) {
   const modal = document.getElementById('help-info-modal');
@@ -813,5 +996,6 @@ function closeHelpModal() {
 
 window.showHelpModal = showHelpModal;
 window.closeHelpModal = closeHelpModal;
+window.auditSinglePage = auditSinglePage;
 
 

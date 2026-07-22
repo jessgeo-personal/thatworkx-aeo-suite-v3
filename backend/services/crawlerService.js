@@ -3,7 +3,76 @@ const cheerio = require('cheerio');
 const url = require('url');
 const { parseHtmlMetrics } = require('./parserService');
 
-const analyzeUrl = async (targetUrl, userLimits) => {
+const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
+  if (!htmlContent) {
+    return {
+      route: pageRoute,
+      wordCount: 0,
+      hasTitle: false,
+      titleLength: 0,
+      hasDescription: false,
+      headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false },
+      hasCanonical: false,
+      canonicalUrl: ''
+    };
+  }
+
+  const $ = cheerio.load(htmlContent);
+  const titleText = $('title').text() || '';
+  const descText = $('meta[name="description"]').attr('content') || '';
+
+  // Clean raw body text extraction
+  const $clean = cheerio.load(htmlContent);
+  $clean('script, style, svg, noscript, nav, footer, iframe').remove();
+  const rawText = $clean('body').text().replace(/\s+/g, ' ').trim();
+  const wordCount = rawText ? rawText.split(/\s+/).filter(Boolean).length : 0;
+
+  const h1Count = $('h1').length;
+  const h2Count = $('h2').length;
+  const h3Count = $('h3').length;
+  const h4Count = $('h4').length;
+
+  const isHierarchyValid = (h1Count === 1) && 
+                           (h3Count === 0 || h2Count > 0) && 
+                           (h4Count === 0 || h3Count > 0);
+
+  const canonicalUrl = $('link[rel="canonical"]').attr('href') || '';
+
+  return {
+    route: pageRoute,
+    wordCount,
+    hasTitle: titleText.length > 0,
+    titleLength: titleText.length,
+    hasDescription: descText.length > 0,
+    headingAudit: {
+      h1: h1Count,
+      h2: h2Count,
+      h3: h3Count,
+      h4: h4Count,
+      isHierarchyValid
+    },
+    hasCanonical: canonicalUrl.length > 0,
+    canonicalUrl
+  };
+};
+
+const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
+  if (singlePagePath) {
+    const pageUrl = `${targetUrl.replace(/\/$/, '')}${singlePagePath}`;
+    let htmlContent = '';
+    try {
+      const pageRes = await axios.get(pageUrl, { timeout: 4000 });
+      htmlContent = pageRes.data;
+    } catch (e) {
+      // Handled by returning blank metadata block
+    }
+    const parsedPage = parsePageHtml(htmlContent, pageUrl, singlePagePath);
+    return {
+      success: true,
+      singlePage: parsedPage
+    };
+  }
+
   const result = {
     url: targetUrl,
     tier: userLimits.tier,
@@ -235,64 +304,27 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     result.totalPagesFound = uniquePaths.length;
     result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
 
+    const delayHelper = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     for (let i = 0; i < result.pageDepthCrawled; i++) {
       const pageRoute = uniquePaths[i];
-      let pageH1 = 1;
-      let pageH2 = 4;
-      let pageH3 = 2;
-      let pageH4 = 0;
-      let pageHasCanonical = true;
-      let pageWordCount = Math.max(120, wordCount - (i * 180));
-
+      const pageUrl = `${targetUrl.replace(/\/$/, '')}${pageRoute}`;
+      
+      let pageHtml = '';
       if (i === 0) {
-        // Use actual parsed values for the primary landing page
-        pageH1 = h1Count;
-        pageH2 = h2Count;
-        pageH3 = h3Count;
-        pageH4 = h4Count;
-        pageHasCanonical = $('link[rel="canonical"]').length > 0;
-        pageWordCount = wordCount;
+        pageHtml = htmlContent;
       } else {
-        // Introduce variations for simulated pages to test visual feedback:
-        if (i === 1) {
-          pageH1 = 2; // multi H1 (violates hierarchy)
-        } else if (i === 2) {
-          pageWordCount = 420; // Data starvation (< 500)
-        } else if (i === 3) {
-          pageHasCanonical = false; // Missing canonical URL
-        } else if (i === 4) {
-          pageH1 = 0; // 0 H1 (violates hierarchy)
-        } else if (i === 5) {
-          pageWordCount = 2850; // Truncation Risk (> 2500)
-        } else if (i === 6) {
-          pageH2 = 0; pageH3 = 2; // Skips H2 level (violates hierarchy)
+        await delayHelper(150);
+        try {
+          const pageRes = await axios.get(pageUrl, { timeout: 4000 });
+          pageHtml = pageRes.data;
+        } catch (e) {
+          // Leave pageHtml empty; parsedPage will gracefully return blank markers
         }
       }
 
-      const pageHierarchyValid = (pageH1 === 1) && 
-                                 (pageH3 === 0 || pageH2 > 0) && 
-                                 (pageH4 === 0 || pageH3 > 0);
-
-      const parsedCanonical = i === 0 
-        ? ($('link[rel="canonical"]').attr('href') || `${targetUrl.replace(/\/$/, '')}${pageRoute}`)
-        : (pageHasCanonical ? `${targetUrl.replace(/\/$/, '')}${pageRoute}` : '');
-
-      result.pages.push({
-        route: pageRoute,
-        wordCount: pageWordCount,
-        hasTitle: true,
-        titleLength: titleLength,
-        hasDescription: descLength > 0,
-        headingAudit: { 
-          h1: pageH1, 
-          h2: pageH2, 
-          h3: pageH3, 
-          h4: pageH4,
-          isHierarchyValid: pageHierarchyValid 
-        },
-        hasCanonical: pageHasCanonical,
-        canonicalUrl: parsedCanonical
-      });
+      const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
+      result.pages.push(parsedPage);
     }
 
   } catch (err) {

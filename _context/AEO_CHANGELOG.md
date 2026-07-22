@@ -4,6 +4,15 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.11.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Removed All Simulated Scans**: Cleaned up the crawler loop to fetch and parse 100% real live metrics for all discovered page routes, removing simulated mock metrics and false warnings.
+- **Polite Crawling Delays**: Injected an asynchronous 150ms delay between consecutive axios hits in the crawl loop to prevent IP bans.
+- **Client-Side Safe Mode Cooldown Banner**: Introduced a 60-second cooldown period after running a whole-site scan. The scan button locks and runs a countdown timer.
+- **Cooldown Informational Help Modal**: Added a help modal explaining the necessity of rate limiting and safe mode.
+- **On-Demand Individual Page Auditing**: Placed an `Audit Page 🔄` button next to each path in the table. Users can bypass the cooldown lock to re-scan a specific page immediately.
+
 ## [1.10.0-sprint8-patch] - 2026-07-22
 
 ### Added
