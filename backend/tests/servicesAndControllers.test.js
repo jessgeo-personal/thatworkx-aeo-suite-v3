@@ -5,6 +5,17 @@ const User = require('../models/User');
 
 describe('Services & Controllers Unit Regression Suite', () => {
 
+  const axios = require('axios');
+  beforeEach(() => {
+    vi.clearAllMocks();
+    axios.post = vi.fn().mockImplementation(async (url, data) => {
+      if (url.includes('api.resend.com')) {
+        return { data: { id: 'mock-email-id-123' } };
+      }
+      return { data: {} };
+    });
+  });
+
   describe('Generator Service Unit Tests', () => {
     it('Should generate valid /llms.txt content', () => {
       const res = generateLlmsTxt('testdomain.com');

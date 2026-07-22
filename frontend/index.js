@@ -556,11 +556,7 @@ async function handleRequestLoginOtp(event) {
     document.getElementById('otp-verify-panel').style.display = 'flex';
     document.getElementById('otp-verify-prompt').innerText = `Please enter the 6-digit OTP code sent to: ${email}`;
 
-    if (data.dev_otp) {
-      console.log(`[DEV OTP ALERT]: Code is ${data.dev_otp}`);
-      alert(`[SIMULATION] Verification Code sent: ${data.dev_otp}`);
-      document.getElementById('otp-code-input').value = data.dev_otp;
-    }
+
   } catch (err) {
     console.error('Request Login OTP Error:', err);
     alert('Connection error. Could not request verification OTP.');
@@ -616,11 +612,7 @@ async function handleRequestRegisterOtp(event) {
     document.getElementById('otp-verify-panel').style.display = 'flex';
     document.getElementById('otp-verify-prompt').innerText = `Please enter the 6-digit verification code sent to: ${email}`;
 
-    if (data.dev_otp) {
-      console.log(`[DEV OTP ALERT]: Code is ${data.dev_otp}`);
-      alert(`[SIMULATION] Verification Code sent: ${data.dev_otp}`);
-      document.getElementById('otp-code-input').value = data.dev_otp;
-    }
+
   } catch (err) {
     console.error('Request Register OTP Error:', err);
     alert('Connection error. Could not request registration OTP.');

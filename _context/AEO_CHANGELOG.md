@@ -4,6 +4,13 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.8.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Resend API Email Delivery Integration**: Hooked up real email verification dispatches via the Resend API to support actual OTP verification workflows.
+- **Copy-Paste Optimization**: Styled the email HTML template to leverage `user-select: all` on the 6-digit OTP code, allowing users to double-click and copy it cleanly in one step.
+- **Removed Debug Prefill Bypass**: Sanitized frontend `index.js` by removing automatic alert displays and values prefilling, requiring real manual inputs during the verification panel step.
+
 ## [1.7.0-sprint8-patch] - 2026-07-22
 
 ### Added

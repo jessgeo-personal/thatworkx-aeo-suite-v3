@@ -33,5 +33,7 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **End-to-End Vitest Module Suite** | Automated Tests | `servicesAndControllers.test.js` | 16/16 tests pass covering generator, parser, OTP auth & crawler gating | `PASS 🟢` |
 | **Twelve-Factor Staging Pre-Flight** | Deployment Package | `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` | Validates environment variables and container deployment blueprint | `PASS 🟢` |
 | **URL Optional Protocol Input** | Input Validation | `index.js` & `server.js` | User can submit URL with or without http/https protocol prefix | `PASS 🟢` |
+| **Resend API OTP Mail Dispatch** | Email Service | `authController.js` | Sends HTML transaction emails containing verification code via Resend | `PASS 🟢` |
+
 
 
