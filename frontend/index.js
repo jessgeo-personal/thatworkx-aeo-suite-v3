@@ -80,7 +80,10 @@ async function updateUserTier() {
 async function executeScan(event) {
   event.preventDefault();
 
-  const urlInput = document.getElementById('target-url').value;
+  let urlInput = document.getElementById('target-url').value.trim();
+  if (urlInput && !/^https?:\/\//i.test(urlInput)) {
+    urlInput = 'https://' + urlInput;
+  }
   const isHeadless = document.getElementById('headless-checkbox').checked;
 
   const btnText = document.getElementById('btn-text');
