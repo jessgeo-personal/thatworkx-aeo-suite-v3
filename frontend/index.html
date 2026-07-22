@@ -46,49 +46,75 @@
     <!-- Educational Onboarding Hero -->
     <section id="onboarding-hero" class="onboarding-card glassmorphic">
       <div class="onboarding-hero-content">
-        <h1>Do you know if AI can see you?</h1>
-        <p class="onboarding-subtext">
+        
+        <!-- Amber Callout Banner -->
+        <div class="onboarding-callout-banner">
           Your brand presence is defined by what you make public. Right now, an estimated <strong>35% of the internet</strong> is unknowingly blocking AI crawlers through CDN, edge proxy, and firewall misconfigurations.
-        </p>
-        <h2 class="onboarding-call-to-action">What would you like to do today? Let's start here...</h2>
+          <br><br>
+          <strong>What would you like to do today? Let's start here...</strong>
+        </div>
+
+        <h2 class="onboarding-section-title">What would you like to do today?...</h2>
 
         <div class="onboarding-cards-grid">
           <!-- Card 1: AIVisualize -->
-          <div class="onboarding-select-card card-visualize-bg" onclick="openUrlModal('visualize')">
-            <div class="card-icon">🔍</div>
+          <div class="onboarding-select-card card-visualize-onboard active-card" id="card-onboard-visualize" onclick="selectOnboardingCard('visualize')">
+            <div class="card-header-tag text-red">AI VISUALIZE</div>
             <h3>Let's show you what AI can see</h3>
-            <ul class="card-feature-list">
+            <ul class="card-feature-list red-bullets">
               <li>Are you blocking out AI?</li>
               <li>Is your web presence optimized for AI?</li>
               <li>Is your content AI-Ready?</li>
               <li>Are you setup to be AI-First?</li>
             </ul>
-            <button class="teaser-btn w-full mt-auto">Inspect Crawl Visibility →</button>
           </div>
 
           <!-- Card 2: AIOptimize -->
-          <div class="onboarding-select-card card-optimize-bg" onclick="openUrlModal('optimize')">
-            <div class="card-icon">⚡</div>
+          <div class="onboarding-select-card card-optimize-onboard" id="card-onboard-optimize" onclick="selectOnboardingCard('optimize')">
+            <div class="card-header-tag text-yellow">AI OPTIMIZE</div>
             <h3>If you already know that you are AI-ready, let's show you how to be Optimized for AI</h3>
-            <ul class="card-feature-list">
+            <ul class="card-feature-list yellow-bullets">
               <li>Optimizing for AI-Ready</li>
               <li>Optimizing for AI-First</li>
             </ul>
-            <button class="teaser-btn w-full mt-auto">Configure Assets & Schema →</button>
           </div>
 
           <!-- Card 3: AISocialize -->
-          <div class="onboarding-select-card card-socialize-bg coming-soon-card">
+          <div class="onboarding-select-card card-socialize-onboard coming-soon-card" onclick="selectOnboardingCard('socialize')">
             <div class="coming-soon-badge">COMING SOON</div>
-            <div class="card-icon">🔗</div>
+            <div class="card-header-tag text-green">AI SOCIALIZE</div>
             <h3>Go further, ensure your social footprint is Optimized for AI</h3>
-            <ul class="card-feature-list">
+            <ul class="card-feature-list green-bullets">
               <li>Domain AI-ready for social?</li>
               <li>Elevate Social to AI-Ready</li>
             </ul>
-            <button class="teaser-btn w-full mt-auto" disabled style="opacity: 0.5; cursor: not-allowed;">Build Social Trust Bridges</button>
           </div>
         </div>
+
+        <!-- URL Input & Ingest Section -->
+        <div class="onboarding-url-section">
+          <h3>Fill in your website URL here...</h3>
+          <form id="onboarding-scan-form" onsubmit="executeOnboardingScan(event)" class="onboarding-form-layout">
+            <div class="onboarding-input-wrapper">
+              <span class="onboarding-input-icon">🔗</span>
+              <input type="text" id="onboarding-target-url" placeholder="https://example.com" required>
+            </div>
+            <button type="submit" class="onboarding-submit-btn" id="onboarding-submit-btn">
+              <span id="onboarding-btn-text">Initiate Scan</span>
+              <div class="btn-loader" id="onboarding-btn-loader" style="display: none;"></div>
+            </button>
+          </form>
+          
+          <!-- Optional Headless Switcher for high tier users on the homepage -->
+          <div class="onboarding-options-wrapper" id="onboarding-headless-wrapper" style="display: none; justify-content: center; margin-top: 1rem;">
+            <label class="checkbox-container">
+              <input type="checkbox" id="onboarding-headless-checkbox">
+              <span class="checkmark"></span>
+              Execute On-Demand Headless Sweep (Puppeteer)
+            </label>
+          </div>
+        </div>
+
       </div>
     </section>
 

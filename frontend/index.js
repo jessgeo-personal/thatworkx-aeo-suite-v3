@@ -1241,9 +1241,74 @@ async function generateTrack2File(type) {
   }
 }
 
+let onboardingSelectedMode = 'visualize';
+
+function selectOnboardingCard(mode) {
+  if (mode === 'socialize') {
+    alert('AI Socialize is coming soon in v4.0! Build your external trust networks and citations automatically.');
+    return;
+  }
+  onboardingSelectedMode = mode;
+  
+  // Update UI classes
+  document.querySelectorAll('.onboarding-select-card').forEach(card => card.classList.remove('active-card'));
+  const selectedCard = document.getElementById(`card-onboard-${mode}`);
+  if (selectedCard) {
+    selectedCard.classList.add('active-card');
+  }
+  
+  // Scroll smoothly to URL input section
+  const inputSection = document.querySelector('.onboarding-url-section');
+  if (inputSection) {
+    inputSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+async function executeOnboardingScan(event) {
+  event.preventDefault();
+  
+  const onboardingUrl = document.getElementById('onboarding-target-url').value.trim();
+  if (!onboardingUrl) return;
+  
+  // Sync target url value to the main scanner input
+  const mainInput = document.getElementById('target-url');
+  if (mainInput) {
+    mainInput.value = onboardingUrl;
+  }
+  
+  // Sync headless checkbox state
+  const mainHeadless = document.getElementById('headless-checkbox');
+  const onboardHeadless = document.getElementById('onboarding-headless-checkbox');
+  if (mainHeadless && onboardHeadless) {
+    mainHeadless.checked = onboardHeadless.checked;
+  }
+  
+  // Change products tab
+  switchProduct(onboardingSelectedMode);
+  
+  // Trigger main scan submit button loader
+  const loader = document.getElementById('onboarding-btn-loader');
+  const btnText = document.getElementById('onboarding-btn-text');
+  const submitBtn = document.getElementById('onboarding-submit-btn');
+  
+  if (loader) loader.style.display = 'block';
+  if (btnText) btnText.style.display = 'none';
+  if (submitBtn) submitBtn.disabled = true;
+  
+  try {
+    await executeScan(event);
+  } finally {
+    if (loader) loader.style.display = 'none';
+    if (btnText) btnText.style.display = 'block';
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
 window.generateTrack2File = generateTrack2File;
+window.selectOnboardingCard = selectOnboardingCard;
+window.executeOnboardingScan = executeOnboardingScan;
 
 

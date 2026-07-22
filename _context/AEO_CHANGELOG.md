@@ -4,6 +4,12 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.18.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Amber Callout Banner & Glow Cards Onboarding**: Redesigned homepage landing layout based on `Slide1.png` mockup guidelines, integrating high-contrast outlines (Red, Yellow, Green) and a unified homepage scanner input form.
+- **Onboarding Card Selector State**: Added active click selection scripts inside `index.js` to highlight card selections and route post-scan actions to AIVisualize or AIOptimize accordingly.
+
 ## [1.17.0-sprint8-patch] - 2026-07-22
 
 ### Added
