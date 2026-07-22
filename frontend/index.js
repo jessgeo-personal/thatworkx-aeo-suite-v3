@@ -210,7 +210,7 @@ function displayScanResults(results) {
   const tbody = document.getElementById('scanned-routes-tbody');
   tbody.innerHTML = '';
   
-  const inputUrlVal = document.getElementById('target-url-input').value.trim();
+  const inputUrlVal = document.getElementById('target-url').value.trim();
   const cleanBaseUrl = inputUrlVal 
     ? (inputUrlVal.startsWith('http') ? inputUrlVal : `https://${inputUrlVal}`)
     : 'https://example.com';

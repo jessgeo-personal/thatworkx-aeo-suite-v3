@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Heading Hierarchy Checking & Icons**: Upgraded the backend to audit linear header nesting and declare hierarchy compliance. Rendered checkmarks (`✓`) or crossmarks (`✗`) in the table rows next to counts. Added a detailed `?` hierarchy rule popup.
 - **Dynamic Help Modal Overlay**: Integrated glassmorphic popups to present detailed technical insights for each scanned criteria.
 
+### Fixed
+- **Target URL input ID typo**: Fixed bug in `index.js` where `target-url-input` was reference queried instead of `target-url` during table rendering, causing a TypeError and blocking scan outputs.
+
 ## [1.8.0-sprint8-patch] - 2026-07-22
 
 ### Added
