@@ -209,13 +209,70 @@ function displayScanResults(results) {
   // Populate scanned paths list table
   const tbody = document.getElementById('scanned-routes-tbody');
   tbody.innerHTML = '';
+  
+  const inputUrlVal = document.getElementById('target-url-input').value.trim();
+  const cleanBaseUrl = inputUrlVal 
+    ? (inputUrlVal.startsWith('http') ? inputUrlVal : `https://${inputUrlVal}`)
+    : 'https://example.com';
+
   results.pages.forEach(p => {
     const row = document.createElement('tr');
+    
+    // Page paths with direct go to page button
+    const fullPageUrl = p.canonicalUrl || `${cleanBaseUrl.replace(/\/$/, '')}${p.route}`;
+    const pathHtml = `
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+        <code style="color: var(--sky-color); font-weight: 500;">${p.route}</code>
+        <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
+          Go to page ↗
+        </a>
+      </div>
+    `;
+
+    // Word Count with dynamic pill color coding
+    let wordCountHtml = '';
+    if (p.wordCount < 500) {
+      wordCountHtml = `<span class="wc-pill wc-pill-red" title="Data Starvation (< 500 words)">${p.wordCount} words (Low)</span>`;
+    } else if (p.wordCount >= 500 && p.wordCount <= 1200) {
+      wordCountHtml = `<span class="wc-pill wc-pill-green" title="Semantic Sweet Spot (500 - 1,200 words)">${p.wordCount} words (Ideal)</span>`;
+    } else if (p.wordCount > 1200 && p.wordCount <= 2500) {
+      wordCountHtml = `<span class="wc-pill wc-pill-yellow" title="Boundary Territory (1,201 - 2,500 words)">${p.wordCount} words (Moderate)</span>`;
+    } else {
+      wordCountHtml = `<span class="wc-pill wc-pill-red" title="Truncation Risk (> 2,500 words)">${p.wordCount} words (High)</span>`;
+    }
+
+    // Canonical URL showing the actual URL or flag missing
+    let canonicalHtml = '';
+    if (p.hasCanonical && p.canonicalUrl) {
+      canonicalHtml = `<code style="font-size: 0.8rem; word-break: break-all; color: var(--dark-300);">${p.canonicalUrl}</code>`;
+    } else {
+      canonicalHtml = `<span class="wc-pill wc-pill-red" style="font-weight: bold; padding: 4px 10px;">✗ Missing (Diluted)</span>`;
+      row.style.background = 'rgba(239, 68, 68, 0.03)';
+    }
+
+    // Structure with tick/cross and hierarchy check
+    const isOk = p.headingAudit ? p.headingAudit.isHierarchyValid : true;
+    const h1Count = p.headingAudit ? p.headingAudit.h1 : 1;
+    const h2Count = p.headingAudit ? p.headingAudit.h2 : 0;
+    
+    const statusIcon = isOk 
+      ? `<span style="color: #4ade80; font-weight: bold; margin-right: 6px;" title="Proper hierarchy followed">✓</span>` 
+      : `<span style="color: #f87171; font-weight: bold; margin-right: 6px;" title="Hierarchy Violated! (Requires exactly 1 H1 and linear sequence)">✗</span>`;
+    
+    const structureHtml = `
+      <div style="display: flex; align-items: center; gap: 4px;">
+        ${statusIcon}
+        <span class="${isOk ? '' : 'text-danger-glow'}" style="font-size: 0.85rem;">
+          ${h1Count} H1 / ${h2Count} H2
+        </span>
+      </div>
+    `;
+
     row.innerHTML = `
-      <td><code>${p.route}</code></td>
-      <td>${p.wordCount} words</td>
-      <td>${p.hasCanonical ? '✓ Active' : '✗ Missing'}</td>
-      <td>${p.headingAudit.h1} H1 / ${p.headingAudit.h2} H2</td>
+      <td>${pathHtml}</td>
+      <td>${wordCountHtml}</td>
+      <td>${canonicalHtml}</td>
+      <td>${structureHtml}</td>
     `;
     tbody.appendChild(row);
   });
@@ -694,5 +751,67 @@ async function checkAuthSession() {
     console.error('Check session error:', err);
   }
 }
+
+const helpContent = {
+  wordCount: {
+    title: 'Word Count Relevance for AI Search Engines',
+    icon: '📝',
+    body: `
+      <p>Generative AI search assistants (like ChatGPT Search, Perplexity, and Gemini) rely on dense factual text to construct answers and source direct citations. Content volume plays a major role in how pages are cataloged:</p>
+      <ul style="margin-left: 1.5rem; margin-top: 0.8rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 8px;">
+        <li><strong style="color: #4ade80;">Ideal (500 - 1,200 words) [Semantic Sweet Spot]:</strong> Long enough to establish complete factual context and distinct entities, but concise enough to guarantee fast ingestion without hitting bot fetch limits.</li>
+        <li><strong style="color: #facc15;">Moderate (1,201 - 2,500 words) [Boundary Territory]:</strong> Acceptable for deeply informative pages, but approaches threshold bounds where fast-moving chat-scrapers may selectively extract only the top half.</li>
+        <li><strong style="color: #f87171;">Low (&lt; 500 words) [Data Starvation]:</strong> The page lacks enough dense, descriptive text nodes to build multi-dimensional vector embeddings, making it difficult for an LLM to match highly specific intents.</li>
+        <li><strong style="color: #f87171;">High (&gt; 2,500 words) [Truncation & Attention Risk]:</strong> Triggers risk of "loss in the middle" or truncation. Severe risk that an inbound scraper's fetch utility truncates the text data block mid-way to conserve its runtime.</li>
+      </ul>
+    `
+  },
+  canonical: {
+    title: 'Significance of Canonical URLs in AEO',
+    icon: '🔗',
+    body: `
+      <p>Canonical URLs act as instructions telling search crawlers and AI bots which version of a page is the primary authoritative source.</p>
+      <ul style="margin-left: 1.5rem; margin-top: 0.8rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 8px;">
+        <li><strong>Prevent Duplicate Dilution:</strong> If multiple URL parameters (like tracking tokens) lead to the same content, bots might index duplicate copies, muddying your semantic rankings and diluting entity signals.</li>
+        <li><strong>Ensure Correct Citation Links:</strong> AI search assistants query the canonical link when citing your site in conversational chat interfaces, ensuring users are directed to the primary landing page.</li>
+        <li><strong style="color: #f87171;">Missing Warning:</strong> If missing, bots may fail to catalog or attribute links properly, dilute link equity, or select the wrong duplicate version as the source.</li>
+      </ul>
+    `
+  },
+  structure: {
+    title: 'Heading Hierarchy & Semantic Architecture',
+    icon: '🏗️',
+    body: `
+      <p>AI models read HTML headers sequentially to parse the structural relationships and semantic hierarchy of your page content.</p>
+      <ul style="margin-left: 1.5rem; margin-top: 0.8rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 8px;">
+        <li><strong>Exactly 1 H1 Tag:</strong> Declare the main entity/topic of the page. Having multiple H1s dilutes the core focus, while 0 H1s leaves the bot blind to the page's core entity.</li>
+        <li><strong>Linear Nesting (H1 → H2 → H3 → H4):</strong> Sub-sections must follow hierarchy. Skipping levels (e.g. going straight from H1 to H3 without an intervening H2) confuses semantic chunking models, causing the page to lose out on precise questions.</li>
+        <li><strong style="color: #4ade80;">✓ Checkmark:</strong> Indicates proper linear structure with exactly 1 H1 tag.</li>
+        <li><strong style="color: #f87171;">✗ Crossmark:</strong> Indicates violations, such as multiple H1s, 0 H1s, or skipped levels.</li>
+      </ul>
+    `
+  }
+};
+
+function showHelpModal(type) {
+  const modal = document.getElementById('help-info-modal');
+  const data = helpContent[type];
+  if (modal && data) {
+    document.getElementById('help-modal-icon').innerText = data.icon;
+    document.getElementById('help-modal-title').innerText = data.title;
+    document.getElementById('help-modal-body').innerHTML = data.body;
+    modal.style.display = 'flex';
+  }
+}
+
+function closeHelpModal() {
+  const modal = document.getElementById('help-info-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+window.showHelpModal = showHelpModal;
+window.closeHelpModal = closeHelpModal;
 
 

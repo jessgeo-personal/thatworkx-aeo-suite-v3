@@ -4,6 +4,16 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.9.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Descriptive Page Paths Simulation**: Replaced generic `/sub-route-1` names with realistic routes (`/about`, `/services`, `/blog`, `/pricing`, `/contact-us`, etc.).
+- **Go To Page Deep Links**: Added a direct external link `"Go to page ↗"` next to each route path to quickly open that specific page in a new tab.
+- **Word Count Relevance Auditing & Color Pills**: Added color-coded badges for Word Count (Low/Ideal/Moderate/High) in the scanned paths table and a detailed `?` informational help popup explaining the semantic implications.
+- **Canonical URL Visibility**: Replaced "Active" indicator text with the actual parsed canonical URL string, highlighting missing tags with a prominent red `✗ Missing (Diluted)` badge. Added a detailed `?` help popup.
+- **Heading Hierarchy Checking & Icons**: Upgraded the backend to audit linear header nesting and declare hierarchy compliance. Rendered checkmarks (`✓`) or crossmarks (`✗`) in the table rows next to counts. Added a detailed `?` hierarchy rule popup.
+- **Dynamic Help Modal Overlay**: Integrated glassmorphic popups to present detailed technical insights for each scanned criteria.
+
 ## [1.8.0-sprint8-patch] - 2026-07-22
 
 ### Added

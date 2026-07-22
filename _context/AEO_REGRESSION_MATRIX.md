@@ -34,6 +34,12 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Twelve-Factor Staging Pre-Flight** | Deployment Package | `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` | Validates environment variables and container deployment blueprint | `PASS 🟢` |
 | **URL Optional Protocol Input** | Input Validation | `index.js` & `server.js` | User can submit URL with or without http/https protocol prefix | `PASS 🟢` |
 | **Resend API OTP Mail Dispatch** | Email Service | `authController.js` | Sends HTML transaction emails containing verification code via Resend | `PASS 🟢` |
+| **Descriptive Path Names & Link Buttons** | Scanned Paths UI | `index.js` & `crawlerService.js` | Simulates descriptive routes and binds direct external navigation buttons | `PASS 🟢` |
+| **Word Count Categorization & Color Pills** | Scanned Paths UI | `index.js` | Applies color codes to counts and details implications inside popup | `PASS 🟢` |
+| **Canonical URL Visibility & Warnings** | Scanned Paths UI | `index.js` & `crawlerService.js` | Displays raw canonical string values and marks missing items in red | `PASS 🟢` |
+| **Heading Hierarchy Validations** | Scanned Paths UI | `index.js` & `crawlerService.js` | Runs hierarchy checks and renders `✓` or `✗` status marks | `PASS 🟢` |
+| **Informational Help Modal Overlays** | Scanned Paths UI | `index.html` & `index.js` | Opens popups outlining relevance of Word Count, Canonical, and Structure | `PASS 🟢` |
+
 
 
 

@@ -163,12 +163,20 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     const descLength = descText.length;
     result.status.seoOptimalDesc = (descLength >= 173 && descLength <= 213);
 
-    // Check headings hierarchy
+    const wordCount = parsedMetrics.wordCount;
     const h1Count = $('h1').length;
-    result.status.hasProperHierarchy = (h1Count === 1);
+    const h2Count = $('h2').length;
+    const h3Count = $('h3').length;
+    const h4Count = $('h4').length;
+
+    // Check headings hierarchy
+    const isHierarchyValid = (h1Count === 1) && 
+                             (h3Count === 0 || h2Count > 0) && 
+                             (h4Count === 0 || h3Count > 0);
+
+    result.status.hasProperHierarchy = isHierarchyValid;
 
     // Analyze text length & word counts
-    const wordCount = parsedMetrics.wordCount;
     if (wordCount < 500) {
       result.status.readabilityRating = 'Data Starvation';
     } else if (wordCount > 2500) {
@@ -184,15 +192,64 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     result.totalPagesFound = 12;
     result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
 
+    const mockPaths = ['/', '/about', '/services', '/blog', '/pricing', '/contact-us', '/features', '/careers', '/faq', '/terms', '/privacy', '/case-studies', '/docs'];
     for (let i = 0; i < result.pageDepthCrawled; i++) {
+      const pageRoute = mockPaths[i] || `/sub-page-${i}`;
+      let pageH1 = 1;
+      let pageH2 = 4;
+      let pageH3 = 2;
+      let pageH4 = 0;
+      let pageHasCanonical = true;
+      let pageWordCount = Math.max(120, wordCount - (i * 180));
+
+      if (i === 0) {
+        // Use actual parsed values for the primary landing page
+        pageH1 = h1Count;
+        pageH2 = h2Count;
+        pageH3 = h3Count;
+        pageH4 = h4Count;
+        pageHasCanonical = $('link[rel="canonical"]').length > 0;
+        pageWordCount = wordCount;
+      } else {
+        // Introduce variations for simulated pages to test visual feedback:
+        if (i === 1) {
+          pageH1 = 2; // multi H1 (violates hierarchy)
+        } else if (i === 2) {
+          pageWordCount = 420; // Data starvation (< 500)
+        } else if (i === 3) {
+          pageHasCanonical = false; // Missing canonical URL
+        } else if (i === 4) {
+          pageH1 = 0; // 0 H1 (violates hierarchy)
+        } else if (i === 5) {
+          pageWordCount = 2850; // Truncation Risk (> 2500)
+        } else if (i === 6) {
+          pageH2 = 0; pageH3 = 2; // Skips H2 level (violates hierarchy)
+        }
+      }
+
+      const pageHierarchyValid = (pageH1 === 1) && 
+                                 (pageH3 === 0 || pageH2 > 0) && 
+                                 (pageH4 === 0 || pageH3 > 0);
+
+      const parsedCanonical = i === 0 
+        ? ($('link[rel="canonical"]').attr('href') || `${targetUrl.replace(/\/$/, '')}${pageRoute}`)
+        : (pageHasCanonical ? `${targetUrl.replace(/\/$/, '')}${pageRoute}` : '');
+
       result.pages.push({
-        route: i === 0 ? '/' : `/sub-route-${i}`,
-        wordCount: Math.max(10, wordCount - (i * 45)),
+        route: pageRoute,
+        wordCount: pageWordCount,
         hasTitle: true,
         titleLength: titleLength,
         hasDescription: descLength > 0,
-        headingAudit: { h1: h1Count, h2: 4 },
-        hasCanonical: true
+        headingAudit: { 
+          h1: pageH1, 
+          h2: pageH2, 
+          h3: pageH3, 
+          h4: pageH4,
+          isHierarchyValid: pageHierarchyValid 
+        },
+        hasCanonical: pageHasCanonical,
+        canonicalUrl: parsedCanonical
       });
     }
 
