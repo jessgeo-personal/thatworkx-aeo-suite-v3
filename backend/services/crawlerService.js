@@ -279,8 +279,9 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
         // Resolve relative link against targetUrl
         const resolvedUrl = new url.URL(href, targetUrl);
 
-        // Only include internal links from the same domain
-        if (resolvedUrl.hostname === targetHost) {
+        // Only include internal links from the same domain (subdomain-insensitive comparison)
+        const cleanHost = (h) => (h || '').replace(/^www\./i, '').toLowerCase();
+        if (cleanHost(resolvedUrl.hostname) === cleanHost(targetHost)) {
           let cleanPath = resolvedUrl.pathname;
           // Ensure it starts with '/'
           if (!cleanPath.startsWith('/')) {

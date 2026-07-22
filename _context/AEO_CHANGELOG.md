@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Cooldown Informational Help Modal**: Added a help modal explaining the necessity of rate limiting and safe mode.
 - **On-Demand Individual Page Auditing**: Placed an `Audit Page 🔄` button next to each path in the table. Users can bypass the cooldown lock to re-scan a specific page immediately.
 
+### Fixed
+- **Subdomain-Insensitive Internal Link Matching**: Normalized hosts by stripping any leading `www.` subdomain prefixes from both the target URL and discovered link URLs, preventing absolute internal links on pages scanned without `www.` from being discarded as external.
+
 ## [1.10.0-sprint8-patch] - 2026-07-22
 
 ### Added

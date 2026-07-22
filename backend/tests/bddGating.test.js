@@ -34,7 +34,7 @@ describe('AEO Suite BDD Integration Gating Tests', () => {
         }
         return { data: 'User-agent: *\nAllow: /' };
       }
-      return { data: '<html><head><title>Mocked Title That is Long Enough to Pass the Seventy-Five Character Test Sweetspot</title></head><body><h1>Hello World</h1></body></html>' };
+      return { data: '<html><head><title>Mocked Title That is Long Enough to Pass the Seventy-Five Character Test Sweetspot</title></head><body><h1>Hello World</h1><a href="https://www.example.com/about">About</a></body></html>' };
     });
   });
 
@@ -139,6 +139,18 @@ describe('AEO Suite BDD Integration Gating Tests', () => {
       expect(scanResult.scoreCard.classification).toBe('Ugly');
       expect(scanResult.scoreCard.overallScore).toBe(20);
       expect(scanResult.alerts[0].type).toBe('TOTAL_AI_BLINDNESS');
+    });
+  });
+
+  // --- Feature 14: Subdomain-Insensitive Domain Matcher ---
+  describe('Feature 14: Subdomain-Insensitive Domain Matcher', () => {
+    it('Scenario 14.1: Should extract subdomain-insensitive www. absolute links as internal routes', async () => {
+      const userLimits = { tier: 'AIVisualize Pro', maxPages: 40 };
+      const scanResult = await analyzeUrl('https://example.com', userLimits);
+
+      // Verify that the link pointing to https://www.example.com/about was recognized as internal route /about
+      const routes = scanResult.pages.map(p => p.route);
+      expect(routes).toContain('/about');
     });
   });
 });
