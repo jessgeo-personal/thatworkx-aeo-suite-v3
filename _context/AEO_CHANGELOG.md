@@ -4,6 +4,12 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.10.0-sprint8-patch] - 2026-07-22
+
+### Added
+- **Discovered Links Extraction Crawler**: Refactored the backend crawler in `crawlerService.js` to parse actual `<a>` links from the scanned HTML page instead of simulated common routes, filtering out external domains, asset formats, and hashes to extract only valid internal relative paths (including product and collection routes for e-commerce platforms like Shopify).
+- **Verified Page Links Integrity**: Re-aligned the scanned paths table to guarantee that clicking `"Go to page ↗"` takes the user directly to a live, active page on their site.
+
 ## [1.9.0-sprint8-patch] - 2026-07-22
 
 ### Added

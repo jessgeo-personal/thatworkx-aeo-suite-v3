@@ -188,13 +188,55 @@ const analyzeUrl = async (targetUrl, userLimits) => {
     // Ingest sitemap link
     result.status.sitemapExists = robotsContent.toLowerCase().includes('sitemap:');
 
-    // Simulate page-level crawling up to the maxPages depth allowed
-    result.totalPagesFound = 12;
+    // Extract actual internal links discovered on the crawled landing page HTML
+    const discoveredLinks = new Set();
+    discoveredLinks.add('/'); // Always include homepage route
+
+    let targetHost = '';
+    try {
+      const parsedTarget = new url.URL(targetUrl);
+      targetHost = parsedTarget.hostname;
+    } catch (e) {
+      // Fallback
+    }
+
+    $('a[href]').each((_, el) => {
+      try {
+        let href = $(el).attr('href');
+        if (!href) return;
+        href = href.trim();
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+        // Resolve relative link against targetUrl
+        const resolvedUrl = new url.URL(href, targetUrl);
+
+        // Only include internal links from the same domain
+        if (resolvedUrl.hostname === targetHost) {
+          let cleanPath = resolvedUrl.pathname;
+          // Ensure it starts with '/'
+          if (!cleanPath.startsWith('/')) {
+            cleanPath = '/' + cleanPath;
+          }
+          // Remove trailing slash unless it's just '/'
+          if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+            cleanPath = cleanPath.slice(0, -1);
+          }
+          // Exclude media assets/documents
+          if (!/\.(png|jpg|jpeg|gif|svg|pdf|css|js|woff|woff2|xml)$/i.test(cleanPath)) {
+            discoveredLinks.add(cleanPath);
+          }
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+    });
+
+    const uniquePaths = Array.from(discoveredLinks);
+    result.totalPagesFound = uniquePaths.length;
     result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
 
-    const mockPaths = ['/', '/about', '/services', '/blog', '/pricing', '/contact-us', '/features', '/careers', '/faq', '/terms', '/privacy', '/case-studies', '/docs'];
     for (let i = 0; i < result.pageDepthCrawled; i++) {
-      const pageRoute = mockPaths[i] || `/sub-page-${i}`;
+      const pageRoute = uniquePaths[i];
       let pageH1 = 1;
       let pageH2 = 4;
       let pageH3 = 2;
