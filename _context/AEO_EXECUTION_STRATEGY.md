@@ -73,3 +73,32 @@ Because the codebase is new, the QA agent does not have to worry about breaking 
 1. **SPRINT START HOOK**: Before any coding or BDD spec generation begins for a new Sprint, the Control Agent must mandate that the Docs Agent updates `_context/AEO_MASTER_PROJECT_PLAN.md`, setting the active Sprint status badge to `[IN PROGRESS 🟡]`.
 2. **SPRINT END HOOK**: Upon passing all BDD integration tests, the Control Agent must mandate that the Docs Agent updates `_context/AEO_MASTER_PROJECT_PLAN.md` setting the active Sprint status badge to `[DONE 🟢]`, appends entry notes to `_context/AEO_CHANGELOG.md`, and updates `_context/AEO_REGRESSION_MATRIX.md` PRIOR TO executing the git commit and push to remote dev.
 
+---
+
+## 🔒 MANDATORY 6-STAGE EXECUTION PIPELINE (NON-NEGOTIABLE)
+
+For EVERY change request (whether a full sprint, a minor UI tweak, or a bug fix), the Control Agent MUST execute the following sequence:
+
+### STAGE 1: PRE-FLIGHT IMPACT ANALYSIS & BDD SPEC
+- Generate plain-English BDD test specs (Given/When/Then).
+- Print the exact list of files to be modified (Code, Tests, Docs).
+- **MANDATORY HALT**: Print prompt: `> Awaiting Human PM Approval. Type 'APPROVED' to execute or specify changes:` and WAIT for user response before making any edits.
+
+### STAGE 2: CODE IMPLEMENTATION
+- Engineering Agent implements requested code changes within workspace boundary.
+
+### STAGE 3: AUTOMATED TESTING PASS
+- QA Agent executes Vitest test suite and verifies 100% pass rate.
+
+### STAGE 4: DOCUMENTATION & CHANGELOG SYNC
+- Docs Agent MUST update `_context/AEO_CHANGELOG.md` with date, scope, and technical details.
+- Docs Agent MUST append test scenarios to `_context/AEO_REGRESSION_MATRIX.md`.
+- Docs Agent MUST update `_context/AEO_MASTER_PROJECT_PLAN.md`.
+
+### STAGE 5: AUDIT VERIFICATION
+- Verify system integrity using local health checks / audit scripts.
+
+### STAGE 6: GIT COMMIT & REMOTE PUSH
+- Execute automated Git commit with semantic commit message and push to remote 'dev' branch.
+
+

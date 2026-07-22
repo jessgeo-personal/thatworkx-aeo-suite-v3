@@ -4,6 +4,12 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.6.1-patch] - 2026-07-22
+
+### Changed
+- **URL Input Experience Improvement**: Changed target URL text input from type `url` to `text` and replaced the pre-filled `value="https://example.com"` with a placeholder to allow immediate typing without having to clear the box.
+- **Optional Protocol Normalization**: Added automatic prepending of `https://` on both frontend URL submit and backend REST API scan requests if a protocol prefix is omitted.
+
 ## [1.6.0-sprint8] - 2026-07-21
 
 ### Added

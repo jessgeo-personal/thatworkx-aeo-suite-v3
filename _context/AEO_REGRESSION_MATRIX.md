@@ -31,4 +31,6 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Sidebar Citation Attribution Widget** | UI Sidebar | `index.html` | Renders `AI Visibility & Share of Voice` sidebar card with affiliate link binding | `PASS 🟢` |
 | **End-to-End Vitest Module Suite** | Automated Tests | `servicesAndControllers.test.js` | 14/14 tests pass covering generator, parser, auth & crawler gating | `PASS 🟢` |
 | **Twelve-Factor Staging Pre-Flight** | Deployment Package | `DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md` | Validates environment variables and container deployment blueprint | `PASS 🟢` |
+| **URL Optional Protocol Input** | Input Validation | `index.js` & `server.js` | User can submit URL with or without http/https protocol prefix | `PASS 🟢` |
+
 
