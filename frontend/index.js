@@ -1358,6 +1358,54 @@ function goBackToHome() {
   if (onboardingUrl) onboardingUrl.value = '';
 }
 
+function switchBentoPreview(mode) {
+  const mdBtn = document.getElementById('btn-bento-md');
+  const aiBtn = document.getElementById('btn-bento-ai');
+  const mdBox = document.getElementById('bento-preview-box-markdown');
+  const aiBox = document.getElementById('bento-preview-box-ai');
+
+  if (mode === 'markdown') {
+    if (mdBtn) mdBtn.classList.add('active');
+    if (aiBtn) aiBtn.classList.remove('active');
+    if (mdBox) mdBox.style.display = 'block';
+    if (aiBox) aiBox.style.display = 'none';
+  } else {
+    if (mdBtn) mdBtn.classList.remove('active');
+    if (aiBtn) aiBtn.classList.add('active');
+    if (mdBox) mdBox.style.display = 'none';
+    if (aiBox) aiBox.style.display = 'block';
+  }
+}
+
+function switchBentoCode(lang) {
+  const curlBtn = document.getElementById('btn-bento-curl');
+  const nodeBtn = document.getElementById('btn-bento-node');
+  const codeBox = document.getElementById('bento-code-box');
+
+  if (lang === 'curl') {
+    if (curlBtn) curlBtn.classList.add('active');
+    if (nodeBtn) nodeBtn.classList.remove('active');
+    if (codeBox) {
+      codeBox.innerText = `curl -X POST https://aeo.thatworkx.com/api/scan \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer AEO_TOKEN_123" \\
+  -d '{"targetUrl": "https://yourbrand.com"}'`;
+    }
+  } else {
+    if (curlBtn) curlBtn.classList.remove('active');
+    if (nodeBtn) nodeBtn.classList.add('active');
+    if (codeBox) {
+      codeBox.innerText = `const axios = require('axios');
+
+axios.post('https://aeo.thatworkx.com/api/scan', {
+  targetUrl: 'https://yourbrand.com'
+}, {
+  headers: { 'Authorization': 'Bearer AEO_TOKEN_123' }
+}).then(res => console.log(res.data));`;
+    }
+  }
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
@@ -1365,5 +1413,7 @@ window.generateTrack2File = generateTrack2File;
 window.selectConsoleTab = selectConsoleTab;
 window.executeOnboardingScan = executeOnboardingScan;
 window.goBackToHome = goBackToHome;
+window.switchBentoPreview = switchBentoPreview;
+window.switchBentoCode = switchBentoCode;
 
 

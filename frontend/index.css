@@ -1544,3 +1544,236 @@ body {
   }
 }
 
+/* Bento Grid Section Styles */
+.onboarding-bento-section {
+  margin-top: 6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 4rem;
+}
+
+.bento-section-header h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.bento-section-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.bento-grid-container {
+  margin-top: 3rem;
+}
+
+.bento-item {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bento-item:hover {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.bento-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.bento-item h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.8rem;
+}
+
+.bento-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+/* Split Comparison Widget */
+.bento-split-widget {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.split-side {
+  text-align: left;
+}
+
+.border-right {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding-right: 1rem;
+}
+
+.split-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.8rem;
+}
+
+.split-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.split-list li {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.muted-list li {
+  color: #475569;
+}
+
+.active-list li {
+  color: #94a3b8;
+}
+
+/* Gateway folder Stack list */
+.bento-stack-list {
+  width: 100%;
+}
+
+.stack-item {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+}
+
+.stack-bullet {
+  font-size: 1.1rem;
+}
+
+.stack-info strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.stack-info p {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Bento Preview Tabs */
+.bento-tabs {
+  gap: 2px;
+}
+
+.bento-tab-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.bento-tab-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Code box */
+.code-box {
+  background: rgba(8, 9, 12, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #a7f3d0;
+  text-align: left;
+  overflow-x: auto;
+}
+
+/* Badges */
+.bento-badge {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-family: monospace;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.bento-badge-ent {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.bullet-green {
+  color: #10b981;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.bento-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bento-list li {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Responsiveness for Bento Grid */
+@media (max-width: 1024px) {
+  .bento-grid-container {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+  .bento-item.col-span-2 {
+    grid-column: span 1 !important;
+  }
+}
+
