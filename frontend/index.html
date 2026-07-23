@@ -160,7 +160,73 @@
           </div>
         </div>
 
+        <!-- ═══════════════════════════════════════════════════
+             3-Column Interactive Tool Cards
+        ════════════════════════════════════════════════════ -->
+        <div class="tool-cards-grid">
 
+          <!-- Card 1: AI Visualize -->
+          <div class="tool-card tool-card--rose" onclick="selectConsoleTab('visualize')" role="button" tabindex="0" aria-label="Select AI Visualize tool">
+            <div class="tool-card__header">
+              <span class="tool-card__badge tool-card__badge--rose">Diagnostic Engine</span>
+            </div>
+            <h3 class="tool-card__title tool-card__title--rose">👁️ AI Visualize</h3>
+            <p class="tool-card__headline">Let's show you what AI can see.</p>
+            <ul class="tool-card__checklist">
+              <li><span class="check-icon check-icon--rose">✔</span>Are you blocking out AI crawlers? <em>(Robots.txt &amp; WAF check)</em></li>
+              <li><span class="check-icon check-icon--rose">✔</span>Is your web presence optimized for AI?</li>
+              <li><span class="check-icon check-icon--rose">✔</span>Is your content AI-Ready? <em>(Readability &amp; Token Load)</em></li>
+              <li><span class="check-icon check-icon--rose">✔</span>Are you setup to be AI-First?</li>
+            </ul>
+            <div class="tool-card__footer">
+              <button type="button" class="tool-card__cta tool-card__cta--rose" onclick="event.stopPropagation(); selectConsoleTab('visualize'); document.getElementById('onboarding-target-url').focus();">
+                Select &amp; Scan URL Above →
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: AIOptimize -->
+          <div class="tool-card tool-card--amber" onclick="selectConsoleTab('optimize')" role="button" tabindex="0" aria-label="Select AIOptimize tool">
+            <div class="tool-card__header">
+              <span class="tool-card__badge tool-card__badge--amber">Prescriptive Fixer</span>
+            </div>
+            <h3 class="tool-card__title tool-card__title--amber">🩺 AIOptimize</h3>
+            <p class="tool-card__headline">If you know you are AI-ready, let's show you how to be Optimized for AI.</p>
+            <ul class="tool-card__checklist">
+              <li><span class="check-icon check-icon--amber">✔</span>Optimizing for AI-Ready <em>(Code stripping &amp; JSON-LD injection)</em></li>
+              <li><span class="check-icon check-icon--amber">✔</span>Optimizing for AI-First <em>(llms.txt &amp; ai-context.md generation)</em></li>
+            </ul>
+            <div class="tool-card__footer">
+              <button type="button" class="tool-card__cta tool-card__cta--amber" onclick="event.stopPropagation(); selectConsoleTab('optimize'); document.getElementById('onboarding-target-url').focus();">
+                Launch Remediation Suite →
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: AISocialize -->
+          <div class="tool-card tool-card--copper" onclick="selectConsoleTab('socialize')" role="button" tabindex="0" aria-label="Select AISocialize tool">
+            <div class="tool-card__header">
+              <span class="tool-card__badge tool-card__badge--copper">Social Citation Engine</span>
+            </div>
+            <h3 class="tool-card__title tool-card__title--copper">📣 AISocialize</h3>
+            <p class="tool-card__headline">Go further, ensure your social footprint is Optimized for AI.</p>
+            <ul class="tool-card__checklist">
+              <li class="tool-card__nested-heading">Domain Social Readiness</li>
+              <li><span class="check-icon check-icon--copper">✔</span>llms.txt validation</li>
+              <li><span class="check-icon check-icon--copper">✔</span>Author Info &amp; Credential mentions</li>
+              <li><span class="check-icon check-icon--copper">✔</span>Valid External &amp; Authority link check</li>
+              <li><span class="check-icon check-icon--copper">✔</span>LastUpdated freshness index</li>
+              <li class="tool-card__nested-heading">Elevate Social</li>
+              <li><span class="check-icon check-icon--copper">✔</span>Automated llms.txt text snippet generation for social content</li>
+            </ul>
+            <div class="tool-card__footer">
+              <button type="button" class="tool-card__cta tool-card__cta--copper" onclick="event.stopPropagation(); alert('Opening Chrome Web Store extension installer...');">
+                Install Chrome Extension ⚡
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /tool-cards-grid -->
 
         <!-- Bento Grid: Technical Capabilities at a Glance -->
         <div class="onboarding-bento-section">
