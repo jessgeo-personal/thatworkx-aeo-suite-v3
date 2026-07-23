@@ -4,6 +4,16 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.19.0-sprint8-patch] - 2026-07-23
+
+### Added
+- **Console Tab Switcher BDD Test Suite**: Added `backend/tests/bdd/consoleTabSwitcher.test.js` to test desktop grid layout, subhead text formatting, active brand accents, dynamic form updating, and mobile responsive stacking.
+- **BDD Specification Scenarios**: Added BDD scenarios 9.1-9.4 into `_context/AEO_BDD_TESTS_V1.md` and updated `_context/AEO_REGRESSION_MATRIX.md`.
+
+### Changed
+- **Console Tab Typography & CSS Refinement**: Refined spacing, font size, line height, and min-height constraints in `frontend/index.css` for `.console-tab-btn`, `.tab-title`, `.tab-subhead`, `.tab-list`, and `.tab-section-title`.
+- **Landing Page Tab Content Fixes**: Corrected typos and polished grammar in tab subheads within `frontend/index.html`.
+
 ## [1.18.0-sprint8-patch] - 2026-07-22
 
 ### Added

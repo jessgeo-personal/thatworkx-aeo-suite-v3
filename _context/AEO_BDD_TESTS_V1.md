@@ -130,3 +130,59 @@ This document defines the business-logic integration tests in Given/When/Then fo
   Then all required 12-factor environment keys are validated
   And the staging pre-flight checklist (`DIGITALOCEAN_STAGING_DEPLOYMENT_GUIDE.md`) is verified ready for zero-downtime container launch
 
+---
+
+## Feature 9: Landing Page Console Tab Switcher Display, Alignment, Visual Text Presence & Mobile Responsiveness
+
+### Scenario 9.1: Console Tab Switcher Display and 3-Column Desktop Alignment
+  Given a user visits the Thatworkx AEO Suite landing page on a desktop device (viewport width >= 768px)
+  When the Hero section search console card is rendered
+  Then the console tab switcher container displays three distinct product tab switcher buttons: "AI Visualize", "AIOptimize", and "AISocialize"
+  And the tab buttons are aligned side-by-side in a 3-column grid container (`grid grid-cols-1 md:grid-cols-3 gap-4`)
+  And each tab button maintains equal card proportions, padding, and uniform height constraints (`min-height-[280px]`)
+
+### Scenario 9.2: Visual Text Presence and Branding Content Verification
+  Given the console tab switcher buttons are rendered on the landing page
+  When inspecting the visual text and iconography elements of each switcher button
+  Then the "AI Visualize" tab button displays:
+    - Title: "Eye Icon" + "AI Visualize" (or "👁️ AI Visualize")
+    - Subhead: "Let show you what AI can see."
+    - Feature List:
+      1. "1. Are you blocking out AI?"
+      2. "2. Is your web presence optimized for AI?"
+      3. "3. Is your content AI-Ready?"
+      4. "4. Are you setup to be AI-First?"
+  And the "AIOptimize" tab button displays:
+    - Title: "ShieldAlert Icon" + "AIOptimize" (or "🩺 AIOptimize")
+    - Subhead: "IF you already know that you are AI-ready, lets show you how to be Optimized for AI."
+    - Feature List:
+      1. "• Optimizing for AI-Ready"
+      2. "• Optimizing for AI-First"
+  And the "AISocialize" tab button displays:
+    - Title: "Share2 Icon" + "AISocialize" (or "📣 AISocialize")
+    - Subhead: "Go further, ensure your social footprint is Optimized for AI"
+    - Section Headers & Sublists:
+      1. "Is your domain AI-ready for social?" ("- llms.txt exists", "- Has Author Info", "- Credential mentions", "- External links(Valid)", "- Authority links(valid)", "- LastUpdated")
+      2. "Elevate your Social to AI-Ready"
+
+### Scenario 9.3: Interactive Active State Selection and Visual Accent Theme Styling
+  Given the console tab switcher is rendered with "AI Visualize" active by default
+  When the user clicks or selects a tab button ("AIOptimize" or "AISocialize")
+  Then the active tab button receives an elevated background and distinct theme accent border:
+    | Tab Button | Brand Accent | Border Styling | Icon Accent Class |
+    | AI Visualize | Cyan | `border-cyan-500/60` | `text-cyan-400` / `text-cyan` |
+    | AIOptimize | Amber | `border-amber-500/60` | `text-amber-400` / `text-amber` |
+    | AISocialize | Violet | `border-violet-500/60` | `text-violet-400` / `text-violet` |
+  And non-active tab buttons revert to transparent border styling (`border-transparent`)
+  And the main input form placeholder text, action button text, and accent colors dynamically update to reflect the chosen product mode
+  And selecting "AISocialize" renders the extension dependency notice: "⚡ Chrome Extension Required for Snippet Generation [Install Extension]"
+
+### Scenario 9.4: Mobile Responsiveness and Adaptive Single-Column Stacking
+  Given a user accesses the landing page on a mobile device (viewport width < 768px)
+  When the Hero section console card is rendered
+  Then the 3-column tab container automatically transitions into a single-column stacked layout (`grid-cols-1`)
+  And each tab button expands to 100% full container width without horizontal scrolling or element truncation
+  And all text nodes (titles, subheads, list items) maintain responsive, legible typography (`text-lg`, `text-xs`, `text-[11px]`)
+  And touch target areas for each tab button meet mobile accessibility guidelines (minimum target height >= 44px)
+
+
