@@ -17,7 +17,7 @@ The development suite is orchestrated by 6 distinct agent persona roles, each ut
   * Tracks token usage; triggers automated safety checkpoints and prompts for fresh sessions if capacity crosses 75%.
   * Enforces the mandatory 6-stage execution pipeline.
   * Coordinates model selection across subagents.
-* **Model Allocation:** `flash` (Fast, low-overhead orchestration, state checks).
+* **Model Allocation:** `pro` (High-Reasoning / Tool-Calling Model).
 
 ### 2. 📋 PRODUCT OWNER (PO) AGENT
 * **Role Summary:** Scope alignment auditor and user story architect.
@@ -26,7 +26,7 @@ The development suite is orchestrated by 6 distinct agent persona roles, each ut
   * Enforces the monetization wall (ensuring Visualize upgrades route cleanly to Optimize call-to-actions).
   * Protects integration boundaries (restricts direct CMS API write connections to the Enterprise tier; maintains Pro sandbox copy-paste export patterns).
   * Writes plain-English user stories.
-* **Model Allocation:** `flash` / `pro` (Semantic analysis, capability verification).
+* **Model Allocation:** `flash` (High-Velocity Text Model).
 
 ### 3. 🧪 QA & REGRESSION AGENT
 * **Role Summary:** Test architect, BDD spec writer, and test execution engine.
@@ -35,7 +35,7 @@ The development suite is orchestrated by 6 distinct agent persona roles, each ut
   * Executes the Vitest regression test suite and verifies 100% pass rates.
   * Updates and maintains [AEO_REGRESSION_MATRIX.md](file:///D:/MyApps/aeo-audit-tool-v3/_context/AEO_REGRESSION_MATRIX.md) with active test cases and status badges.
   * Monitors test durations, memory leaks, and zombie crawling processes.
-* **Model Allocation:** `pro` (Deep reasoning, logical testing, test code parsing).
+* **Model Allocation:** `flash` (High-Velocity Reasoning Model).
 
 ### 4. 💻 ENGINEERING AGENT
 * **Role Summary:** Core developer, code refactorer, and sandboxed builder.
@@ -61,7 +61,7 @@ The development suite is orchestrated by 6 distinct agent persona roles, each ut
   * Synchronizes project status inside [AEO_MASTER_PROJECT_PLAN.md](file:///D:/MyApps/aeo-audit-tool-v3/_context/AEO_MASTER_PROJECT_PLAN.md).
   * Records detailed release history, patches, and fixes inside [AEO_CHANGELOG.md](file:///D:/MyApps/aeo-audit-tool-v3/_context/AEO_CHANGELOG.md).
   * Prepares commit messages adhering to semantic conventions and handles git commit and push actions.
-* **Model Allocation:** `flash` / `flash_lite` (Fast text generation, documentation editing, git operations).
+* **Model Allocation:** `flash` (Fast Text Generation Model).
 
 ---
 
@@ -73,3 +73,37 @@ To ensure continuous accountability and visibility:
    * **Stage 1 (Pre-Flight):** Control, PO, and QA agents analyze the change, present the BDD spec, and halt for approval. In Stage 1 (Pre-Flight Analysis) for any frontend/UI task, the [🎨 UI/UX DESIGN AGENT] must review design token alignment and visual hierarchy specs alongside the [🧪 QA AGENT]'s BDD test cases BEFORE human approval is requested.
    * **Stage 2-6 (Build & Deploy):** Engineering writes code, QA runs tests, Docs updates plans and changelogs, and Docs executes Git commits.
 3. **No Direct User Prompts during Build:** Once Human PM approval (`APPROVED`) is received for a given change spec, the pod works autonomously through execution and reporting without stopping for micro-approvals until the commit stage is ready.
+
+## 3. MANDATORY MODEL ROUTING MATRIX:
+When executing 'ManageSubagents' tool calls to spawn background child subagent processes, pass the following explicit model parameters:
+
+1. [🛡️ CONTROL AGENT]:
+   - Strategy: Orchestration & Pipeline Enforcer
+   - Model Target: High-Reasoning / Tool-Calling Model (gemini-1.5-pro / claude-3-5-sonnet)
+
+2. [📋 PO AGENT]:
+   - Strategy: Fast Requirement & Capability Parsing
+   - Model Target: High-Velocity Text Model (gemini-1.5-flash / gpt-4o-mini)
+   - Scope: Align requests with 'AEO_USER_CAPABILITIES_V1.md' and define acceptance criteria.
+
+3. [🎨 UI/UX DESIGN AGENT]:
+   - Strategy: Visual Multimodal Layout & Token Inspection
+   - Model Target: Multimodal Vision Model (gemini-1.5-pro / claude-3-5-sonnet)
+   - Scope: Inspect .png mockups in '_context/mockups/' and maintain '_context/design-tokens.json'.
+
+4. [⚙️ ENGINEERING AGENT]:
+   - Strategy: Sandboxed Code Synthesis & Editing
+   - Model Target: Code-Optimized Model (gemini-1.5-pro / claude-3-5-sonnet)
+   - Scope: Write/modify Node.js, Express, HTML, CSS, JS within 'D:\MyApps\aeo-audit-tool-v3'.
+
+5. [🧪 QA AGENT]:
+   - Strategy: BDD Test Generation & Vitest Execution
+   - Model Target: High-Velocity Reasoning Model (gemini-1.5-flash / gpt-4o-mini)
+   - Scope: Formulate Given/When/Then specs and update 'AEO_REGRESSION_MATRIX.md'.
+
+6. [📝 DOCS AGENT]:
+   - Strategy: Rapid Documentation & Repository Synchronization
+   - Model Target: Fast Text Generation Model (gemini-1.5-flash)
+   - Scope: Synchronize 'AEO_MASTER_PROJECT_PLAN.md', 'AEO_CHANGELOG.md', and execute Git commits.
+
+Acknowledge subagent model dispatch matrix and enforce on all subsequent tool invocations.
