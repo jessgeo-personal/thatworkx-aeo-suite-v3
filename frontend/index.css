@@ -2311,3 +2311,198 @@ body.light-theme .faq-item h4 {
   color: #0F172A;
 }
 
+/* SPATIAL BENTO COMMAND DECK STYLES */
+.onboarding-deck-section {
+  margin-top: 6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 4rem;
+  margin-bottom: 2rem;
+}
+
+.deck-section-header h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.deck-section-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.deck-grid-container {
+  max-width: 1000px;
+  margin: 3rem auto 0 auto;
+}
+
+.deck-nav-card {
+  background: #111318 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: start;
+  gap: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.deck-nav-card:hover {
+  background: #15171e !important;
+  transform: translateX(4px);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.active-deck-card {
+  border-color: rgba(6, 182, 212, 0.5) !important;
+  background: #13161c !important;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.08);
+}
+
+.deck-card-icon {
+  font-size: 1.25rem;
+  margin-top: 0.2rem;
+}
+
+.deck-card-text h3 {
+  font-size: 0.95rem;
+  font-weight: 750;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.deck-card-text p {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.deck-inspector-card {
+  background: #111318 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 2.2rem;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.inspector-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.8rem;
+  display: inline-block;
+}
+
+.inspector-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.inspector-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.deck-code-preview {
+  margin-top: 1.2rem;
+}
+
+.deck-code-header {
+  background: rgba(8, 9, 12, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.deck-code-box {
+  background: rgba(8, 9, 12, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 1rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: #a7f3d0;
+  text-align: left;
+  overflow-x: auto;
+  margin-top: 0;
+}
+
+/* Light Theme overrides for Spatial deck */
+body.light-theme .onboarding-deck-section {
+  border-color: #E2E8F0;
+}
+
+body.light-theme .deck-section-header h2 {
+  color: #0F172A;
+}
+
+body.light-theme .deck-nav-card {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .deck-nav-card:hover {
+  background: #F8FAFC !important;
+}
+
+body.light-theme .active-deck-card {
+  border-color: rgba(6, 182, 212, 0.5) !important;
+  background: #F0FDFA !important;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.05);
+}
+
+body.light-theme .deck-card-text h3 {
+  color: #0F172A;
+}
+
+body.light-theme .deck-card-text p {
+  color: #64748b;
+}
+
+body.light-theme .deck-inspector-card {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .inspector-title {
+  color: #0F172A;
+}
+
+body.light-theme .inspector-desc {
+  color: #64748b;
+}
+
+body.light-theme .deck-code-header {
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+  color: #475569;
+}
+
+body.light-theme .deck-code-box {
+  background: #0F172A;
+}
+

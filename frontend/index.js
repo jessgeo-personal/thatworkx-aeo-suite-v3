@@ -1456,6 +1456,27 @@ function toggleTheme() {
   }
 }
 
+function switchDeckCard(cardId) {
+  // 1. Remove active state from all left column cards
+  document.querySelectorAll('.deck-nav-card').forEach(card => {
+    card.classList.remove('active-deck-card');
+  });
+  // 2. Add active state to clicked card
+  const selectedNavCard = document.getElementById(`deck-nav-${cardId}`);
+  if (selectedNavCard) {
+    selectedNavCard.classList.add('active-deck-card');
+  }
+  // 3. Hide all right column content blocks
+  document.querySelectorAll('.deck-content-block').forEach(block => {
+    block.style.display = 'none';
+  });
+  // 4. Show right column block
+  const selectedBlock = document.getElementById(`deck-content-${cardId}`);
+  if (selectedBlock) {
+    selectedBlock.style.display = 'block';
+  }
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
@@ -1466,5 +1487,6 @@ window.goBackToHome = goBackToHome;
 window.switchBentoPreview = switchBentoPreview;
 window.switchBentoCode = switchBentoCode;
 window.toggleTheme = toggleTheme;
+window.switchDeckCard = switchDeckCard;
 
 
