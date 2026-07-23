@@ -35,13 +35,18 @@
   --dark-950: #020617;
 
   /* Typography */
-  --font-sans: 'Inter', 'system-ui', sans-serif;
-  --font-mono: 'JetBrains Mono', 'monospace';
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-headline: 'Space Grotesk', sans-serif;
+  
+  /* Theme defaults (Dark Mode) */
+  --canvas-bg: #08090C;
+  --text-primary: #ffffff;
   
   /* Shadows */
   --glow-shadow: 0 0 20px var(--visualize-bg-glow);
-  --glass-bg: rgba(15, 23, 42, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-bg: #111318;
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -52,13 +57,14 @@
 }
 
 body {
-  background-color: var(--dark-950);
-  color: #ffffff;
+  background-color: var(--canvas-bg);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Header & Toggle Switch */
@@ -2114,5 +2120,175 @@ body {
   .accordion-links-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* LIGHT THEME OVERRIDES */
+body.light-theme {
+  --canvas-bg: #FAFAFA;
+  --glass-bg: #FFFFFF;
+  --glass-border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+}
+
+body.light-theme .app-header {
+  background-color: rgba(250, 250, 250, 0.85);
+  border-bottom-color: #E2E8F0;
+  color: #0F172A;
+}
+
+body.light-theme .logo-text,
+body.light-theme .logo-symbol {
+  color: #0F172A;
+}
+
+body.light-theme .theme-toggle-btn {
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .auth-trigger-btn {
+  border-color: #E2E8F0;
+  color: #0F172A;
+  background: #FFFFFF;
+}
+
+body.light-theme .onboarding-badge-capsule {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  color: #475569;
+}
+
+body.light-theme .onboarding-header-group h1 {
+  color: #0F172A;
+}
+
+body.light-theme .onboarding-subheadline {
+  color: #64748b;
+}
+
+body.light-theme .onboarding-console-card {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+body.light-theme .console-tabs-container {
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .console-tab-btn {
+  color: #64748b;
+}
+
+body.light-theme .console-tab-btn.active {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  color: #0F172A;
+}
+
+body.light-theme .onboarding-input-wrapper input {
+  background: #FAFAFA;
+  border-color: #E2E8F0;
+  color: #0F172A;
+}
+
+body.light-theme .onboarding-input-wrapper input:focus {
+  background: #FFFFFF;
+}
+
+body.light-theme .feature-card-item {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .feature-card-item h3 {
+  color: #0F172A;
+}
+
+body.light-theme .card-subhead {
+  color: #64748b;
+}
+
+body.light-theme .card-checker-list li {
+  color: #334155;
+}
+
+body.light-theme .nested-group-title {
+  color: #94a3b8;
+}
+
+body.light-theme .action-outline-btn.border-cyan {
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #0891b2;
+}
+
+body.light-theme .action-outline-btn.border-amber {
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #d97706;
+}
+
+body.light-theme .extension-badge-tag {
+  background: rgba(139, 92, 246, 0.04);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: #6d28d9;
+}
+
+body.light-theme .onboarding-bento-section {
+  border-color: #E2E8F0;
+}
+
+body.light-theme .onboarding-accordion-section {
+  border-color: #E2E8F0;
+}
+
+body.light-theme .bento-section-header h2,
+body.light-theme .accordion-section-header h2 {
+  color: #0F172A;
+}
+
+body.light-theme .bento-item,
+body.light-theme .accordion-item {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .bento-item h3,
+body.light-theme .accordion-header {
+  color: #0F172A;
+}
+
+body.light-theme .bento-desc,
+body.light-theme .accordion-content p {
+  color: #64748b;
+}
+
+body.light-theme .bento-split-widget {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .stack-item {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .stack-info strong {
+  color: #0F172A;
+}
+
+body.light-theme .code-box {
+  background: #0F172A;
+}
+
+body.light-theme .bento-badge {
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+  color: #334155;
+}
+
+body.light-theme .faq-item h4 {
+  color: #0F172A;
 }
 

@@ -19,6 +19,27 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Synchronize tier with backend
   updateUserTier();
+
+  // Handle URL query parameter bookmarks
+  const params = new URLSearchParams(window.location.search);
+  const toolParam = params.get('tool');
+  const urlParam = params.get('url');
+  if (toolParam && urlParam) {
+    if (toolParam === 'visualize' || toolParam === 'optimize') {
+      selectConsoleTab(toolParam);
+    }
+    const onboardInput = document.getElementById('onboarding-target-url');
+    if (onboardInput) onboardInput.value = urlParam;
+    const mainInput = document.getElementById('target-url');
+    if (mainInput) mainInput.value = urlParam;
+
+    setTimeout(() => {
+      const onboardForm = document.getElementById('onboarding-scan-form');
+      if (onboardForm) {
+        executeOnboardingScan(new Event('submit'));
+      }
+    }, 400);
+  }
 });
 
 // Product panel navigation switches (Visualize vs Optimize vs Socialize)
@@ -1312,6 +1333,12 @@ async function executeOnboardingScan(event) {
   
   const onboardingUrl = document.getElementById('onboarding-target-url').value.trim();
   if (!onboardingUrl) return;
+
+  // URL query parameter injection for shareable bookmarks
+  const queryParams = new URLSearchParams(window.location.search);
+  queryParams.set('tool', onboardingSelectedMode);
+  queryParams.set('url', onboardingUrl);
+  window.history.pushState({}, '', `${window.location.pathname}?${queryParams.toString()}`);
   
   // Sync target url value to the main scanner input
   const mainInput = document.getElementById('target-url');
@@ -1417,6 +1444,18 @@ axios.post('https://aeo.thatworkx.com/api/scan', {
   }
 }
 
+function toggleTheme() {
+  const body = document.body;
+  const isLight = body.classList.toggle('light-theme');
+  const themeToggleIcon = document.getElementById('theme-toggle-icon');
+  
+  if (isLight) {
+    if (themeToggleIcon) themeToggleIcon.innerText = '☀️';
+  } else {
+    if (themeToggleIcon) themeToggleIcon.innerText = '🌙';
+  }
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
@@ -1426,5 +1465,6 @@ window.executeOnboardingScan = executeOnboardingScan;
 window.goBackToHome = goBackToHome;
 window.switchBentoPreview = switchBentoPreview;
 window.switchBentoCode = switchBentoCode;
+window.toggleTheme = toggleTheme;
 
 
