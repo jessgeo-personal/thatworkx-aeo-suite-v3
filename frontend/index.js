@@ -1504,7 +1504,6 @@ window.switchBentoCode = switchBentoCode;
 window.toggleTheme = toggleTheme;
 window.switchDeckCard = switchDeckCard;
 
-// ── 1-Click Instant Try Pills ──────────────────────────────────────────────
 function triggerInstantScan(domain) {
   const inputField = document.getElementById('onboarding-target-url');
   if (inputField) {
@@ -1517,6 +1516,45 @@ function triggerInstantScan(domain) {
   }
 }
 window.triggerInstantScan = triggerInstantScan;
+
+function switchPipelineStep(stepIndex) {
+  const stepFiles = {
+    1: 'robots.txt',
+    2: 'llms.txt',
+    3: 'ai-context.md',
+    4: 'about-aeo.md'
+  };
+
+  // 1. Deactivate all step cards
+  document.querySelectorAll('.pipeline-step-card').forEach(c => {
+    c.classList.remove('pipeline-step-card--active');
+    c.setAttribute('aria-selected', 'false');
+  });
+  // 2. Activate selected step card
+  const stepCard = document.getElementById(`pipeline-step-${stepIndex}`);
+  if (stepCard) {
+    stepCard.classList.add('pipeline-step-card--active');
+    stepCard.setAttribute('aria-selected', 'true');
+  }
+
+  // 3. Deactivate all output panels (CSS height:0 for bot indexability)
+  document.querySelectorAll('.pipeline-panel').forEach(p => {
+    p.classList.remove('pipeline-panel--active');
+  });
+  // 4. Activate selected panel
+  const panel = document.getElementById(`pipeline-panel-${stepIndex}`);
+  if (panel) {
+    panel.classList.add('pipeline-panel--active');
+  }
+
+  // 5. Update sandbox filename title
+  const filenameEl = document.getElementById('pipeline-sandbox-filename');
+  if (filenameEl) {
+    filenameEl.textContent = stepFiles[stepIndex] || 'robots.txt';
+  }
+}
+window.switchPipelineStep = switchPipelineStep;
+
 
 
 

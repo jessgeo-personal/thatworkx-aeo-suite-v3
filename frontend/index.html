@@ -618,11 +618,172 @@ curl -X POST https://aeo.thatworkx.com/api/scan \
           </div><!-- /deck-grid -->
         </div><!-- /spatial-bento-deck -->
 
+        <!-- ═══════════════════════════════════════════════════════
+             4-LAYER MACHINE FILE HIERARCHY & DELIVERY PIPELINE
+             AI Crawlability: All text panels pre-rendered.
+             Inactive panels: height:0; visibility:hidden; overflow:hidden
+        ════════════════════════════════════════════════════════ -->
+        <div class="pipeline-section" id="machine-file-pipeline">
+          <div class="pipeline-header">
+            <span class="pipeline-eyebrow">⚙ 4-LAYER MACHINE HIERARCHY &amp; DELIVERY PIPELINE</span>
+            <h2 class="pipeline-title">The 4-Layer Machine File Hierarchy</h2>
+            <p class="pipeline-sub">How we structure your brand data for AI crawlers, RAG pipelines, and agentic LLMs. Fully crawlable without Javascript.</p>
+          </div>
 
+          <div class="pipeline-grid">
+            
+            <!-- Left Side: Interactive Step Cards -->
+            <div class="pipeline-steps-col" role="tablist" aria-label="Pipeline Steps">
+              
+              <!-- Step 1 -->
+              <div class="pipeline-step-card pipeline-step-card--active" id="pipeline-step-1" onclick="switchPipelineStep(1)" role="tab" aria-selected="true" aria-controls="pipeline-panel-1" tabindex="0">
+                <div class="step-num step-num--rose">01</div>
+                <div class="step-info">
+                  <h3>Layer 1 - Protocol Gatekeeper (/robots.txt)</h3>
+                  <span class="step-role">Bot Access Control &amp; Gatekeeper Handshake</span>
+                  <p class="step-desc">Automated WAF rules, user-agent clearance, and pathway mapping to machine manifests.</p>
+                </div>
+              </div>
 
+              <!-- Step 2 -->
+              <div class="pipeline-step-card" id="pipeline-step-2" onclick="switchPipelineStep(2)" role="tab" aria-selected="false" aria-controls="pipeline-panel-2" tabindex="0">
+                <div class="step-num step-num--amber">02</div>
+                <div class="step-info">
+                  <h3>Layer 2 - Discovery Index (/sitemap.xml &amp; /llms.txt)</h3>
+                  <span class="step-role">Machine Navigation &amp; External Asset Registration</span>
+                  <p class="step-desc">Standardized llms.txt file listing high-velocity domain routes and social citation links.</p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="pipeline-step-card" id="pipeline-step-3" onclick="switchPipelineStep(3)" role="tab" aria-selected="false" aria-controls="pipeline-panel-3" tabindex="0">
+                <div class="step-num step-num--copper">03</div>
+                <div class="step-info">
+                  <h3>Layer 3 - Brand Manifest (/ai-context.md)</h3>
+                  <span class="step-role">Core Brand Context &amp; Entity Disambiguation</span>
+                  <p class="step-desc">Proprietary flattened brand manifest protecting against competitor mashups and LLM hallucinations.</p>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="pipeline-step-card" id="pipeline-step-4" onclick="switchPipelineStep(4)" role="tab" aria-selected="false" aria-controls="pipeline-panel-4" tabindex="0">
+                <div class="step-num step-num--emerald">04</div>
+                <div class="step-info">
+                  <h3>Layer 4 - Semantic Payload (Clean Markdown Pages)</h3>
+                  <span class="step-role">High-Density Text Indexing for RAG Vector Search</span>
+                  <p class="step-desc">Cleaned, noise-free Markdown pages optimized for token efficiency.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Side: Live Visual Sandbox (Outputs) -->
+            <div class="pipeline-outputs-col">
+              <div class="pipeline-sandbox-shell">
+                <div class="sandbox-header-bar">
+                  <span class="sandbox-dot red"></span>
+                  <span class="sandbox-dot yellow"></span>
+                  <span class="sandbox-dot green"></span>
+                  <span class="sandbox-title" id="pipeline-sandbox-filename">robots.txt</span>
+                </div>
+
+                <!-- PANEL 1: robots.txt -->
+                <div class="pipeline-panel pipeline-panel--active" id="pipeline-panel-1" role="tabpanel" aria-labelledby="pipeline-step-1">
+                  <div class="panel-details">
+                    <span class="panel-tag text-rose">Layer 1 Handshake Output</span>
+                    <p>WAF firewalls and robots.txt define permissions. We generate machine-ready rules allowing GPTBot, PerplexityBot, and ClaudeBot while mapping discovery sitemaps.</p>
+                    <pre class="panel-code-box"><code># Robots.txt crawler permission manifest
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://aeo.thatworkx.com/sitemap.xml
+LLMs-txt: https://aeo.thatworkx.com/llms.txt</code></pre>
+                  </div>
+                </div>
+
+                <!-- PANEL 2: llms.txt -->
+                <div class="pipeline-panel" id="pipeline-panel-2" role="tabpanel" aria-labelledby="pipeline-step-2">
+                  <div class="panel-details">
+                    <span class="panel-tag text-amber">Layer 2 Handshake Output</span>
+                    <p>Automated index indexing sitemaps, linking core content routes, and establishing verified outbound trust anchors for LLM crawlers.</p>
+                    <pre class="panel-code-box"><code># llms.txt directory
+- [AEO Tooling](https://aeo.thatworkx.com/docs/tooling)
+- [Enterprise API](https://aeo.thatworkx.com/docs/api)
+- [EEAT Verification](https://aeo.thatworkx.com/docs/eeat)
+- [Fair Use Guidelines](https://aeo.thatworkx.com/docs/policy)</code></pre>
+                  </div>
+                </div>
+
+                <!-- PANEL 3: ai-context.md -->
+                <div class="pipeline-panel" id="pipeline-panel-3" role="tabpanel" aria-labelledby="pipeline-step-3">
+                  <div class="panel-details">
+                    <span class="panel-tag text-copper">Layer 3 Handshake Output</span>
+                    <p>Unified organization meta-context. Hardens entity attributes, prevents competitor mashups in search query answers, and references ORCID/LinkedIn author proofs.</p>
+                    <pre class="panel-code-box"><code># Brand manifest context (/ai-context.md)
+* Brand Legal: Thatworkx LLC
+* NAICS ID: 541511
+* Domain Scope: Answer Engine Optimization
+* Author Proof: https://orcid.org/0000-0001-2345-6789</code></pre>
+                  </div>
+                </div>
+
+                <!-- PANEL 4: Clean Markdown -->
+                <div class="pipeline-panel" id="pipeline-panel-4" role="tabpanel" aria-labelledby="pipeline-step-4">
+                  <div class="panel-details">
+                    <span class="panel-tag text-emerald">Layer 4 Handshake Output</span>
+                    <p>Serving final semantic layout to scrapers. Strips JS rendering delays, deletes sidebars/headers, and delivers direct crawlable value to RAG crawlers.</p>
+                    <pre class="panel-code-box"><code># Flat payload pages (readability index)
+## Answer Engine Optimization (AEO) vs SEO
+Traditional sitemaps target index rankings. AEO structures brand data context. Models compile markdown indices natively rather than rendering JS-heavy SPA layouts.</code></pre>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Delivery Channels Bar -->
+          <div class="delivery-channels-bar">
+            <div class="delivery-method">
+              <span class="method-icon">⚡</span>
+              <div class="method-text">
+                <h4>Instant Copy-Paste</h4>
+                <p>For manual server injection</p>
+              </div>
+            </div>
+            <div class="delivery-method">
+              <span class="method-icon">📥</span>
+              <div class="method-text">
+                <h4>One-Click Downloads</h4>
+                <p>.txt / .md / .json bundles</p>
+              </div>
+            </div>
+            <div class="delivery-method">
+              <span class="method-icon">🌐</span>
+              <div class="method-text">
+                <h4>Edge CDN &amp; API Sync</h4>
+                <p>Automated Worker publishing</p>
+              </div>
+            </div>
+            <div class="delivery-method">
+              <span class="method-icon">📄</span>
+              <div class="method-text">
+                <h4>Executive Reports</h4>
+                <p>PDF &amp; Markdown Summaries</p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /machine-file-pipeline -->
 
       </div>
     </section>
+
 
 
     <!-- Input Form Segment -->
