@@ -1243,24 +1243,56 @@ async function generateTrack2File(type) {
 
 let onboardingSelectedMode = 'visualize';
 
-function selectOnboardingCard(mode) {
-  if (mode === 'socialize') {
-    alert('AI Socialize is coming soon in v4.0! Build your external trust networks and citations automatically.');
+function selectConsoleTab(tabId) {
+  if (tabId === 'socialize') {
+    alert('AI Socialize is coming soon in v4.0! Integrate external citations and social credentials directly.');
     return;
   }
-  onboardingSelectedMode = mode;
+  onboardingSelectedMode = tabId;
   
-  // Update UI classes
-  document.querySelectorAll('.onboarding-select-card').forEach(card => card.classList.remove('active-card'));
-  const selectedCard = document.getElementById(`card-onboard-${mode}`);
-  if (selectedCard) {
-    selectedCard.classList.add('active-card');
+  // 1. Update Segmented tab active states
+  document.querySelectorAll('.console-tab-btn').forEach(btn => btn.classList.remove('active'));
+  const activeTabBtn = document.getElementById(`btn-tab-${tabId}`);
+  if (activeTabBtn) activeTabBtn.classList.add('active');
+  
+  // 2. Update Console Card accent glow border
+  const consoleCard = document.getElementById('onboarding-console-card');
+  if (consoleCard) {
+    consoleCard.className = 'onboarding-console-card'; // Reset
+    consoleCard.classList.add(`active-${tabId}-glow`);
   }
   
-  // Scroll smoothly to URL input section
-  const inputSection = document.querySelector('.onboarding-url-section');
-  if (inputSection) {
-    inputSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // 3. Update Main Input Placeholder
+  const inputField = document.getElementById('onboarding-target-url');
+  if (inputField) {
+    if (tabId === 'visualize') {
+      inputField.placeholder = 'Enter website URL to see what AI search bots see (e.g. https://yourbrand.com)...';
+    } else if (tabId === 'optimize') {
+      inputField.placeholder = 'Enter domain to diagnose accessibility, configure schema & edge workers...';
+    }
+  }
+  
+  // 4. Update Button text & colors
+  const btn = document.getElementById('onboarding-submit-btn');
+  const btnText = document.getElementById('onboarding-btn-text');
+  if (btn && btnText) {
+    btn.className = 'onboarding-submit-btn'; // Reset
+    if (tabId === 'visualize') {
+      btnText.innerText = 'Initiate Scan';
+      btn.classList.add('bg-cyan');
+    } else if (tabId === 'optimize') {
+      btnText.innerText = 'Diagnose Site';
+      btn.classList.add('bg-amber');
+    }
+  }
+  
+  // 5. Update Feature cards borders
+  document.querySelectorAll('.feature-card-item').forEach(card => {
+    card.classList.remove('active-border-cyan', 'active-border-amber', 'active-border-violet');
+  });
+  const activeFeatCard = document.getElementById(`feat-card-${tabId}`);
+  if (activeFeatCard) {
+    activeFeatCard.classList.add(`active-border-${tabId === 'visualize' ? 'cyan' : tabId === 'optimize' ? 'amber' : 'violet'}`);
   }
 }
 
@@ -1308,7 +1340,7 @@ window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
 window.generateTrack2File = generateTrack2File;
-window.selectOnboardingCard = selectOnboardingCard;
+window.selectConsoleTab = selectConsoleTab;
 window.executeOnboardingScan = executeOnboardingScan;
 
 
