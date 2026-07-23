@@ -1326,6 +1326,7 @@ body {
   gap: 0.8rem;
   height: 100%;
   min-height: 240px;
+  text-align: left;
 }
 
 .console-tab-btn:hover {

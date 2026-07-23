@@ -4,6 +4,14 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.20.0-sprint8-patch] - 2026-07-23
+
+### Changed
+- **Console Tab Alignment & Layout Refinement**: Left-aligned console tab text and updated typography layout rules in `frontend/index.css`.
+
+### Removed
+- **Tool Cards Cleanup**: Removed obsolete tool cards from `frontend/index.html` to streamline the console UI layout.
+
 ## [1.19.0-sprint8-patch] - 2026-07-23
 
 ### Added
