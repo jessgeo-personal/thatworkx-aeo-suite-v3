@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Visualize Dashboard - Thatworkx AEO Suite</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="page-visualize">
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
+      <span class="logo-symbol">🌐</span>
+      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+    </div>
+    
+    <nav class="nav-links flex items-center gap-4" style="display: flex; gap: 1.2rem; align-items: center;">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="visualize.html" class="nav-link active">👁️ AI Visualize</a>
+      <a href="optimize.html" class="nav-link">🩺 AI Optimize</a>
+      <a href="socialize.html" class="nav-link">📣 AI Socialize</a>
+    </nav>
+
+    <div class="header-actions flex items-center gap-3">
+      <div class="tier-badge-container">
+        <span class="tier-label">Plan:</span>
+        <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+          <option value="AIVisualize Free">AIVisualize Free</option>
+          <option value="AIVisualize Pro">AIVisualize Pro</option>
+          <option value="AIVisualize ENT">AIVisualize ENT</option>
+          <option value="AIOptimize Free">AIOptimize Free</option>
+          <option value="AIOptimize Pro">AIOptimize Pro</option>
+          <option value="AIOptimize ENT">AIOptimize ENT</option>
+        </select>
+      </div>
+      <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+      <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Light/Dark Theme" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: 8px; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1rem; width: 36px; height: 36px;">
+        <span id="theme-toggle-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Visualize Workspace -->
+  <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
+
+    <!-- Audit Action Bar -->
+    <div class="visualize-search-bar-card glassmorphic border-glow-cyan mb-6" style="padding: 1.25rem 1.5rem; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+      
+      <form id="scan-form" onsubmit="executeDashboardScan(event)" style="display: flex; gap: 0.75rem; align-items: center; flex: 1; min-width: 320px;">
+        <div class="input-wrapper" style="position: relative; flex: 1;">
+          <span class="input-icon" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem;">🌐</span>
+          <input type="text" id="target-url" placeholder="Enter target domain (e.g. example.com)..." required style="width: 100%; padding: 0.7rem 1rem 0.7rem 2.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(15, 23, 42, 0.6); color: #f8fafc; font-size: 0.95rem;">
+        </div>
+        <button type="submit" class="submit-btn glowing-btn bg-cyan" id="scan-submit-btn" style="padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+          <span>Run Audit 🔄</span>
+        </button>
+      </form>
+
+      <!-- View Mode Switcher Toggle Pill -->
+      <div class="view-mode-pill-container" style="display: flex; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); padding: 0.25rem; border-radius: 8px; gap: 0.25rem;">
+        <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;">
+          🏢 Executive Mode
+        </button>
+        <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;">
+          🛠️ Developer / DIY Mode
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Active Target Domain Header Display -->
+    <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8;">
+      <div>Scanned Target: <strong id="display-scanned-domain" style="color: #38bdf8;">thatworkx.com</strong></div>
+      <div id="scan-timestamp-badge">Last audited: Just now</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         EXECUTIVE MODE CONTAINER (#exec-mode-container)
+    ════════════════════════════════════════════════════════ -->
+    <div id="exec-mode-container" class="view-mode-section">
+      
+      <!-- Top Row: Score Dial Gauge + Side-by-Side Perception Simulator -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <!-- Overall AI Visibility Score Dial Gauge -->
+        <div class="score-dial-card glassmorphic border-glow-cyan" style="padding: 1.5rem; border-radius: 12px; text-align: center; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <h4 style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">AI Visibility Health Index</h4>
+          
+          <div class="dial-wrapper" style="position: relative; width: 160px; height: 160px; margin: 0 auto 1rem;">
+            <svg viewBox="0 0 100 100" class="dial-svg" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+              <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" stroke-width="8" fill="none"></circle>
+              <circle id="score-dial-arc" cx="50" cy="50" r="42" stroke="#e11d48" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="66" stroke-linecap="round" fill="none" style="transition: stroke-dashoffset 1s ease;"></circle>
+            </svg>
+            <div class="dial-text-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+              <span id="exec-overall-score" style="font-size: 2.5rem; font-weight: 800; color: #ffffff;">75</span>
+              <span style="font-size: 0.8rem; color: #64748b; display: block;">/ 100</span>
+            </div>
+          </div>
+
+          <div id="exec-score-classification-pill" class="badge-status status-amber" style="display: inline-block; padding: 0.35rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">
+            MODERATE VISIBILITY
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.75rem;" id="exec-score-summary-text">
+            Domain has active machine welcome mats, but DOM contains minor content density gaps.
+          </p>
+        </div>
+
+        <!-- Side-by-Side Visual Perception Simulator -->
+        <div class="perception-simulator-card glassmorphic border-glow-cyan" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">👁️ Visual Perception Engine Simulator</h4>
+            <span class="badge-status status-green" style="font-size: 0.75rem;">Live AI Stream comparison</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <!-- Frame 1: What Humans See -->
+            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
+              <div style="font-weight: 600; font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>🌐 What Humans See (Parsed DOM)</span>
+              </div>
+              <div id="sim-human-view" style="font-family: var(--font-sans); font-size: 0.78rem; line-height: 1.5; color: #cbd5e1; height: 160px; overflow-y: auto; background: #0f172a; padding: 0.75rem; border-radius: 6px;">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Frame 2: What ChatGPT & Perplexity Read -->
+            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
+              <div style="font-weight: 600; font-size: 0.8rem; color: #f59e0b; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>🤖 What ChatGPT &amp; Perplexity Read (Vector RAG)</span>
+              </div>
+              <div id="sim-ai-view" style="font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.4; color: #4ade80; height: 160px; overflow-y: auto; background: #090a0f; padding: 0.75rem; border-radius: 6px; white-space: pre-wrap;">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4 Strategic Health Pillars -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+        
+        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 1</div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Gateway &amp; Access</div>
+          <div id="pillar-sec1-badge" class="badge-status status-green" style="font-size: 0.75rem;">OPTIMIZED HANDSHAKE</div>
+        </div>
+
+        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 2</div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Presence &amp; Hygiene</div>
+          <div id="pillar-sec2-badge" class="badge-status status-amber" style="font-size: 0.75rem;">MINOR HYGIENE GAPS</div>
+        </div>
+
+        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 3</div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Parsing &amp; Readability</div>
+          <div id="pillar-sec3-badge" class="badge-status status-green" style="font-size: 0.75rem;">HIGH DENSITY</div>
+        </div>
+
+        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 4</div>
+          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Machine Manifests</div>
+          <div id="pillar-sec4-badge" class="badge-status status-green" style="font-size: 0.75rem;">WELCOME MAT ACTIVE</div>
+        </div>
+
+      </div>
+
+      <!-- Scanned Routes & AI-Ready Machine Files Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        
+        <!-- Scanned Routes Directory -->
+        <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">📂 Scanned Routes Directory Path</h4>
+            <span class="table-count-badge" id="exec-routes-count" style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 12px;">3 Pages Crawled</span>
+          </div>
+          <div class="table-responsive-wrapper" style="max-height: 320px; overflow-y: auto;">
+            <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
+                  <th style="padding: 0.6rem;">Route Path</th>
+                  <th style="padding: 0.6rem;">Word Count</th>
+                  <th style="padding: 0.6rem;">Canonical</th>
+                  <th style="padding: 0.6rem; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="exec-routes-tbody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Scanned AI-Ready Machine Files Table -->
+        <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">🤖 Scanned AI-Ready Machine Files</h4>
+            <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: rgba(74, 222, 128, 0.15); color: #4ade80; padding: 0.2rem 0.6rem; border-radius: 12px;">8 Manifests Tracked</span>
+          </div>
+          <div class="table-responsive-wrapper" style="max-height: 320px; overflow-y: auto;">
+            <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
+                  <th style="padding: 0.6rem;">Machine File</th>
+                  <th style="padding: 0.6rem;">Status</th>
+                  <th style="padding: 0.6rem;">Words / Chars</th>
+                  <th style="padding: 0.6rem; text-align: right;">Inspection</th>
+                </tr>
+              </thead>
+              <tbody id="exec-machine-files-tbody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         DEVELOPER / DIY MODE CONTAINER (#dev-mode-container)
+    ════════════════════════════════════════════════════════ -->
+    <div id="dev-mode-container" class="view-mode-section" style="display: none;">
+      
+      <!-- 32-Capability Diagnostic Matrix -->
+      <div id="dev-matrix-wrapper"></div>
+
+      <!-- Code Inspection Drawers -->
+      <div id="dev-drawers-wrapper"></div>
+
+      <!-- Edge Network Sandbox -->
+      <div id="dev-edge-wrapper"></div>
+
+      <!-- Expandable Route Directory Table -->
+      <div id="dev-routes-wrapper"></div>
+
+    </div>
+
+  </main>
+
+  <!-- Modals Container -->
+  <div id="auth-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto;">
+      <span class="modal-close" onclick="closeAuthModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center;">🔐</div>
+      <h3 id="auth-modal-title" style="text-align: center; color: #fff; margin-bottom: 0.5rem;">Authenticate to Thatworkx AEO</h3>
+      <p id="auth-modal-subtitle" style="text-align: center; font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem;">Access your multi-page crawler credits and custom edge routing scripts.</p>
+
+      <div class="auth-tabs" id="auth-tabs-container" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">Sign In</button>
+        <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">New User</button>
+      </div>
+
+      <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Email Address:</label>
+          <input type="email" id="login-email" required placeholder="user@example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        </div>
+        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

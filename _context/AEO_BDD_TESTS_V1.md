@@ -185,4 +185,41 @@ This document defines the business-logic integration tests in Given/When/Then fo
   And all text nodes (titles, subheads, list items) maintain responsive, legible typography (`text-lg`, `text-xs`, `text-[11px]`)
   And touch target areas for each tab button meet mobile accessibility guidelines (minimum target height >= 44px)
 
+---
+
+## Feature 10: 4-Page Architecture, Deep-Linked URL Search Parameters & REST API Readiness
+
+### Scenario 10.1: Direct URL Audit Triggers (`visualize.html?url=example.com`)
+  Given a user accesses `visualize.html?url=example.com`
+  When the page initializes
+  Then the AIVisualize scanner automatically executes or fetches audit metrics for `example.com`
+  And the top scanned route header displays `example.com`
+  And all 32 capability metric cards populate cleanly without requiring manual search bar entry.
+
+### Scenario 10.2: Deep-Linked View Mode Triggers (`visualize.html?url=example.com&mode=developer`)
+  Given a user accesses `visualize.html?url=example.com&mode=developer`
+  When the AIVisualize page finishes loading
+  Then the Developer / DIY Mode view is active by default
+  And the 32-capability diagnostic matrix and machine code drawers are displayed
+  And when `mode=executive` is specified, Executive Mode is active showing the score dial gauge and perception simulator.
+
+### Scenario 10.3: Deep-Linked Target Domain on AIOptimize (`optimize.html?url=example.com`)
+  Given a user navigates to `optimize.html?url=example.com`
+  When the AIOptimize page initializes
+  Then the target domain input is pre-filled with `example.com`
+  And remediation generators (Track 1 Page Fixes & Track 2 File Generators) load configured manifests for `example.com`.
+
+### Scenario 10.4: Programmatic REST API Audit Endpoints (`/api/v1/scan?url=example.com`)
+  Given a Pro or Enterprise API consumer issues a request to `GET /api/v1/scan?url=example.com` or `POST /api/v1/scan`
+  When valid authorization credentials or session tokens are provided
+  Then the system returns a structured JSON payload containing the 32-capability diagnostic evaluation matrix, score health index, and generated machine manifest paths
+  And the API response supports headless sweep flags (`headless=true`) for authorized Pro/ENT accounts.
+
+### Scenario 10.5: Global Auth Modal & Navigation Bar Integrity across 4 Pages
+  Given a user is navigating across any of the 4 dedicated pages (`index.html`, `visualize.html`, `optimize.html`, `socialize.html`)
+  When the user clicks "🔑 Sign In" in the top navigation header
+  Then the authentication OTP modal opens cleanly over the active page
+  And the top header brand logo (`THATWORKX AEO SUITE`) provides a clean hyperlink returning to `index.html`.
+
+
 

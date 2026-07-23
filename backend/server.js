@@ -202,8 +202,68 @@ app.post('/api/generator/build', async (req, res) => {
   }
 });
 
-// Serve frontend assets
+// REST API v1 Endpoint for Pro & Enterprise programmatic integrations
+app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
+  try {
+    let targetUrl = req.query.url;
+    if (!targetUrl) {
+      return res.status(400).json({ error: 'Target URL parameter (url) is required' });
+    }
+    targetUrl = targetUrl.trim();
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = 'https://' + targetUrl;
+    }
+    const scanResults = await analyzeUrl(targetUrl, req.userLimits);
+    res.json({
+      success: true,
+      api_version: 'v1',
+      target_url: targetUrl,
+      results: scanResults
+    });
+  } catch (error) {
+    console.error('API v1 Scan Error:', error);
+    res.status(500).json({ error: 'Internal API scan failure' });
+  }
+});
+
+app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
+  try {
+    let { targetUrl, url } = req.body;
+    let target = targetUrl || url;
+    if (!target) {
+      return res.status(400).json({ error: 'Target URL field is required' });
+    }
+    target = target.trim();
+    if (!/^https?:\/\//i.test(target)) {
+      target = 'https://' + target;
+    }
+    const scanResults = await analyzeUrl(target, req.userLimits);
+    res.json({
+      success: true,
+      api_version: 'v1',
+      target_url: target,
+      results: scanResults
+    });
+  } catch (error) {
+    console.error('API v1 POST Scan Error:', error);
+    res.status(500).json({ error: 'Internal API scan failure' });
+  }
+});
+
+// Serve frontend assets and dedicated page routes
 app.use(express.static(path.join(__dirname, '../frontend')));
+
+app.get('/visualize', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/visualize.html'));
+});
+
+app.get('/optimize', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/optimize.html'));
+});
+
+app.get('/socialize', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/socialize.html'));
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
@@ -214,3 +274,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+

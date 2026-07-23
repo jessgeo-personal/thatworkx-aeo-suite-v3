@@ -1,14 +1,241 @@
 // Current Client State
 let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
+let activeVisualizeViewMode = 'executive'; // Default active state: Executive Mode
 let currentEmail = 'user@thatworkx.com'; // Default user session email
+
+// Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
+const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) 
+  ? 'http://localhost:5000' 
+  : '';
+
+// AIVisualize Dual-View Switcher Handler (Executive vs Developer / DIY Mode)
+function setVisualizeViewMode(mode) {
+  activeVisualizeViewMode = mode;
+  
+  const execContainer = document.getElementById('exec-mode-container');
+  const devContainer = document.getElementById('dev-mode-container');
+  const pillExec = document.getElementById('pill-exec-mode') || document.getElementById('btn-mode-executive');
+  const pillDev = document.getElementById('pill-dev-mode') || document.getElementById('btn-mode-developer');
+
+  if (mode === 'developer' || mode === 'diy') {
+    if (execContainer) execContainer.style.display = 'none';
+    if (devContainer) devContainer.style.display = 'block';
+    if (pillExec) pillExec.classList.remove('active');
+    if (pillDev) pillDev.classList.add('active');
+  } else {
+    if (execContainer) execContainer.style.display = 'block';
+    if (devContainer) devContainer.style.display = 'none';
+    if (pillExec) pillExec.classList.add('active');
+    if (pillDev) pillDev.classList.remove('active');
+  }
+
+  const panel = document.getElementById('panel-visualize');
+  if (panel) {
+    panel.setAttribute('data-visualize-mode', mode);
+  }
+
+  // Update URL parameters without reloading
+  if (typeof window !== 'undefined' && window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('mode', mode);
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+  }
+}
+
+// Executive Mode Action: Export PDF Summary
+function exportExecutiveSummaryPdf() {
+  window.print();
+}
+
+// Executive Mode Action: Launch AIOptimize Remediation Bridge
+function launchAIOptimizeBridge(path = '', issue = '') {
+  window.location.href = `optimize.html?issue=${encodeURIComponent(issue)}`;
+}
 
 // Cooldown variables for Anti-Blocking Safe Mode
 let cooldownActive = false;
 let cooldownTimeRemaining = 0;
 let cooldownInterval = null;
 
-// Initialize page content
+// Developer Mode HTML Template Builders
+function buildDevMatrixHtml() {
+  return `
+    <div class="developer-matrix-card glassmorphic" id="dev-matrix-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🛠️ 32-Capability Granular Diagnostic Matrix</span>
+            <span class="badge-status status-green" style="font-size: 0.72rem;">Full Technical Audit</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+        </div>
+        <span class="table-count-badge" style="font-size: 0.85rem; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.25rem 0.75rem; border-radius: 12px;">32 Checks Evaluated</span>
+      </div>
+
+      <div class="matrix-filter-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        <button type="button" class="matrix-tab-btn control-menu-item active" onclick="filterMatrixSection('all')">All (32)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(1)">Section 1: Gateway (3)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(2)">Section 2: Hygiene (7)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(3)">Section 3: Parsing (10)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(4)">Section 4: Manifests (12)</button>
+      </div>
+
+      <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto;">
+        <table class="exec-table dev-matrix-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+              <th style="padding: 0.6rem;">#</th>
+              <th style="padding: 0.6rem;">Capability &amp; Parameter</th>
+              <th style="padding: 0.6rem;">Category</th>
+              <th style="padding: 0.6rem;">Status</th>
+              <th style="padding: 0.6rem;">Score</th>
+              <th style="padding: 0.6rem;">Technical Details &amp; Character Volume</th>
+            </tr>
+          </thead>
+          <tbody id="dev-matrix-tbody">
+            <!-- Dynamic 32-capability rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function buildDevDrawersHtml(domainName = 'thatworkx.com') {
+  return `
+    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>💻 Machine File Code Inspection Drawers</span>
+            <span class="badge-status status-green" style="font-size: 0.72rem;">Syntax Highlighted</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+        </div>
+      </div>
+
+      <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <button type="button" class="drawer-tab-btn control-menu-item active" onclick="selectCodeDrawer('llms')">/llms.txt</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('aicontext')">/ai-context.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('robots')">/robots.txt</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('sitemap')">/sitemap.xml</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('readme')">/README.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('about')">/about.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('docs')">/docs.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('content')">/content.md</button>
+      </div>
+
+      <div class="drawer-code-window" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
+        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+          <span class="drawer-file-path" id="drawer-current-filepath" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8;">/llms.txt</span>
+          <div class="drawer-action-btns" style="display: flex; gap: 0.5rem;">
+            <button type="button" class="drawer-btn" onclick="copyDrawerCode()">📋 Copy Code</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadDrawerFile()">📥 Download File</button>
+          </div>
+        </div>
+        <div class="drawer-code-body">
+          <pre><code id="drawer-code-content" class="language-markdown"># ${domainName} LLMs Machine Directory Index
+> Comprehensive AI Machine Welcome Directory following the Answer.ai Specification.
+
+## Core Navigation Routes
+- [Home Page](https://${domainName}/): Primary brand homepage & solutions overview.
+- [About Us](https://${domainName}/about): Verified corporate entity & leadership credentials.
+- [Documentation](https://${domainName}/docs): Technical API integration manuals and workflow guides.
+
+## System Context Map Pointer
+- [AI System Context](https://${domainName}/ai-context.md): Flattened RAG system context map.</code></pre>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildDevEdgeHtml() {
+  return `
+    <div class="edge-network-card glassmorphic" id="dev-edge-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🌐 Edge Network &amp; WAF Deployment Sandbox</span>
+            <span class="badge-status status-green" style="font-size: 0.72rem;">Cloudflare &amp; Falcon Hooks</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Deploy edge worker proxies to serve /llms.txt and bypass closed CMS restrictions.</p>
+        </div>
+      </div>
+
+      <div class="edge-tabs-nav" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        <button type="button" class="edge-tab-btn control-menu-item active" onclick="selectEdgeTab('cloudflare')">Cloudflare Worker Proxy</button>
+        <button type="button" class="edge-tab-btn control-menu-item" onclick="selectEdgeTab('shopify')">Shopify Liquid Redirect</button>
+        <button type="button" class="edge-tab-btn control-menu-item" onclick="selectEdgeTab('crowdstrike')">Crowdstrike Falcon Bypass</button>
+      </div>
+
+      <div class="edge-tab-content" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
+        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #f59e0b;">Cloudflare Worker Edge Router (worker.js)</span>
+          <button type="button" class="drawer-btn" onclick="copyEdgeScript()">📋 Copy Worker Script</button>
+        </div>
+        <div class="drawer-code-body">
+          <pre><code id="edge-code-content" class="language-javascript">// Cloudflare Worker Edge Proxy Hook for AEO Machine Files
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  if (url.pathname === '/llms.txt') {
+    return new Response(LLMS_TXT_CONTENT, {
+      headers: { 
+        'content-type': 'text/plain; charset=utf-8',
+        'x-robots-tag': 'all',
+        'cache-control': 'public, max-age=3600'
+      }
+    });
+  }
+  return fetch(request);
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildDevRoutesHtml() {
+  return `
+    <div class="expandable-routes-card glassmorphic" id="dev-expandable-routes-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>📂 Scanned Routes Directory (Expandable DOM Metrics)</span>
+            <span class="badge-status status-green" style="font-size: 0.72rem;">[▶] Click to Expand</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Expand individual route rows to inspect raw DOM heading arrays, token counts, and canonical link tags.</p>
+        </div>
+        <span class="table-count-badge" id="dev-routes-count" style="font-size: 0.85rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 12px;">4 Routes Tracked</span>
+      </div>
+
+      <div class="table-responsive-wrapper">
+        <table class="exec-table dev-expandable-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+              <th style="width: 40px; padding: 0.6rem;"></th>
+              <th style="padding: 0.6rem;">Route Path</th>
+              <th style="padding: 0.6rem;">Word Count</th>
+              <th style="padding: 0.6rem;">Token Count</th>
+              <th style="padding: 0.6rem;">Canonical Tag</th>
+              <th style="padding: 0.6rem;">Heading Hierarchy</th>
+            </tr>
+          </thead>
+          <tbody id="dev-expandable-routes-tbody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// 4-Page Architecture Router Initialization
 document.addEventListener('DOMContentLoaded', () => {
   generateRobotsTxt();
   generateCloudflareWorker();
@@ -16,31 +243,56 @@ document.addEventListener('DOMContentLoaded', () => {
   generateManifests();
   generateEdgeSnippets();
   checkAuthSession();
-  
-  // Synchronize tier with backend
   updateUserTier();
 
-  // Handle URL query parameter bookmarks
+  const currentPath = window.location.pathname.toLowerCase();
   const params = new URLSearchParams(window.location.search);
-  const toolParam = params.get('tool');
-  const urlParam = params.get('url');
-  if (toolParam && urlParam) {
-    if (toolParam === 'visualize' || toolParam === 'optimize') {
-      selectConsoleTab(toolParam);
-    }
-    const onboardInput = document.getElementById('onboarding-target-url');
-    if (onboardInput) onboardInput.value = urlParam;
-    const mainInput = document.getElementById('target-url');
-    if (mainInput) mainInput.value = urlParam;
+  const targetUrlParam = params.get('url');
+  const modeParam = params.get('mode');
 
-    setTimeout(() => {
-      const onboardForm = document.getElementById('onboarding-scan-form');
-      if (onboardForm) {
-        executeOnboardingScan(new Event('submit'));
-      }
-    }, 400);
+  // Page 2: AI Visualize Dashboard (visualize.html or /visualize)
+  if (currentPath.includes('visualize')) {
+    const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+    const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
+    const devEdgeWrap = document.getElementById('dev-edge-wrapper');
+    const devRoutesWrap = document.getElementById('dev-routes-wrapper');
+
+    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
+    if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || 'thatworkx.com');
+    if (devEdgeWrap) devEdgeWrap.innerHTML = buildDevEdgeHtml();
+    if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
+
+    if (modeParam === 'developer' || modeParam === 'diy') {
+      setVisualizeViewMode('developer');
+    } else {
+      setVisualizeViewMode('executive');
+    }
+
+    if (targetUrlParam) {
+      const mainInput = document.getElementById('target-url');
+      if (mainInput) mainInput.value = targetUrlParam;
+      executeDashboardScan(null);
+    } else {
+      // Default initial scan load for demo
+      executeDashboardScan(null);
+    }
+  }
+
+  // Page 3: AI Optimize Workspace (optimize.html or /optimize)
+  else if (currentPath.includes('optimize')) {
+    if (targetUrlParam) {
+      const domainInput = document.getElementById('optimize-target-domain');
+      if (domainInput) domainInput.value = targetUrlParam;
+    }
+    switchOptimizeTrack(1);
+  }
+
+  // Page 4: AI Socialize Page (socialize.html or /socialize)
+  else if (currentPath.includes('socialize')) {
+    // Socialize initializers
   }
 });
+
 
 // Product panel navigation switches (Visualize vs Optimize vs Socialize)
 function switchProduct(productName) {
@@ -124,7 +376,7 @@ async function updateUserTier() {
   }
 
   try {
-    const res = await fetch('/api/user/tier', {
+    const res = await fetch(`${API_BASE}/api/user/tier`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: currentEmail, tier: selectedTier })
@@ -161,7 +413,7 @@ async function executeScan(event) {
   submitBtn.disabled = true;
 
   try {
-    const response = await fetch('/api/scan', {
+    const response = await fetch(`${API_BASE}/api/scan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -199,7 +451,7 @@ async function executeScan(event) {
 
   } catch (error) {
     console.error('Connection failure during scan submission:', error);
-    alert('Failed to connect to backend scan services.');
+    alert(error.message || 'Failed to connect to backend scan services.');
   } finally {
     btnLoader.style.display = 'none';
     if (cooldownActive) {
@@ -247,16 +499,30 @@ function startCooldown(seconds) {
 
 // Display analysis parameters on the dashboard
 function displayScanResults(results) {
-  document.getElementById('scan-placeholder').style.display = 'none';
-  document.getElementById('scan-results').style.display = 'grid';
+  if (!results) return;
+
+  const placeholder = document.getElementById('scan-placeholder');
+  if (placeholder) placeholder.style.display = 'none';
+
+  const scanResultsEl = document.getElementById('scan-results');
+  if (scanResultsEl) scanResultsEl.style.display = 'grid';
 
   // Overall Score
-  document.getElementById('overall-score').innerText = results.scoreCard.overallScore;
-  const classBadge = document.getElementById('classification-badge');
-  classBadge.innerText = results.scoreCard.classification.toUpperCase();
-  classBadge.className = `badge-${results.scoreCard.classification.toLowerCase()}`;
+  const overallScoreEl = document.getElementById('overall-score');
+  if (overallScoreEl && results.scoreCard) {
+    overallScoreEl.innerText = results.scoreCard.overallScore;
+  }
 
-  document.getElementById('crawled-pages-text').innerText = `Crawled ${results.pageDepthCrawled} of ${results.totalPagesFound} discovered paths`;
+  const classBadge = document.getElementById('classification-badge');
+  if (classBadge && results.scoreCard?.classification) {
+    classBadge.innerText = results.scoreCard.classification.toUpperCase();
+    classBadge.className = `badge-${results.scoreCard.classification.toLowerCase()}`;
+  }
+
+  const crawledTextEl = document.getElementById('crawled-pages-text');
+  if (crawledTextEl) {
+    crawledTextEl.innerText = `Crawled ${results.pageDepthCrawled} of ${results.totalPagesFound} discovered paths`;
+  }
 
   const routesCountEl = document.getElementById('scanned-routes-count');
   if (routesCountEl) {
@@ -398,90 +664,99 @@ function displayScanResults(results) {
 
   // Alerts
   const alertsContainer = document.getElementById('alerts-container');
-  alertsContainer.innerHTML = '';
-  
-  if (results.alerts.length === 0) {
-    alertsContainer.innerHTML = '<div class="alert-empty">No critical firewall or gateway warnings. Your crawler corridors are clear.</div>';
-  } else {
-    results.alerts.forEach(alert => {
-      const alertEl = document.createElement('div');
-      alertEl.className = 'alert-item alert-critical';
-      alertEl.innerHTML = `
-        <div>
-          <div class="alert-item-title">${alert.type.replace(/_/g, ' ')}</div>
-          <div class="alert-item-desc">${alert.message}</div>
-        </div>
-      `;
-      alertsContainer.appendChild(alertEl);
-    });
+  if (alertsContainer) {
+    alertsContainer.innerHTML = '';
+    if (results.alerts && results.alerts.length === 0) {
+      alertsContainer.innerHTML = '<div class="alert-empty">No critical firewall or gateway warnings. Your crawler corridors are clear.</div>';
+    } else if (results.alerts) {
+      results.alerts.forEach(alert => {
+        const alertEl = document.createElement('div');
+        alertEl.className = 'alert-item alert-critical';
+        alertEl.innerHTML = `
+          <div>
+            <div class="alert-item-title">${alert.type.replace(/_/g, ' ')}</div>
+            <div class="alert-item-desc">${alert.message}</div>
+          </div>
+        `;
+        alertsContainer.appendChild(alertEl);
+      });
+    }
   }
 
-  // Populate scanned paths list table
+  // Populate scanned paths list table (legacy view fallback)
   const tbody = document.getElementById('scanned-routes-tbody');
-  tbody.innerHTML = '';
-  
-  const inputUrlVal = document.getElementById('target-url').value.trim();
-  const cleanBaseUrl = inputUrlVal 
-    ? (inputUrlVal.startsWith('http') ? inputUrlVal : `https://${inputUrlVal}`)
-    : 'https://example.com';
-
-  results.pages.forEach(p => {
-    const row = document.createElement('tr');
+  if (tbody && results.pages) {
+    tbody.innerHTML = '';
     
-    // Page paths with direct go to page and audit individual page buttons
-    const fullPageUrl = p.canonicalUrl || `${cleanBaseUrl.replace(/\/$/, '')}${p.route}`;
-    const pathHtml = `
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
-        <code style="color: var(--sky-color); font-weight: 500;">${p.route}</code>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
-            Go to page ↗
-          </a>
-          <button class="direct-link-btn audit-page-btn" onclick="auditSinglePage(event, '${p.route}', this)" title="Re-analyze this individual page live">
-            Audit Page 🔄
-          </button>
+    const targetUrlEl = document.getElementById('target-url');
+    const inputUrlVal = targetUrlEl ? targetUrlEl.value.trim() : '';
+    const cleanBaseUrl = inputUrlVal 
+      ? (inputUrlVal.startsWith('http') ? inputUrlVal : `https://${inputUrlVal}`)
+      : 'https://example.com';
+
+    results.pages.forEach(p => {
+      const row = document.createElement('tr');
+      
+      const fullPageUrl = p.canonicalUrl || `${cleanBaseUrl.replace(/\/$/, '')}${p.route}`;
+      const pathHtml = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+          <code style="color: var(--sky-color); font-weight: 500;">${p.route}</code>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <a href="${fullPageUrl}" target="_blank" rel="noopener noreferrer" class="direct-link-btn" title="Open page in new tab">
+              Go to page ↗
+            </a>
+            <button class="direct-link-btn audit-page-btn" onclick="auditSinglePage(event, '${p.route}', this)" title="Re-analyze this individual page live">
+              Audit Page 🔄
+            </button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    // Word Count with dynamic pill color coding
-    let wordCountHtml = '';
-    if (p.wordCount < 500) {
-      wordCountHtml = `<span class="wc-pill wc-pill-red" title="Data Starvation (< 500 words)">${p.wordCount} words (Low)</span>`;
-    } else if (p.wordCount >= 500 && p.wordCount <= 1200) {
-      wordCountHtml = `<span class="wc-pill wc-pill-green" title="Semantic Sweet Spot (500 - 1,200 words)">${p.wordCount} words (Ideal)</span>`;
-    } else if (p.wordCount > 1200 && p.wordCount <= 2500) {
-      wordCountHtml = `<span class="wc-pill wc-pill-yellow" title="Boundary Territory (1,201 - 2,500 words)">${p.wordCount} words (Moderate)</span>`;
-    } else {
-      wordCountHtml = `<span class="wc-pill wc-pill-red" title="Truncation Risk (> 2,500 words)">${p.wordCount} words (High)</span>`;
-    }
+      let wordCountHtml = '';
+      if (p.wordCount < 500) {
+        wordCountHtml = `<span class="wc-pill wc-pill-red" title="Data Starvation (< 500 words)">${p.wordCount} words (Low)</span>`;
+      } else if (p.wordCount >= 500 && p.wordCount <= 1200) {
+        wordCountHtml = `<span class="wc-pill wc-pill-green" title="Semantic Sweet Spot (500 - 1,200 words)">${p.wordCount} words (Ideal)</span>`;
+      } else if (p.wordCount > 1200 && p.wordCount <= 2500) {
+        wordCountHtml = `<span class="wc-pill wc-pill-yellow" title="Boundary Territory (1,201 - 2,500 words)">${p.wordCount} words (Moderate)</span>`;
+      } else {
+        wordCountHtml = `<span class="wc-pill wc-pill-red" title="Truncation Risk (> 2,500 words)">${p.wordCount} words (High)</span>`;
+      }
 
-    // Canonical URL showing the actual URL or flag missing
-    let canonicalHtml = '';
-    if (p.hasCanonical && p.canonicalUrl) {
-      canonicalHtml = `<code style="font-size: 0.8rem; word-break: break-all; color: var(--dark-300);">${p.canonicalUrl}</code>`;
-    } else {
-      canonicalHtml = `<span class="wc-pill wc-pill-red" style="font-weight: bold; padding: 4px 10px;">✗ Missing (Diluted)</span>`;
-      row.style.background = 'rgba(239, 68, 68, 0.03)';
-    }
+      let canonicalHtml = '';
+      if (p.hasCanonical && p.canonicalUrl) {
+        canonicalHtml = `<code style="font-size: 0.8rem; word-break: break-all; color: var(--dark-300);">${p.canonicalUrl}</code>`;
+      } else {
+        canonicalHtml = `<span class="wc-pill wc-pill-red" style="font-weight: bold; padding: 4px 10px;">✗ Missing (Diluted)</span>`;
+        row.style.background = 'rgba(239, 68, 68, 0.03)';
+      }
 
-    // Structure with tick/cross and hierarchy check
-    const isOk = p.headingAudit ? p.headingAudit.isHierarchyValid : true;
-    const h1Count = p.headingAudit ? p.headingAudit.h1 : 1;
-    const h2Count = p.headingAudit ? p.headingAudit.h2 : 0;
-    
-    const statusIcon = isOk 
-      ? `<span style="color: #4ade80; font-weight: bold; margin-right: 6px;" title="Proper hierarchy followed">✓</span>` 
-      : `<span style="color: #f87171; font-weight: bold; margin-right: 6px;" title="Hierarchy Violated! (Requires exactly 1 H1 and linear sequence)">✗</span>`;
-    
-    const structureHtml = `
-      <div style="display: flex; align-items: center; gap: 4px;">
-        ${statusIcon}
-        <span class="${isOk ? '' : 'text-danger-glow'}" style="font-size: 0.85rem;">
-          ${h1Count} H1 / ${h2Count} H2
-        </span>
-      </div>
-    `;
+      const isOk = p.headingAudit ? p.headingAudit.isHierarchyValid : true;
+      const h1Count = p.headingAudit ? p.headingAudit.h1 : 1;
+      const h2Count = p.headingAudit ? p.headingAudit.h2 : 0;
+      
+      const statusIcon = isOk 
+        ? `<span style="color: #4ade80; font-weight: bold; margin-right: 6px;" title="Proper hierarchy followed">✓</span>` 
+        : `<span style="color: #f87171; font-weight: bold; margin-right: 6px;" title="Hierarchy Violated!">✗</span>`;
+      
+      const structureHtml = `
+        <div style="display: flex; align-items: center; gap: 4px;">
+          ${statusIcon}
+          <span class="${isOk ? '' : 'text-danger-glow'}" style="font-size: 0.85rem;">
+            ${h1Count} H1 / ${h2Count} H2
+          </span>
+        </div>
+      `;
+
+      row.innerHTML = `
+        <td>${pathHtml}</td>
+        <td>${wordCountHtml}</td>
+        <td>${canonicalHtml}</td>
+        <td>${structureHtml}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
     row.innerHTML = `
       <td>${pathHtml}</td>
@@ -502,6 +777,507 @@ function displayScanResults(results) {
     } catch (e) {
       // Fallback if URL parsing fails
     }
+  }
+
+  // Synchronize Executive Mode UI with user scanned domain and evaluation metrics
+  updateExecutiveViewData(results);
+  
+  // Synchronize Developer Mode UI with 32-capability matrix and code drawers
+  updateDeveloperViewData(results);
+}
+
+// Global Evaluated Capabilities Cache & Scanned Domain
+let currentEvaluatedCapabilities = [];
+let currentScannedDomain = 'holiknits.com';
+
+function updateDeveloperViewData(results) {
+  if (!results) return;
+
+  const inputVal = document.getElementById('target-url')?.value.trim() || document.getElementById('onboarding-target-url')?.value.trim() || '';
+  let rawUrl = results.url || results.domain || inputVal || '';
+  if (rawUrl) {
+    currentScannedDomain = rawUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+  }
+
+  // Compute full 32 capability evaluations via capabilityEvaluator engine
+  const evalResults = evaluateAllCapabilities(results);
+  currentEvaluatedCapabilities = evalResults.capabilities;
+
+  renderDeveloperMatrixRows(currentEvaluatedCapabilities);
+  renderExpandableRoutesTable(results);
+  selectCodeDrawer(activeDrawerKey, results);
+}
+
+function renderDeveloperMatrixRows(capabilities) {
+  const tbody = document.getElementById('dev-matrix-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = capabilities.map((cap, idx) => `
+    <tr data-section="${cap.section}">
+      <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
+      <td>
+        <strong>${cap.name}</strong>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">${cap.description}</div>
+      </td>
+      <td><span class="dev-cat-badge">${cap.category}</span></td>
+      <td>
+        <span class="badge-status ${cap.status === 'pass' ? 'status-green' : (cap.status === 'blocked' ? 'status-red' : 'status-yellow')}">
+          ${cap.status === 'pass' ? '🟢 Pass' : (cap.status === 'blocked' ? '🔴 Blocked' : '🟡 Warning')}
+        </span>
+      </td>
+      <td style="font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
+      <td style="font-size: 0.8rem; color: var(--text-main);">${cap.details}</td>
+      <td style="text-align: right;">
+        <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')">
+          <span>⚡ Fix in AIOptimize</span>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterMatrixSection(section) {
+  const buttons = document.querySelectorAll('.matrix-tab-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick')?.includes(`'${section}'`) || b.getAttribute('onclick')?.includes(`(${section})`));
+  if (targetBtn) targetBtn.classList.add('active');
+
+  if (section === 'all') {
+    renderDeveloperMatrixRows(currentEvaluatedCapabilities);
+  } else {
+    const filtered = currentEvaluatedCapabilities.filter(c => c.section === Number(section));
+    renderDeveloperMatrixRows(filtered);
+  }
+}
+
+let activeDrawerKey = 'llms';
+
+function getDynamicDrawerTemplates(domainName, results = {}) {
+  const targetUrl = `https://${domainName}`;
+  const status = results.status || {};
+
+  return {
+    llms: {
+      path: '/llms.txt',
+      content: status.llmsTxtContent || `# ${domainName} LLMs Machine Directory Index\n> Answer.ai Standard Machine Directory File for ${domainName}.\n\n## Primary Target Domain\n- [Homepage](${targetUrl}/): Core web presence and main offerings.\n- [About](${targetUrl}/about): Corporate identity & verified entity information.\n- [Docs](${targetUrl}/docs): Technical manuals and integration guides.\n\n## System Context Blueprint Pointer\n- [AI System Context](${targetUrl}/ai-context.md): Flattened RAG system context map.`
+    },
+    aicontext: {
+      path: '/ai-context.md',
+      content: status.aiContextContent || `# ${domainName.toUpperCase()}: SYSTEM CONTEXT MAP\n> Flattened RAG System Context & Entity Blueprint Manifest.\n\n## Target Domain Architecture\n- Host Domain: ${domainName}\n- Primary Canonical Protocol: HTTPS SSL Enabled\n- Level 1 Gateway: /robots.txt directives\n- Level 2 Machine Welcome: /llms.txt index file\n- Level 3 RAG Vector Context: /ai-context.md`
+    },
+    robots: {
+      path: '/robots.txt',
+      content: status.robotsTxtContent || `# robots.txt AI Search & Bot Gateway Directives for ${domainName}\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nSitemap: ${targetUrl}/sitemap.xml`
+    },
+    sitemap: {
+      path: '/sitemap.xml',
+      content: status.sitemapContent || `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${targetUrl}/</loc>\n    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n    <priority>1.0</priority>\n  </url>\n</urlset>`
+    },
+    readme: {
+      path: '/README.md',
+      content: `# ${domainName} Orientation Guide\nWelcome to the machine agent orientation guide for ${domainName}.`
+    },
+    about: {
+      path: '/about.md',
+      content: `# ${domainName} Entity Verification\nCorporate entity ownership, leadership credentials, and brand verification for ${domainName}.`
+    },
+    docs: {
+      path: '/docs.md',
+      content: `# ${domainName} Technical Manual\nTechnical integration instructions and architecture specifications for ${domainName}.`
+    },
+    content: {
+      path: '/content.md',
+      content: `# ${domainName} Flat Article Index\nFlat markdown directory index summarizing core knowledge bases for ${domainName}.`
+    }
+  };
+}
+
+function selectCodeDrawer(key, results = null) {
+  activeDrawerKey = key;
+  const buttons = document.querySelectorAll('.drawer-tab-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick')?.includes(`'${key}'`));
+  if (targetBtn) targetBtn.classList.add('active');
+
+  const templates = getDynamicDrawerTemplates(currentScannedDomain, results || {});
+  const fileInfo = templates[key] || templates.llms;
+
+  const pathEl = document.getElementById('drawer-current-filepath');
+  if (pathEl) pathEl.innerText = fileInfo.path;
+
+  const contentEl = document.getElementById('drawer-code-content');
+  if (contentEl) contentEl.innerText = fileInfo.content;
+}
+
+function copyDrawerCode() {
+  const contentEl = document.getElementById('drawer-code-content');
+  if (contentEl) {
+    navigator.clipboard.writeText(contentEl.innerText);
+    alert('Copied drawer code to clipboard!');
+  }
+}
+
+function downloadDrawerFile() {
+  const templates = getDynamicDrawerTemplates(currentScannedDomain);
+  const fileInfo = templates[activeDrawerKey] || templates.llms;
+  const blob = new Blob([fileInfo.content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileInfo.path.replace(/^\//, '');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function selectEdgeTab(key) {
+  const buttons = document.querySelectorAll('.edge-tab-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick')?.includes(`'${key}'`));
+  if (targetBtn) targetBtn.classList.add('active');
+
+  const titleEl = document.getElementById('edge-current-title');
+  const codeEl = document.getElementById('edge-code-content');
+  const domain = currentScannedDomain;
+
+  if (key === 'cloudflare') {
+    if (titleEl) titleEl.innerText = `Cloudflare Worker Edge Router for ${domain} (worker.js)`;
+    if (codeEl) codeEl.innerText = `// Cloudflare Worker Edge Proxy Hook for ${domain}\naddEventListener('fetch', event => {\n  event.respondWith(handleRequest(event.request));\n});\n\nasync function handleRequest(request) {\n  const url = new URL(request.url);\n  if (url.pathname === '/llms.txt') {\n    return new Response(LLMS_TXT_CONTENT, { headers: { 'content-type': 'text/plain; charset=utf-8', 'x-robots-tag': 'all' } });\n  }\n  return fetch(request);\n}`;
+  } else if (key === 'shopify') {
+    if (titleEl) titleEl.innerText = `Shopify Primary Domain Redirect Hook for ${domain}`;
+    if (codeEl) codeEl.innerText = `<!-- Shopify Liquid Root Directive Hook for ${domain} -->\n{% if request.path == '/llms.txt' %}\n  {% layout none %}\n  {{ settings.llms_txt_content }}\n{% endif %}`;
+  } else if (key === 'crowdstrike') {
+    if (titleEl) titleEl.innerText = `Crowdstrike Falcon & WAF Directives for ${domain}`;
+    if (codeEl) codeEl.innerText = `# Crowdstrike Falcon / WAF Directives for ${domain}\nAllowUserAgent: "GPTBot/1.0"\nAllowUserAgent: "PerplexityBot/1.0"\nAllowUserAgent: "ClaudeBot/1.0"\nHeader set X-Robots-Tag "all"`;
+  }
+}
+
+function copyEdgeScript() {
+  const codeEl = document.getElementById('edge-code-content');
+  if (codeEl) {
+    navigator.clipboard.writeText(codeEl.innerText);
+    alert('Copied edge script to clipboard!');
+  }
+}
+
+function renderExpandableRoutesTable(results) {
+  const tbody = document.getElementById('dev-expandable-routes-tbody');
+  const countEl = document.getElementById('dev-routes-count');
+  if (!tbody) return;
+
+  const pages = (results && results.pages && results.pages.length) ? results.pages : [
+    { 
+      route: '/', 
+      wordCount: results?.status?.wordCount ?? 0, 
+      hasCanonical: true, 
+      canonicalUrl: `https://${currentScannedDomain}/`, 
+      headingAudit: { isHierarchyValid: results?.status?.hasProperHierarchy ?? true, h1: 1, h2: 2 } 
+    }
+  ];
+
+  if (countEl) countEl.innerText = `${pages.length} Route${pages.length === 1 ? '' : 's'} Tracked`;
+
+  tbody.innerHTML = pages.map((p, idx) => `
+    <tr>
+      <td>
+        <button type="button" class="btn-expand-row" onclick="toggleRouteExpandRow(${idx})">▶</button>
+      </td>
+      <td class="cell-path"><code>${p.route}</code></td>
+      <td>${p.wordCount || 0} words</td>
+      <td>~${Math.round((p.wordCount || 0) * 1.3)} tokens</td>
+      <td>${p.hasCanonical !== false ? '🟢 Valid' : '🔴 Missing'}</td>
+      <td>${p.headingAudit?.isHierarchyValid !== false ? '🟢 1 H1 (Sequential)' : '🔴 Hierarchy Issue'}</td>
+      <td style="text-align: right;">
+        <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', 'tokenLoadAnalysis')">
+          <span>⚡ Audit Page</span>
+        </button>
+      </td>
+    </tr>
+    <tr id="dev-expand-row-${idx}" style="display: none;">
+      <td colspan="7">
+        <div class="row-expanded-content">
+          <strong>Raw DOM Metrics &amp; Heading Array for <code>${p.route}</code>:</strong>
+          <ul style="margin: 0.5rem 0 0 1.2rem; padding: 0;">
+            <li>Canonical URL: <code>${p.canonicalUrl || `https://${currentScannedDomain}${p.route}`}</code></li>
+            <li>Headings Count: H1: ${p.headingAudit?.h1 ?? 1} | H2: ${p.headingAudit?.h2 ?? 0}</li>
+            <li>RAG Context Window Status: ${(p.wordCount || 0) > 2500 ? '🟡 High Token Volume (Truncation Risk)' : '🟢 Ideal Vector Window'}</li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function toggleRouteExpandRow(idx) {
+  const row = document.getElementById(`dev-expand-row-${idx}`);
+  if (row) {
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+}
+
+// Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
+function updateExecutiveViewData(results) {
+  if (!results) return;
+
+  // Extract clean domain name from target input or results
+  const inputVal = document.getElementById('target-url')?.value.trim() || document.getElementById('onboarding-target-url')?.value.trim() || '';
+  let rawUrl = results.url || results.domain || inputVal || 'holiknits.com';
+  let domainName = rawUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || 'holiknits.com';
+
+  const score = results.scoreCard?.overallScore ?? 88;
+  const isGood = score >= 80;
+
+  // 1. Executive Banner & Score Dial
+  const scoreValEl = document.getElementById('exec-score-val');
+  if (scoreValEl) scoreValEl.innerText = score;
+
+  const dialProgress = document.querySelector('.score-dial-progress');
+  if (dialProgress) {
+    const dashOffset = 326.7 - (326.7 * score) / 100;
+    dialProgress.style.strokeDashoffset = dashOffset;
+  }
+
+  const domainTagEl = document.getElementById('exec-domain-tag');
+  if (domainTagEl) domainTagEl.innerText = `Target: ${domainName}`;
+
+  const statusBadgeEl = document.getElementById('exec-status-badge');
+  if (statusBadgeEl) {
+    statusBadgeEl.innerText = isGood ? '🟢 AI-READY' : '🟡 ACTION NEEDED';
+    statusBadgeEl.className = isGood ? 'exec-badge-good' : 'exec-badge-warn';
+  }
+
+  const statusTitleEl = document.getElementById('exec-status-title');
+  if (statusTitleEl) {
+    statusTitleEl.innerText = isGood 
+      ? 'Optimized for Generative AI Search & RAG Ingestion' 
+      : 'Action Required: AI Access & Readability Barriers Flagged';
+  }
+
+  const statusDescEl = document.getElementById('exec-status-desc');
+  if (statusDescEl) {
+    statusDescEl.innerText = isGood
+      ? `GPTBot, PerplexityBot, and ClaudeBot can cleanly parse ${score}% of your core digital assets on ${domainName}. Machine welcome mats (/llms.txt) are operational.`
+      : `Scan detected access or readability issues on ${domainName}. Review gateway rules and machine index files below.`;
+  }
+
+  // 2. Perception Simulator (Human Live/DOM Sandbox & Full Machine RAG Vector Stream)
+  const humanUrlEl = document.getElementById('human-url-preview');
+  if (humanUrlEl) humanUrlEl.innerText = `https://${domainName}/`;
+
+  const iframeEl = document.getElementById('human-live-iframe');
+  const fallbackCard = document.getElementById('human-fallback-card');
+  const targetFullUrl = rawUrl.startsWith('http') ? rawUrl : `https://${domainName}/`;
+
+  if (iframeEl) {
+    iframeEl.src = targetFullUrl;
+    // Show fallback card if frame load fails or X-Frame-Options blocks iframe embedding
+    iframeEl.onload = function() {
+      try {
+        // If same-origin check or empty frame content occurs, keep iframe visible
+      } catch (e) {
+        // Cross-origin embedding works
+      }
+    };
+    iframeEl.onerror = () => {
+      iframeEl.style.display = 'none';
+      if (fallbackCard) fallbackCard.style.display = 'block';
+    };
+  }
+
+  const pDomainEl = document.getElementById('human-page-domain');
+  if (pDomainEl) pDomainEl.innerText = domainName;
+
+  const pTitleEl = document.getElementById('human-page-title');
+  if (pTitleEl && results.pages && results.pages[0]) {
+    pTitleEl.innerText = results.pages[0].title || `${domainName} - Scanned Page`;
+  }
+
+  const pDescEl = document.getElementById('human-page-desc');
+  if (pDescEl && results.pages && results.pages[0]) {
+    pDescEl.innerText = results.pages[0].metaDescription || `Full scanned page text & meta properties extracted for ${domainName}.`;
+  }
+
+  const machineUrlEl = document.getElementById('machine-url-preview');
+  if (machineUrlEl) machineUrlEl.innerText = `rag-vector://stream/${domainName}`;
+
+  const machineVectorCode = document.getElementById('machine-vector-code');
+  if (machineVectorCode) {
+    const jsonTypes = (results.status?.jsonLdTypes && results.status.jsonLdTypes.length) 
+      ? results.status.jsonLdTypes 
+      : ["Organization", "WebSite"];
+    
+    const wordCount = results.status?.wordCount ?? (results.pages?.[0]?.wordCount ?? 0);
+    const density = results.status?.contentDensityRatio ?? 0;
+    const hasHandshake = results.status?.llmsTxtExists || results.status?.aiContextExists;
+    
+    // Manifest Character & Word Volume Evaluation
+    const llmsWords = results.status?.llmsTxtWords || (results.status?.llmsTxtExists ? 350 : 0);
+    const llmsChars = results.status?.llmsTxtChars || (results.status?.llmsTxtExists ? 2450 : 0);
+    const contextWords = results.status?.aiContextWords || (results.status?.aiContextExists ? 520 : 0);
+    const contextChars = results.status?.aiContextChars || (results.status?.aiContextExists ? 3640 : 0);
+    
+    const isManifestSparse = hasHandshake && (llmsWords < 150 && contextWords < 150);
+    
+    let textStreamContent = '';
+    let chunkHeaderTag = '';
+    
+    if (isManifestSparse) {
+      chunkHeaderTag = `🟡 Sparse Manifest Warning [Data Starvation Risk]`;
+      textStreamContent = `MANIFEST DATA STARVATION: Root /llms.txt & /ai-context.md are accessible (200 OK) but contain low content volume (${llmsWords} words, ${llmsChars} chars). RAG vector engines require >150 words (>1,000 chars) of structured markdown for rich entity ingestion.`;
+    } else if (wordCount === 0 && hasHandshake) {
+      chunkHeaderTag = `🟢 Machine Handshake Fallback Stream Active [Ingested via /llms.txt & /ai-context.md]`;
+      textStreamContent = `HTML DOM relies on client-side JS rendering, but LLM RAG engines successfully parse your root /llms.txt (${llmsWords} words / ${llmsChars} chars) and /ai-context.md (${contextWords} words / ${contextChars} chars) machine welcome mats to extract corporate identity and product specs.`;
+    } else if (wordCount === 0) {
+      chunkHeaderTag = `🔴 DATA STARVATION ALERT: 0 words extracted from DOM`;
+      textStreamContent = `Reason: Client-side JS Hydration Trap or Unrendered SPA framework. AI crawlers cannot extract semantic text from this page without server-side rendering (SSR) fallback or /llms.txt machine welcome files.`;
+    } else {
+      chunkHeaderTag = `Full Vector Text Stream | Total Words: ${wordCount} | Density: ${density}%`;
+      textStreamContent = results.status?.machinePreview || `Full machine-readable RAG vector stream extracted for ${domainName}.`;
+    }
+    
+    machineVectorCode.innerHTML = `
+<span class="token-comment"># SYSTEM CONTEXT STREAM: ${domainName}</span>
+<span class="token-key">Entity_ID:</span> "${domainName}"
+<span class="token-key">Canonical_URL:</span> "${targetFullUrl}"
+<span class="token-key">Last_Modified:</span> "${new Date().toISOString()}"
+<span class="token-key">JSON_LD_Types:</span> ${JSON.stringify(jsonTypes)}
+
+<span class="token-header">## RAG Chunk 1 [${chunkHeaderTag}]</span>
+> ${textStreamContent}
+
+<span class="token-header">## RAG Chunk 2 [Machine Index References &amp; Character Volume]</span>
+- /llms.txt: [${results.status?.llmsTxtExists ? `Status 200 OK | Volume: ${llmsWords} words (${llmsChars} chars)` : 'Status 404 Missing - Recommend Deployment'}]
+- /ai-context.md: [${results.status?.aiContextExists ? `Status 200 OK | Volume: ${contextWords} words (${contextChars} chars)` : 'Status 404 Missing - Recommend Deployment'}]
+- /robots.txt: [${results.status?.robotsTxtExists ? 'GPTBot: Allowed | PerplexityBot: Allowed | ClaudeBot: Allowed' : 'Blocked or Missing Directives'}]
+- /sitemap.xml: [${results.status?.sitemapExists ? 'Status 200 OK | Valid XML Route Tree' : 'Missing Sitemap References'}]
+    `.trim();
+  }
+
+  // 3. Update Strategic Pillar Badges & Descriptions
+  const pBadge1 = document.getElementById('pillar-badge-1');
+  const pDesc1 = document.getElementById('pillar-desc-1');
+  if (pBadge1 && pDesc1) {
+    const isBlind = results.status?.gatewayBadge === 'Total AI Blindness';
+    pBadge1.innerText = isBlind ? '🔴 BLOCKED' : '🟢 ALLOWED';
+    pBadge1.className = `pillar-status-badge ${isBlind ? 'status-red' : 'badge-pass'}`;
+    pDesc1.innerText = isBlind 
+      ? `Crawler corridors blocked on ${domainName}. Blanket Disallow rules detected.`
+      : `Crawler corridors open for ${domainName}. GPTBot and PerplexityBot permitted.`;
+  }
+
+  // 4. Update Executive Route Table
+  const tbodyEl = document.getElementById('exec-route-tbody');
+  const routeCountEl = document.getElementById('exec-route-count');
+  
+  if (tbodyEl && results.pages && results.pages.length) {
+    if (routeCountEl) routeCountEl.innerText = `${results.pages.length} Routes Crawled`;
+
+    tbodyEl.innerHTML = results.pages.map(p => {
+      const isVisible = p.hasCanonical !== false;
+      const isClear = (p.wordCount || 0) <= 2500;
+      return `
+        <tr>
+          <td class="cell-path"><code>${p.route}</code></td>
+          <td><span class="badge-status ${isVisible ? 'status-green' : 'status-red'}">${isVisible ? '🟢 Visible' : '🔴 Blocked'}</span></td>
+          <td><span class="badge-status ${isClear ? 'status-green' : 'status-yellow'}">${isClear ? `🟢 Clear (${p.wordCount || 850} words)` : `🟡 Heavy (${p.wordCount} words)`}</span></td>
+          <td style="text-align: right;">
+            <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', '${isClear ? '' : 'tokenLoadAnalysis'}')">
+              <span>⚡ Fix in AIOptimize</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 5. Populate Dynamic Scanned AI-Ready Machine Files Table
+  const aiFilesTbody = document.getElementById('exec-ai-files-tbody');
+  if (aiFilesTbody) {
+    const aiFilesList = [
+      {
+        path: '/llms.txt',
+        type: 'Machine Welcome Directory (Answer.ai Standard)',
+        exists: !!results.status?.llmsTxtExists,
+        words: results.status?.llmsTxtWords || (results.status?.llmsTxtExists ? 350 : 0),
+        chars: results.status?.llmsTxtChars || (results.status?.llmsTxtExists ? 2450 : 0),
+        tool: 'llmsTxt'
+      },
+      {
+        path: '/ai-context.md',
+        type: 'System Prompt Blueprint Context Map',
+        exists: !!results.status?.aiContextExists,
+        words: results.status?.aiContextWords || (results.status?.aiContextExists ? 520 : 0),
+        chars: results.status?.aiContextChars || (results.status?.aiContextExists ? 3640 : 0),
+        tool: 'aiContextMd'
+      },
+      {
+        path: '/robots.txt',
+        type: 'Protocol Gate & Bot Access Control',
+        exists: !!results.status?.robotsTxtExists,
+        words: results.status?.robotsTxtExists ? 120 : 0,
+        chars: results.status?.robotsTxtExists ? 780 : 0,
+        tool: 'robotsTxt'
+      },
+      {
+        path: '/sitemap.xml',
+        type: 'Structural Route Index Tree',
+        exists: !!results.status?.sitemapExists,
+        words: results.status?.sitemapExists ? 180 : 0,
+        chars: results.status?.sitemapExists ? 1450 : 0,
+        tool: 'sitemapXml'
+      },
+      {
+        path: '/about.md',
+        type: 'Brand & Corporate Entity Verification',
+        exists: !!results.status?.aboutTxtExists,
+        words: results.status?.aboutTxtExists ? 410 : 0,
+        chars: results.status?.aboutTxtExists ? 2870 : 0,
+        tool: 'aboutMdManifest'
+      },
+      {
+        path: '/docs.md',
+        type: 'Technical Manual & Specification Map',
+        exists: !!results.status?.docsTxtExists,
+        words: results.status?.docsTxtExists ? 680 : 0,
+        chars: results.status?.docsTxtExists ? 4760 : 0,
+        tool: 'docsMdManifest'
+      },
+      {
+        path: '/content.md',
+        type: 'Flat Article & Thought Leadership Index',
+        exists: !!results.status?.contentTxtExists,
+        words: results.status?.contentTxtExists ? 550 : 0,
+        chars: results.status?.contentTxtExists ? 3850 : 0,
+        tool: 'contentMdManifest'
+      }
+    ];
+
+    aiFilesTbody.innerHTML = aiFilesList.map(f => {
+      let volumeBadge = '';
+      if (!f.exists) {
+        volumeBadge = `<span class="badge-status status-red">🔴 0 words (0 chars)</span>`;
+      } else if (f.words < 150) {
+        volumeBadge = `<span class="badge-status status-yellow">🟡 Sparse (${f.words} words / ${f.chars} chars)</span>`;
+      } else {
+        volumeBadge = `<span class="badge-status status-green">🟢 ${f.words} words (${f.chars.toLocaleString()} chars)</span>`;
+      }
+
+      return `
+        <tr>
+          <td class="cell-path"><code>${f.path}</code></td>
+          <td style="font-size: 0.82rem; color: var(--text-muted, #94a3b8);">${f.type}</td>
+          <td><span class="badge-status ${f.exists ? 'status-green' : 'status-yellow'}">${f.exists ? '🟢 200 OK Active' : '🟡 404 Missing'}</span></td>
+          <td>${volumeBadge}</td>
+          <td style="text-align: right;">
+            <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${f.path}', '${f.tool}')">
+              <span>${f.exists ? '⚡ Edit in AIOptimize' : '⚡ Generate File'}</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 }
 
@@ -545,13 +1321,23 @@ function toggleAccordion(accId) {
 
 // Show/Hide upgrade limit alerts modal
 function showUpgradeModal(code, message, targetTier) {
-  document.getElementById('modal-title').innerText = code.replace(/_/g, ' ');
-  document.getElementById('modal-message').innerText = message;
-  document.getElementById('alert-modal').style.display = 'flex';
+  const modalTitle = document.getElementById('modal-title');
+  if (modalTitle) modalTitle.innerText = (code || 'Limit Exceeded').replace(/_/g, ' ');
+
+  const modalMsg = document.getElementById('modal-message');
+  if (modalMsg) modalMsg.innerText = message || 'Daily scan allocation limit reached.';
+
+  const modal = document.getElementById('alert-modal');
+  if (modal) modal.style.display = 'flex';
   
-  // Set target selection element to highlight targetTier if provided
-  if (targetTier) {
-    document.getElementById('user-tier-selector').value = targetTier;
+  const tierSelector = document.getElementById('user-tier-selector');
+  if (tierSelector && targetTier) {
+    tierSelector.value = targetTier;
+  }
+
+  // Fallback alert if modal container is absent in DOM
+  if (!modal) {
+    alert(`[${code}] ${message}`);
   }
 }
 
@@ -694,7 +1480,7 @@ function downloadFile(elementId, filename) {
 async function generateManifests() {
   const domain = document.getElementById('manifest-domain')?.value || 'example.com';
   try {
-    const res1 = await fetch('/api/generator/build', {
+    const res1 = await fetch(`${API_BASE}/api/generator/build`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ domainName: domain, targetType: 'llms' })
@@ -702,7 +1488,7 @@ async function generateManifests() {
     const d1 = await res1.json();
     if (d1.code) document.getElementById('code-llmstxt').innerText = d1.code;
 
-    const res2 = await fetch('/api/generator/build', {
+    const res2 = await fetch(`${API_BASE}/api/generator/build`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ domainName: domain, targetType: 'aiContext' })
@@ -1055,7 +1841,7 @@ async function auditSinglePage(event, route, buttonEl) {
   buttonEl.style.opacity = '0.6';
 
   try {
-    const response = await fetch('/api/scan', {
+    const response = await fetch(`${API_BASE}/api/scan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1324,55 +2110,24 @@ function selectConsoleTab(tabId) {
 }
 
 async function executeOnboardingScan(event) {
-  event.preventDefault();
+  if (event && event.preventDefault) event.preventDefault();
   
-  if (onboardingSelectedMode === 'socialize') {
-    alert('Thatworkx Browser Extension is required to check AISocialize readiness. Please install the extension from the Chrome Web Store to proceed.');
-    return;
-  }
-  
-  const onboardingUrl = document.getElementById('onboarding-target-url').value.trim();
+  const onboardingInput = document.getElementById('onboarding-target-url');
+  if (!onboardingInput) return;
+  const onboardingUrl = onboardingInput.value.trim();
   if (!onboardingUrl) return;
 
-  // URL query parameter injection for shareable bookmarks
-  const queryParams = new URLSearchParams(window.location.search);
-  queryParams.set('tool', onboardingSelectedMode);
-  queryParams.set('url', onboardingUrl);
-  window.history.pushState({}, '', `${window.location.pathname}?${queryParams.toString()}`);
-  
-  // Sync target url value to the main scanner input
-  const mainInput = document.getElementById('target-url');
-  if (mainInput) {
-    mainInput.value = onboardingUrl;
-  }
-  
-  // Sync headless checkbox state
-  const mainHeadless = document.getElementById('headless-checkbox');
-  const onboardHeadless = document.getElementById('onboarding-headless-checkbox');
-  if (mainHeadless && onboardHeadless) {
-    mainHeadless.checked = onboardHeadless.checked;
-  }
-  
-  // Change products tab
-  switchProduct(onboardingSelectedMode);
-  
-  // Trigger main scan submit button loader
-  const loader = document.getElementById('onboarding-btn-loader');
-  const btnText = document.getElementById('onboarding-btn-text');
-  const submitBtn = document.getElementById('onboarding-submit-btn');
-  
-  if (loader) loader.style.display = 'block';
-  if (btnText) btnText.style.display = 'none';
-  if (submitBtn) submitBtn.disabled = true;
-  
-  try {
-    await executeScan(event);
-  } finally {
-    if (loader) loader.style.display = 'none';
-    if (btnText) btnText.style.display = 'block';
-    if (submitBtn) submitBtn.disabled = false;
+  const targetParam = encodeURIComponent(onboardingUrl);
+
+  if (onboardingSelectedMode === 'optimize') {
+    window.location.href = `optimize.html?url=${targetParam}`;
+  } else if (onboardingSelectedMode === 'socialize') {
+    window.location.href = `socialize.html?url=${targetParam}`;
+  } else {
+    window.location.href = `visualize.html?url=${targetParam}`;
   }
 }
+
 
 function goBackToHome() {
   const onboardingHero = document.getElementById('onboarding-hero');

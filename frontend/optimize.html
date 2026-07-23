@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Optimize Workspace - Thatworkx AEO Suite</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="page-optimize">
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
+      <span class="logo-symbol">🌐</span>
+      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+    </div>
+    
+    <nav class="nav-links flex items-center gap-4" style="display: flex; gap: 1.2rem; align-items: center;">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="visualize.html" class="nav-link">👁️ AI Visualize</a>
+      <a href="optimize.html" class="nav-link active">🩺 AI Optimize</a>
+      <a href="socialize.html" class="nav-link">📣 AI Socialize</a>
+    </nav>
+
+    <div class="header-actions flex items-center gap-3">
+      <div class="tier-badge-container">
+        <span class="tier-label">Plan:</span>
+        <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+          <option value="AIVisualize Free">AIVisualize Free</option>
+          <option value="AIVisualize Pro">AIVisualize Pro</option>
+          <option value="AIVisualize ENT">AIVisualize ENT</option>
+          <option value="AIOptimize Free">AIOptimize Free</option>
+          <option value="AIOptimize Pro">AIOptimize Pro</option>
+          <option value="AIOptimize ENT">AIOptimize ENT</option>
+        </select>
+      </div>
+      <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+      <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Light/Dark Theme" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: 8px; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1rem; width: 36px; height: 36px;">
+        <span id="theme-toggle-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Optimize Workspace -->
+  <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
+
+    <!-- Optimize Header Console -->
+    <div class="optimize-header-card glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(245, 158, 11, 0.2);">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🩺 AIOptimize Remediation Sandbox</span>
+            <span class="badge-status status-amber" style="font-size: 0.75rem;">Prescriptive Code Generators</span>
+          </h2>
+          <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.25rem;">
+            Generate one-click code fixes, edge worker scripts, and AI-First markdown blueprint manifests.
+          </p>
+        </div>
+
+        <!-- Target Domain Selector -->
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span style="font-size: 0.85rem; color: #cbd5e1;">Target Domain:</span>
+          <input type="text" id="optimize-target-domain" placeholder="example.com" value="thatworkx.com" onchange="updateOptimizeTargetDomain()" style="padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: #0f172a; color: #f8fafc; font-size: 0.9rem; width: 200px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Track Selector Tabs -->
+    <div class="optimize-master-tabs mb-6" style="display: flex; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+      <button type="button" class="control-menu-item active" id="btn-track1" onclick="switchOptimizeTrack(1)" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;">
+        Track 1: AI-Ready Page Fixes 🛠️
+      </button>
+      <button type="button" class="control-menu-item" id="btn-track2" onclick="switchOptimizeTrack(2)" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;">
+        Track 2: AI-First File Generators 📁
+      </button>
+    </div>
+
+    <!-- Sub-Tool Navigation Tabs (Track 1) -->
+    <div id="optimize-track1-subtabs" class="optimize-tabs mb-6" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button type="button" class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">Robots.txt Editor</button>
+      <button type="button" class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">Cloudflare Edge Worker</button>
+      <button type="button" class="control-menu-item" id="menu-shopify" onclick="switchOptimizeTool('shopify')">Shopify Liquid Hook</button>
+      <button type="button" class="control-menu-item" id="menu-jsonld" onclick="switchOptimizeTool('jsonld')">JSON-LD Entity Schema</button>
+      <button type="button" class="control-menu-item" id="menu-htaccess" onclick="switchOptimizeTool('htaccess')">Apache .htaccess</button>
+    </div>
+
+    <!-- Sub-Tool Navigation Tabs (Track 2) -->
+    <div id="optimize-track2-subtabs" class="optimize-tabs mb-6" style="display: none; gap: 0.5rem; flex-wrap: wrap;">
+      <button type="button" class="control-menu-item" id="menu-llmstxt" onclick="switchOptimizeTool('llmstxt')">/llms.txt</button>
+      <button type="button" class="control-menu-item" id="menu-aicontext" onclick="switchOptimizeTool('aicontext')">/ai-context.md</button>
+      <button type="button" class="control-menu-item" id="menu-about" onclick="switchOptimizeTool('about')">/about.md</button>
+      <button type="button" class="control-menu-item" id="menu-docs" onclick="switchOptimizeTool('docs')">/docs.md</button>
+      <button type="button" class="control-menu-item" id="menu-content" onclick="switchOptimizeTool('content')">/content.md</button>
+      <button type="button" class="control-menu-item" id="menu-sitemap" onclick="switchOptimizeTool('sitemap')">/sitemap.xml</button>
+    </div>
+
+    <!-- Canvas Remediation Viewer Card -->
+    <div class="workspace-card glassmorphic" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+      
+      <!-- Dynamic Tool View Panels -->
+      <div id="opt-tool-robots" class="optimize-tool-view active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">Robots.txt Protocol Gate Fixer</h4>
+          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('robots-output')">📋 Copy Robots.txt</button>
+        </div>
+        <pre><code id="robots-output" class="language-markdown"># User-agent Bot Permission Rules for thatworkx.com
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://thatworkx.com/sitemap.xml</code></pre>
+      </div>
+
+      <div id="opt-tool-cloudflare" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">Cloudflare Worker Edge Proxy Script</h4>
+          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('cloudflare-output')">📋 Copy Worker Script</button>
+        </div>
+        <pre><code id="cloudflare-output" class="language-javascript">// Cloudflare Worker Router Hook</code></pre>
+      </div>
+
+      <div id="opt-tool-shopify" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">Shopify Liquid Theme File Injector</h4>
+          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('shopify-output')">📋 Copy Liquid Hook</button>
+        </div>
+        <pre><code id="shopify-output" class="language-html"><!-- Shopify theme.liquid AI Meta Injection --></code></pre>
+      </div>
+
+      <div id="opt-tool-jsonld" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">Organization &amp; Entity JSON-LD Schema</h4>
+          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('jsonld-output')">📋 Copy Schema</button>
+        </div>
+        <pre><code id="jsonld-output" class="language-json">/* Organization JSON-LD Schema */</code></pre>
+      </div>
+
+      <div id="opt-tool-htaccess" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">Apache .htaccess Server Directives</h4>
+          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('htaccess-output')">📋 Copy Directives</button>
+        </div>
+        <pre><code id="htaccess-output" class="language-apache"># Apache AEO Response Headers</code></pre>
+      </div>
+
+      <!-- Track 2 Manifest Views -->
+      <div id="opt-tool-llmstxt" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/llms.txt Machine Welcome Mat</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('llmstxt-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('llmstxt-output', 'llms.txt')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="llmstxt-output" class="language-markdown"># Loading /llms.txt...</code></pre>
+      </div>
+
+      <div id="opt-tool-aicontext" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/ai-context.md System Context Map</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('aicontext-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('aicontext-output', 'ai-context.md')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="aicontext-output" class="language-markdown"># Loading /ai-context.md...</code></pre>
+      </div>
+
+      <div id="opt-tool-about" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/about.md E-E-A-T Identity Signature</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('about-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('about-output', 'about.md')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="about-output" class="language-markdown"># Loading /about.md...</code></pre>
+      </div>
+
+      <div id="opt-tool-docs" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/docs.md Technical Specification</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('docs-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('docs-output', 'docs.md')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="docs-output" class="language-markdown"># Loading /docs.md...</code></pre>
+      </div>
+
+      <div id="opt-tool-content" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/content.md Case Study &amp; Narrative Vault</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('content-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('content-output', 'content.md')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="content-output" class="language-markdown"># Loading /content.md...</code></pre>
+      </div>
+
+      <div id="opt-tool-sitemap" class="optimize-tool-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="color: #fff; font-size: 1rem;">/sitemap.xml Machine Navigation Tree</h4>
+          <div>
+            <button type="button" class="drawer-btn" onclick="copyCodeFromPre('sitemap-output')">📋 Copy</button>
+            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadFileContent('sitemap-output', 'sitemap.xml')">📥 Download</button>
+          </div>
+        </div>
+        <pre><code id="sitemap-output" class="language-xml"><!-- Loading /sitemap.xml... --></code></pre>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Modals Container -->
+  <div id="auth-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto;">
+      <span class="modal-close" onclick="closeAuthModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center;">🔐</div>
+      <h3 id="auth-modal-title" style="text-align: center; color: #fff; margin-bottom: 0.5rem;">Authenticate to Thatworkx AEO</h3>
+      <p id="auth-modal-subtitle" style="text-align: center; font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem;">Access your multi-page crawler credits and custom edge routing scripts.</p>
+
+      <div class="auth-tabs" id="auth-tabs-container" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">Sign In</button>
+        <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">New User</button>
+      </div>
+
+      <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Email Address:</label>
+          <input type="email" id="login-email" required placeholder="user@example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        </div>
+        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

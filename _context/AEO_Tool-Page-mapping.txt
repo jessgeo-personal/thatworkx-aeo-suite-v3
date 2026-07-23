@@ -1,0 +1,143 @@
+I am not sure this is helpful, it does not communicate a consistent message that a business user can follow.  I am going to split the tools into what is AIFirst vs. what is traditional.  you will find it in the attached csv file.  The objective here is to educate the user at every step.  
+
+When the user comes to the main AEO homepage, there is an intro section that says something like 'Do you know if AI can see you?' with body that says something like 'Your brand presence is defined by what you make public and your web presence is a big part of that.  But do you know what AI can see about your and your brand, or if it is seeing anything at all?'  I would like a metric that confirms how what percentage of the internet does not exist for AI because they are unknowingly blocking, technically hindering, contextually overloading or authoritatively blinding AI to their presence.  
+
+Below that I would like a line like 'What would you like to do today? Lets start here..." with 3 big boxes below, one for AIVisualize, one for AIOptimize and the other for AISocialize.  In the boxes, I want a description of what each of the tools do, on the lines of whats mentioned here.
+
+#AIVisualize:#
+##Let show you what AI can see.##
+	* 1. Are you blocking out AI?
+	* 2. Is your web presence optimized for AI?
+	* 3. Is your content AI-Ready?
+	* 4. Are you setup to be AI-First?
+	
+#AIOptimize:#
+##IF you already know that you are AI-ready, lets show you how to be Optimized for AI.##
+	* Optimizing for AI-Ready
+	* Optimizing for AI-First
+
+#AISocialize:#
+##Go further, ensure your social footprint is Optimized for AI##
+	* Is your domain AI-ready for social?
+		* llms.txt exists
+		* Has Author Info
+		* Credential mentions
+		* External links(Valid)
+		* Authority links(valid)
+		* LastUpdated
+	* Elevate your Social to AI-Ready
+		* llms.txt text generation to append to llms.txt based on social content, URL etc.
+
+For the time being AISocialize is TBD
+
+Once the user chooses one of the boxes for AIOptimize or AIVisualize, the customer is prompted to provide a URL to scan, which will then pass forward onto the relevant tool dashboard(AIOptimize or AIVisualize)
+
+
+
+This is the breakup of tools and sections once the user chooses their options
+#AIVisualize:#
+##Let show you what AI can see.##
+	* 1. Are you blocking out AI?  
+		* CDN/Edge Firewall Blocking
+		* X-Robots-Tag Headers
+		* Robotx.txt: Total AI Blindness
+	* 2. Is your web presence optimized for AI?
+		* Essential pages(mark on pages that are identified)
+		* heavy page indication(per page)
+		* token load analysis(per page)
+		* External links(Per page)
+		* LastUpdated(per page)
+		* isSecure(sitelevel)
+		* Domain Age(sitelevel)
+	* 3. Is your content AI-Ready?
+		* Has canonical (per page)
+		* internal links analysis (per page)
+		* Title and metadata (Per page)
+		* synctactic Complexity: Flesch score (Per page)
+		* Vector Layour: words/paragraph (Per page)
+		* Has FAQ schema (per page)
+		* Question Count(correctly formatted)(per page)
+		* Answer count (correctly formatted)(Per page)
+		* Answer/Question parity ratio (Per page)
+		* Has Semantic Tags(Per page)
+		* Heading Counts(per page)
+		* Has Proper Heirarchy (Per pagE)
+		* Images without Alt(Per page)
+		* HasContactInfo(check) (Sitelevel)
+		* HasPrivacyPolicy(check) (Sitelevel)
+	* 4. Are you setup to be AI-First?
+		* What is AI-First?
+		* How does AI-first work?
+		* What you need for AI-first(Basic)
+			* robots.txt
+				* availability
+				* review with bots
+				* sample in case missing
+			* sitemap.xml
+				* availability
+				* sample if missing
+				* comparison with key pages found
+				* missing essential pages
+			* llms.txt
+				* availability
+				* sample if missing
+			* JSON_LD schema
+				* availability per page
+				* sample if missing
+			* ai-context.md
+				* availability
+				* mapping to robots.txt
+				* sample in case missing (pulled from content on key pages)
+			* README.md
+				* availability
+				* sample in case missing
+			* about.md(sample)
+				* availability
+				* sample in case missing
+			* docs.md(sample)
+				* availability
+				* sample in case missing
+			* content.md(sample)
+				* availability
+				* sample in case missing
+
+#AIOptimize:#
+##Lets show you how to be AI-ready.##
+	* What you need to be AI-Ready: 
+		* Token Load Optimization
+		* IsMobileFriendly
+		* Experience Indicators
+		* Media Count
+		* Has AuthorInfo
+		* Credential Mentions
+		* External links(valid per page)
+		* Authority links (Valid per page)
+		* isSecure(how to fix)
+		* hasContactInfo(how to optimize)
+		* hasPrivacyPolicy(how to optimize)
+	* What you need for AI-First(advanced)
+			* robots.txt
+				* checks for essential files
+				* addition and optimization
+			* sitemap.xml
+				* comparison with pages found
+				* Optimization and addition (from github or headless browser)
+			* llms.txt
+				* Optimization and addition (from github or headless browser)
+			* JSON_LD schema
+				* Optimization and addition
+			* ai-context.md
+				* Optimization and addition (from github or headless browser)
+			* README.md
+				* Optimization and addition (from github or headless browser)
+			* about.md
+				* Optimization and addition (from github or headless browser)
+			* docs.md
+				* Optimization and addition (from github or headless browser)
+			* content.md
+				* Optimization and addition (from github or headless browser)
+
+
+
+	
+	

@@ -153,4 +153,101 @@ describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
       expect(heroSectionContent).toContain('window.executeOnboardingScan');
     });
   });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  describe('Scenario 9.5: AIVisualize Dual View Mode Switcher Pill (Milestone 1)', () => {
+    it('should render Executive Mode and Developer/DIY Mode switcher buttons in panel-visualize', () => {
+      const execBtn = $('#btn-mode-executive');
+      const devBtn  = $('#btn-mode-developer');
+
+      expect(execBtn.length).toBe(1);
+      expect(devBtn.length).toBe(1);
+      expect(execBtn.text()).toContain('Executive Mode');
+      expect(devBtn.text()).toContain('Developer / DIY Mode');
+    });
+
+    it('should set Executive Mode as the default active state', () => {
+      const execBtn = $('#btn-mode-executive');
+      const panel   = $('#panel-visualize');
+
+      expect(execBtn.hasClass('active')).toBe(true);
+      expect(execBtn.attr('aria-selected')).toBe('true');
+      expect(panel.attr('data-visualize-mode')).toBe('executive');
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  describe('Scenario 9.6: AIVisualize Executive Mode UI & Perception Simulator (Milestone 3)', () => {
+    it('should render Executive Score Dial (0-100) and top Action CTAs', () => {
+      const scoreVal = $('#exec-score-val');
+      const statusBadge = $('#exec-status-badge');
+      expect(scoreVal.length).toBe(1);
+      expect(statusBadge.text()).toContain('AI-READY');
+    });
+
+    it('should render Side-by-Side Visual Perception Engine Simulator comparing Human vs Machine viewports', () => {
+      const simContainer = $('.perception-simulator-container');
+      const humanWin = $('.human-window');
+      const machineWin = $('.machine-window');
+
+      expect(simContainer.length).toBe(1);
+      expect(humanWin.text()).toContain('What Humans See');
+      expect(machineWin.text()).toContain('What ChatGPT & Perplexity Read');
+    });
+
+    it('should render 4 Strategic Health Pillar cards', () => {
+      const pillars = $('.strategic-pillars-grid .pillar-card');
+      expect(pillars.length).toBe(4);
+    });
+
+    it('should render Executive Route Table and Scanned AI-Ready Machine Files Table with AIOptimize bridge CTAs', () => {
+      const table = $('.executive-route-table-card');
+      const routeRows = $('#exec-route-tbody tr');
+      const aiFileRows = $('#exec-ai-files-tbody tr');
+
+      expect(table.length).toBe(6); // 2 Exec tables + 4 Dev tables
+      expect(routeRows.length).toBeGreaterThanOrEqual(4);
+      expect(aiFileRows.length).toBe(7);
+    });
+  });
+
+  describe('Scenario 9.7: AIVisualize Developer / DIY Mode UI (Milestone 4)', () => {
+    it('should render 32-Capability Granular Diagnostic Matrix with section filter tabs', () => {
+      const devMatrixSection = $('#dev-matrix-section');
+      const filterTabs = $('.matrix-tab-btn');
+
+      expect(devMatrixSection.length).toBe(1);
+      expect(filterTabs.length).toBe(5); // All, Sec 1, Sec 2, Sec 3, Sec 4
+      expect(devMatrixSection.text()).toContain('32-Capability Granular Diagnostic Matrix');
+    });
+
+    it('should render Machine File Code Inspection Drawers with Copy and Download buttons', () => {
+      const drawersSection = $('#dev-drawers-section');
+      const drawerTabs = $('.drawer-file-tabs .drawer-tab-btn');
+      const codeBar = $('.drawer-code-bar');
+
+      expect(drawersSection.length).toBe(1);
+      expect(drawerTabs.length).toBe(8); // llms, aicontext, robots, sitemap, readme, about, docs, content
+      expect(codeBar.text()).toContain('Copy Code');
+      expect(codeBar.text()).toContain('Download File');
+    });
+
+    it('should render Edge Network & WAF Deployment Sandbox with Cloudflare, Shopify, and Crowdstrike tabs', () => {
+      const edgeSection = $('#dev-edge-section');
+      const edgeTabs = $('.edge-tab-btn');
+
+      expect(edgeSection.length).toBe(1);
+      expect(edgeTabs.length).toBe(3); // Cloudflare, Shopify, Crowdstrike
+      expect(edgeSection.text()).toContain('Edge Network & WAF Deployment Sandbox');
+    });
+
+    it('should render Expandable Scanned Routes Directory with [▶] row expanders', () => {
+      const devRoutesSection = $('#dev-expandable-routes-section');
+      const tableHeader = $('.dev-expandable-table th');
+
+      expect(devRoutesSection.length).toBe(1);
+      expect(tableHeader.length).toBe(7);
+      expect(devRoutesSection.text()).toContain('Scanned Routes Directory');
+    });
+  });
 });

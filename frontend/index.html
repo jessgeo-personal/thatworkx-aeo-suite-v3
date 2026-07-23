@@ -14,15 +14,17 @@
 
   <!-- Top Navigation Header -->
   <header class="app-header">
-    <div class="logo" onclick="goBackToHome()" style="cursor: pointer;" title="Go back to Homepage">
+    <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
       <span class="logo-symbol">🌐</span>
       <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
     </div>
     
-    <div class="toggle-container" id="toggle-container-header" style="display: none;">
-      <button class="toggle-btn active" id="btn-visualize" onclick="switchProduct('visualize')">AI Visualize (Inquire)</button>
-      <button class="toggle-btn" id="btn-optimize" onclick="switchProduct('optimize')">AI Optimize (Treat)</button>
-    </div>
+    <nav class="nav-links flex items-center gap-4" style="display: flex; gap: 1.2rem; align-items: center;">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="visualize.html" class="nav-link">👁️ AI Visualize</a>
+      <a href="optimize.html" class="nav-link">🩺 AI Optimize</a>
+      <a href="socialize.html" class="nav-link">📣 AI Socialize</a>
+    </nav>
 
     <div class="header-actions flex items-center gap-3">
       <div class="tier-badge-container">
@@ -42,6 +44,7 @@
       </button>
     </div>
   </header>
+
 
   <!-- Main Application Workspace -->
   <main class="app-container">
@@ -201,7 +204,7 @@
 <div class="footer-bento-wrapper">
         <div class="deck-section-header text-center mb-8">
           <span class="deck-section-eyebrow">⌨ SPATIAL BENTO &amp; SCHEMA INSPECTOR</span>
-          <h2 class="deck-section-title">Interactive Blueprints &amp; Crawler Handshake Protocols</h2>
+          <h2 class="deck-section-title">What does it take to be AI Optimized?</h2>
           <p class="deck-section-sub">Pre-rendered for search index visibility. Every panel is in the static DOM — fully indexed by GPTBot, ClaudeBot, and PerplexityBot without JavaScript.</p>
         </div>
 
@@ -406,8 +409,8 @@
         <div class="pipeline-section" id="machine-file-pipeline">
           <div class="pipeline-header">
             <span class="pipeline-eyebrow">⚙ 4-LAYER MACHINE HIERARCHY &amp; DELIVERY PIPELINE</span>
-            <h2 class="pipeline-title">The 4-Layer Machine File Hierarchy</h2>
-            <p class="pipeline-sub">How we structure your brand data for AI crawlers, RAG pipelines, and agentic LLMs. Fully crawlable without Javascript.</p>
+            <h2 class="pipeline-title">Making your Brand truly AI-Ready</h2>
+            <p class="pipeline-sub">The 4-Layer Machine File Hierarchy</p>
           </div>
 
           <div class="pipeline-grid">
@@ -796,230 +799,366 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
     </div>
 
     <!-- THREAD A: AI Visualize Viewport -->
-    <section id="panel-visualize" class="product-panel active">
-      <div class="scan-results-grid" id="scan-results" style="display: none;">
+    <section id="panel-visualize" class="product-panel active" data-visualize-mode="executive">
+      
+      <!-- Top-Level Dual View Mode Switcher Pill -->
+      <div class="visualize-header-bar">
+        <div class="visualize-header-title">
+          <span class="visualize-badge-icon">👁️</span>
+          <div>
+            <h2>AIVisualize Dashboard</h2>
+            <p class="visualize-header-sub">Generative AI Crawler Visibility &amp; Diagnostics Engine</p>
+          </div>
+        </div>
         
-        <!-- Score Overview Card -->
-        <div class="dashboard-card glassmorphic text-center" id="score-card">
-          <h3>Domain Visibility Score</h3>
-          <div class="score-circle-container">
-            <div class="score-circle">
-              <span class="score-value" id="overall-score">--</span>
-              <span class="score-label">/ 100</span>
-            </div>
-          </div>
-          <h4 id="classification-badge" class="badge-good">GOOD</h4>
-          <p id="crawled-pages-text">Crawled 0 of 0 pages</p>
+        <div class="view-mode-switcher-pill" role="tablist" aria-label="Dashboard View Mode">
+          <button 
+            type="button" 
+            id="btn-mode-executive" 
+            class="mode-pill-btn active" 
+            onclick="setVisualizeViewMode('executive')"
+            role="tab"
+            aria-selected="true"
+          >
+            <span>🏢 Executive Mode</span>
+          </button>
+          <button 
+            type="button" 
+            id="btn-mode-developer" 
+            class="mode-pill-btn" 
+            onclick="setVisualizeViewMode('developer')"
+            role="tab"
+            aria-selected="false"
+          >
+            <span>🛠️ Developer / DIY Mode</span>
+          </button>
         </div>
+      </div>
 
-        <!-- Alert Notification Panel -->
-        <div class="dashboard-card glassmorphic col-span-2" id="alerts-card">
-          <h3>Security & Bot Access Gateway Flags</h3>
-          <div id="alerts-container">
-            <div class="alert-empty">No critical firewall or gateway warnings. Your crawler corridors are clear.</div>
-          </div>
-        </div>
+      <!-- Executive View Container (Default Active View - Milestone 3) -->
+      <div id="executive-view-container" class="exec-only-component">
+        
+        <!-- Top Executive Banner: Dial, Diagnosis & Action CTAs -->
+        <div class="executive-banner-card">
+          <div class="exec-banner-left">
+            <div class="exec-score-dial-wrapper">
+              <svg class="score-dial-svg" viewBox="0 0 120 120">
+                <circle class="score-dial-bg" cx="60" cy="60" r="52" />
+                <circle class="score-dial-progress" cx="60" cy="60" r="52" style="stroke-dasharray: 326.7; stroke-dashoffset: 39.2;" />
+              </svg>
+              <div class="score-dial-inner">
+                <span class="score-dial-value" id="exec-score-val">88</span>
+                <span class="score-dial-max">/100</span>
+              </div>
+            </div>
 
-        <!-- Section 1: Are you blocking out AI? -->
-        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-1">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
-            <h3 style="margin: 0; color: #ffffff;">🔒 Section 1: Are you blocking out AI?</h3>
-            <span class="gateway-badge badge-handshake" id="sec-status-1">Scanning...</span>
-          </div>
-          <p class="text-sm text-muted mb-4">Evaluates baseline bot access disallow parameters, CDN firewalls, and gateway crawler block configurations.</p>
-          
-          <div class="bot-matrix-grid">
-            <div class="bot-status-item">
-              <span class="bot-icon">🤖</span>
-              <span class="bot-name">GPTBot (OpenAI)</span>
-              <span class="bot-perm" id="perm-gptbot">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">🔍</span>
-              <span class="bot-name">PerplexityBot</span>
-              <span class="bot-perm" id="perm-perplexity">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">🧠</span>
-              <span class="bot-name">ClaudeBot (Anthropic)</span>
-              <span class="bot-perm" id="perm-claudebot">🟢 Allowed</span>
-            </div>
-            <div class="bot-status-item">
-              <span class="bot-icon">💎</span>
-              <span class="bot-name">Google-Extended</span>
-              <span class="bot-perm" id="perm-geminibot">🟢 Allowed</span>
-            </div>
-          </div>
-          
-          <div class="checklist-grid mt-4" style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-robots">❓</span>
-              <div class="checklist-info">
-                <strong>robots.txt file</strong>
-                <p>Public access routing document directing scrapers and chat models.</p>
+            <div class="exec-status-info">
+              <div class="exec-status-header">
+                <span class="exec-badge-good" id="exec-status-badge">🟢 AI-READY</span>
+                <span class="exec-domain-tag" id="exec-domain-tag">Target: thatworkx.com</span>
               </div>
+              <h3 class="exec-status-title" id="exec-status-title">Optimized for Generative AI Search &amp; RAG Ingestion</h3>
+              <p class="exec-status-desc" id="exec-status-desc">
+                GPTBot, PerplexityBot, and ClaudeBot can cleanly parse 88% of your core digital assets. Your machine welcome mats (/llms.txt) are operational.
+              </p>
             </div>
           </div>
-        </div>
 
-        <!-- Section 2: Is your web presence optimized for AI? -->
-        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-2">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
-            <h3 style="margin: 0; color: #ffffff;">🌐 Section 2: Is your web presence optimized for AI?</h3>
-            <span class="gateway-badge badge-handshake" id="sec-status-2">Scanning...</span>
-          </div>
-          <p class="text-sm text-muted mb-4">Audits network rendering protocols, server-level crawl indexability configurations, and secure connection trust.</p>
-          
-          <div class="checklist-grid">
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-sitemap">❓</span>
-              <div class="checklist-info">
-                <strong>Sitemap sitemap.xml</strong>
-                <p>Ensures sitemap is indexable so AI agents can query your path structures.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-xrobots">❓</span>
-              <div class="checklist-info">
-                <strong>x-robots-tag headers</strong>
-                <p>Verifies HTTP headers are not instructing LLM crawler agents to ignore page indexation.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-spatrap">❓</span>
-              <div class="checklist-info">
-                <strong>SPA Hydration Trap</strong>
-                <p>Passes checks if DOM is flat-text pre-rendered instead of locked behind empty JS client containers.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-ssl">❓</span>
-              <div class="checklist-info">
-                <strong>HTTPS SSL secure</strong>
-                <p>Verifies active 256-bit secure encryption and domain TLS trust certification.</p>
-              </div>
-            </div>
+          <div class="exec-banner-actions">
+            <button type="button" class="exec-cta-btn exec-cta-secondary" onclick="exportExecutiveSummaryPdf()">
+              <span>📥 Export Executive Summary PDF</span>
+            </button>
+            <button type="button" class="exec-cta-btn exec-cta-primary" onclick="launchAIOptimizeBridge('')">
+              <span>⚡ Launch AIOptimize Remediation</span>
+            </button>
           </div>
         </div>
 
-        <!-- Section 3: Is your content AI-Ready? -->
-        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-3">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
-            <h3 style="margin: 0; color: #ffffff;">📝 Section 3: Is your content AI-Ready?</h3>
-            <span class="gateway-badge badge-handshake" id="sec-status-3">Scanning...</span>
-          </div>
-          <p class="text-sm text-muted mb-4">Validates content readability scores, metadata sweetspot lengths, and heading outline hierarchies.</p>
-          
-          <div class="checklist-grid">
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-title">❓</span>
-              <div class="checklist-info">
-                <strong>Title length range</strong>
-                <p>Verifies title is not truncated and fits semantic sweet spots (75 to 125 characters).</p>
+        <!-- Side-by-Side Visual Perception Engine Simulator -->
+        <div class="perception-simulator-container">
+          <div class="simulator-header">
+            <div class="simulator-title-group">
+              <span class="simulator-icon">👁️</span>
+              <div>
+                <h4>Visual Perception Engine Simulator</h4>
+                <p>Real-Time Comparison: Rendered Web Layout vs Machine-Extracted RAG Vector Stream</p>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-desc">❓</span>
-              <div class="checklist-info">
-                <strong>Meta Description range</strong>
-                <p>Checks meta description is present and within range (173 to 213 characters).</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-heading">❓</span>
-              <div class="checklist-info">
-                <strong>Heading Hierarchy</strong>
-                <p>Checks outline sequence (exactly 1 H1 and linear H1 -> H2 -> H3 nesting) for chunkers.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-readability">❓</span>
-              <div class="checklist-info">
-                <strong>Flesch Readability Score</strong>
-                <p>Assesses factual sentence density and word count to guard against agent truncation.</p>
-              </div>
+            <div class="simulator-meta-tag">
+              <span>⚡ Live Stream Simulation</span>
             </div>
           </div>
 
-          <!-- Raw Ingestion viewport -->
-          <div class="mt-4 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
-            <div class="flex justify-between items-center mb-2">
-              <h4 style="margin: 0; color: #ffffff; font-size: 0.95rem;">Raw LLM Ingestion Stream Viewport</h4>
-              <span class="density-badge" id="density-badge">Content Density: --%</span>
+          <div class="simulator-split-grid">
+            <!-- Left Window: What Humans See (Live Site Sandbox & Real Parsed DOM Snapshot) -->
+            <div class="simulator-window human-window">
+              <div class="window-top-bar">
+                <div class="window-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <div class="window-url-bar" id="human-url-preview">https://thatworkx.com/</div>
+                <span class="window-type-badge">🌐 What Humans See</span>
+              </div>
+              <div class="window-content human-content-preview" id="human-viewport-container">
+                <iframe id="human-live-iframe" src="https://thatworkx.com/" title="Scanned Page Live Preview" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 320px; border: none; border-radius: 8px; background: #ffffff;"></iframe>
+                <div id="human-fallback-card" style="display: none; padding: 1rem; background: #0f172a; border-radius: 8px;">
+                  <span class="mock-tag" id="human-page-domain">thatworkx.com</span>
+                  <h1 id="human-page-title" style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin: 0.5rem 0 0.3rem 0;">Empower Your Brand in LLM Search</h1>
+                  <p id="human-page-desc" style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 0.75rem 0; line-height: 1.5;">Maximize your visibility across ChatGPT, Perplexity, and Gemini search engines.</p>
+                </div>
+              </div>
             </div>
-            <p class="text-sm text-muted mb-2">This is the sanitized text stream extracted directly from raw HTML by LLM pre-processors after stripping DOM scripts, styles, and markup noise.</p>
-            <div class="code-viewport-box font-mono" id="machine-preview-box" style="max-height: 150px; font-size: 0.75rem; background: rgba(15, 23, 42, 0.5);">Awaiting scan execution...</div>
-          </div>
-        </div>
 
-        <!-- Section 4: Are you setup to be AI-First? -->
-        <div class="dashboard-card glassmorphic col-span-3" id="sec-card-4">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.8rem; margin-bottom: 1rem;">
-            <h3 style="margin: 0; color: #ffffff;">🚀 Section 4: Are you setup to be AI-First?</h3>
-            <span class="gateway-badge badge-handshake" id="sec-status-4">Scanning...</span>
-          </div>
-          <p class="text-sm text-muted mb-4">Audits system-level AI manifest maps, entity microdata configurations, and narrative profile files.</p>
-          
-          <div class="checklist-grid">
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-llmstxt">❓</span>
-              <div class="checklist-info">
-                <strong>llms.txt file map</strong>
-                <p>Standardized directory details summarizing system parameters and link paths.</p>
+            <!-- Right Window: What ChatGPT / Perplexity Reads (Complete Untruncated RAG Vector Stream) -->
+            <div class="simulator-window machine-window">
+              <div class="window-top-bar">
+                <div class="window-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <div class="window-url-bar" id="machine-url-preview">rag-vector://stream/thatworkx.com</div>
+                <span class="window-type-badge machine-badge">🤖 What ChatGPT &amp; Perplexity Read</span>
               </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-aicontext">❓</span>
-              <div class="checklist-info">
-                <strong>ai-context.md file</strong>
-                <p>Master flat file mapping trust credentials, E-E-A-T anchors, and corporate records.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-schema">❓</span>
-              <div class="checklist-info">
-                <strong>JSON-LD Schema Markup</strong>
-                <p>Insulates brand authority from competitor identity dilution.</p>
-              </div>
-            </div>
-            <div class="checklist-item">
-              <span class="checklist-status" id="chk-narrative-files">❓</span>
-              <div class="checklist-info">
-                <strong>Secondary Manifests</strong>
-                <p>Verifies presence of supporting profiles (about.md, docs.md, and content.md).</p>
+              <div class="window-content machine-code-stream" style="max-height: 320px; overflow-y: auto;">
+                <pre><code id="machine-vector-code"><span class="token-comment"># SYSTEM CONTEXT STREAM: thatworkx.com</span>
+<span class="token-key">Entity_ID:</span> "thatworkx.com"
+<span class="token-key">Canonical_URL:</span> "https://thatworkx.com/"
+<span class="token-key">Last_Modified:</span> "2026-07-23T14:00:00Z"
+<span class="token-key">JSON_LD_Types:</span> ["Organization", "WebSite"]
+
+<span class="token-header">## RAG Chunk 1 [Full Vector Text Stream | Flesch Score: 68.4]</span>
+> Empower Your Brand in LLM Search. Maximize your digital visibility across ChatGPT, Perplexity, and Gemini search engines with automated AEO handshake protocol indexing.
+
+<span class="token-header">## RAG Chunk 2 [Machine Index References]</span>
+- /llms.txt: [Status 200 OK | Answer.ai Standard Verified]
+- /ai-context.md: [Status 200 OK | System Prompt Flattened]
+- /robots.txt: [GPTBot: Allowed | PerplexityBot: Allowed | ClaudeBot: Allowed]</code></pre>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Pages Crawled Route Map -->
-        <div class="dashboard-card glassmorphic col-span-3">
-          <div class="flex justify-between items-center mb-2">
-            <h3>Scanned Routes Directory Path</h3>
-            <span id="scanned-routes-count" class="density-badge" style="background: rgba(14, 165, 233, 0.15); color: var(--sky-color); border: 1px solid rgba(14, 165, 233, 0.3);">Pulled 0 of 0 pages</span>
+        <!-- 4 Strategic Health Pillars -->
+        <div class="strategic-pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-card-header">
+              <span class="pillar-icon">🚪</span>
+              <span class="pillar-status-badge badge-pass" id="pillar-badge-1">🟢 ALLOWED</span>
+            </div>
+            <h4 class="pillar-title">Gatekeeper Access</h4>
+            <p class="pillar-desc" id="pillar-desc-1">Crawler corridors open. GPTBot, PerplexityBot, and ClaudeBot are not blocked by firewall rules.</p>
+            <div class="pillar-footer">
+              <span class="pillar-meta">robots.txt &amp; WAF Status</span>
+            </div>
           </div>
-          <div class="table-container">
-            <table class="data-table">
+
+          <div class="pillar-card">
+            <div class="pillar-card-header">
+              <span class="pillar-icon">⚡</span>
+              <span class="pillar-status-badge badge-pass" id="pillar-badge-2">🟢 OPTIMAL</span>
+            </div>
+            <h4 class="pillar-title">AI Readability</h4>
+            <p class="pillar-desc" id="pillar-desc-2">Fast ingestion speed (~1,250 tokens/page). Clean Flesch readability (68.4/100) and vector density.</p>
+            <div class="pillar-footer">
+              <span class="pillar-meta">Token Load &amp; Readability</span>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-card-header">
+              <span class="pillar-icon">🎯</span>
+              <span class="pillar-status-badge badge-pass" id="pillar-badge-3">🟢 VERIFIED</span>
+            </div>
+            <h4 class="pillar-title">Brand Security &amp; Trust</h4>
+            <p class="pillar-desc" id="pillar-desc-3">Verified contact info, privacy policies, HTTPS encryption, and Organization JSON-LD schemas.</p>
+            <div class="pillar-footer">
+              <span class="pillar-meta">E-E-A-T &amp; SSL Signals</span>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-card-header">
+              <span class="pillar-icon">📄</span>
+              <span class="pillar-status-badge badge-pass" id="pillar-badge-4">🟢 READY</span>
+            </div>
+            <h4 class="pillar-title">Machine Index Files</h4>
+            <p class="pillar-desc" id="pillar-desc-4">/llms.txt and /ai-context.md files detected in root directory with standard-compliant layouts.</p>
+            <div class="pillar-footer">
+              <span class="pillar-meta">Handshake &amp; Manifests</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simplified Executive Route Table -->
+        <div class="executive-route-table-card">
+          <div class="table-card-header">
+            <div>
+              <h4>Scanned Routes Executive Summary</h4>
+              <p>Key page paths evaluated for AI search indexability and RAG context readability.</p>
+            </div>
+            <span class="table-count-badge" id="exec-route-count">4 Routes Crawled</span>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="exec-table">
               <thead>
                 <tr>
-                  <th style="min-width: 200px;">Page paths</th>
-                  <th>
-                    Word Count 
-                    <button class="info-help-btn" onclick="showHelpModal('wordCount')" aria-label="Word Count Help">?</button>
-                  </th>
-                  <th>
-                    Canonical URL 
-                    <button class="info-help-btn" onclick="showHelpModal('canonical')" aria-label="Canonical URL Help">?</button>
-                  </th>
-                  <th>
-                    Structure 
-                    <button class="info-help-btn" onclick="showHelpModal('structure')" aria-label="Structure Help">?</button>
-                  </th>
+                  <th>Page Path</th>
+                  <th>AI Index Status</th>
+                  <th>Readability Status</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
-              <tbody id="scanned-routes-tbody">
+              <tbody id="exec-route-tbody">
                 <tr>
-                  <td colspan="4" class="text-center">No routes crawled yet.</td>
+                  <td class="cell-path"><code>/</code></td>
+                  <td><span class="badge-status status-green">🟢 Visible</span></td>
+                  <td><span class="badge-status status-green">🟢 Clear (1,250 tokens)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/', '')">
+                      <span>⚡ Fix in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/about</code></td>
+                  <td><span class="badge-status status-green">🟢 Visible</span></td>
+                  <td><span class="badge-status status-green">🟢 Clear (850 tokens)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/about', '')">
+                      <span>⚡ Fix in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/products</code></td>
+                  <td><span class="badge-status status-green">🟢 Visible</span></td>
+                  <td><span class="badge-status status-yellow">🟡 Token Heavy (4,200 tokens)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/products', 'tokenLoadAnalysis')">
+                      <span>⚡ Fix in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/pricing</code></td>
+                  <td><span class="badge-status status-red">🔴 Blocked</span></td>
+                  <td><span class="badge-status status-green">🟢 Clear (900 tokens)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/pricing', 'robotsTxtTotalBlindness')">
+                      <span>⚡ Fix in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Dedicated Section: Scanned AI-Ready Machine Files -->
+        <div class="executive-route-table-card" style="margin-top: 1.5rem;" id="executive-ai-files-card">
+          <div class="table-card-header">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>🤖 Scanned AI-Ready Machine Files</span>
+                <span class="badge-status status-green" style="font-size: 0.72rem;">Handshake &amp; Manifest Verification</span>
+              </h4>
+              <p>Root directory machine welcome mats, system context maps, and flat markdown indices evaluated for RAG ingestion volume.</p>
+            </div>
+            <span class="table-count-badge" id="exec-ai-files-count">7 AI-Ready Files Tracked</span>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="exec-table">
+              <thead>
+                <tr>
+                  <th>Machine File Path</th>
+                  <th>File Type &amp; Purpose</th>
+                  <th>Status</th>
+                  <th>Volume / Character Count</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="exec-ai-files-tbody">
+                <tr>
+                  <td class="cell-path"><code>/llms.txt</code></td>
+                  <td>Machine Welcome Directory (Answer.ai Standard)</td>
+                  <td><span class="badge-status status-green" id="status-llms-file">🟢 200 OK Active</span></td>
+                  <td><span id="vol-llms-file">🟢 450 words (2,850 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/llms.txt', 'llmsTxt')">
+                      <span>⚡ Edit in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/ai-context.md</code></td>
+                  <td>System Prompt Blueprint Context Map</td>
+                  <td><span class="badge-status status-green" id="status-aicontext-file">🟢 200 OK Active</span></td>
+                  <td><span id="vol-aicontext-file">🟢 620 words (3,900 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/ai-context.md', 'aiContextMd')">
+                      <span>⚡ Edit in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/robots.txt</code></td>
+                  <td>Protocol Gate &amp; Bot Access Control</td>
+                  <td><span class="badge-status status-green" id="status-robots-file">🟢 200 OK Active</span></td>
+                  <td><span id="vol-robots-file">🟢 120 words (780 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/robots.txt', 'robotsTxt')">
+                      <span>⚡ Edit in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/sitemap.xml</code></td>
+                  <td>Structural Route Index Tree</td>
+                  <td><span class="badge-status status-green" id="status-sitemap-file">🟢 200 OK Active</span></td>
+                  <td><span id="vol-sitemap-file">🟢 180 words (1,450 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/sitemap.xml', 'sitemapXml')">
+                      <span>⚡ Edit in AIOptimize</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/about.md</code></td>
+                  <td>Brand &amp; Corporate Entity Verification</td>
+                  <td><span class="badge-status status-yellow" id="status-aboutmd-file">🟡 404 Missing</span></td>
+                  <td><span id="vol-aboutmd-file">🔴 0 words (0 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/about.md', 'aboutMdManifest')">
+                      <span>⚡ Generate File</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/docs.md</code></td>
+                  <td>Technical Manual &amp; Specification Map</td>
+                  <td><span class="badge-status status-yellow" id="status-docsmd-file">🟡 404 Missing</span></td>
+                  <td><span id="vol-docsmd-file">🔴 0 words (0 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/docs.md', 'docsMdManifest')">
+                      <span>⚡ Generate File</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cell-path"><code>/content.md</code></td>
+                  <td>Flat Article &amp; Thought Leadership Index</td>
+                  <td><span class="badge-status status-yellow" id="status-contentmd-file">🟡 404 Missing</span></td>
+                  <td><span id="vol-contentmd-file">🔴 0 words (0 chars)</span></td>
+                  <td style="text-align: right;">
+                    <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('/content.md', 'contentMdManifest')">
+                      <span>⚡ Generate File</span>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1028,10 +1167,172 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
 
       </div>
 
-      <div class="welcome-placeholder text-center" id="scan-placeholder">
-        <div class="placeholder-icon animate-pulse-slow">🔍</div>
-        <h3>Ready to Auditing</h3>
-        <p>Submit a URL above to inspect your brand's AI search index configuration.</p>
+      <div class="scan-results-grid dev-only-component" id="scan-results" style="display: none;">
+        
+        <!-- 32-Capability Granular Matrix Card -->
+        <div class="executive-route-table-card dev-only-component" id="dev-matrix-section" style="grid-column: span 3;">
+          <div class="table-card-header">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛠️ 32-Capability Granular Diagnostic Matrix</span>
+                <span class="badge-status status-green" style="font-size: 0.72rem;">Full Technical Audit</span>
+              </h4>
+              <p>Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+            </div>
+            <span class="table-count-badge">32 Checks Evaluated</span>
+          </div>
+
+          <div class="matrix-filter-tabs">
+            <button type="button" class="matrix-tab-btn active" onclick="filterMatrixSection('all')">All (32)</button>
+            <button type="button" class="matrix-tab-btn" onclick="filterMatrixSection(1)">Section 1: Gateway (3)</button>
+            <button type="button" class="matrix-tab-btn" onclick="filterMatrixSection(2)">Section 2: Hygiene (7)</button>
+            <button type="button" class="matrix-tab-btn" onclick="filterMatrixSection(3)">Section 3: Parsing (10)</button>
+            <button type="button" class="matrix-tab-btn" onclick="filterMatrixSection(4)">Section 4: Manifests (12)</button>
+          </div>
+
+          <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto;">
+            <table class="exec-table dev-matrix-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Capability &amp; Parameter</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Score</th>
+                  <th>Technical Details &amp; Character Volume</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dev-matrix-tbody">
+                <!-- Dynamically populated by index.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Machine File Code Inspection Drawers -->
+        <div class="executive-route-table-card dev-only-component" id="dev-drawers-section" style="grid-column: span 3; margin-top: 1rem;">
+          <div class="table-card-header">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>💻 Machine File Code Inspection Drawers</span>
+                <span class="badge-status status-green" style="font-size: 0.72rem;">Syntax Highlighted</span>
+              </h4>
+              <p>Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+            </div>
+          </div>
+
+          <div class="drawer-file-tabs">
+            <button type="button" class="drawer-tab-btn active" onclick="selectCodeDrawer('llms')">/llms.txt</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('aicontext')">/ai-context.md</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('robots')">/robots.txt</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('sitemap')">/sitemap.xml</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('readme')">/README.md</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('about')">/about.md</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('docs')">/docs.md</button>
+            <button type="button" class="drawer-tab-btn" onclick="selectCodeDrawer('content')">/content.md</button>
+          </div>
+
+          <div class="drawer-code-window">
+            <div class="drawer-code-bar">
+              <span class="drawer-file-path" id="drawer-current-filepath">/llms.txt</span>
+              <div class="drawer-action-btns">
+                <button type="button" class="drawer-btn" onclick="copyDrawerCode()">
+                  <span>📋 Copy Code</span>
+                </button>
+                <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadDrawerFile()">
+                  <span>📥 Download File</span>
+                </button>
+              </div>
+            </div>
+            <div class="drawer-code-body">
+              <pre><code id="drawer-code-content" class="language-markdown"># LLMs Machine Welcome Directory Index
+> Comprehensive AI Machine Directory following the Answer.ai Specification.
+
+## Primary Routes
+- [Homepage](https://thatworkx.com/): Core AEO Optimization platform.
+- [About](https://thatworkx.com/about): Corporate identity & leadership.
+- [Docs](https://thatworkx.com/docs): Technical integration manuals.
+
+## System Context Map
+- [AI Context Map](https://thatworkx.com/ai-context.md): Flattened RAG system context.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edge Network & WAF Deployment Tab -->
+        <div class="executive-route-table-card dev-only-component" id="dev-edge-section" style="grid-column: span 3; margin-top: 1rem;">
+          <div class="table-card-header">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>🌐 Edge Network &amp; WAF Deployment Sandbox</span>
+                <span class="badge-status status-green" style="font-size: 0.72rem;">Cloudflare &amp; Falcon Hooks</span>
+              </h4>
+              <p>Deploy edge worker proxies to serve /llms.txt and bypass closed CMS hosting restrictions (Shopify, Wix, Squarespace).</p>
+            </div>
+          </div>
+
+          <div class="edge-tabs-nav">
+            <button type="button" class="edge-tab-btn active" onclick="selectEdgeTab('cloudflare')">Cloudflare Worker Proxy Script</button>
+            <button type="button" class="edge-tab-btn" onclick="selectEdgeTab('shopify')">Shopify Domain Redirect Hook</button>
+            <button type="button" class="edge-tab-btn" onclick="selectEdgeTab('crowdstrike')">Crowdstrike Falcon WAF Bypass</button>
+          </div>
+
+          <div class="edge-tab-content">
+            <div class="drawer-code-bar">
+              <span class="drawer-file-path" id="edge-current-title">Cloudflare Worker Edge Router (worker.js)</span>
+              <button type="button" class="drawer-btn" onclick="copyEdgeScript()">
+                <span>📋 Copy Worker Script</span>
+              </button>
+            </div>
+            <div class="drawer-code-body">
+              <pre><code id="edge-code-content" class="language-javascript">// Cloudflare Worker Edge Proxy Hook for AEO Machine Files
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  if (url.pathname === '/llms.txt') {
+    return new Response(LLMS_TXT_CONTENT, { headers: { 'content-type': 'text/plain; charset=utf-8', 'x-robots-tag': 'all' } });
+  }
+  return fetch(request);
+}</code></pre>
+            </div>
+          </div>
+        <!-- Expandable Scanned Routes Directory ([▶]) -->
+        <div class="executive-route-table-card dev-only-component" id="dev-expandable-routes-section" style="grid-column: span 3; margin-top: 1rem;">
+          <div class="table-card-header">
+            <div>
+              <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>📂 Scanned Routes Directory (Expandable DOM Metrics)</span>
+                <span class="badge-status status-green" style="font-size: 0.72rem;">[▶] Click to Expand</span>
+              </h4>
+              <p>Expand individual route rows to inspect raw DOM heading arrays, token counts, and canonical link tags.</p>
+            </div>
+            <span class="table-count-badge" id="dev-routes-count">1 Route Tracked</span>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="exec-table dev-expandable-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"></th>
+                  <th>Route Path</th>
+                  <th>Word Count</th>
+                  <th>Token Count</th>
+                  <th>Canonical Tag</th>
+                  <th>Heading Hierarchy</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dev-expandable-routes-tbody">
+                <!-- Dynamically rendered by index.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </section>
 

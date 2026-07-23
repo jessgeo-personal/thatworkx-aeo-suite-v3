@@ -4,6 +4,42 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.23.0-milestone5] - 2026-07-23
+
+### Added
+- **4-Page Architecture Decoupling**: Restructured monolithic template into 4 distinct, state-isolated HTML pages:
+  - [index.html](file:///D:/MyApps/aeo-audit-tool-v3/frontend/index.html) (Public Landing Page with Hero, Onboarding Console, AI-Ready vs AI-Optimized explainers, AISocialize section).
+  - [visualize.html](file:///D:/MyApps/aeo-audit-tool-v3/frontend/visualize.html) (Dedicated AIVisualize Dashboard Page for Executive Dial & Developer 32-Capability Matrix).
+  - [optimize.html](file:///D:/MyApps/aeo-audit-tool-v3/frontend/optimize.html) (Dedicated AIOptimize Workspace Page for Track 1 Page Fixes & Track 2 File Generators).
+  - [socialize.html](file:///D:/MyApps/aeo-audit-tool-v3/frontend/socialize.html) (Dedicated AISocialize Page for Social Footprint Engine & Chrome Extension Hub).
+- **Deep-Linked URL Search Parameters**:
+  - `visualize.html?url=example.com` automatically triggers scan execution for `example.com`.
+  - `visualize.html?url=example.com&mode=developer` opens directly in Developer / DIY Mode.
+  - `optimize.html?url=example.com` pre-fills the target domain in remediation generators.
+- **REST API v1 Programmatic Audit Endpoints**: Added `GET /api/v1/scan?url=...` and `POST /api/v1/scan` endpoints returning structured 32-capability evaluation JSON payloads for Pro & Enterprise integrations.
+- **BDD Feature 10 Test Suite**: Added `backend/tests/bdd/fourPageArchitecture.test.js` covering 4-page navigation, URL parameter routing, and REST API contract parity (52/52 passing Vitest tests).
+
+### Changed
+- **Auth & Login Modal Integrity**: Fixed event listeners and element guards for `openAuthModal()` across all 4 pages.
+- **Top Navigation Bar & Brand Logo Routing**: Updated top header brand logo to provide clean return hyperlink to `index.html`.
+
+## [1.22.0-sprint8-patch] - 2026-07-23
+
+
+### Added
+- **AIVisualize Dashboard Core Component Suite (`/src/pages/VisualizeDashboard.jsx`)**: Built dual-view dashboard architecture exporting theme tokens, Executive Mode components, and Developer Mode components.
+- **Milestone 1: Dual View Switcher & Theme Tokens**: Added top-level View Mode Switcher pill ("🏢 Executive Mode" vs "🛠️ Developer / DIY Mode") in `frontend/index.html` and design system tokens in `frontend/index.css` (`#0D0E11` dark, `#F8FAFC` light, `#E11D48` Rose Crimson, `#F59E0B` Amber).
+- **Milestone 2: 32-Capability Evaluation Engine (`frontend/src/services/capabilityEvaluator.js`)**: Implemented 32 capability evaluations across Sections 1 (3), 2 (7), 3 (10), and 4 (12) with Data Starvation penalties for empty DOM text and credits for active `/llms.txt` and `/ai-context.md` machine welcome mats.
+- **Milestone 3: Executive Mode UI & Side-by-Side Perception Simulator**: Rendered Executive AI Visibility Score Dial Gauge (0-100), Visual Perception Engine Simulator comparing "What Humans See" (live iframe with parsed DOM fallback card) vs "What ChatGPT & Perplexity Read" (untruncated vector stream), 4 Strategic Health Pillars, Executive Route Table, and dedicated Scanned AI-Ready Machine Files Table with word and character volume counts.
+- **Machine Handshake Fallback Stream**: Added machine fallback stream detection when HTML DOM is JS-heavy (`0 words`), displaying verified `/llms.txt` and `/ai-context.md` fallback streams in RAG Chunk 1 to prevent false Data Starvation warnings.
+- **Milestone 4: Developer / DIY Mode UI & Code Inspection Drawers**: Added 32-Capability Granular Diagnostic Matrix with section filter tabs (`All`, `Sec 1`, `Sec 2`, `Sec 3`, `Sec 4`), Interactive Syntax-Highlighted Code Drawers for 8 machine files (`/llms.txt`, `/ai-context.md`, `/robots.txt`, `/sitemap.xml`, `/README.md`, `/about.md`, `/docs.md`, `/content.md`) with Copy Code & Download File buttons, Edge Network & WAF Sandbox (Cloudflare, Shopify, Crowdstrike Falcon rules), and Expandable Scanned Routes Directory Table (`[▶]`).
+- **Resilient API Routing & Null Guards**: Added `API_BASE` resolver in `frontend/index.js` for multi-port / `file://` access and added safe null guards across `displayScanResults()` and `showUpgradeModal()`.
+
+### Changed
+- **Removed Obsolete Legacy Cards**: Cleaned out legacy duplicate dashboard cards from `frontend/index.html` to eliminate layout overlap.
+- **Dynamic Scanned Domain Binding**: Removed static `'thatworkx.com'` fallbacks across Code Drawers, Perception Simulator, and Edge Scripts to bind 100% dynamically to the user's scanned target domain (e.g. `holiknits.com`).
+- **Vitest Test Suite Expansion**: Expanded BDD test suite in `backend/tests/bdd/consoleTabSwitcher.test.js` to 48/48 passing tests.
+
 ## [1.21.0-sprint8-patch] - 2026-07-23
 
 ### Added

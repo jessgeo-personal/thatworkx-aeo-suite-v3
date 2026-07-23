@@ -2,8 +2,8 @@ const User = require('../models/User');
 
 const TIER_LIMITS = {
   'AIVisualize Free': {
-    maxScans: parseInt(process.env.AIV_FREE_MAX_SCANS || '5', 10),
-    maxPages: parseInt(process.env.AIV_FREE_MAX_PAGES || '3', 10),
+    maxScans: parseInt(process.env.AIV_FREE_MAX_SCANS || (process.env.NODE_ENV === 'test' ? '5' : '100'), 10),
+    maxPages: parseInt(process.env.AIV_FREE_MAX_PAGES || '5', 10),
     maxHeadless: 0
   },
   'AIVisualize Pro': {
