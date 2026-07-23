@@ -1584,9 +1584,19 @@ body {
   line-height: 1;
 }
 
+.check-icon-svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 .list-cyan .check-icon { color: #22d3ee; }
+.list-cyan .check-icon-svg { color: #06b6d4; }
 .list-amber .check-icon { color: #f59e0b; }
+.list-amber .check-icon-svg { color: #f59e0b; }
 .list-violet .check-icon { color: #a78bfa; }
+.list-violet .check-icon-svg { color: #8b5cf6; }
 
 /* Nested checklist sections */
 .nested-check-section {
@@ -2215,6 +2225,10 @@ body.light-theme .card-checker-list li {
   color: #334155;
 }
 
+body.light-theme .list-cyan .check-icon-svg { color: #0891b2; }
+body.light-theme .list-amber .check-icon-svg { color: #d97706; }
+body.light-theme .list-violet .check-icon-svg { color: #6d28d9; }
+
 body.light-theme .nested-group-title {
   color: #94a3b8;
 }
@@ -2227,6 +2241,11 @@ body.light-theme .action-outline-btn.border-cyan {
 body.light-theme .action-outline-btn.border-amber {
   border-color: rgba(245, 158, 11, 0.4);
   color: #d97706;
+}
+
+body.light-theme .action-outline-btn.border-violet {
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #6d28d9;
 }
 
 body.light-theme .extension-badge-tag {
