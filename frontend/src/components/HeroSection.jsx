@@ -192,18 +192,18 @@ function NavBar({ dark, onToggle }) {
 
 function SegmentedSwitcher({ active, onChange }) {
   const tabs = ['visualize', 'optimize', 'socialize'];
-  const acc = ACCENTS[active];
 
   return (
-    <div className="inline-flex rounded-xl p-1 gap-1
+    <div className="grid grid-cols-3 rounded-xl p-1 gap-1
                     bg-slate-100 dark:bg-[#1F222A]
-                    border border-slate-200 dark:border-white/8">
+                    border border-slate-200 dark:border-white/8 w-full max-w-lg">
       {tabs.map(tab => {
         const a = ACCENTS[tab];
         const isActive = tab === active;
         return (
           <button
             key={tab}
+            type="button"
             onClick={() => onChange(tab)}
             aria-pressed={isActive}
             style={isActive ? {
@@ -212,8 +212,8 @@ function SegmentedSwitcher({ active, onChange }) {
               boxShadow: `0 0 16px ${a.hex}22`,
             } : {}}
             className={`
-              flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
-              transition-all duration-200 border
+              flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold
+              transition-all duration-200 border uppercase tracking-wider
               ${isActive
                 ? `${a.text} border-current`
                 : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-200'
@@ -226,6 +226,91 @@ function SegmentedSwitcher({ active, onChange }) {
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function ConsoleDetails({ activeTool }) {
+  const card = CAPABILITY_CARDS.find(c => c.tool === activeTool);
+  const acc = ACCENTS[activeTool];
+  if (!card) return null;
+
+  return (
+    <div className="my-5 p-4 rounded-xl border border-slate-100 dark:border-white/5
+                    bg-slate-50/50 dark:bg-[#1C1E26]/40 transition-all duration-300">
+      <div className="flex items-center gap-2 mb-2">
+        <span
+          style={{ backgroundColor: `${acc.hex}18`, color: acc.hex, borderColor: `${acc.hex}44` }}
+          className="px-2.5 py-0.5 rounded-full border font-mono text-[0.62rem] font-bold uppercase tracking-widest"
+        >
+          {acc.badge}
+        </span>
+        <h4 style={{ color: acc.hex }} className="text-sm font-extrabold">
+          {acc.emoji} {acc.label}
+        </h4>
+      </div>
+      
+      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-3 leading-relaxed">
+        {card.subtitle}
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Scope list */}
+        <div>
+          <p className="font-mono text-[0.62rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1.5">
+            {card.scopeLabel}
+          </p>
+          
+          {card.items && (
+            <ul className="flex flex-col gap-1">
+              {card.items.map((item, i) => (
+                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300 leading-snug">
+                  <Check size={10} style={{ color: acc.hex }} className="mt-0.5 flex-shrink-0" />
+                  <span>
+                    {item.text}
+                    {item.detail && <span className="text-slate-500 text-[0.7rem]"> ({item.detail})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {card.groups && (
+            <div className="flex flex-col gap-2">
+              {card.groups.map((group, gi) => (
+                <div key={gi}>
+                  <p className="font-mono text-[0.58rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-0.5">
+                    {group.label}
+                  </p>
+                  <ul className="flex flex-col gap-1">
+                    {group.items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300 leading-snug">
+                        <Check size={10} style={{ color: acc.hex }} className="mt-0.5 flex-shrink-0" />
+                        {item.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Deliverables list */}
+        <div>
+          <p className="font-mono text-[0.62rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1.5">
+            Deliverables
+          </p>
+          <ul className="flex flex-col gap-1">
+            {card.deliverables.map((d, i) => (
+              <li key={i} className="flex items-center gap-1.5 text-[0.7rem] text-slate-500 dark:text-slate-400">
+                <span style={{ color: acc.hex }} className="text-[0.6rem]">▸</span>
+                {d}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
@@ -243,7 +328,7 @@ function ScanForm({ activeTool, urlRef, onSubmit }) {
       onSubmit={onSubmit}
       action="/scan"
       method="GET"
-      className="w-full flex gap-2 mt-4"
+      className="w-full flex gap-2"
     >
       <input type="hidden" name="tool" value={activeTool} />
       <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl
@@ -281,7 +366,7 @@ function ScanForm({ activeTool, urlRef, onSubmit }) {
 
 function EnterpriseDemoChips() {
   return (
-    <div className="flex flex-wrap items-center gap-2 mt-3">
+    <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
       <span className="font-mono text-xs font-semibold text-slate-400 dark:text-slate-500 flex-shrink-0">
         ⚡ Instant Enterprise Demo:
       </span>
@@ -506,6 +591,9 @@ export default function HeroSection() {
             <SegmentedSwitcher active={activeTool} onChange={setActiveTool} />
           </div>
 
+          {/* Dynamic Switcher details within the Action Console */}
+          <ConsoleDetails activeTool={activeTool} />
+
           {/* Scan form */}
           <ScanForm activeTool={activeTool} urlRef={urlRef} onSubmit={handleScan} />
 
@@ -576,4 +664,3 @@ export default function HeroSection() {
   window.history.pushState
   window.executeOnboardingScan
 */
-
