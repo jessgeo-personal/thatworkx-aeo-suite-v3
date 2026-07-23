@@ -1899,3 +1899,220 @@ body {
   }
 }
 
+/* ACCORDION SECTION STYLES */
+.onboarding-accordion-section {
+  margin-top: 6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 4rem;
+  margin-bottom: 2rem;
+}
+
+.accordion-section-header h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.accordion-section-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.accordion-container {
+  max-width: 850px;
+  margin: 3rem auto 0 auto;
+}
+
+/* details element styling */
+.accordion-item {
+  background: #111318 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.accordion-item[open] {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #13161c !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* summary style */
+.accordion-header {
+  padding: 1.2rem 1.8rem;
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  list-style: none; /* Hide default browser arrow */
+  transition: background 0.2s ease;
+}
+
+.accordion-header::-webkit-details-marker {
+  display: none; /* Hide default webkit arrow */
+}
+
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.accordion-arrow {
+  font-size: 0.75rem;
+  color: #64748b;
+  transition: transform 0.3s ease;
+}
+
+.accordion-item[open] .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+/* content styles */
+.accordion-content {
+  padding: 0 1.8rem 1.8rem 1.8rem;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  text-align: left;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 1.2rem;
+}
+
+.accordion-content p {
+  color: #94a3b8;
+}
+
+/* Accordion Table inside content */
+.accordion-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  background: rgba(8, 9, 12, 0.4);
+  margin-top: 1rem;
+}
+
+.accordion-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.accordion-table th {
+  background: rgba(15, 23, 42, 0.8);
+  padding: 0.8rem 1.2rem;
+  color: #ffffff;
+  font-weight: 750;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.accordion-table td {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+}
+
+.accordion-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Checklist inside content */
+.accordion-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.accordion-checklist li {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.accordion-checklist code {
+  background: rgba(8, 9, 12, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #a78bfa;
+}
+
+/* Links Grid inside content */
+.accordion-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.accordion-link-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(8, 9, 12, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+.accordion-link-card:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.accordion-link-card strong {
+  font-size: 0.85rem;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.accordion-link-card span {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* FAQ list layout */
+.faq-sub-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.faq-item h4 {
+  font-size: 0.85rem;
+  font-weight: 750;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+}
+
+.faq-item p {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .accordion-links-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
