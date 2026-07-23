@@ -1489,4 +1489,19 @@ window.switchBentoCode = switchBentoCode;
 window.toggleTheme = toggleTheme;
 window.switchDeckCard = switchDeckCard;
 
+// ── 1-Click Instant Try Pills ──────────────────────────────────────────────
+function triggerInstantScan(domain) {
+  const inputField = document.getElementById('onboarding-target-url');
+  if (inputField) {
+    inputField.value = domain;
+    inputField.focus();
+  }
+  const form = document.getElementById('onboarding-scan-form');
+  if (form) {
+    executeOnboardingScan(new Event('submit'));
+  }
+}
+window.triggerInstantScan = triggerInstantScan;
+
+
 

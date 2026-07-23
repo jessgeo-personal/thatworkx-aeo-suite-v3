@@ -7,7 +7,7 @@
   <!-- Modern Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@750;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -63,7 +63,7 @@
 
         <!-- 3. Headline & 4. Subheadline -->
         <div class="onboarding-header-group">
-          <h1>Educating Brands to be <span class="text-gradient-cyan">AI-Ready</span>, AI-First, and <span class="text-gradient-amber">AIOptimized</span>.</h1>
+          <h1>Educating Brands to be <span class="text-accent-rose">AI-Ready</span>, AI-First, and <span class="text-accent-amber">AIOptimized</span>.</h1>
           <p class="onboarding-subheadline">
             Discover how LLMs, answer engines, and agentic bots perceive, compress, and cite your digital presence.
           </p>
@@ -136,8 +136,18 @@
           </form>
           
           <!-- Dynamic Socialize Extension Badge -->
-          <div id="socialize-extension-badge" style="display: none; align-items: center; justify-content: center; margin-top: 1.2rem; font-size: 0.8rem; color: #a78bfa; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); padding: 0.6rem 1.2rem; border-radius: 8px; width: fit-content; margin-left: auto; margin-right: auto; font-weight: 600;">
-            ⚡ Chrome Extension Required for Snippet Generation <a href="#install" onclick="alert('Opening Chrome Web Store extension installer...');" style="text-decoration: underline; margin-left: 4px; color: #a78bfa; cursor: pointer;">[Install Extension]</a>
+          <div id="socialize-extension-badge" class="socialize-badge-pill" style="display: none;">
+            <span class="socialize-badge-zap">⚡</span>
+            Chrome Extension Required for Post Snippets
+            <a href="#install" onclick="alert('Opening Chrome Web Store extension installer...');" class="socialize-badge-link">[Install]</a>
+          </div>
+
+          <!-- 1-Click Instant Try Pills -->
+          <div class="instant-try-row" id="instant-try-row">
+            <span class="instant-try-label">⚡ Try Instant Scan:</span>
+            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('shopify.com')">shopify.com</button>
+            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('stripe.com')">stripe.com</button>
+            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('airbnb.com')">airbnb.com</button>
           </div>
           
           <!-- Optional Headless Switcher for high tier users on the homepage -->

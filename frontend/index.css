@@ -1250,6 +1250,16 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* ── Headline accent spans (per spec: Rose Crimson + Safety Amber) ── */
+.text-accent-rose {
+  color: #9F1239;
+}
+
+.text-accent-amber {
+  color: #B45309;
+}
+
+/* Keep legacy gradient classes for any other uses */
 .text-gradient-cyan {
   background: linear-gradient(135deg, #22d3ee 30%, #06b6d4 100%);
   -webkit-background-clip: text;
@@ -1285,18 +1295,21 @@ body {
 }
 
 .active-visualize-glow {
-  border-color: rgba(6, 182, 212, 0.4);
-  box-shadow: 0 0 40px rgba(6, 182, 212, 0.12), inset 0 0 12px rgba(6, 182, 212, 0.04);
+  /* Rose Crimson accent per spec */
+  border-color: rgba(159, 18, 57, 0.45);
+  box-shadow: 0 0 40px rgba(159, 18, 57, 0.14), inset 0 0 12px rgba(159, 18, 57, 0.05);
 }
 
 .active-optimize-glow {
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 0 40px rgba(245, 158, 11, 0.12), inset 0 0 12px rgba(245, 158, 11, 0.04);
+  /* Safety Amber accent per spec */
+  border-color: rgba(180, 83, 9, 0.45);
+  box-shadow: 0 0 40px rgba(180, 83, 9, 0.14), inset 0 0 12px rgba(180, 83, 9, 0.05);
 }
 
 .active-socialize-glow {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.12), inset 0 0 12px rgba(139, 92, 246, 0.04);
+  /* Burnt Copper accent per spec */
+  border-color: rgba(154, 52, 18, 0.45);
+  box-shadow: 0 0 40px rgba(154, 52, 18, 0.14), inset 0 0 12px rgba(154, 52, 18, 0.05);
 }
 
 /* SEGMENTED TAB SWITCHER ROW */
@@ -1341,27 +1354,35 @@ body {
 }
 
 .console-tab-btn.active#btn-tab-visualize {
-  border-color: rgba(6, 182, 212, 0.5) !important;
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.12);
+  border-color: rgba(159, 18, 57, 0.55) !important;
+  box-shadow: 0 0 25px rgba(159, 18, 57, 0.15);
+  background: rgba(159, 18, 57, 0.06);
 }
 
 .console-tab-btn.active#btn-tab-optimize {
-  border-color: rgba(245, 158, 11, 0.5) !important;
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.12);
+  border-color: rgba(180, 83, 9, 0.55) !important;
+  box-shadow: 0 0 25px rgba(180, 83, 9, 0.15);
+  background: rgba(180, 83, 9, 0.06);
 }
 
 .console-tab-btn.active#btn-tab-socialize {
-  border-color: rgba(139, 92, 246, 0.5) !important;
-  box-shadow: 0 0 25px rgba(139, 92, 246, 0.12);
+  border-color: rgba(154, 52, 18, 0.55) !important;
+  box-shadow: 0 0 25px rgba(154, 52, 18, 0.15);
+  background: rgba(154, 52, 18, 0.06);
 }
 
 /* Button interior text formatting */
 .tab-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.25rem; 
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.1rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
+
+/* Per-tab title accent colors */
+.tab-title.text-cyan  { color: #9F1239; } /* AI Visualize → Rose */
+.tab-title.text-amber { color: #B45309; } /* AIOptimize → Safety Amber */
+.tab-title.text-violet { color: #9A3412; } /* AISocialize → Burnt Copper */
 
 .tab-subhead {
   font-size: 0.9rem;
@@ -1439,20 +1460,19 @@ body {
   background: rgba(15, 23, 42, 0.7);
 }
 
-/* Active input states on focus */
 .active-visualize-glow input:focus {
-  border-color: #22d3ee;
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+  border-color: #9F1239;
+  box-shadow: 0 0 15px rgba(159, 18, 57, 0.2);
 }
 
 .active-optimize-glow input:focus {
-  border-color: #f59e0b;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  border-color: #B45309;
+  box-shadow: 0 0 15px rgba(180, 83, 9, 0.2);
 }
 
 .active-socialize-glow input:focus {
-  border-color: #a78bfa;
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  border-color: #9A3412;
+  box-shadow: 0 0 15px rgba(154, 52, 18, 0.2);
 }
 
 /* ACTION CTAS */
@@ -1474,37 +1494,116 @@ body {
   transform: scale(1.02);
 }
 
+/* CTA Buttons — updated to spec accent tones */
 .onboarding-submit-btn.bg-cyan {
-  background: #06b6d4;
-  color: #08090c;
-  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+  background: #9F1239;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(159, 18, 57, 0.35);
 }
 
 .onboarding-submit-btn.bg-cyan:hover {
-  background: #22d3ee;
-  box-shadow: 0 4px 30px rgba(6, 182, 212, 0.5);
+  background: #BE1846;
+  box-shadow: 0 4px 30px rgba(159, 18, 57, 0.5);
 }
 
 .onboarding-submit-btn.bg-amber {
-  background: #f59e0b;
-  color: #08090c;
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+  background: #B45309;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.35);
 }
 
 .onboarding-submit-btn.bg-amber:hover {
-  background: #fbbf24;
-  box-shadow: 0 4px 30px rgba(245, 158, 11, 0.5);
+  background: #D0640C;
+  box-shadow: 0 4px 30px rgba(180, 83, 9, 0.5);
 }
 
 .onboarding-submit-btn.bg-violet {
-  background: #8b5cf6;
+  background: #9A3412;
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(154, 52, 18, 0.35);
 }
 
 .onboarding-submit-btn.bg-violet:hover {
-  background: #a78bfa;
-  box-shadow: 0 4px 30px rgba(139, 92, 246, 0.5);
+  background: #B64016;
+  box-shadow: 0 4px 30px rgba(154, 52, 18, 0.5);
+}
+
+/* ── AISocialize Extension Badge (styled class) ── */
+.socialize-badge-pill {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #9A3412;
+  background: rgba(154, 52, 18, 0.08);
+  border: 1px solid rgba(154, 52, 18, 0.3);
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.socialize-badge-zap {
+  font-size: 0.9rem;
+}
+
+.socialize-badge-link {
+  text-decoration: underline;
+  margin-left: 4px;
+  color: #9A3412;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.socialize-badge-link:hover {
+  opacity: 0.75;
+}
+
+/* ── 1-Click Instant Try Pills ── */
+.instant-try-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.instant-try-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.instant-try-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(159, 18, 57, 0.10);
+  border: 1px solid rgba(159, 18, 57, 0.28);
+  color: #9F1239;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.instant-try-pill:hover {
+  background: rgba(159, 18, 57, 0.18);
+  transform: translateY(-1px);
+}
+
+.instant-try-pill:active {
+  transform: scale(0.96);
 }
 
 .onboarding-submit-btn:active {
