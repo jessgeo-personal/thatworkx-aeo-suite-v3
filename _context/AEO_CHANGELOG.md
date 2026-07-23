@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Console Tab Typography & CSS Refinement**: Refined spacing, font size, line height, and min-height constraints in `frontend/index.css` for `.console-tab-btn`, `.tab-title`, `.tab-subhead`, `.tab-list`, and `.tab-section-title`.
 - **Landing Page Tab Content Fixes**: Corrected typos and polished grammar in tab subheads within `frontend/index.html`.
 
+### Fixed
+- **Console Tab Switcher Layout Overlaps**: Added CSS Grid layout (`display: grid; grid-template-columns: repeat(3, 1fr)`) to `.console-tabs-container` in `frontend/index.css` to eliminate tab card overlapping issues across viewports.
+
+
 ## [1.18.0-sprint8-patch] - 2026-07-22
 
 ### Added
