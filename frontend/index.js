@@ -2053,10 +2053,27 @@ let onboardingSelectedMode = 'visualize';
 function selectConsoleTab(tabId) {
   onboardingSelectedMode = tabId;
   
-  // 1. Update Segmented tab active states
-  document.querySelectorAll('.console-tab-btn').forEach(btn => btn.classList.remove('active'));
+  // 1. Update Segmented tab active states & visible focus rings
+  document.querySelectorAll('.console-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+    btn.style.boxShadow = 'none';
+  });
+
   const activeTabBtn = document.getElementById(`btn-tab-${tabId}`);
-  if (activeTabBtn) activeTabBtn.classList.add('active');
+  if (activeTabBtn) {
+    activeTabBtn.classList.add('active');
+    if (tabId === 'visualize') {
+      activeTabBtn.style.borderColor = '#38bdf8';
+      activeTabBtn.style.boxShadow = '0 0 20px rgba(56, 189, 248, 0.25)';
+    } else if (tabId === 'optimize') {
+      activeTabBtn.style.borderColor = '#f59e0b';
+      activeTabBtn.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.25)';
+    } else if (tabId === 'socialize') {
+      activeTabBtn.style.borderColor = '#c084fc';
+      activeTabBtn.style.boxShadow = '0 0 20px rgba(192, 132, 252, 0.25)';
+    }
+  }
   
   // 2. Update Console Card accent glow border
   const consoleCard = document.getElementById('onboarding-console-card');
@@ -2065,49 +2082,57 @@ function selectConsoleTab(tabId) {
     consoleCard.classList.add(`active-${tabId}-glow`);
   }
   
-  // 3. Update Main Input Placeholder & Extension Badge display
+  // 3. Update Focused Form Header Label
+  const toolLabel = document.getElementById('onboarding-form-tool-label');
+  if (toolLabel) {
+    if (tabId === 'visualize') {
+      toolLabel.innerHTML = '👁️ AI Visualize Diagnostic Scanner';
+      toolLabel.style.color = '#38bdf8';
+    } else if (tabId === 'optimize') {
+      toolLabel.innerHTML = '🩺 AIOptimize Remediation Workspace';
+      toolLabel.style.color = '#f59e0b';
+    } else if (tabId === 'socialize') {
+      toolLabel.innerHTML = '📣 AISocialize Citation Footprint Engine';
+      toolLabel.style.color = '#c084fc';
+    }
+  }
+
+  // 4. Update Main Input Placeholder & Extension Badge display
   const inputField = document.getElementById('onboarding-target-url');
   const extensionBadge = document.getElementById('socialize-extension-badge');
   
   if (inputField) {
     if (tabId === 'visualize') {
-      inputField.placeholder = 'Enter domain URL (e.g. example.com)...';
+      inputField.placeholder = 'Enter domain URL to scan (e.g., example.com)...';
       if (extensionBadge) extensionBadge.style.display = 'none';
     } else if (tabId === 'optimize') {
-      inputField.placeholder = 'Enter domain or URL to optimize...';
+      inputField.placeholder = 'Enter domain URL to generate fix manifests...';
       if (extensionBadge) extensionBadge.style.display = 'none';
     } else if (tabId === 'socialize') {
-      inputField.placeholder = 'Enter domain URL or social handle...';
+      inputField.placeholder = 'Enter target URL or social profile link...';
       if (extensionBadge) extensionBadge.style.display = 'flex';
     }
+    inputField.focus();
   }
   
-  // 4. Update Button text & colors
+  // 5. Update Button text & colors
   const btn = document.getElementById('onboarding-submit-btn');
   const btnText = document.getElementById('onboarding-btn-text');
   if (btn && btnText) {
     btn.className = 'onboarding-submit-btn'; // Reset
     if (tabId === 'visualize') {
-      btnText.innerText = 'Initiate Scan';
+      btnText.innerText = 'Initiate Diagnostic Scan →';
       btn.classList.add('bg-cyan');
     } else if (tabId === 'optimize') {
-      btnText.innerText = 'Launch Optimizer';
+      btnText.innerText = 'Launch AIOptimize Remediation →';
       btn.classList.add('bg-amber');
     } else if (tabId === 'socialize') {
-      btnText.innerText = 'Check Social Readiness';
+      btnText.innerText = 'Check Social Citation Footprint →';
       btn.classList.add('bg-violet');
     }
   }
-  
-  // 5. Update Feature cards borders
-  document.querySelectorAll('.feature-card-item').forEach(card => {
-    card.classList.remove('active-border-cyan', 'active-border-amber', 'active-border-violet');
-  });
-  const activeFeatCard = document.getElementById(`feat-card-${tabId}`);
-  if (activeFeatCard) {
-    activeFeatCard.classList.add(`active-border-${tabId === 'visualize' ? 'cyan' : tabId === 'optimize' ? 'amber' : 'violet'}`);
-  }
 }
+
 
 async function executeOnboardingScan(event) {
   if (event && event.preventDefault) event.preventDefault();

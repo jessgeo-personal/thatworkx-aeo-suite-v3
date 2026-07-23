@@ -157,17 +157,21 @@
             </div>
           </div>
 
-          <!-- Main Input Form -->
+          <!-- Focused Form Tool Indicator & Input Form -->
+          <div id="onboarding-form-tool-label" style="text-align: center; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 800; color: #38bdf8;">
+            👁️ AI Visualize Diagnostic Scanner
+          </div>
           <form id="onboarding-scan-form" onsubmit="executeOnboardingScan(event)" class="onboarding-form-layout">
             <div class="onboarding-input-wrapper">
               <span class="onboarding-input-icon">🌐</span>
-              <input type="text" id="onboarding-target-url" placeholder="Enter domain URL (e.g., example.com)..." required>
+              <input type="text" id="onboarding-target-url" placeholder="Enter domain URL to scan (e.g., example.com)..." required>
             </div>
             <button type="submit" class="onboarding-submit-btn bg-cyan" id="onboarding-submit-btn">
-              <span id="onboarding-btn-text">Initiate Scan</span>
+              <span id="onboarding-btn-text">Initiate Diagnostic Scan →</span>
               <div class="btn-loader" id="onboarding-btn-loader" style="display: none;"></div>
             </button>
           </form>
+
           
           <!-- Dynamic Socialize Extension Badge -->
           <div id="socialize-extension-badge" class="socialize-badge-pill" style="display: none; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.82rem; color: #c084fc; background: rgba(192, 132, 252, 0.08); border: 1px solid rgba(192, 132, 252, 0.25); padding: 0.4rem 1rem; border-radius: 20px; width: fit-content; margin-left: auto; margin-right: auto;">
