@@ -19,11 +19,11 @@
       <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
     </div>
     
-    <nav class="nav-links flex items-center gap-4" style="display: flex; gap: 1.2rem; align-items: center;">
-      <a href="index.html" class="nav-link active">Home</a>
-      <a href="visualize.html" class="nav-link">👁️ AI Visualize</a>
-      <a href="optimize.html" class="nav-link">🩺 AI Optimize</a>
-      <a href="socialize.html" class="nav-link">📣 AI Socialize</a>
+    <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
+      <a href="index.html" class="nav-link active" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #ffffff; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); text-decoration: none;">Home</a>
+      <a href="visualize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">👁️ AI Visualize</a>
+      <a href="optimize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">🩺 AI Optimize</a>
+      <a href="socialize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">📣 AI Socialize</a>
     </nav>
 
     <div class="header-actions flex items-center gap-3">
@@ -180,6 +180,455 @@
 
       </div>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SPATIAL BENTO COMMAND DECK (AI-Ready vs AI-Optimized)
+    ════════════════════════════════════════════════════════ -->
+    <div class="onboarding-deck-section my-12" id="spatial-bento-deck">
+      <div class="footer-bento-wrapper">
+        <div class="deck-section-header text-center mb-8">
+          <span class="deck-section-eyebrow">⌨ SPATIAL BENTO &amp; SCHEMA INSPECTOR</span>
+          <h2 class="deck-section-title">What does it take to be AI Optimized?</h2>
+          <p class="deck-section-sub">Pre-rendered for search index visibility. Every panel is in the static DOM — fully indexed by GPTBot, ClaudeBot, and PerplexityBot without JavaScript.</p>
+        </div>
+
+        <div class="deck-grid">
+
+          <!-- Left Column: 5 Interactive Navigation Bento Cards -->
+          <div class="deck-left-col" role="tablist" aria-label="AEO Knowledge Panels">
+
+            <!-- Card 1: What is AEO? -->
+            <div class="deck-nav-card deck-nav-card--active" id="deck-nav-aeo"
+                 onclick="switchDeckCard('aeo')" role="tab" aria-selected="true"
+                 aria-controls="deck-panel-aeo" tabindex="0">
+              <span class="deck-nav-icon" style="color:#9F1239;">👁️</span>
+              <div class="deck-nav-text">
+                <h3>What is Answer Engine Optimization (AEO)?</h3>
+                <p>Understand the shift from keyword PageRank lists to generative RAG index retrieval.</p>
+              </div>
+              <span class="deck-nav-arrow">›</span>
+            </div>
+
+            <!-- Card 2: 4-Layer Machine File Hierarchy -->
+            <div class="deck-nav-card" id="deck-nav-hierarchy"
+                 onclick="switchDeckCard('hierarchy')" role="tab" aria-selected="false"
+                 aria-controls="deck-panel-hierarchy" tabindex="0">
+              <span class="deck-nav-icon" style="color:#B45309;">📂</span>
+              <div class="deck-nav-text">
+                <h3>The 4-Layer Machine File Hierarchy</h3>
+                <p>Discover robots.txt, llms.txt, ai-context.md, and markdown directory routes.</p>
+              </div>
+              <span class="deck-nav-arrow">›</span>
+            </div>
+
+            <!-- Card 3: E-E-A-T & Citation Authority Engine -->
+            <div class="deck-nav-card" id="deck-nav-eeat"
+                 onclick="switchDeckCard('eeat')" role="tab" aria-selected="false"
+                 aria-controls="deck-panel-eeat" tabindex="0">
+              <span class="deck-nav-icon" style="color:#059669;">🛡️</span>
+              <div class="deck-nav-text">
+                <h3>E-E-A-T &amp; Citation Authority Engine</h3>
+                <p>Audit author credentials, citation index anchors, and fresh metadata files.</p>
+              </div>
+              <span class="deck-nav-arrow">›</span>
+            </div>
+
+            <!-- Card 4: Enterprise APIs & Automated Workflows -->
+            <div class="deck-nav-card" id="deck-nav-api"
+                 onclick="switchDeckCard('api')" role="tab" aria-selected="false"
+                 aria-controls="deck-panel-api" tabindex="0">
+              <span class="deck-nav-icon" style="color:#9A3412;">⚡</span>
+              <div class="deck-nav-text">
+                <h3>Enterprise APIs &amp; Automated Workflows</h3>
+                <p>Configure headless scraper checks and automated CI/CD publishing keys.</p>
+              </div>
+              <span class="deck-nav-arrow">›</span>
+            </div>
+
+            <!-- Card 5: Documentation & Fair Use Policy -->
+            <div class="deck-nav-card" id="deck-nav-policy"
+                 onclick="switchDeckCard('policy')" role="tab" aria-selected="false"
+                 aria-controls="deck-panel-policy" tabindex="0">
+              <span class="deck-nav-icon" style="color:#7C3AED;">🏆</span>
+              <div class="deck-nav-text">
+                <h3>Documentation &amp; Fair Use Policy</h3>
+                <p>Outlines daily limits, sitemap depth capacity, and commercial workspace tiers.</p>
+              </div>
+              <span class="deck-nav-arrow">›</span>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Live Inspector Shell -->
+          <div class="deck-right-col">
+            <div class="deck-inspector-shell">
+              <div class="deck-terminal-bar">
+                <div class="deck-terminal-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <span class="deck-terminal-filename" id="deck-terminal-label">ai-context.json</span>
+                <span class="deck-terminal-tag" id="deck-terminal-tag" style="color: #9F1239;">AEO_VS_SEO_MATRIX</span>
+              </div>
+
+              <!-- Panel 1: AEO -->
+              <div class="deck-panel deck-panel--active" id="deck-panel-aeo" role="tabpanel" aria-labelledby="deck-nav-aeo">
+                <p class="deck-panel-desc">While SEO targets algorithmic blue url indexing, AEO optimizes sites to serve <strong>flat, structured text summaries</strong> matching semantic intent.</p>
+                <table class="deck-compare-table">
+                  <thead>
+                    <tr><th>Vector</th><th>SEO</th><th>AEO</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>Queries</strong></td><td>Keywords</td><td>RAG Context</td></tr>
+                    <tr><td><strong>Focus</strong></td><td>Sitemaps</td><td>Flat Markdown</td></tr>
+                    <tr><td><strong>Links</strong></td><td>Backlinks</td><td>Author EEAT</td></tr>
+                  </tbody>
+                </table>
+                <div class="deck-code-block">
+                  <div class="deck-code-header">
+                    <span>ai-context.json</span>
+                    <span class="deck-code-lang">JSON</span>
+                  </div>
+                  <pre class="deck-code-pre"><code class="deck-code">{
+  "context": "https://aeo.thatworkx.com/schemas/context.json",
+  "organization": {
+    "name": "Thatworkx",
+    "naics": "541511",
+    "description": "Enterprise AI search visibility and directory protocols"
+  }
+}</code></pre>
+                </div>
+              </div>
+
+              <!-- Panel 2: Hierarchy -->
+              <div class="deck-panel" id="deck-panel-hierarchy" role="tabpanel" aria-labelledby="deck-nav-hierarchy">
+                <p class="deck-panel-desc">A strict file structure helps crawlers retrieve metadata instantly. We test <strong>robots.txt</strong> permissions, <strong>llms.txt</strong> indices, and corporate prompt rules.</p>
+                <ul class="deck-prose-list">
+                  <li><strong>1. robots.txt</strong> — Controls access permissions.</li>
+                  <li><strong>2. llms.txt</strong> — Machine-readable directory maps.</li>
+                  <li><strong>3. ai-context.md</strong> — Prompts, NAICS definitions, credentials.</li>
+                  <li><strong>4. Clean Markdown</strong> — Target flat text payload pages.</li>
+                </ul>
+                <div class="deck-code-block">
+                  <div class="deck-code-header">
+                    <span>llms.txt</span>
+                    <span class="deck-code-lang">TEXT</span>
+                  </div>
+                  <pre class="deck-code-pre"><code class="deck-code"># Thatworkx AEO Suite Directory
+
+- [AEO Tooling](https://aeo.thatworkx.com/docs/tooling)
+- [Enterprise API](https://aeo.thatworkx.com/docs/api)
+- [EEAT Strategy](https://aeo.thatworkx.com/docs/eeat)</code></pre>
+                </div>
+              </div>
+
+              <!-- Panel 3: EEAT -->
+              <div class="deck-panel" id="deck-panel-eeat" role="tabpanel" aria-labelledby="deck-nav-eeat">
+                <p class="deck-panel-desc">Models prioritize <strong>author credentials and freshness indices</strong>. Ensure metadata files have recent updates and external authority links.</p>
+                <div class="deck-code-block">
+                  <div class="deck-code-header">
+                    <span>schema-eeat.json</span>
+                    <span class="deck-code-lang">JSON-LD</span>
+                  </div>
+                  <pre class="deck-code-pre"><code class="deck-code">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Jesse Geo",
+  "jobTitle": "Lead AI Architect",
+  "knowsAbout": ["AEO", "RAG", "LLM Scraping"]
+}</code></pre>
+                </div>
+              </div>
+
+              <!-- Panel 4: API -->
+              <div class="deck-panel" id="deck-panel-api" role="tabpanel" aria-labelledby="deck-nav-api">
+                <p class="deck-panel-desc">Automate scraper diagnostics using endpoint hooks. Build headless sweeps to test SPA JavaScript hydration limits.</p>
+                <ul class="deck-prose-list">
+                  <li>✔ Automated sitemap scraping pipelines.</li>
+                  <li>✔ Chrome Headless rendering audit integrations.</li>
+                  <li>✔ Edge workers deployment assets for Cloudflare.</li>
+                </ul>
+                <div class="deck-code-block">
+                  <div class="deck-code-header">
+                    <span>deploy-pipeline.sh</span>
+                    <span class="deck-code-lang">SHELL</span>
+                  </div>
+                  <pre class="deck-code-pre"><code class="deck-code">curl -X POST https://aeo.thatworkx.com/api/scan \
+  -H "Authorization: Bearer $AEO_SECRET_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://brand.com", "headless": true}'</code></pre>
+                </div>
+              </div>
+
+              <!-- Panel 5: Policy -->
+              <div class="deck-panel" id="deck-panel-policy" role="tabpanel" aria-labelledby="deck-nav-policy">
+                <p class="deck-panel-desc">Scans are optimized by daily user quotas. Guests are limited to 5 scans per day, and sitemap crawls verify up to 50 URLs.</p>
+                <div class="deck-code-block">
+                  <div class="deck-code-header">
+                    <span>rate-limits.json</span>
+                    <span class="deck-code-lang">JSON</span>
+                  </div>
+                  <pre class="deck-code-pre"><code class="deck-code">{
+  "tiers": {
+    "guest":      { "scansPerDay": 5,  "depth": 10, "headless": false },
+    "pro":        { "scansPerDay": -1, "depth": 50, "headless": true  },
+    "enterprise": { "scansPerDay": -1, "depth": -1, "headless": true,
+                    "concurrency": 20, "sla": "99.9%" }
+  }
+}</code></pre>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         4-LAYER MACHINE FILE HIERARCHY & DELIVERY PIPELINE
+    ════════════════════════════════════════════════════════ -->
+    <div class="pipeline-section" id="machine-file-pipeline">
+      <div class="pipeline-header">
+        <span class="pipeline-eyebrow">⚙ 4-LAYER MACHINE HIERARCHY &amp; DELIVERY PIPELINE</span>
+        <h2 class="pipeline-title">Making your Brand truly AI-Ready</h2>
+        <p class="pipeline-sub">The 4-Layer Machine File Hierarchy</p>
+      </div>
+
+      <div class="pipeline-grid">
+        
+        <!-- Left Side: Interactive Step Cards -->
+        <div class="pipeline-steps-col" role="tablist" aria-label="Pipeline Steps">
+          
+          <!-- Step 1 -->
+          <div class="pipeline-step-card pipeline-step-card--active" id="pipeline-step-1" onclick="switchPipelineStep(1)" role="tab" aria-selected="true" aria-controls="pipeline-panel-1" tabindex="0">
+            <div class="step-num step-num--rose">01</div>
+            <div class="step-info">
+              <h3>Layer 1 - Protocol Gatekeeper (/robots.txt)</h3>
+              <span class="step-role">Bot Access Control &amp; Gatekeeper Handshake</span>
+              <p class="step-desc">Automated WAF rules, user-agent clearance, and pathway mapping to machine manifests.</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="pipeline-step-card" id="pipeline-step-2" onclick="switchPipelineStep(2)" role="tab" aria-selected="false" aria-controls="pipeline-panel-2" tabindex="0">
+            <div class="step-num step-num--amber">02</div>
+            <div class="step-info">
+              <h3>Layer 2 - Discovery Index (/sitemap.xml &amp; /llms.txt)</h3>
+              <span class="step-role">Machine Navigation &amp; External Asset Registration</span>
+              <p class="step-desc">Standardized llms.txt file listing high-velocity domain routes and social citation links.</p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="pipeline-step-card" id="pipeline-step-3" onclick="switchPipelineStep(3)" role="tab" aria-selected="false" aria-controls="pipeline-panel-3" tabindex="0">
+            <div class="step-num step-num--copper">03</div>
+            <div class="step-info">
+              <h3>Layer 3 - Brand Manifest (/ai-context.md)</h3>
+              <span class="step-role">Core Brand Context &amp; Entity Disambiguation</span>
+              <p class="step-desc">Proprietary flattened brand manifest protecting against competitor mashups and LLM hallucinations.</p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="pipeline-step-card" id="pipeline-step-4" onclick="switchPipelineStep(4)" role="tab" aria-selected="false" aria-controls="pipeline-panel-4" tabindex="0">
+            <div class="step-num step-num--emerald">04</div>
+            <div class="step-info">
+              <h3>Layer 4 - Semantic Payload (Clean Markdown Pages)</h3>
+              <span class="step-role">High-Density Text Indexing for RAG Vector Search</span>
+              <p class="step-desc">Cleaned, noise-free Markdown pages optimized for token efficiency.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Live Visual Sandbox (Outputs) -->
+        <div class="pipeline-outputs-col">
+          <div class="pipeline-sandbox-shell">
+            <div class="sandbox-header-bar">
+              <span class="sandbox-dot red"></span>
+              <span class="sandbox-dot yellow"></span>
+              <span class="sandbox-dot green"></span>
+              <span class="sandbox-title" id="pipeline-sandbox-filename">robots.txt</span>
+            </div>
+
+            <!-- PANEL 1: robots.txt -->
+            <div class="pipeline-panel pipeline-panel--active" id="pipeline-panel-1" role="tabpanel" aria-labelledby="pipeline-step-1">
+              <div class="panel-details">
+                <span class="panel-tag text-rose">Layer 1 Handshake Output</span>
+                <p>WAF firewalls and robots.txt define permissions. We generate machine-ready rules allowing GPTBot, PerplexityBot, and ClaudeBot while mapping discovery sitemaps.</p>
+                <pre class="panel-code-box"><code># Robots.txt crawler permission manifest
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://aeo.thatworkx.com/sitemap.xml
+LLMs-txt: https://aeo.thatworkx.com/llms.txt</code></pre>
+              </div>
+            </div>
+
+            <!-- PANEL 2: llms.txt -->
+            <div class="pipeline-panel" id="pipeline-panel-2" role="tabpanel" aria-labelledby="pipeline-step-2">
+              <div class="panel-details">
+                <span class="panel-tag text-amber">Layer 2 Handshake Output</span>
+                <p>Automated index indexing sitemaps, linking core content routes, and establishing verified outbound trust anchors for LLM crawlers.</p>
+                <pre class="panel-code-box"><code># llms.txt directory
+- [AEO Tooling](https://aeo.thatworkx.com/docs/tooling)
+- [Enterprise API](https://aeo.thatworkx.com/docs/api)
+- [EEAT Verification](https://aeo.thatworkx.com/docs/eeat)
+- [Fair Use Guidelines](https://aeo.thatworkx.com/docs/policy)</code></pre>
+              </div>
+            </div>
+
+            <!-- PANEL 3: ai-context.md -->
+            <div class="pipeline-panel" id="pipeline-panel-3" role="tabpanel" aria-labelledby="pipeline-step-3">
+              <div class="panel-details">
+                <span class="panel-tag text-copper">Layer 3 Handshake Output</span>
+                <p>Unified organization meta-context. Hardens entity attributes, prevents competitor mashups in search query answers, and references ORCID/LinkedIn author proofs.</p>
+                <pre class="panel-code-box"><code># Brand manifest context (/ai-context.md)
+* Brand Legal: Thatworkx LLC
+* NAICS ID: 541511
+* Domain Scope: Answer Engine Optimization
+* Author Proof: https://orcid.org/0000-0001-2345-6789</code></pre>
+              </div>
+            </div>
+
+            <!-- PANEL 4: Clean Markdown -->
+            <div class="pipeline-panel" id="pipeline-panel-4" role="tabpanel" aria-labelledby="pipeline-step-4">
+              <div class="panel-details">
+                <span class="panel-tag text-emerald">Layer 4 Handshake Output</span>
+                <p>Serving final semantic layout to scrapers. Strips JS rendering delays, deletes sidebars/headers, and delivers direct crawlable value to RAG crawlers.</p>
+                <pre class="panel-code-box"><code># Flat payload pages (readability index)
+## Answer Engine Optimization (AEO) vs SEO
+Traditional sitemaps target index rankings. AEO structures brand data context. Models compile markdown indices natively rather than rendering JS-heavy SPA layouts.</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Delivery Channels Bar -->
+      <div class="delivery-channels-bar">
+        <div class="delivery-method">
+          <span class="method-icon">⚡</span>
+          <div class="method-text">
+            <h4>Instant Copy-Paste</h4>
+            <p>For manual server injection</p>
+          </div>
+        </div>
+        <div class="delivery-method">
+          <span class="method-icon">📥</span>
+          <div class="method-text">
+            <h4>One-Click Downloads</h4>
+            <p>.txt / .md / .json bundles</p>
+          </div>
+        </div>
+        <div class="delivery-method">
+          <span class="method-icon">🌐</span>
+          <div class="method-text">
+            <h4>Edge CDN &amp; API Sync</h4>
+            <p>Automated Worker publishing</p>
+          </div>
+        </div>
+        <div class="delivery-method">
+          <span class="method-icon">📄</span>
+          <div class="method-text">
+            <h4>Executive Reports</h4>
+            <p>PDF &amp; Markdown Summaries</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bento Grid: Technical Capabilities at a Glance -->
+    <div class="onboarding-bento-section my-12">
+      <div class="bento-section-header text-center mb-10">
+        <h2>Technical Capabilities at a Glance</h2>
+        <p>Explore how the Thatworkx AEO Suite audits and treats your digital footprint for AI crawlers.</p>
+      </div>
+
+      <div class="bento-grid-container grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Item 1: How AI agents read your data -->
+        <div class="bento-item" id="bento-live-report">
+          <div class="flex justify-between items-center mb-3">
+            <div class="flex items-center gap-2 text-violet">
+              <span class="bento-icon">💻</span>
+              <span class="bento-tag">Live Sample Report</span>
+            </div>
+            <div class="bento-tabs flex p-0.5" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;">
+              <button type="button" class="bento-tab-btn active" id="btn-bento-md" onclick="switchBentoPreview('markdown')">Raw Markdown</button>
+              <button type="button" class="bento-tab-btn" id="btn-bento-ai" onclick="switchBentoPreview('ai')">AI Interpretation</button>
+            </div>
+          </div>
+          <h3>How AI Agents Read Your Data</h3>
+          
+          <div class="bento-code-preview mt-4">
+            <pre class="code-box" id="bento-preview-box-markdown" style="font-size: 0.72rem; max-height: 100px;"># Corporate Attributes (/ai-context.md)
+* Legal Name: Thatworkx LLC
+* NAICS Code: 541511 (Programming)
+* Active EEAT Verification: https://yourbrand.com/EEAT-proof.json</pre>
+            <div class="ai-box" id="bento-preview-box-ai" style="display: none; font-size: 0.8rem; line-height: 1.4; color: #cbd5e1; padding: 0.5rem 0;">
+              <span class="text-cyan" style="font-weight: bold;">🤖 GPTBot summary parsed:</span>
+              <p style="margin-top: 4px; color: #94a3b8;">Entity is verified as <strong style="color: #ffffff;">Thatworkx LLC</strong> under software services NAICS-541511. Trust anchors are established via external JSON signature. Low hallucination index.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 2: Enterprise API Access -->
+        <div class="bento-item" id="bento-api">
+          <div class="flex justify-between items-center mb-3">
+            <div class="flex items-center gap-2 text-cyan">
+              <span class="bento-icon">⚡</span>
+              <span class="bento-tag">Enterprise API Access</span>
+            </div>
+            <div class="bento-tabs flex p-0.5" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;">
+              <button type="button" class="bento-tab-btn active" id="btn-bento-curl" onclick="switchBentoCode('curl')">cURL</button>
+              <button type="button" class="bento-tab-btn" id="btn-bento-node" onclick="switchBentoCode('node')">Node.js</button>
+            </div>
+          </div>
+          <h3>Enterprise API Access</h3>
+          
+          <div class="bento-code-preview mt-4">
+            <pre class="code-box" id="bento-code-box" style="font-size: 0.75rem; color: #a7f3d0; max-height: 120px;">curl -X POST https://aeo.thatworkx.com/api/scan \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer AEO_TOKEN_123" \
+  -d '{"targetUrl": "https://yourbrand.com"}'</pre>
+          </div>
+        </div>
+
+        <!-- Item 3: Fair Usage & API Limits -->
+        <div class="bento-item" id="bento-limits">
+          <div class="flex items-center gap-2 text-yellow mb-3">
+            <span class="bento-icon">🏆</span>
+            <span class="bento-tag">Fair Use &amp; Capabilities</span>
+          </div>
+          <h3>Fair Usage &amp; API Limits</h3>
+          
+          <div class="space-y-3 mt-4">
+            <div class="flex justify-between items-center text-xs">
+              <span style="color: #64748b;">Free Guest Scan limit</span>
+              <span class="bento-badge">5 / day</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span style="color: #64748b;">Pro Crawl Depth cap</span>
+              <span class="bento-badge">50 / scan</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span style="color: #64748b;">Headless browser rendering</span>
+              <span class="bento-badge-ent text-cyan border-cyan">PRO/ENT Only</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
 
     <!-- Dedicated AISocialize Overview Section on Landing Page -->
     <section class="aisocialize-landing-section glassmorphic border-glow-violet my-12" style="padding: 2.5rem; border-radius: 16px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(192, 132, 252, 0.2); max-width: 1200px; margin: 3rem auto;">
