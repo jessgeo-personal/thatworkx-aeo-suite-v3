@@ -1338,7 +1338,7 @@ body {
   align-items: flex-start;
   gap: 0.8rem;
   height: 100%;
-  min-height: 240px;
+  min-height: 480px;
   text-align: left;
 }
 
@@ -2473,6 +2473,9 @@ body.light-mode .tool-card__cta         { border-color: #E2E8F0; color: #64748b;
   }
   .console-tabs-container {
     grid-template-columns: 1fr;
+  }
+  .console-tab-btn {
+    min-height: auto;
   }
 }
 
