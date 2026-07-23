@@ -27,39 +27,54 @@ const HeroSection = () => {
       label: 'AI Visualize',
       icon: Eye,
       color: 'cyan',
-      glowClass: {
-        dark: 'shadow-[0_0_40px_rgba(6,182,212,0.12)] border-cyan-500/40',
-        light: 'shadow-[0_0_25px_rgba(6,182,212,0.08)] border-cyan-500/20'
-      },
-      activeBorder: 'border-cyan-400',
       placeholder: 'Enter domain URL (e.g., example.com)...',
       buttonText: 'Initiate Scan',
+      subhead: "Let show you what AI can see.",
+      listItems: [
+        "1. Are you blocking out AI?",
+        "2. Is your web presence optimized for AI?",
+        "3. Is your content AI-Ready?",
+        "4. Are you setup to be AI-First?"
+      ]
     },
     {
       id: 'optimize',
       label: 'AIOptimize',
       icon: ShieldAlert,
       color: 'amber',
-      glowClass: {
-        dark: 'shadow-[0_0_40px_rgba(245,158,11,0.12)] border-amber-500/40',
-        light: 'shadow-[0_0_25px_rgba(245,158,11,0.08)] border-amber-500/20'
-      },
-      activeBorder: 'border-amber-400',
       placeholder: 'Enter domain or URL to optimize...',
       buttonText: 'Launch Optimizer',
+      subhead: "IF you already know that you are AI-ready, lets show you how to be Optimized for AI.",
+      listItems: [
+        "• Optimizing for AI-Ready",
+        "• Optimizing for AI-First"
+      ]
     },
     {
       id: 'socialize',
       label: 'AISocialize',
       icon: Share2,
       color: 'violet',
-      glowClass: {
-        dark: 'shadow-[0_0_40px_rgba(139,92,246,0.12)] border-violet-500/40',
-        light: 'shadow-[0_0_25px_rgba(139,92,246,0.08)] border-violet-500/20'
-      },
-      activeBorder: 'border-violet-400',
       placeholder: 'Enter domain or social post URL...',
       buttonText: 'Check Social Readiness',
+      subhead: "Go further, ensure your social footprint is Optimized for AI",
+      sections: [
+        {
+          title: "Is your domain AI-ready for social?",
+          items: [
+            "- llms.txt exists",
+            "- Has Author Info",
+            "- Credential mentions",
+            "- External links(Valid)",
+            "- Authority links(valid)",
+            "- LastUpdated"
+          ]
+        },
+        {
+          title: "Elevate your Social to AI-Ready",
+          items: []
+        }
+      ]
     }
   ];
 
@@ -198,29 +213,80 @@ const HeroSection = () => {
         >
           
           {/* Segmented control tabs switcher */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <div 
-              className="inline-flex p-1 rounded-xl shadow-inner"
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full p-2 rounded-2xl"
               style={{
-                backgroundColor: theme === 'dark' ? '#08090C' : '#F1F5F9',
+                backgroundColor: theme === 'dark' ? 'rgba(8,9,12,0.4)' : '#F1F5F9',
                 border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#E2E8F0'}`
               }}
             >
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
+                
+                let activeBorderClass = '';
+                if (isActive) {
+                  if (tab.id === 'visualize') activeBorderClass = 'border-cyan-500/60 shadow-[0_0_20px_rgba(6,182,212,0.12)] bg-[#13161c]';
+                  else if (tab.id === 'optimize') activeBorderClass = 'border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.12)] bg-[#13161c]';
+                  else if (tab.id === 'socialize') activeBorderClass = 'border-violet-500/60 shadow-[0_0_20px_rgba(139,92,246,0.12)] bg-[#13161c]';
+                }
+
                 return (
                   <button
                     key={tab.id}
+                    type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 ${
+                    className={`flex flex-col items-start text-left p-6 rounded-xl border transition-all duration-300 min-height-[280px] ${
                       isActive 
-                        ? (theme === 'dark' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-900 shadow-md')
-                        : 'text-slate-500 hover:text-slate-400'
+                        ? activeBorderClass
+                        : 'border-transparent bg-slate-900/30 hover:bg-slate-900/50'
                     }`}
+                    style={{
+                      borderColor: isActive ? undefined : (theme === 'dark' ? 'rgba(255,255,255,0.04)' : '#E2E8F0'),
+                      backgroundColor: isActive ? undefined : (theme === 'dark' ? 'rgba(8,9,12,0.2)' : '#FFFFFF'),
+                    }}
                   >
-                    <IconComponent className="w-4 h-4" />
-                    {tab.label}
+                    <div className="flex items-center gap-2 mb-3">
+                      <IconComponent className={`w-5 h-5 ${isActive ? (tab.id === 'visualize' ? 'text-cyan-400' : tab.id === 'optimize' ? 'text-amber-400' : 'text-violet-400') : 'text-slate-500'}`} />
+                      <span className={`font-['Space_Grotesk'] text-lg font-bold ${isActive ? 'text-white' : 'text-slate-400'}`}>
+                        {tab.label}
+                      </span>
+                    </div>
+
+                    <p className={`text-xs mb-4 font-semibold leading-relaxed ${isActive ? 'text-slate-300' : 'text-slate-500'}`}>
+                      {tab.subhead}
+                    </p>
+
+                    {tab.listItems && (
+                      <ul className="space-y-1.5 text-[11px] text-slate-400 font-medium">
+                        {tab.listItems.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-1">
+                            <span>•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {tab.sections && (
+                      <div className="space-y-3.5 text-[11px] text-slate-400 font-medium w-full">
+                        {tab.sections.map((sect, idx) => (
+                          <div key={idx} className="space-y-1">
+                            <span className="font-bold text-slate-300 block">{sect.title}</span>
+                            {sect.items.length > 0 && (
+                              <ul className="space-y-0.5 pl-3 list-none">
+                                {sect.items.map((sub, sIdx) => (
+                                  <li key={sIdx} className="text-slate-400">
+                                    {sub}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </button>
                 );
               })}

@@ -1321,15 +1321,6 @@ function selectConsoleTab(tabId) {
   if (activeFeatCard) {
     activeFeatCard.classList.add(`active-border-${tabId === 'visualize' ? 'cyan' : tabId === 'optimize' ? 'amber' : 'violet'}`);
   }
-
-  // 6. Toggle console details panel blocks
-  document.querySelectorAll('.tab-details-block').forEach(block => {
-    block.style.display = 'none';
-  });
-  const activeDetails = document.getElementById(`details-${tabId}`);
-  if (activeDetails) {
-    activeDetails.style.display = 'block';
-  }
 }
 
 async function executeOnboardingScan(event) {
