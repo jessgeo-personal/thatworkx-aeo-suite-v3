@@ -6,7 +6,7 @@ Here is exactly how to sequence this handoff for the different agent pods:
 
 ### Step 1: Extract the Legacy Design Tokens (For the Design Agents)
 
-Before initializing the build scripts, have your documentation agent scrape the existing codebase to isolate all brand-specific aesthetic variables. Bundle these variables into a standalone global theme asset file (e.g., `design-tokens.json` or a global theme style manifest) containing:
+Before initializing the build scripts, have your documentation agent scrape the existing codebase to isolate all brand-specific aesthetic variables. Bundle these variables into a standalone global theme asset file (e.g., `design-tokens.json` or a global theme style manifest). The UI/UX Design Agent maintains and updates this stand-alone global theme asset file containing:
 
 * The exact hex code arrays (monochromatic canvas tones, sharp color accents).
 * Typography scaling factors, font family rules, and borders.
@@ -82,6 +82,7 @@ For EVERY change request (whether a full sprint, a minor UI tweak, or a bug fix)
 ### STAGE 1: PRE-FLIGHT IMPACT ANALYSIS & BDD SPEC
 - Generate plain-English BDD test specs (Given/When/Then).
 - Print the exact list of files to be modified (Code, Tests, Docs).
+- For any frontend/UI task, the UI/UX DESIGN AGENT must review design token alignment and visual hierarchy specs alongside the QA AGENT's BDD test cases BEFORE human approval is requested.
 - **MANDATORY HALT**: Print prompt: `> Awaiting Human PM Approval. Type 'APPROVED' to execute or specify changes:` and WAIT for user response before making any edits.
 
 ### STAGE 2: CODE IMPLEMENTATION
