@@ -2506,3 +2506,17 @@ body.light-theme .deck-code-box {
   background: #0F172A;
 }
 
+body.light-theme .console-details-panel {
+  background: rgba(15, 23, 42, 0.03) !important;
+  border-color: #E2E8F0 !important;
+}
+
+body.light-theme .details-subhead {
+  color: #475569 !important;
+}
+
+body.light-theme .details-list,
+body.light-theme .details-sublist {
+  color: #64748b !important;
+}
+
