@@ -4,7 +4,16 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.24.0-landing-patch] - 2026-07-23
+
+### Fixed
+- **Root Cause DOMContentLoaded Script Crash (`frontend/index.js`)**: Resolved an uncaught `TypeError: Cannot read properties of null` thrown on `index.html` load when generator functions (`generateRobotsTxt`, `generateCloudflareWorker`, `generateJsonLd`) queried optimization elements that only exist on `optimize.html`. Added strict null guards and route-level safety checks so JavaScript execution never halts.
+- **Header & Footer Navigation Parity**: Standardized top header navigation and restored full 4-column **Mega-Footer** (`#mega-footer`) across all 4 HTML pages (`index.html`, `visualize.html`, `optimize.html`, `socialize.html`).
+- **Interactive Slider Buttons & Parameter Routing**: Fixed 3 tool slider cards on `index.html` (`AI Visualize`, `AIOptimize`, `AISocialize`) with dynamic active focus rings, focused tool label headers, input placeholder updates, and seamless target page URL query parameter forwarding (`visualize.html?url=...`, `optimize.html?url=...`, `socialize.html?url=...`).
+- **Restored Educational Bento Sections**: Restored the Spatial Bento Command Deck (AEO vs. SEO matrix & live JSON terminal inspector), 4-Layer Machine File Hierarchy Pipeline, and Technical Capabilities Bento Grid on `index.html`.
+
 ## [1.23.0-milestone5] - 2026-07-23
+
 
 ### Added
 - **4-Page Architecture Decoupling**: Restructured monolithic template into 4 distinct, state-isolated HTML pages:
