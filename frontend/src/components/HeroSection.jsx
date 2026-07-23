@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, ShieldAlert, Share2, Globe, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, ShieldAlert, Share2, Globe, ArrowRight } from 'lucide-react';
 
 const HeroSection = () => {
   const [activeTab, setActiveTab] = useState('visualize');
@@ -11,9 +11,9 @@ const HeroSection = () => {
       label: 'AI Visualize',
       icon: Eye,
       color: 'cyan',
-      glowClass: 'shadow-[0_0_25px_rgba(6,182,212,0.15)] border-cyan-500/50',
+      glowClass: 'shadow-[0_0_40px_rgba(6,182,212,0.12)] border-cyan-500/40',
       activeBorder: 'border-cyan-400',
-      placeholder: 'Enter website URL to see what AI search bots see (e.g. https://yourbrand.com)...',
+      placeholder: 'Enter domain URL (e.g. example.com)...',
       buttonText: 'Initiate Scan',
     },
     {
@@ -21,20 +21,20 @@ const HeroSection = () => {
       label: 'AIOptimize',
       icon: ShieldAlert,
       color: 'amber',
-      glowClass: 'shadow-[0_0_25px_rgba(245,158,11,0.15)] border-amber-500/50',
+      glowClass: 'shadow-[0_0_40px_rgba(245,158,11,0.12)] border-amber-500/40',
       activeBorder: 'border-amber-400',
-      placeholder: 'Enter domain to diagnose accessibility, configure schema & edge workers...',
-      buttonText: 'Diagnose Site',
+      placeholder: 'Enter domain or URL to optimize...',
+      buttonText: 'Launch Optimizer',
     },
     {
       id: 'socialize',
       label: 'AISocialize',
       icon: Share2,
       color: 'violet',
-      glowClass: 'shadow-[0_0_25px_rgba(139,92,246,0.15)] border-violet-500/50',
+      glowClass: 'shadow-[0_0_40px_rgba(139,92,246,0.12)] border-violet-500/40',
       activeBorder: 'border-violet-400',
-      placeholder: 'Enter brand social route or citation channel to audit (e.g. linkedin.com/company/...)...',
-      buttonText: 'Audit Citations',
+      placeholder: 'Enter domain URL or social handle...',
+      buttonText: 'Check Social Readiness',
     }
   ];
 
@@ -51,9 +51,9 @@ const HeroSection = () => {
 
   const getButtonBg = () => {
     switch (activeTab) {
-      case 'visualize': return 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_4px_20px_rgba(6,182,212,0.3)] hover:shadow-[0_4px_30px_rgba(6,182,212,0.5)]';
-      case 'optimize': return 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_4px_30px_rgba(245,158,11,0.5)]';
-      case 'socialize': return 'bg-violet-500 hover:bg-violet-400 text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] hover:shadow-[0_4px_30px_rgba(139,92,246,0.5)]';
+      case 'visualize': return 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_4px_20px_rgba(6,182,212,0.3)]';
+      case 'optimize': return 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_4px_20px_rgba(245,158,11,0.3)]';
+      case 'socialize': return 'bg-violet-500 hover:bg-violet-400 text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)]';
       default: return 'bg-cyan-500';
     }
   };
@@ -61,23 +61,27 @@ const HeroSection = () => {
   const handleScanSubmit = (e) => {
     e.preventDefault();
     if (!url) return;
+    if (activeTab === 'socialize') {
+      alert('Thatworkx Browser Extension is required to check AISocialize readiness. Please install the extension from the Chrome Web Store to proceed.');
+      return;
+    }
     alert(`Initiating ${activeTab} action for: ${url}`);
   };
 
   return (
     <div className="relative min-h-screen bg-[#08090C] text-slate-100 font-sans overflow-hidden flex flex-col justify-center px-4 py-16 sm:px-6 lg:px-8">
       {/* 1. Glow grid and radial gradient mesh background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-r from-cyan-500/10 via-amber-500/5 to-violet-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,#000_70%,transparent_100%)]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-r from-cyan-500/10 via-amber-500/5 to-violet-500/10 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto w-full z-10">
         
-        {/* 2. Top Header Badge */}
+        {/* 2. Top Header Badge with animated green pulsing dot */}
         <div className="flex justify-center mb-8">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-[11px] sm:text-xs font-semibold tracking-wider text-slate-300 uppercase shadow-xl backdrop-blur-md">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
             THE AEO & GEO INFRASTRUCTURE PLATFORM
           </div>
@@ -87,25 +91,26 @@ const HeroSection = () => {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none mb-6">
             Educating Brands to be{' '}
-            <span className="bg-gradient-to-r from-white via-cyan-400 to-amber-400 bg-clip-text text-transparent">
-              AI-Ready, AI-First
+            <span className="bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">
+              AI-Ready
             </span>
-            , and{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-violet-400 bg-clip-text text-transparent">
-              AIOptimized.
+            , AI-First, and{' '}
+            <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">
+              AIOptimized
             </span>
+            .
           </h1>
-          <p className="text-base sm:text-lg lg:text-xl text-slate-400 font-medium leading-relaxed">
+          <p className="text-base sm:text-lg text-slate-400 font-medium leading-relaxed max-w-2xl mx-auto">
             Discover how LLMs, answer engines, and agentic bots perceive, compress, and cite your digital presence.
           </p>
         </div>
 
-        {/* 5. Tool Switcher Search Console */}
-        <div className={`w-full max-w-4xl mx-auto mb-16 rounded-2xl border bg-slate-950/80 backdrop-blur-xl transition-all duration-500 p-6 ${currentTab.glowClass}`}>
+        {/* 5. Tool Switcher Search Console (Floating card #111318) */}
+        <div className={`w-full max-w-4xl mx-auto rounded-2xl border border-white/10 bg-[#111318] backdrop-blur-xl transition-all duration-500 p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] ${currentTab.glowClass}`}>
           
           {/* Segmented control pill */}
           <div className="flex justify-center mb-6">
-            <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800 shadow-inner">
+            <div className="inline-flex p-1 rounded-xl bg-slate-950/80 border border-slate-900 shadow-inner">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -143,92 +148,19 @@ const HeroSection = () => {
             </div>
             <button
               type="submit"
-              className={`h-14 px-8 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap active:scale-95 ${getButtonBg()}`}
+              className={`h-14 px-8 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap active:scale-95 hover:scale-[1.02] ${getButtonBg()}`}
             >
               {currentTab.buttonText}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-        </div>
 
-        {/* 6. Three Interactive Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Card 1: AI Visualize */}
-          <div 
-            onClick={() => setActiveTab('visualize')}
-            className={`group flex flex-col p-6 rounded-2xl border bg-slate-950/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-slate-950/80 hover:-translate-y-1 ${
-              activeTab === 'visualize' 
-                ? 'border-cyan-500/50 shadow-[0_4px_25px_rgba(6,182,212,0.08)]' 
-                : 'border-slate-800 hover:border-cyan-500/30'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-800/30 text-cyan-400">
-                <Eye className="w-5 h-5" />
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-950/50 border border-cyan-800/30 text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-                Audit
-              </span>
+          {/* AISocialize Extension Badge */}
+          {activeTab === 'socialize' && (
+            <div className="flex items-center justify-center gap-1.5 mt-4 py-2.5 px-4 bg-violet-500/10 border border-violet-500/20 text-violet-400 font-semibold rounded-lg text-xs w-fit mx-auto shadow-sm">
+              ⚡ Browser Extension Required for Snippet Generation
             </div>
-            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-              AI Visualize
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Inspect your web visibility across 4 primary search vectors. Identify structural blocks, content density, and model index status.
-            </p>
-          </div>
-
-          {/* Card 2: AIOptimize */}
-          <div 
-            onClick={() => setActiveTab('optimize')}
-            className={`group flex flex-col p-6 rounded-2xl border bg-slate-950/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-slate-950/80 hover:-translate-y-1 ${
-              activeTab === 'optimize' 
-                ? 'border-amber-500/50 shadow-[0_4px_25px_rgba(245,158,11,0.08)]' 
-                : 'border-slate-800 hover:border-amber-500/30'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/30 text-amber-400">
-                <ShieldAlert className="w-5 h-5" />
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-950/50 border border-amber-800/30 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                Treat
-              </span>
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-              AIOptimize
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Remediate vulnerabilities dynamically. Generate Edge workers to bypass hydration blocks and build custom flat-text md maps.
-            </p>
-          </div>
-
-          {/* Card 3: AISocialize */}
-          <div 
-            onClick={() => setActiveTab('socialize')}
-            className={`group flex flex-col p-6 rounded-2xl border bg-slate-950/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-slate-950/80 hover:-translate-y-1 ${
-              activeTab === 'socialize' 
-                ? 'border-violet-500/50 shadow-[0_4px_25px_rgba(139,92,246,0.08)]' 
-                : 'border-slate-800 hover:border-violet-500/30'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2.5 rounded-xl bg-violet-950/30 border border-violet-800/30 text-violet-400">
-                <Share2 className="w-5 h-5" />
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-violet-950/50 border border-violet-800/30 text-[10px] font-bold text-violet-400 uppercase tracking-wider">
-                Amplify
-              </span>
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-violet-400 transition-colors">
-              AISocialize
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Integrate off-page proof links and social citations into your system manifest schemas to solidify brand attribution.
-            </p>
-          </div>
-
+          )}
         </div>
 
       </div>

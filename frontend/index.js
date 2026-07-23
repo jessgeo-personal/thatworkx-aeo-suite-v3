@@ -1244,10 +1244,6 @@ async function generateTrack2File(type) {
 let onboardingSelectedMode = 'visualize';
 
 function selectConsoleTab(tabId) {
-  if (tabId === 'socialize') {
-    alert('AI Socialize is coming soon in v4.0! Integrate external citations and social credentials directly.');
-    return;
-  }
   onboardingSelectedMode = tabId;
   
   // 1. Update Segmented tab active states
@@ -1262,13 +1258,20 @@ function selectConsoleTab(tabId) {
     consoleCard.classList.add(`active-${tabId}-glow`);
   }
   
-  // 3. Update Main Input Placeholder
+  // 3. Update Main Input Placeholder & Extension Badge display
   const inputField = document.getElementById('onboarding-target-url');
+  const extensionBadge = document.getElementById('socialize-extension-badge');
+  
   if (inputField) {
     if (tabId === 'visualize') {
-      inputField.placeholder = 'Enter website URL to see what AI search bots see (e.g. https://yourbrand.com)...';
+      inputField.placeholder = 'Enter domain URL (e.g. example.com)...';
+      if (extensionBadge) extensionBadge.style.display = 'none';
     } else if (tabId === 'optimize') {
-      inputField.placeholder = 'Enter domain to diagnose accessibility, configure schema & edge workers...';
+      inputField.placeholder = 'Enter domain or URL to optimize...';
+      if (extensionBadge) extensionBadge.style.display = 'none';
+    } else if (tabId === 'socialize') {
+      inputField.placeholder = 'Enter domain URL or social handle...';
+      if (extensionBadge) extensionBadge.style.display = 'flex';
     }
   }
   
@@ -1281,8 +1284,11 @@ function selectConsoleTab(tabId) {
       btnText.innerText = 'Initiate Scan';
       btn.classList.add('bg-cyan');
     } else if (tabId === 'optimize') {
-      btnText.innerText = 'Diagnose Site';
+      btnText.innerText = 'Launch Optimizer';
       btn.classList.add('bg-amber');
+    } else if (tabId === 'socialize') {
+      btnText.innerText = 'Check Social Readiness';
+      btn.classList.add('bg-violet');
     }
   }
   
@@ -1298,6 +1304,11 @@ function selectConsoleTab(tabId) {
 
 async function executeOnboardingScan(event) {
   event.preventDefault();
+  
+  if (onboardingSelectedMode === 'socialize') {
+    alert('Thatworkx Browser Extension is required to check AISocialize readiness. Please install the extension from the Chrome Web Store to proceed.');
+    return;
+  }
   
   const onboardingUrl = document.getElementById('onboarding-target-url').value.trim();
   if (!onboardingUrl) return;
