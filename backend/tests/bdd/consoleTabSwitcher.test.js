@@ -125,10 +125,11 @@ describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
       // HTML-side vanilla badge
       const badge = $('#socialize-extension-badge');
       expect(badge.length).toBe(1);
-      expect(badge.text()).toContain('⚡ Chrome Extension Required for Snippet Generation');
-      expect(badge.text()).toContain('[Install Extension]');
+      // Badge now uses structured spans; check for key substrings
+      expect(badge.text()).toContain('Chrome Extension Required for Post Snippets');
+      expect(badge.text()).toContain('[Install]');
 
-      // React component uses updated spec copy
+      // React component uses same updated spec copy
       expect(heroSectionContent).toContain('Chrome Extension Required for Post Snippets');
     });
 
