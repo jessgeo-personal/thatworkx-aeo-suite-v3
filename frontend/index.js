@@ -1457,25 +1457,40 @@ function toggleTheme() {
 }
 
 function switchDeckCard(cardId) {
-  // 1. Remove active state from all left column cards
-  document.querySelectorAll('.deck-nav-card').forEach(card => {
-    card.classList.remove('active-deck-card');
+  const PANEL_META = {
+    aeo:       { file: 'ai-context.json',      tag: 'AEO_VS_SEO_MATRIX',           tagColor: '#9F1239' },
+    hierarchy: { file: 'llms.txt',             tag: 'DIRECTORY_HANDSHAKE',          tagColor: '#B45309' },
+    eeat:      { file: 'schema-eeat.json',     tag: 'EEAT_CITATION_AUDITING',       tagColor: '#059669' },
+    api:       { file: 'deploy-pipeline.sh',   tag: 'WORKFLOWS_AND_APIS',           tagColor: '#9A3412' },
+    policy:    { file: 'rate-limits.json',     tag: 'FAIR_USE_POLICY',              tagColor: '#7C3AED' },
+  };
+
+  // 1. Deactivate all nav cards
+  document.querySelectorAll('.deck-nav-card').forEach(c => {
+    c.classList.remove('deck-nav-card--active');
+    c.setAttribute('aria-selected', 'false');
   });
-  // 2. Add active state to clicked card
-  const selectedNavCard = document.getElementById(`deck-nav-${cardId}`);
-  if (selectedNavCard) {
-    selectedNavCard.classList.add('active-deck-card');
+  // 2. Activate selected nav card
+  const navCard = document.getElementById(`deck-nav-${cardId}`);
+  if (navCard) {
+    navCard.classList.add('deck-nav-card--active');
+    navCard.setAttribute('aria-selected', 'true');
   }
-  // 3. Hide all right column content blocks
-  document.querySelectorAll('.deck-content-block').forEach(block => {
-    block.style.display = 'none';
-  });
-  // 4. Show right column block
-  const selectedBlock = document.getElementById(`deck-content-${cardId}`);
-  if (selectedBlock) {
-    selectedBlock.style.display = 'block';
-  }
+
+  // 3. Deactivate all panels (CSS height:0 hides from humans, text stays in DOM for bots)
+  document.querySelectorAll('.deck-panel').forEach(p => p.classList.remove('deck-panel--active'));
+  // 4. Activate selected panel
+  const panel = document.getElementById(`deck-panel-${cardId}`);
+  if (panel) panel.classList.add('deck-panel--active');
+
+  // 5. Update terminal bar labels
+  const meta = PANEL_META[cardId] || {};
+  const labelEl = document.getElementById('deck-terminal-label');
+  const tagEl   = document.getElementById('deck-terminal-tag');
+  if (labelEl) labelEl.textContent = meta.file || '';
+  if (tagEl)   { tagEl.textContent = meta.tag || ''; tagEl.style.color = meta.tagColor || '#9F1239'; }
 }
+
 
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
