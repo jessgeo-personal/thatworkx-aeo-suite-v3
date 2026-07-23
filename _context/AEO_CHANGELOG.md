@@ -4,6 +4,16 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [1.21.0-sprint8-patch] - 2026-07-23
+
+### Added
+- **Spatial Bento Command Deck with Interactive Terminal Inspector**: Ported the 2-column crawlable Spatial Bento Command Deck featuring an interactive Terminal Inspector and tab switching in `frontend/src/components/HeroSection.jsx`.
+- **Deliverables Lists in Upfront Capability Grid**: Added explicit deliverables sub-lists (scorecards, Cloudflare edge scripts, .txt/.md manifests, Chrome extension hooks) to the 3-column upfront capability grid in `frontend/index.html` and styled via `frontend/index.css`.
+
+### Changed
+- **Rose/Amber/Copper Muted Design Tokens & JetBrains Mono Fonts**: Ported muted color palette tokens (`#9F1239` Rose, `#B45309` Amber, `#9A3412` Copper) and `JetBrains Mono` monospace typography across vanilla frontend (`frontend/index.html`, `frontend/index.css`) and React components (`frontend/src/components/HeroSection.jsx`).
+- **Enterprise Demo Chips Upgrade**: Upgraded 1-click instant try pills to `target="_blank"` Enterprise Demo chips (`shopify.com ↗`, `stripe.com ↗`, `airbnb.com ↗`) linking directly to enterprise demo routes in `frontend/index.html` and `frontend/src/components/HeroSection.jsx`.
+
 ## [1.20.0-sprint8-patch] - 2026-07-23
 
 ### Changed

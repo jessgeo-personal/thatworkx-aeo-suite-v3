@@ -1721,6 +1721,46 @@ body {
 .check-icon--amber  { color: #B45309; }
 .check-icon--copper { color: #9A3412; }
 
+/* Deliverables Section */
+.tool-card__deliverables {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.deliverables-title {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.tool-card__deliverables ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.tool-card__deliverables li {
+  font-size: 0.68rem !important;
+  color: #64748b !important;
+  line-height: 1.4;
+}
+
+body.light-mode .tool-card__deliverables {
+  border-top-color: #f1f5f9;
+}
+body.light-mode .deliverables-title {
+  color: #94a3b8;
+}
+body.light-mode .tool-card__deliverables li {
+  color: #475569 !important;
+}
+
 /* Footer CTA */
 .tool-card__footer { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); }
 .tool-card__cta {

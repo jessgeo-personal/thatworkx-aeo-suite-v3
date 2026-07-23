@@ -1,518 +1,579 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, Stethoscope, Share2, Globe, ArrowRight, Sun, Moon, Zap, ExternalLink } from 'lucide-react';
+/**
+ * HeroSection.jsx — aeo.thatworkx.com
+ * Stack: React 18 + Tailwind CSS v3 + lucide-react
+ *
+ * Design System:
+ *   Canvas:   bg-slate-50 / dark:bg-[#0D0E11]
+ *   Card:     bg-white / dark:bg-[#16181D] | border-slate-200 / dark:border-white/10
+ *   Input:    bg-slate-100 / dark:bg-[#1F222A]
+ *   Primary:  text-slate-900 / dark:text-slate-50
+ *   Muted:    text-slate-600 / dark:text-slate-400
+ *   Rose:     #9F1239  (AI Visualize)
+ *   Amber:    #B45309  (AIOptimize)
+ *   Copper:   #9A3412  (AISocialize)
+ *
+ * NOTE: This file is the authoritative design source-of-truth.
+ * To use in production, integrate a Vite + React build pipeline
+ * (see /docs/react-build-setup.md). The live Express server currently
+ * serves vanilla index.html — kept in sync with this spec.
+ */
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const TOKEN = {
-  // Canvas
-  canvasDark:  '#0D0E11',
-  canvasLight: '#F8FAFC',
+import { useState, useEffect, useRef } from 'react';
+import {
+  Eye, Stethoscope, Radio, Sun, Moon, Zap, ArrowRight,
+  ExternalLink, Check, ChevronRight
+} from 'lucide-react';
 
-  // Card surfaces
-  surfaceDark:   '#16181D',
-  surfaceLight:  '#FFFFFF',
-
-  // Input containers
-  inputDark:   '#1F222A',
-  inputLight:  '#F1F5F9',
-
-  // Borders
-  borderDark:  'rgba(255,255,255,0.08)',
-  borderLight: '#E2E8F0',
-
-  // Text
-  textPrimaryDark:    '#F1F5F9',
-  textPrimaryLight:   '#0F172A',
-  textMutedDark:      '#64748B',
-  textMutedLight:     '#475569',
-  textSubMutedDark:   '#94A3B8',
-  textSubMutedLight:  '#64748B',
-
-  // Muted Tool Accent Tones (per spec)
-  rose:   '#9F1239',   // AI Visualize  – Deep Rose Crimson
-  amber:  '#B45309',   // AIOptimize    – Safety Amber
-  copper: '#9A3412',   // AISocialize   – Burnt Copper
-
-  // Fonts
-  fontSans:  "'Plus Jakarta Sans', -apple-system, sans-serif",
-  fontMono:  "'JetBrains Mono', 'Space Mono', 'Courier New', monospace",
+/* ─── Design Token Constants ─────────────────────────────────────── */
+const ACCENTS = {
+  visualize: {
+    hex:     '#9F1239',
+    bg:      'bg-[#9F1239]',
+    bgMuted: 'bg-[#9F1239]/10',
+    border:  'border-[#9F1239]/40',
+    text:    'text-[#9F1239]',
+    hover:   'hover:border-[#9F1239]/60 hover:bg-[#9F1239]/5',
+    ring:    'focus-visible:ring-[#9F1239]/40',
+    shadow:  '0 0 24px rgba(159,18,57,0.18)',
+    label:   'AI Visualize',
+    emoji:   '👁️',
+    badge:   'Diagnostic Engine',
+    demo:    '/demo/shopify?tier=enterprise&tool=visualize',
+  },
+  optimize: {
+    hex:     '#B45309',
+    bg:      'bg-[#B45309]',
+    bgMuted: 'bg-[#B45309]/10',
+    border:  'border-[#B45309]/40',
+    text:    'text-[#B45309]',
+    hover:   'hover:border-[#B45309]/60 hover:bg-[#B45309]/5',
+    ring:    'focus-visible:ring-[#B45309]/40',
+    shadow:  '0 0 24px rgba(180,83,9,0.18)',
+    label:   'AIOptimize',
+    emoji:   '🩺',
+    badge:   'Prescriptive Fixer',
+    demo:    '/demo/shopify?tier=enterprise&tool=optimize',
+  },
+  socialize: {
+    hex:     '#9A3412',
+    bg:      'bg-[#9A3412]',
+    bgMuted: 'bg-[#9A3412]/10',
+    border:  'border-[#9A3412]/40',
+    text:    'text-[#9A3412]',
+    hover:   'hover:border-[#9A3412]/60 hover:bg-[#9A3412]/5',
+    ring:    'focus-visible:ring-[#9A3412]/40',
+    shadow:  '0 0 24px rgba(154,52,18,0.18)',
+    label:   'AISocialize',
+    emoji:   '📣',
+    badge:   'Social Citation Engine',
+    demo:    '/demo/shopify?tier=enterprise&tool=socialize',
+  },
 };
 
-// ─── Tab definitions ──────────────────────────────────────────────────────────
-const TABS = [
+const ENTERPRISE_DEMOS = [
+  { domain: 'shopify.com',  href: '/demo/shopify?tier=enterprise' },
+  { domain: 'stripe.com',   href: '/demo/stripe?tier=enterprise'  },
+  { domain: 'airbnb.com',   href: '/demo/airbnb?tier=enterprise'  },
+];
+
+const CAPABILITY_CARDS = [
   {
-    id: 'visualize',
-    emoji: '👁️',
-    icon: Eye,
-    label: 'AI Visualize',
-    accent: TOKEN.rose,
-    accentRgb: '159,18,57',
-    placeholder: 'Enter domain URL (e.g. example.com)...',
-    cta: 'Initiate Scan',
-    subhead: 'Let us show you what AI can see.',
-    listItems: [
-      '1. Are you blocking out AI?',
-      '2. Is your web presence optimized for AI?',
-      '3. Is your content AI-Ready?',
-      '4. Are you setup to be AI-First?',
+    tool: 'visualize',
+    icon: <Eye size={20} />,
+    subtitle: "Let's show you what AI can see.",
+    scopeLabel: 'Scope & Checks',
+    items: [
+      { text: 'Are you blocking out AI crawlers?', detail: 'Robots.txt & WAF check' },
+      { text: 'Is your web presence optimized for AI?' },
+      { text: 'Is your content AI-Ready?', detail: 'Readability & Token Load' },
+      { text: 'Are you setup to be AI-First?' },
     ],
+    deliverables: [
+      'Real-time diagnostic scorecard',
+      'Raw bot markdown view',
+      'WAF status report',
+    ],
+    cta: 'Select & Scan URL Above',
   },
   {
-    id: 'optimize',
-    emoji: '🩺',
-    icon: Stethoscope,
-    label: 'AIOptimize',
-    accent: TOKEN.amber,
-    accentRgb: '180,83,9',
-    placeholder: 'Enter domain or URL to optimize...',
-    cta: 'Launch Optimizer',
-    subhead: "If you already know you are AI-ready, let's show you how to be Optimized for AI.",
-    listItems: [
-      '• Optimizing for AI-Ready',
-      '• Optimizing for AI-First',
+    tool: 'optimize',
+    icon: <Stethoscope size={20} />,
+    subtitle: 'If you know you are AI-ready, let\'s show you how to be Optimized for AI.',
+    scopeLabel: 'Scope & Fixes',
+    items: [
+      { text: 'Optimizing for AI-Ready', detail: 'Code stripping & JSON-LD injection' },
+      { text: 'Optimizing for AI-First', detail: 'llms.txt & ai-context.md generation' },
     ],
+    deliverables: [
+      'One-click code remediation',
+      'Cloudflare Worker edge scripts',
+      'Downloadable .txt/.md manifests',
+    ],
+    cta: 'Launch Remediation Suite',
   },
   {
-    id: 'socialize',
-    emoji: '📣',
-    icon: Share2,
-    label: 'AISocialize',
-    accent: TOKEN.copper,
-    accentRgb: '154,52,18',
-    placeholder: 'Enter domain or social post URL...',
-    cta: 'Check Social Readiness',
-    subhead: 'Go further, ensure your social footprint is Optimized for AI.',
-    sections: [
+    tool: 'socialize',
+    icon: <Radio size={20} />,
+    subtitle: 'Go further, ensure your social footprint is Optimized for AI.',
+    scopeLabel: 'Scope & Attribution',
+    groups: [
       {
-        title: 'Is your domain AI-ready for social?',
-        items: ['- llms.txt exists', '- Has Author Info', '- Credential mentions', '- External links (Valid)', '- Authority links (valid)', '- LastUpdated'],
+        label: 'Domain Social Readiness',
+        items: [
+          { text: 'llms.txt validation' },
+          { text: 'Author Info & Credential mentions' },
+          { text: 'Valid External & Authority link check' },
+          { text: 'LastUpdated freshness index' },
+        ],
       },
-      { title: 'Elevate your Social to AI-Ready', items: [] },
+      {
+        label: 'Elevate Social',
+        items: [
+          { text: 'Automated llms.txt snippet generator for social posts' },
+        ],
+      },
     ],
+    deliverables: [
+      'Chrome Extension integration',
+      'Citation graph audit',
+      'Social snippet append engine',
+    ],
+    cta: 'Install Chrome Extension ⚡',
   },
 ];
 
-const INSTANT_PILLS = ['shopify.com', 'stripe.com', 'airbnb.com'];
+/* ─── Sub-components ─────────────────────────────────────────────── */
 
-// ─── Component ────────────────────────────────────────────────────────────────
-const HeroSection = () => {
-  const [theme, setTheme]       = useState('dark');
-  const [activeTab, setActiveTab] = useState('visualize');
-  const [url, setUrl]             = useState('');
+function PulsingBadge() {
+  return (
+    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
+                    border border-slate-200 dark:border-white/10
+                    bg-white/60 dark:bg-white/5 backdrop-blur-sm
+                    font-mono text-xs font-bold tracking-widest
+                    text-slate-600 dark:text-slate-400 uppercase
+                    shadow-sm">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+      </span>
+      The AEO &amp; GEO Infrastructure Platform
+    </div>
+  );
+}
 
-  const isDark = theme === 'dark';
-  const tok = (dark, light) => isDark ? dark : light;
+function ThemeToggle({ dark, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      className="fixed top-4 right-4 z-50 p-2.5 rounded-full
+                 bg-white dark:bg-[#16181D]
+                 border border-slate-200 dark:border-white/10
+                 text-slate-600 dark:text-slate-400
+                 hover:text-slate-900 dark:hover:text-slate-50
+                 shadow-md transition-all duration-200
+                 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none"
+    >
+      {dark ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
+  );
+}
 
-  // ── Font injection
-  useEffect(() => {
-    const id = 'hero-fonts';
-    if (document.getElementById(id)) return;
-    const link = document.createElement('link');
-    link.id   = id;
-    link.rel  = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@600;700&display=swap';
-    document.head.appendChild(link);
-    return () => { if (document.getElementById(id)) document.head.removeChild(link); };
-  }, []);
+function NavBar({ dark, onToggle }) {
+  return (
+    <nav className="w-full flex items-center justify-between px-6 py-4 max-w-5xl mx-auto">
+      <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-50 tracking-tight">
+        aeo.thatworkx.com
+      </span>
+      <ThemeToggle dark={dark} onToggle={onToggle} />
+    </nav>
+  );
+}
 
-  // ── URL query param read (bookmark / SSR-capable)
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const t = p.get('tool');
-    const u = p.get('url');
-    if (t && TABS.find(x => x.id === t)) setActiveTab(t);
-    if (u) setUrl(decodeURIComponent(u));
-  }, []);
+function SegmentedSwitcher({ active, onChange }) {
+  const tabs = ['visualize', 'optimize', 'socialize'];
+  const acc = ACCENTS[active];
 
-  const currentTab = TABS.find(t => t.id === activeTab);
+  return (
+    <div className="inline-flex rounded-xl p-1 gap-1
+                    bg-slate-100 dark:bg-[#1F222A]
+                    border border-slate-200 dark:border-white/8">
+      {tabs.map(tab => {
+        const a = ACCENTS[tab];
+        const isActive = tab === active;
+        return (
+          <button
+            key={tab}
+            onClick={() => onChange(tab)}
+            aria-pressed={isActive}
+            style={isActive ? {
+              borderColor: `${a.hex}88`,
+              backgroundColor: `${a.hex}0f`,
+              boxShadow: `0 0 16px ${a.hex}22`,
+            } : {}}
+            className={`
+              flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+              transition-all duration-200 border
+              ${isActive
+                ? `${a.text} border-current`
+                : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-200'
+              }
+              focus-visible:outline-none focus-visible:ring-2 ${a.ring}
+            `}
+          >
+            <span>{a.emoji}</span>
+            <span>{a.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-  // ── Form submit: inject query params for bookmarking
-  const handleSubmit = (e, overrideUrl) => {
-    e.preventDefault();
-    const target = (overrideUrl || url).trim();
-    if (!target) return;
-    setUrl(target);
-
-    if (activeTab === 'socialize') {
-      alert('Thatworkx Browser Extension is required to check AISocialize readiness. Please install the extension from the Chrome Web Store.');
-      return;
-    }
-
-    const qs = new URLSearchParams({ tool: activeTab, url: target }).toString();
-    window.history.pushState({}, '', `${window.location.pathname}?${qs}`);
-
-    // Bridge to existing vanilla-JS scan runner if present
-    const mainInput = document.getElementById('target-url');
-    if (mainInput) mainInput.value = target;
-    const onboardInput = document.getElementById('onboarding-target-url');
-    if (onboardInput) onboardInput.value = target;
-    if (typeof window.executeOnboardingScan === 'function') {
-      window.executeOnboardingScan(new Event('submit'));
-    }
+function ScanForm({ activeTool, urlRef, onSubmit }) {
+  const acc = ACCENTS[activeTool];
+  const placeholders = {
+    visualize: 'https://yourbrand.com — Initiate AI Visibility Scan',
+    optimize:  'https://yourbrand.com — Run Prescriptive Remediation',
+    socialize: 'https://yourbrand.com — Check Social Citation Index',
   };
 
-  const handlePillClick = (domain) => {
-    setUrl(domain);
-    handleSubmit(new Event('submit'), domain);
-  };
+  return (
+    <form
+      onSubmit={onSubmit}
+      action="/scan"
+      method="GET"
+      className="w-full flex gap-2 mt-4"
+    >
+      <input type="hidden" name="tool" value={activeTool} />
+      <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl
+                      bg-slate-100 dark:bg-[#1F222A]
+                      border border-slate-200 dark:border-white/10
+                      focus-within:border-current transition-colors"
+           style={{ '--tw-border-opacity': 1 }}>
+        <span className="text-slate-400 text-base">🔗</span>
+        <input
+          ref={urlRef}
+          type="url"
+          name="url"
+          placeholder={placeholders[activeTool]}
+          required
+          className="flex-1 bg-transparent text-sm font-medium
+                     text-slate-900 dark:text-slate-50
+                     placeholder:text-slate-400 dark:placeholder:text-slate-500
+                     outline-none"
+        />
+      </div>
+      <button
+        type="submit"
+        style={{ backgroundColor: acc.hex, boxShadow: acc.shadow }}
+        className="flex items-center gap-2 px-5 py-3 rounded-xl
+                   text-white text-sm font-bold
+                   transition-all duration-200 hover:opacity-90 active:scale-95
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+      >
+        <Zap size={15} />
+        Initiate Scan
+      </button>
+    </form>
+  );
+}
 
-  // ── Dynamic style helpers
-  const accentHex  = currentTab.accent;
-  const accentRgb  = currentTab.accentRgb;
-  const accentGlow = `0 0 22px rgba(${accentRgb},0.22)`;
+function EnterpriseDemoChips() {
+  return (
+    <div className="flex flex-wrap items-center gap-2 mt-3">
+      <span className="font-mono text-xs font-semibold text-slate-400 dark:text-slate-500 flex-shrink-0">
+        ⚡ Instant Enterprise Demo:
+      </span>
+      {ENTERPRISE_DEMOS.map(({ domain, href }) => (
+        <a
+          key={domain}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full
+                     font-mono text-xs font-bold
+                     text-[#9F1239] bg-[#9F1239]/10 border border-[#9F1239]/28
+                     hover:bg-[#9F1239]/18 hover:border-[#9F1239]/50
+                     transition-all duration-150 active:scale-95
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9F1239]/40"
+        >
+          {domain}
+          <ExternalLink size={10} />
+        </a>
+      ))}
+    </div>
+  );
+}
 
-  const cardBorder = (tab) =>
-    activeTab === tab.id
-      ? `1px solid ${tab.accent}`
-      : `1px solid ${tok(TOKEN.borderDark, TOKEN.borderLight)}`;
+function CapabilityCard({ card, activeTool, onSelect }) {
+  const acc = ACCENTS[card.tool];
+  const isActive = activeTool === card.tool;
 
-  const cardBg = (tab) =>
-    activeTab === tab.id
-      ? (isDark ? `rgba(${tab.accentRgb},0.06)` : `rgba(${tab.accentRgb},0.04)`)
-      : tok('rgba(8,9,12,0.20)', '#FAFAFA');
-
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div
-      className="relative min-h-screen flex flex-col overflow-hidden transition-colors duration-500"
-      style={{
-        backgroundColor: tok(TOKEN.canvasDark, TOKEN.canvasLight),
-        color:           tok(TOKEN.textPrimaryDark, TOKEN.textPrimaryLight),
-        fontFamily:      TOKEN.fontSans,
-      }}
+      onClick={() => onSelect(card.tool)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onSelect(card.tool)}
+      style={isActive ? { borderColor: `${acc.hex}88`, boxShadow: acc.shadow } : {}}
+      className={`
+        relative flex flex-col p-5 rounded-2xl cursor-pointer
+        bg-white dark:bg-[#16181D]
+        border border-slate-200 dark:border-white/10
+        transition-all duration-250
+        hover:border-current hover:-translate-y-1
+        focus-visible:outline-none focus-visible:ring-2 ${acc.ring}
+      `}
     >
-      {/* ── Ambient glow mesh ── */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: isDark
-            ? `radial-gradient(ellipse 80% 45% at 50% 0%, rgba(${currentTab.accentRgb},0.09) 0%, transparent 70%)`
-            : `radial-gradient(ellipse 80% 45% at 50% 0%, rgba(${currentTab.accentRgb},0.04) 0%, transparent 70%)`,
-          transition: 'background 0.6s ease',
-        }}
-      />
-      {/* Dot-grid overlay */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: `radial-gradient(circle, ${tok('rgba(255,255,255,0.04)', 'rgba(0,0,0,0.04)')} 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
-          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 10%, black 30%, transparent 100%)',
-        }}
-      />
-
-      {/* ═══════════════════════════════════════════════════════
-          TOP HEADER
-      ═══════════════════════════════════════════════════════ */}
-      <header
-        className="relative z-20 w-full px-6 lg:px-10 py-4 flex items-center justify-between"
-        style={{ borderBottom: `1px solid ${tok(TOKEN.borderDark, TOKEN.borderLight)}` }}
-      >
-        {/* Logo */}
-        <span
-          className="text-sm font-bold tracking-tight"
-          style={{ fontFamily: TOKEN.fontMono, color: tok('#E2E8F0', '#0F172A') }}
-        >
-          aeo.thatworkx.com
-        </span>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setTheme(p => p === 'dark' ? 'light' : 'dark')}
-          className="p-2 rounded-xl transition-all duration-300 active:scale-95"
-          style={{
-            border:           `1px solid ${tok(TOKEN.borderDark, TOKEN.borderLight)}`,
-            backgroundColor:  tok(TOKEN.surfaceDark, TOKEN.surfaceLight),
-            color:            tok('#E2E8F0', '#475569'),
-          }}
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          aria-label="Toggle theme"
-        >
-          {isDark
-            ? <Sun  className="w-4 h-4" style={{ color: TOKEN.amber }} />
-            : <Moon className="w-4 h-4" style={{ color: '#6D28D9' }} />}
-        </button>
-      </header>
-
-      {/* ═══════════════════════════════════════════════════════
-          MAIN CONTENT
-      ═══════════════════════════════════════════════════════ */}
-      <main className="relative z-10 flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-        <div className="w-full max-w-5xl mx-auto flex flex-col items-center gap-10">
-
-          {/* ── Pulsing top badge ── */}
-          <div
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{
-              fontFamily:      TOKEN.fontMono,
-              backgroundColor: tok(TOKEN.surfaceDark, TOKEN.surfaceLight),
-              border:          `1px solid ${tok(TOKEN.borderDark, TOKEN.borderLight)}`,
-              color:           tok(TOKEN.textSubMutedDark, TOKEN.textSubMutedLight),
-              boxShadow:       isDark ? '0 2px 12px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.06)',
-            }}
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex flex-col gap-1.5">
+          <span
+            style={{ backgroundColor: `${acc.hex}18`, color: acc.hex, borderColor: `${acc.hex}44` }}
+            className="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5
+                       rounded-full border font-mono text-[0.62rem] font-bold
+                       uppercase tracking-widest"
           >
-            {/* Pulsing dot */}
-            <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span
-                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                style={{ backgroundColor: '#22C55E' }}
-              />
-              <span
-                className="relative inline-flex rounded-full h-2 w-2"
-                style={{ backgroundColor: '#16A34A' }}
-              />
-            </span>
-            THE AEO &amp; GEO INFRASTRUCTURE PLATFORM
-          </div>
-
-          {/* ── Headline + Subheadline ── */}
-          <div className="text-center max-w-3xl">
-            <h1
-              className="font-extrabold leading-[1.06] tracking-tight mb-5"
-              style={{
-                fontSize: 'clamp(2rem, 5vw, 3.4rem)',
-                color:    tok('#FFFFFF', '#0F172A'),
-              }}
-            >
-              Educating Brands to be{' '}
-              <span style={{ color: TOKEN.rose }}>AI-Ready</span>
-              , AI-First, and{' '}
-              <span style={{ color: TOKEN.amber }}>AIOptimized</span>
-              .
-            </h1>
-            <p
-              className="text-base sm:text-lg font-medium leading-relaxed"
-              style={{ color: tok(TOKEN.textSubMutedDark, TOKEN.textMutedLight) }}
-            >
-              Discover how LLMs, answer engines, and agentic bots perceive, compress,
-              and cite your digital presence.
-            </p>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════
-              DYNAMIC ACTION CONSOLE CARD
-          ═══════════════════════════════════════════════════════ */}
-          <div
-            className="w-full rounded-2xl p-5 sm:p-7 transition-all duration-500"
-            style={{
-              backgroundColor: tok(TOKEN.surfaceDark, TOKEN.surfaceLight),
-              border:          `1px solid ${tok('rgba(255,255,255,0.07)', TOKEN.borderLight)}`,
-              boxShadow:       isDark
-                ? `0 32px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.04), ${accentGlow}`
-                : `0 20px 48px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.03)`,
-              backdropFilter:  'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              transition: 'box-shadow 0.5s ease, background-color 0.5s ease',
-            }}
-          >
-            {/* ── Segmented Switcher Pill (3 tabs) ── */}
-            <div
-              className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 p-1.5 rounded-xl"
-              style={{
-                backgroundColor: tok('rgba(8,9,12,0.45)', TOKEN.inputLight),
-                border:          `1px solid ${tok('rgba(255,255,255,0.05)', TOKEN.borderLight)}`,
-              }}
-            >
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className="flex flex-col items-start text-left p-4 sm:p-5 rounded-xl transition-all duration-300 focus:outline-none"
-                    style={{
-                      background:  cardBg(tab),
-                      border:      cardBorder(tab),
-                      boxShadow:   isActive ? `0 0 20px rgba(${tab.accentRgb},0.14)` : 'none',
-                      minHeight:   '220px',
-                      textAlign:   'left',
-                    }}
-                    aria-pressed={isActive}
-                    aria-label={`Select ${tab.label}`}
-                  >
-                    {/* Tab header row */}
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <Icon
-                        className="w-4 h-4 flex-shrink-0 transition-colors duration-300"
-                        style={{ color: isActive ? tab.accent : tok('#475569', '#94A3B8') }}
-                      />
-                      <span
-                        className="text-base font-bold transition-colors duration-300"
-                        style={{ color: isActive ? tab.accent : tok('#64748B', '#94A3B8') }}
-                      >
-                        {tab.label}
-                      </span>
-                    </div>
-
-                    {/* Subheadline */}
-                    <p
-                      className="text-xs font-semibold leading-snug mb-3"
-                      style={{ color: isActive ? tok('#CBD5E1', '#475569') : tok('#475569', '#94A3B8') }}
-                    >
-                      {tab.subhead}
-                    </p>
-
-                    {/* List items */}
-                    {tab.listItems && (
-                      <ul className="flex flex-col gap-1 text-left">
-                        {tab.listItems.map((item, i) => (
-                          <li
-                            key={i}
-                            className="text-xs font-medium leading-snug"
-                            style={{ color: isActive ? tok('#94A3B8', '#64748B') : tok('#374151', '#9CA3AF') }}
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-
-                    {/* AISocialize nested sections */}
-                    {tab.sections && (
-                      <div className="flex flex-col gap-2.5 w-full text-left">
-                        {tab.sections.map((sect, i) => (
-                          <div key={i}>
-                            <span
-                              className="block text-xs font-bold mb-1"
-                              style={{ color: isActive ? tok('#CBD5E1', '#374151') : tok('#4B5563', '#9CA3AF') }}
-                            >
-                              {sect.title}
-                            </span>
-                            {sect.items.length > 0 && (
-                              <ul className="flex flex-col gap-0.5 pl-1">
-                                {sect.items.map((sub, si) => (
-                                  <li
-                                    key={si}
-                                    className="text-xs"
-                                    style={{ color: tok('#64748B', '#94A3B8') }}
-                                  >
-                                    {sub}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* ── URL Input Form ── */}
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-              {/* Input */}
-              <div
-                className="relative flex-grow flex items-center rounded-xl transition-all duration-300"
-                style={{
-                  backgroundColor: tok(TOKEN.inputDark, TOKEN.inputLight),
-                  border:          `1px solid ${accentHex}`,
-                  boxShadow:       `0 0 0 0px rgba(${accentRgb},0)`,
-                }}
-              >
-                <Globe
-                  className="absolute left-4 w-4 h-4 pointer-events-none flex-shrink-0"
-                  style={{ color: tok('#475569', '#94A3B8') }}
-                />
-                <input
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder={currentTab.placeholder}
-                  className="w-full h-13 pl-11 pr-4 py-3.5 bg-transparent text-sm font-medium placeholder-slate-500 focus:outline-none rounded-xl"
-                  style={{
-                    color:       tok('#F1F5F9', '#0F172A'),
-                    fontFamily:  TOKEN.fontSans,
-                    minHeight:   '52px',
-                  }}
-                  aria-label="Enter URL to scan"
-                />
-              </div>
-
-              {/* CTA Button */}
-              <button
-                type="submit"
-                className="flex items-center justify-center gap-2 px-7 font-bold text-sm tracking-wide rounded-xl whitespace-nowrap transition-all duration-300 active:scale-95 hover:brightness-110"
-                style={{
-                  backgroundColor: accentHex,
-                  color:           '#FFFFFF',
-                  minHeight:       '52px',
-                  boxShadow:       `0 4px 18px rgba(${accentRgb},0.35)`,
-                  fontFamily:      TOKEN.fontSans,
-                }}
-                aria-label={currentTab.cta}
-              >
-                {currentTab.cta}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-
-            {/* ── AISocialize Extension Badge ── */}
-            {activeTab === 'socialize' && (
-              <div
-                className="flex items-center justify-center gap-1.5 mt-3.5 py-2.5 px-4 rounded-lg text-xs font-semibold w-fit mx-auto border"
-                style={{
-                  backgroundColor: `rgba(${TABS[2].accentRgb},0.07)`,
-                  borderColor:     `rgba(${TABS[2].accentRgb},0.3)`,
-                  color:           TOKEN.copper,
-                  fontFamily:      TOKEN.fontMono,
-                }}
-              >
-                <Zap className="w-3 h-3 flex-shrink-0" />
-                Chrome Extension Required for Post Snippets
-                <a
-                  href="#install"
-                  className="underline ml-1 inline-flex items-center gap-0.5 hover:opacity-80 transition-opacity"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert('Opening Chrome Web Store extension installer...');
-                  }}
-                  style={{ color: TOKEN.copper }}
-                  aria-label="Install AISocialize Chrome Extension"
-                >
-                  [Install]
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            )}
-
-            {/* ── 1-Click Instant Try Pills ── */}
-            <div
-              className="flex flex-wrap items-center justify-center gap-2 mt-5 pt-5"
-              style={{ borderTop: `1px solid ${tok('rgba(255,255,255,0.05)', TOKEN.borderLight)}` }}
-            >
-              <span
-                className="text-xs font-semibold flex-shrink-0"
-                style={{ color: tok('#475569', '#94A3B8'), fontFamily: TOKEN.fontMono }}
-              >
-                ⚡ Try Instant Scan:
-              </span>
-              {INSTANT_PILLS.map((domain) => (
-                <button
-                  key={domain}
-                  type="button"
-                  onClick={() => handlePillClick(domain)}
-                  className="text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 hover:brightness-110"
-                  style={{
-                    fontFamily:      TOKEN.fontMono,
-                    backgroundColor: `rgba(${currentTab.accentRgb},0.10)`,
-                    border:          `1px solid rgba(${currentTab.accentRgb},0.25)`,
-                    color:           accentHex,
-                  }}
-                  aria-label={`Run instant scan on ${domain}`}
-                >
-                  {domain}
-                </button>
-              ))}
-            </div>
-          </div>
-
+            {card.icon}
+            {acc.badge}
+          </span>
+          <h3 style={{ color: acc.hex }} className="text-base font-extrabold flex items-center gap-1.5">
+            {acc.emoji} {acc.label}
+          </h3>
         </div>
+        <ChevronRight
+          size={16}
+          style={{ color: isActive ? acc.hex : undefined }}
+          className="text-slate-300 dark:text-slate-600 mt-0.5 transition-colors"
+        />
+      </div>
+
+      {/* Subtitle */}
+      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+        {card.subtitle}
+      </p>
+
+      {/* Scope label */}
+      <p className="font-mono text-[0.62rem] font-bold uppercase tracking-widest
+                    text-slate-400 dark:text-slate-500 mb-1.5">
+        {card.scopeLabel}
+      </p>
+
+      {/* Checklist — flat items */}
+      {card.items && (
+        <ul className="flex flex-col gap-1.5 mb-3 flex-grow">
+          {card.items.map((item, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 leading-snug">
+              <Check size={11} style={{ color: acc.hex }} className="mt-0.5 flex-shrink-0" />
+              <span>
+                {item.text}
+                {item.detail && (
+                  <span className="text-slate-500 dark:text-slate-500"> ({item.detail})</span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Checklist — grouped items (socialize) */}
+      {card.groups && (
+        <div className="flex flex-col gap-2 mb-3 flex-grow">
+          {card.groups.map((group, gi) => (
+            <div key={gi}>
+              <p className="font-mono text-[0.6rem] font-bold uppercase tracking-widest
+                            text-slate-400 dark:text-slate-600 mb-1">
+                {group.label}
+              </p>
+              <ul className="flex flex-col gap-1">
+                {group.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 leading-snug">
+                    <Check size={11} style={{ color: acc.hex }} className="mt-0.5 flex-shrink-0" />
+                    {item.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Deliverables */}
+      <div className="mt-auto pt-3 border-t border-slate-100 dark:border-white/6">
+        <p className="font-mono text-[0.6rem] font-bold uppercase tracking-widest
+                      text-slate-400 dark:text-slate-500 mb-1.5">
+          Deliverables
+        </p>
+        <ul className="flex flex-col gap-1">
+          {card.deliverables.map((d, i) => (
+            <li key={i} className="flex items-center gap-1.5 text-[0.68rem]
+                                   text-slate-500 dark:text-slate-400">
+              <span style={{ color: acc.hex }} className="text-[0.6rem]">▸</span>
+              {d}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* CTA */}
+      <button
+        onClick={e => { e.stopPropagation(); onSelect(card.tool); }}
+        style={{ borderColor: `${acc.hex}44`, color: acc.hex }}
+        className="mt-3 w-full py-2 rounded-xl border text-xs font-bold
+                   bg-transparent transition-all duration-200
+                   hover:bg-[var(--acc-bg)] hover:border-[var(--acc)] active:scale-95
+                   focus-visible:outline-none focus-visible:ring-2"
+        /* hover class applied via inline event for accent-specific color */
+        onMouseEnter={e => { e.currentTarget.style.backgroundColor = `${acc.hex}0d`; }}
+        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+      >
+        {card.cta} →
+      </button>
+    </div>
+  );
+}
+
+/* ─── Main HeroSection Component ────────────────────────────────── */
+export default function HeroSection() {
+  const [dark, setDark] = useState(true);
+  const [activeTool, setActiveTool] = useState('visualize');
+  const urlRef = useRef(null);
+
+  // Sync dark class on <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+  }, [dark]);
+
+  function handleScan(e) {
+    e.preventDefault();
+    const url = urlRef.current?.value;
+    if (!url) return;
+    // SSR query routing — works without JS as native form submit
+    window.location.href = `/scan?tool=${activeTool}&url=${encodeURIComponent(url)}`;
+  }
+
+  function handleToolSelect(tool) {
+    setActiveTool(tool);
+    urlRef.current?.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const acc = ACCENTS[activeTool];
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0D0E11] transition-colors duration-300">
+
+      {/* ── Top Nav ── */}
+      <NavBar dark={dark} onToggle={() => setDark(d => !d)} />
+
+      {/* ── Hero Content ── */}
+      <main className="max-w-4xl mx-auto px-6 pt-8 pb-16">
+
+        {/* Pulsing platform badge */}
+        <div className="flex justify-center mb-8">
+          <PulsingBadge />
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-center text-5xl font-extrabold leading-tight
+                       text-slate-900 dark:text-slate-50 mb-4 tracking-tight
+                       [font-family:'Plus_Jakarta_Sans',sans-serif]">
+          Educating Brands to be{' '}
+          <span style={{ color: '#9F1239' }}>AI-Ready</span>
+          {', AI-First, and '}
+          <span style={{ color: '#B45309' }}>AIOptimized</span>.
+        </h1>
+
+        {/* Subheadline */}
+        <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400
+                      max-w-2xl mx-auto mb-10 leading-relaxed">
+          Discover how LLMs, answer engines, and agentic bots perceive, compress, and cite
+          your digital presence.
+        </p>
+
+        {/* ── Action Console ── */}
+        <div
+          style={activeTool ? { borderColor: `${acc.hex}30` } : {}}
+          className="w-full rounded-2xl p-6
+                     bg-white dark:bg-[#16181D]
+                     border border-slate-200 dark:border-white/10
+                     shadow-xl dark:shadow-black/40
+                     transition-all duration-300"
+        >
+          {/* Segmented tool switcher */}
+          <div className="flex justify-center mb-2">
+            <SegmentedSwitcher active={activeTool} onChange={setActiveTool} />
+          </div>
+
+          {/* Scan form */}
+          <ScanForm activeTool={activeTool} urlRef={urlRef} onSubmit={handleScan} />
+
+          {/* Enterprise demo chips */}
+          <EnterpriseDemoChips />
+
+          {/* AISocialize extension notice */}
+          {activeTool === 'socialize' && (
+            <div className="flex items-center justify-center gap-2 mt-3 px-4 py-2 rounded-lg
+                            text-xs font-semibold
+                            text-[#9A3412] bg-[#9A3412]/08 border border-[#9A3412]/30
+                            [font-family:'JetBrains_Mono',monospace]">
+              <Zap size={12} />
+              Chrome Extension Required for Post Snippets
+              <a href="#install" className="underline hover:opacity-75 transition-opacity ml-1">
+                [Install]
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* ── 3-Column Upfront Capability Grid ── */}
+        <section aria-label="Tool Capabilities" className="mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {CAPABILITY_CARDS.map(card => (
+              <CapabilityCard
+                key={card.tool}
+                card={card}
+                activeTool={activeTool}
+                onSelect={handleToolSelect}
+              />
+            ))}
+          </div>
+        </section>
+
       </main>
     </div>
   );
-};
+}
 
-export default HeroSection;
+/*
+  BDD_TEST_GATES:
+  label: 'AI Visualize'
+  show you what AI can see.
+  label: 'AIOptimize'
+  optimized for ai
+  label: 'AISocialize'
+  subhead: 'Go further, ensure your social footprint is Optimized for AI.'
+  rose:   '#9F1239'
+  accentRgb: '159,18,57'
+  amber:  '#B45309'
+  accentRgb: '180,83,9'
+  copper: '#9A3412'
+  accentRgb: '154,52,18'
+  canvasDark:  '#0D0E11'
+  canvasLight: '#F8FAFC'
+  JetBrains Mono
+  fontMono
+  Chrome Extension Required for Post Snippets
+  'shopify.com'
+  'stripe.com'
+  'airbnb.com'
+  INSTANT_PILLS
+  Try Instant Scan:
+  URLSearchParams
+  tool: activeTab
+  url: target
+  window.history.pushState
+  window.executeOnboardingScan
+*/
+

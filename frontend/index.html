@@ -142,12 +142,12 @@
             <a href="#install" onclick="alert('Opening Chrome Web Store extension installer...');" class="socialize-badge-link">[Install]</a>
           </div>
 
-          <!-- 1-Click Instant Try Pills -->
+          <!-- Instant Demo Chips (Below Console) -->
           <div class="instant-try-row" id="instant-try-row">
-            <span class="instant-try-label">⚡ Try Instant Scan:</span>
-            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('shopify.com')">shopify.com</button>
-            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('stripe.com')">stripe.com</button>
-            <button type="button" class="instant-try-pill" onclick="triggerInstantScan('airbnb.com')">airbnb.com</button>
+            <span class="instant-try-label">⚡ Instant Enterprise Demo:</span>
+            <a href="/demo/shopify?tier=enterprise" target="_blank" class="instant-try-pill">shopify.com ↗</a>
+            <a href="/demo/stripe?tier=enterprise" target="_blank" class="instant-try-pill">stripe.com ↗</a>
+            <a href="/demo/airbnb?tier=enterprise" target="_blank" class="instant-try-pill">airbnb.com ↗</a>
           </div>
           
           <!-- Optional Headless Switcher for high tier users on the homepage -->
@@ -178,6 +178,14 @@
               <li><span class="check-icon check-icon--rose">✔</span>Is your content AI-Ready? <em>(Readability &amp; Token Load)</em></li>
               <li><span class="check-icon check-icon--rose">✔</span>Are you setup to be AI-First?</li>
             </ul>
+            <div class="tool-card__deliverables">
+              <span class="deliverables-title">Deliverables</span>
+              <ul>
+                <li>▸ Real-time diagnostic scorecard</li>
+                <li>▸ Raw bot markdown view</li>
+                <li>▸ WAF status report</li>
+              </ul>
+            </div>
             <div class="tool-card__footer">
               <button type="button" class="tool-card__cta tool-card__cta--rose" onclick="event.stopPropagation(); selectConsoleTab('visualize'); document.getElementById('onboarding-target-url').focus();">
                 Select &amp; Scan URL Above →
@@ -196,6 +204,14 @@
               <li><span class="check-icon check-icon--amber">✔</span>Optimizing for AI-Ready <em>(Code stripping &amp; JSON-LD injection)</em></li>
               <li><span class="check-icon check-icon--amber">✔</span>Optimizing for AI-First <em>(llms.txt &amp; ai-context.md generation)</em></li>
             </ul>
+            <div class="tool-card__deliverables">
+              <span class="deliverables-title">Deliverables</span>
+              <ul>
+                <li>▸ One-click code remediation</li>
+                <li>▸ Cloudflare Worker edge scripts</li>
+                <li>▸ Downloadable .txt/.md manifests</li>
+              </ul>
+            </div>
             <div class="tool-card__footer">
               <button type="button" class="tool-card__cta tool-card__cta--amber" onclick="event.stopPropagation(); selectConsoleTab('optimize'); document.getElementById('onboarding-target-url').focus();">
                 Launch Remediation Suite →
@@ -219,6 +235,14 @@
               <li class="tool-card__nested-heading">Elevate Social</li>
               <li><span class="check-icon check-icon--copper">✔</span>Automated llms.txt text snippet generation for social content</li>
             </ul>
+            <div class="tool-card__deliverables">
+              <span class="deliverables-title">Deliverables</span>
+              <ul>
+                <li>▸ Chrome Extension integration</li>
+                <li>▸ Citation graph audit</li>
+                <li>▸ Social snippet append engine</li>
+              </ul>
+            </div>
             <div class="tool-card__footer">
               <button type="button" class="tool-card__cta tool-card__cta--copper" onclick="event.stopPropagation(); alert('Opening Chrome Web Store extension installer...');">
                 Install Chrome Extension ⚡
