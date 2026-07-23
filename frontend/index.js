@@ -1336,11 +1336,34 @@ async function executeOnboardingScan(event) {
   }
 }
 
+function goBackToHome() {
+  const onboardingHero = document.getElementById('onboarding-hero');
+  if (onboardingHero) onboardingHero.style.display = 'block';
+  
+  const scanResults = document.getElementById('scan-results');
+  if (scanResults) scanResults.style.display = 'none';
+  
+  const scanPlaceholder = document.getElementById('scan-placeholder');
+  if (scanPlaceholder) scanPlaceholder.style.display = 'none';
+  
+  const scanInputCard = document.getElementById('scan-input-card');
+  if (scanInputCard) scanInputCard.style.display = 'none';
+  
+  const toggleHeader = document.getElementById('toggle-container-header');
+  if (toggleHeader) toggleHeader.style.display = 'none';
+  
+  const targetUrl = document.getElementById('target-url');
+  if (targetUrl) targetUrl.value = '';
+  const onboardingUrl = document.getElementById('onboarding-target-url');
+  if (onboardingUrl) onboardingUrl.value = '';
+}
+
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;
 window.handleModalScanSubmit = handleModalScanSubmit;
 window.generateTrack2File = generateTrack2File;
 window.selectConsoleTab = selectConsoleTab;
 window.executeOnboardingScan = executeOnboardingScan;
+window.goBackToHome = goBackToHome;
 
 

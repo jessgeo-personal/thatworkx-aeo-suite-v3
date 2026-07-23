@@ -14,7 +14,7 @@
 
   <!-- Top Navigation Header -->
   <header class="app-header">
-    <div class="logo">
+    <div class="logo" onclick="goBackToHome()" style="cursor: pointer;" title="Go back to Homepage">
       <span class="logo-symbol">🌐</span>
       <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
     </div>
@@ -146,6 +146,11 @@
 
     <!-- Input Form Segment -->
     <section class="scan-input-card glassmorphic" id="scan-input-card" style="display: none;">
+      <div style="display: flex; justify-content: flex-start; margin-bottom: 1.2rem;">
+        <button type="button" class="teaser-btn" onclick="goBackToHome()" style="padding: 0.5rem 1.2rem; font-size: 0.82rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15,23,42,0.4); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+          <span>← Back to Home</span>
+        </button>
+      </div>
       <h2>Analyze Your AI Search Index Footprint</h2>
       <p class="subtitle">Evaluate and optimize your web presence structure for AI bots, RAG chunkers, and answer engines.</p>
       
