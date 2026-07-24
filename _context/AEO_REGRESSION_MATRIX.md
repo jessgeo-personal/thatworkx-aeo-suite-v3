@@ -48,6 +48,11 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Scanned Routes Count Badge** | Scanned Paths UI | `index.html` & `index.js` | Displays "Pulled X of Y pages" at the top of the Scanned Routes card | `PASS 🟢` |
 | **AIOptimize Tabbed Remediation Controls** | Sandbox UI | `index.html` & `index.css` | Combines vertical controls sidebar into a unified card with horizontal header tabs | `PASS 🟢` |
 | **Semrush Direct Query Interpolation** | Referral Gate | `index.js` | Parses the scanned domain from the results and updates the link with it | `PASS 🟢` |
+| **Multi-Bot RAG Token Truncation** | RAG Ingestion | `index.js` | Inserts Gemini boundary at 2,000 words & Copilot cut-off at 2,500 words | `PASS 🟢` |
+| **Exact 4-Pillar Score Math** | Scoring Engine | `index.js` & `crawlerService.js` | Enforces overall score = P1 + P2 + P3 + P4 (0-100) with sub-scores & notes | `PASS 🟢` |
+| **Zero-Default Dashboard Architecture** | UI Quality | `visualize.html` & `index.js` | Purges all fake defaults, mock HTML fallbacks & hardcoded scores | `PASS 🟢` |
+| **Vibrant Status Pill Colors** | UI Theme | `index.js` | Applies vibrant green (`#34d399`), amber (`#fbbf24`), and red (`#f43f5e`) badges | `PASS 🟢` |
+| **Section Info Help Modals** | Modal Interactivity | `index.js` & `visualize.html` | Opens info help popups on `?` click with z-index 999999 override | `PASS 🟢` |
 | **Semrush Redirection Safety Disclaimer Modal** | Referral Gate | `index.html` & `index.js` | Shows a safety/terms modal warning users when they trigger the Semrush affiliate link | `PASS 🟢` |
 | **Educational Onboarding Homepage Hero** | Onboarding UI | `index.html` & `index.css` | Displays educational landing page citing the 35% blocking statistic | `PASS 🟢` |
 | **URL Ingest Modal & Dashboard Router** | Onboarding UI | `index.html` & `index.js` | Launches ingestion modal on card clicks and routes state to appropriate dashboard | `PASS 🟢` |

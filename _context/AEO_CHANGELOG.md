@@ -4,6 +4,29 @@ All notable code changes, schema definitions, and infrastructure updates will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), adhering to Semantic Versioning.
 
+## [3.4.0-prod] - 2026-07-24
+
+### Added
+- **Multi-Bot RAG Token Truncation Engine (`frontend/index.js`)**: Implemented multi-bot truncation boundaries:
+  - **Google Gemini & AI Overviews:** Truncation boundary inserted at Word 2,000 (~2,700 tokens).
+  - **Microsoft Copilot, Bing & GPTBot:** Hard cut-off boundary inserted at Word 2,500 (~3,375 tokens).
+  - **Lost Content Container:** Un-indexed content beyond Word 2,500 is rendered under `❌ LOST CONTENT (IGNORED BY ALL AI SEARCH BOTS)`.
+- **Dynamic 3-Tier Status Pill Color Highlights (`frontend/index.js`)**: Restored high-contrast status pill highlights for badges and sub-score chips:
+  - **🟢 Positive (Green - 20 to 25 pts):** `background: rgba(16, 185, 129, 0.18)`, `color: #34d399`, `border: 1px solid rgba(16, 185, 129, 0.4)`
+  - **🟡 Moderate (Amber - 10 to 19 pts):** `background: rgba(245, 158, 11, 0.18)`, `color: #fbbf24`, `border: 1px solid rgba(245, 158, 11, 0.4)`
+  - **🔴 Negative (Red - 0 to 9 pts):** `background: rgba(244, 63, 94, 0.18)`, `color: #f43f5e`, `border: 1px solid rgba(244, 63, 94, 0.4)`
+- **Interactive Info Help Popups (`?` Modals)**: Integrated `openSectionHelpModal(secNum, event)` with event prevention and `z-index: 999999` display override across the score dial card and 4 pillar cards.
+- **Resizable Perception Simulator Boxes (`frontend/visualize.html`)**: Added native vertical drag handles (`resize: vertical; min-height: 180px; max-height: 800px;`) and font zoom controls (`A+`, `A-`, `↺`).
+
+### Fixed
+- **Clean Panel Separation under "What AI Can See" (`frontend/index.js`)**: Separated webpage RAG vector chunk ingestion (Left Panel) from machine welcome mat file contents (Right Panel: `/llms.txt`, `/ai-context.md`, `/about.md`, `/docs.md`, `/content.md`). Zero DOM duplication.
+- **RAG Body Text Extraction (`backend/services/crawlerService.js`)**: Updated Cheerio text parsing using `$clean.root().text()` to extract body text cleanly even on pages without explicit `<h1-h6>` headings or `<body>` tag wrappers.
+- **Exact 4-Pillar Score Mathematics (`frontend/index.js`)**: Enforced `overallScore = p1.score + p2.score + p3.score + p4.score` so overall score dial and sub-scores are 100% mathematically aligned.
+- **Complete Zero-Default Architecture**:
+  - Purged all hardcoded default score values (`88`, `50`), fake word count fallbacks (`850`), page count fallbacks (`12`), and default domain fallbacks (`thatworkx.com`).
+  - Purged synthetic mock HTML fallback injection (`<html><body><h1>Mock Content...</h1></body></html>`) in `crawlerService.js`; registered explicit critical error alerts instead.
+  - Set un-scanned initial UI state (`--`, `UNAUDITED VISIBILITY`, `--/25 pts`).
+
 ## [1.24.0-landing-patch] - 2026-07-23
 
 ### Fixed
