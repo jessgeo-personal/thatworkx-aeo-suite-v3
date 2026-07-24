@@ -76,8 +76,8 @@
 
     <!-- Active Target Domain Header Display -->
     <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8;">
-      <div>Scanned Target: <strong id="display-scanned-domain" style="color: #38bdf8;">thatworkx.com</strong></div>
-      <div id="scan-timestamp-badge">Last audited: Just now</div>
+      <div>Scanned Target: <strong id="display-scanned-domain" style="color: #38bdf8;">--</strong></div>
+      <div id="scan-timestamp-badge">Last audited: Not scanned</div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════
@@ -85,108 +85,179 @@
     ════════════════════════════════════════════════════════ -->
     <div id="exec-mode-container" class="view-mode-section">
       
-      <!-- Top Row: Score Dial Gauge + Side-by-Side Perception Simulator -->
+      <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
         
         <!-- Overall AI Visibility Score Dial Gauge -->
-        <div class="score-dial-card glassmorphic border-glow-cyan" style="padding: 1.5rem; border-radius: 12px; text-align: center; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <h4 style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">AI Visibility Health Index</h4>
+        <div class="score-dial-card glassmorphic border-glow-cyan" style="position: relative; padding: 1.5rem; border-radius: 12px; text-align: center; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <button type="button" class="info-help-btn" onclick="openSectionHelpModal(0, event)" title="Calculation Logic of AI Visibility Health Index" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+          <h4 style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">AI Visibility Health Index</h4>
           
-          <div class="dial-wrapper" style="position: relative; width: 160px; height: 160px; margin: 0 auto 1rem;">
+          <div class="dial-wrapper" style="position: relative; width: 140px; height: 140px; margin: 0 auto 0.75rem;">
             <svg viewBox="0 0 100 100" class="dial-svg" style="transform: rotate(-90deg); width: 100%; height: 100%;">
               <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" stroke-width="8" fill="none"></circle>
-              <circle id="score-dial-arc" cx="50" cy="50" r="42" stroke="#e11d48" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="66" stroke-linecap="round" fill="none" style="transition: stroke-dashoffset 1s ease;"></circle>
+              <circle id="score-dial-arc" cx="50" cy="50" r="42" stroke="#64748b" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="none" style="transition: stroke-dashoffset 1s ease, stroke 0.5s ease;"></circle>
             </svg>
             <div class="dial-text-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-              <span id="exec-overall-score" style="font-size: 2.5rem; font-weight: 800; color: #ffffff;">75</span>
-              <span style="font-size: 0.8rem; color: #64748b; display: block;">/ 100</span>
+              <span id="exec-overall-score" style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">--</span>
+              <span style="font-size: 0.75rem; color: #64748b; display: block;">/ 100</span>
             </div>
           </div>
 
-          <div id="exec-score-classification-pill" class="badge-status status-amber" style="display: inline-block; padding: 0.35rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">
-            MODERATE VISIBILITY
+          <div id="exec-score-classification-pill" class="badge-status" style="display: inline-block; padding: 0.3rem 0.9rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; background: rgba(255,255,255,0.08); color: #94a3b8;">
+            UNAUDITED VISIBILITY
           </div>
-          <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.75rem;" id="exec-score-summary-text">
-            Domain has active machine welcome mats, but DOM contains minor content density gaps.
+          <p style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.5rem;" id="exec-score-summary-text">
+            Enter a domain URL above and click 'Run Audit' to measure live AI Visibility.
           </p>
         </div>
 
-        <!-- Side-by-Side Visual Perception Simulator -->
-        <div class="perception-simulator-card glassmorphic border-glow-cyan" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">👁️ Visual Perception Engine Simulator</h4>
-            <span class="badge-status status-green" style="font-size: 0.75rem;">Live AI Stream comparison</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <!-- Frame 1: What Humans See -->
-            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
-              <div style="font-weight: 600; font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
-                <span>🌐 What Humans See (Parsed DOM)</span>
+        <!-- 4 Strategic Health Pillars arranged in a 2x2 Sub-Grid with Info Popups -->
+        <div class="pillars-2x2-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          
+          <!-- Section 1 Card -->
+          <div class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Section 1</span>
+                  <span id="pillar-sec1-score" style="font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Learn more about Gateway & Access" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
               </div>
-              <div id="sim-human-view" style="font-family: var(--font-sans); font-size: 0.78rem; line-height: 1.5; color: #cbd5e1; height: 160px; overflow-y: auto; background: #0f172a; padding: 0.75rem; border-radius: 6px;">
-                <!-- Rendered by JS -->
-              </div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem;">Gateway &amp; Access</div>
             </div>
-
-            <!-- Frame 2: What ChatGPT & Perplexity Read -->
-            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
-              <div style="font-weight: 600; font-size: 0.8rem; color: #f59e0b; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
-                <span>🤖 What ChatGPT &amp; Perplexity Read (Vector RAG)</span>
-              </div>
-              <div id="sim-ai-view" style="font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.4; color: #4ade80; height: 160px; overflow-y: auto; background: #090a0f; padding: 0.75rem; border-radius: 6px; white-space: pre-wrap;">
-                <!-- Rendered by JS -->
-              </div>
+            <div>
+              <div id="pillar-sec1-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: rgba(255,255,255,0.08); color: #94a3b8;">UNAUDITED</div>
+              <p id="pillar-sec1-note" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.35;">Pending live scan.</p>
             </div>
           </div>
+
+          <!-- Section 2 Card -->
+          <div class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Section 2</span>
+                  <span id="pillar-sec2-score" style="font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="Learn more about Presence & Hygiene" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+              </div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem;">Presence &amp; Hygiene</div>
+            </div>
+            <div>
+              <div id="pillar-sec2-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: rgba(255,255,255,0.08); color: #94a3b8;">UNAUDITED</div>
+              <p id="pillar-sec2-note" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.35;">Pending live scan.</p>
+            </div>
+          </div>
+
+          <!-- Section 3 Card -->
+          <div class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Section 3</span>
+                  <span id="pillar-sec3-score" style="font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(3, event)" title="Learn more about Parsing & Readability" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+              </div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem;">Parsing &amp; Readability</div>
+            </div>
+            <div>
+              <div id="pillar-sec3-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: rgba(255,255,255,0.08); color: #94a3b8;">UNAUDITED</div>
+              <p id="pillar-sec3-note" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.35;">Pending live scan.</p>
+            </div>
+          </div>
+
+          <!-- Section 4 Card -->
+          <div class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Section 4</span>
+                  <span id="pillar-sec4-score" style="font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(4, event)" title="Learn more about Machine Manifests" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+              </div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem;">Machine Manifests</div>
+            </div>
+            <div>
+              <div id="pillar-sec4-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: rgba(255,255,255,0.08); color: #94a3b8;">UNAUDITED</div>
+              <p id="pillar-sec4-note" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.35;">Pending live scan.</p>
+            </div>
+          </div>
+
+        </div>04 MISSING</div>
+              <p id="pillar-sec4-note" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.35;">Missing JSON-LD schema (-15 pts) and canonical tag (-10 pts).</p>
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      <!-- 4 Strategic Health Pillars -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-        
-        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 1</div>
-          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Gateway &amp; Access</div>
-          <div id="pillar-sec1-badge" class="badge-status status-green" style="font-size: 0.75rem;">OPTIMIZED HANDSHAKE</div>
+      <!-- What AI can see (Perception Simulator) -->
+      <div class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+            <span>👁️ What AI can see</span>
+            <span class="badge-status status-green" style="font-size: 0.72rem;">Live AI Stream comparison</span>
+          </h4>
         </div>
 
-        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 2</div>
-          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Presence &amp; Hygiene</div>
-          <div id="pillar-sec2-badge" class="badge-status status-amber" style="font-size: 0.75rem;">MINOR HYGIENE GAPS</div>
-        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <!-- Frame 1: How AI sees your website -->
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 0.82rem; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+                <span>🌐 How AI sees your website</span>
+              </div>
+              <div class="zoom-controls" style="display: flex; gap: 0.25rem; align-items: center;">
+                <button type="button" onclick="adjustSimulatorFont('human', 1)" title="Zoom In (Larger Font)" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; border-radius: 4px; padding: 0.15rem 0.45rem; font-size: 0.72rem; cursor: pointer; font-weight: 700; transition: all 0.2s;">A+</button>
+                <button type="button" onclick="adjustSimulatorFont('human', -1)" title="Zoom Out (Smaller Font)" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 4px; padding: 0.15rem 0.45rem; font-size: 0.72rem; cursor: pointer; font-weight: 700; transition: all 0.2s;">A-</button>
+                <button type="button" onclick="adjustSimulatorFont('human', 0)" title="Reset Font Size" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; border-radius: 4px; padding: 0.15rem 0.4rem; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">↺</button>
+              </div>
+            </div>
+            <div id="sim-human-view" style="font-family: var(--font-sans); font-size: 0.78rem; line-height: 1.5; color: #cbd5e1; height: 240px; min-height: 180px; max-height: 800px; overflow: auto; resize: vertical; background: #0f172a; padding: 0.75rem; border-radius: 6px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
 
-        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 3</div>
-          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Parsing &amp; Readability</div>
-          <div id="pillar-sec3-badge" class="badge-status status-green" style="font-size: 0.75rem;">HIGH DENSITY</div>
+          <!-- Frame 2: How AI sees your AI-ready content -->
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 0.82rem; color: #4ade80; display: flex; align-items: center; gap: 0.35rem;">
+                <span>🤖 How AI sees your AI-ready content</span>
+              </div>
+              <div class="zoom-controls" style="display: flex; gap: 0.25rem; align-items: center;">
+                <button type="button" onclick="adjustSimulatorFont('ai', 1)" title="Zoom In (Larger Font)" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #4ade80; border-radius: 4px; padding: 0.15rem 0.45rem; font-size: 0.72rem; cursor: pointer; font-weight: 700; transition: all 0.2s;">A+</button>
+                <button type="button" onclick="adjustSimulatorFont('ai', -1)" title="Zoom Out (Smaller Font)" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 4px; padding: 0.15rem 0.45rem; font-size: 0.72rem; cursor: pointer; font-weight: 700; transition: all 0.2s;">A-</button>
+                <button type="button" onclick="adjustSimulatorFont('ai', 0)" title="Reset Font Size" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; border-radius: 4px; padding: 0.15rem 0.4rem; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">↺</button>
+              </div>
+            </div>
+            <div id="sim-ai-view" style="font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.4; color: #4ade80; height: 240px; min-height: 180px; max-height: 800px; overflow: auto; resize: vertical; background: #090a0f; padding: 0.75rem; border-radius: 6px; white-space: pre-wrap;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
         </div>
-
-        <div class="pillar-card glassmorphic" style="padding: 1.25rem; border-radius: 10px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
-          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">Section 4</div>
-          <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.5rem;">Machine Manifests</div>
-          <div id="pillar-sec4-badge" class="badge-status status-green" style="font-size: 0.75rem;">WELCOME MAT ACTIVE</div>
-        </div>
-
       </div>
 
-      <!-- Scanned Routes & AI-Ready Machine Files Table -->
+      <!-- Scanned/Discovered webpages & Scanned/Discovered AI-Ready Files Table -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
         
-        <!-- Scanned Routes Directory -->
+        <!-- Scanned/Discovered webpages -->
         <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">📂 Scanned Routes Directory Path</h4>
-            <span class="table-count-badge" id="exec-routes-count" style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 12px;">3 Pages Crawled</span>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">📂 Scanned/Discovered webpages</h4>
+            <span class="table-count-badge" id="exec-routes-count" style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 12px;">Crawled 1 of 12 pages discovered</span>
           </div>
-          <div class="table-responsive-wrapper" style="max-height: 320px; overflow-y: auto;">
+          <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
             <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
               <thead>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
                   <th style="padding: 0.6rem;">Route Path</th>
-                  <th style="padding: 0.6rem;">Word Count</th>
+                  <th style="padding: 0.6rem;">Words</th>
+                  <th style="padding: 0.6rem;">Tokens</th>
                   <th style="padding: 0.6rem;">Canonical</th>
                   <th style="padding: 0.6rem; text-align: right;">Action</th>
                 </tr>
@@ -198,13 +269,13 @@
           </div>
         </div>
 
-        <!-- Scanned AI-Ready Machine Files Table -->
+        <!-- Scanned/Discovered AI-Ready Files (machine readable) -->
         <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">🤖 Scanned AI-Ready Machine Files</h4>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">🤖 Scanned/Discovered AI-Ready Files (machine readable)</h4>
             <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: rgba(74, 222, 128, 0.15); color: #4ade80; padding: 0.2rem 0.6rem; border-radius: 12px;">8 Manifests Tracked</span>
           </div>
-          <div class="table-responsive-wrapper" style="max-height: 320px; overflow-y: auto;">
+          <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
             <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
               <thead>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
@@ -333,6 +404,18 @@
         </div>
         <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
       </form>
+  </div>
+
+  <!-- Section Explanation Modal -->
+  <div id="help-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 520px; margin: 0 auto; padding: 1.75rem;">
+      <span class="modal-close" onclick="closeHelpModal()">×</span>
+      <div id="help-modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🛡️</div>
+      <h3 id="help-modal-title" style="text-align: center; color: #fff; margin-bottom: 1rem; font-size: 1.15rem;">Section Explanation</h3>
+      <div id="help-modal-body" style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+        <!-- Filled dynamically by JS -->
+      </div>
+      <button type="button" onclick="closeHelpModal()" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; border-radius: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 600; cursor: pointer;">Got It 👍</button>
     </div>
   </div>
 

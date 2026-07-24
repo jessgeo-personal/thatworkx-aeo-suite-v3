@@ -250,8 +250,14 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
   }
 });
 
-// Serve frontend assets and dedicated page routes
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve frontend assets — disable cache in dev so JS/CSS changes are instant
+app.use(express.static(path.join(__dirname, '../frontend'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store');
+  }
+}));
 
 app.get('/visualize', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/visualize.html'));

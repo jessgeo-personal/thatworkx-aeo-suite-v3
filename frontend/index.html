@@ -745,11 +745,9 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
 
     </div>
   </footer>
-
-
   <!-- Authentication & Registration Modal Overlay -->
   <div id="auth-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto;">
+    <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto; max-height: 90vh; overflow-y: auto;">
       <span class="modal-close" onclick="closeAuthModal()">×</span>
       <div class="modal-icon" style="font-size: 2rem; text-align: center;">🔐</div>
       <h3 id="auth-modal-title" style="text-align: center; color: #fff; margin-bottom: 0.5rem;">Authenticate to Thatworkx AEO</h3>
@@ -760,36 +758,62 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
         <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">New User</button>
       </div>
 
-      <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)">
-        <div style="margin-bottom: 1rem;">
+      <!-- Login Form -->
+      <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div>
           <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Email Address:</label>
-          <input type="email" id="login-email" required placeholder="user@example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+          <input type="email" id="login-email" required placeholder="user@example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
         </div>
-        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+          <input type="checkbox" id="login-opt-in" style="margin-top: 3px; flex-shrink: 0;">
+          <label for="login-opt-in" style="font-size: 0.78rem; color: #94a3b8; line-height: 1.4; cursor: pointer;">I agree to the data storage and usage policies of Thatworkx Solutions.</label>
+        </div>
+        <button type="submit" id="login-submit-btn" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
       </form>
 
-      <form id="register-form-panel" onsubmit="handleRequestRegisterOtp(event)" style="display: none;">
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <!-- Register Form -->
+      <form id="register-form-panel" onsubmit="handleRequestRegisterOtp(event)" style="display: none; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem;">
           <div style="flex: 1;">
             <label style="font-size: 0.8rem; color: #cbd5e1;">First Name*:</label>
-            <input type="text" id="reg-firstname" required placeholder="Jane" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+            <input type="text" id="reg-firstname" required placeholder="Jane" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
           </div>
           <div style="flex: 1;">
             <label style="font-size: 0.8rem; color: #cbd5e1;">Last Name*:</label>
-            <input type="text" id="reg-lastname" required placeholder="Doe" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+            <input type="text" id="reg-lastname" required placeholder="Doe" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
           </div>
         </div>
-        <div style="margin-bottom: 0.75rem;">
+        <div>
           <label style="font-size: 0.8rem; color: #cbd5e1;">Email Address*:</label>
-          <input type="email" id="reg-email" required placeholder="jane.doe@example.com" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+          <input type="email" id="reg-email" required placeholder="jane.doe@example.com" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
         </div>
-        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Register &amp; Send OTP</button>
+        <div>
+          <label style="font-size: 0.8rem; color: #cbd5e1;">Phone Number*:</label>
+          <input type="tel" id="reg-phone" required placeholder="+1 555 000 0000" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <div style="flex: 1;">
+            <label style="font-size: 0.8rem; color: #cbd5e1;">Company:</label>
+            <input type="text" id="reg-company" placeholder="Acme Inc." style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
+          </div>
+          <div style="flex: 1;">
+            <label style="font-size: 0.8rem; color: #cbd5e1;">Country:</label>
+            <input type="text" id="reg-country" placeholder="United States" style="width: 100%; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff; box-sizing: border-box;">
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+          <input type="checkbox" id="reg-opt-in" style="margin-top: 3px; flex-shrink: 0;">
+          <label for="reg-opt-in" style="font-size: 0.78rem; color: #94a3b8; line-height: 1.4; cursor: pointer;">I agree to the data storage and usage policies of Thatworkx Solutions.</label>
+        </div>
+        <button type="submit" id="register-submit-btn" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Register &amp; Send OTP</button>
       </form>
 
-      <form id="otp-verify-panel" onsubmit="handleOtpVerification(event)" style="display: none;">
-        <p style="font-size: 0.85rem; text-align: center; color: #94a3b8; margin-bottom: 1rem;">Enter the 6-digit verification code sent to your email.</p>
-        <input type="text" id="otp-code-input" required placeholder="000000" pattern="\d{6}" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.35rem; width: 180px; margin: 0 auto 1rem; display: block; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
-        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Verify Code</button>
+      <!-- OTP Verify Panel -->
+      <form id="otp-verify-panel" onsubmit="handleOtpVerification(event)" style="display: none; flex-direction: column; align-items: center; gap: 0.75rem;">
+        <p id="otp-verify-prompt" style="font-size: 0.85rem; text-align: center; color: #94a3b8; margin: 0;">Enter the 6-digit verification code sent to your email.</p>
+        <input type="text" id="otp-code-input" required placeholder="000000" pattern="\d{6}" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.35rem; width: 180px; padding: 0.5rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        <button type="submit" id="otp-submit-btn" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Verify Code</button>
+        <button type="button" onclick="cancelOtpVerification()" style="background: transparent; border: none; color: #64748b; font-size: 0.8rem; cursor: pointer; padding: 0.25rem;">← Back</button>
       </form>
     </div>
   </div>

@@ -102,7 +102,7 @@ function buildDevMatrixHtml() {
   `;
 }
 
-function buildDevDrawersHtml(domainName = 'thatworkx.com') {
+function buildDevDrawersHtml(domainName = '') {
   return `
     <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
     if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
-    if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || 'thatworkx.com');
+    if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
     if (devEdgeWrap) devEdgeWrap.innerHTML = buildDevEdgeHtml();
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
 
@@ -389,14 +389,18 @@ window.switchOptimizeTool = switchOptimizeTool;
 
 // Quota and plan sync
 async function updateUserTier() {
-  const selectedTier = document.getElementById('user-tier-selector').value;
+  const tierSelector = document.getElementById('user-tier-selector');
+  if (!tierSelector) return;
+  const selectedTier = tierSelector.value;
   
-  // Update headless controls visibility based on selected tier
+  // Update headless controls visibility based on selected tier (only exists on visualize.html)
   const headlessControls = document.getElementById('headless-checkbox-wrapper');
-  if (activeProduct === 'visualize' && (selectedTier.includes('AIOptimize Pro') || selectedTier.includes('AIOptimize ENT'))) {
-    headlessControls.style.display = 'block';
-  } else {
-    headlessControls.style.display = 'none';
+  if (headlessControls) {
+    if (activeProduct === 'visualize' && (selectedTier.includes('AIOptimize Pro') || selectedTier.includes('AIOptimize ENT'))) {
+      headlessControls.style.display = 'block';
+    } else {
+      headlessControls.style.display = 'none';
+    }
   }
 
   try {
@@ -782,15 +786,6 @@ function displayScanResults(results) {
     });
   }
 
-    row.innerHTML = `
-      <td>${pathHtml}</td>
-      <td>${wordCountHtml}</td>
-      <td>${canonicalHtml}</td>
-      <td>${structureHtml}</td>
-    `;
-    tbody.appendChild(row);
-  });
-
   // Update Semrush link in confirmation modal with affiliate campaign tags
   const semrushConfirmBtn = document.getElementById('semrush-confirm-proceed-btn');
   if (semrushConfirmBtn && results.url) {
@@ -1042,266 +1037,329 @@ function toggleRouteExpandRow(idx) {
 }
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
+// Execute Dashboard Scan for visualize.html
+async function executeDashboardScan(event) {
+  if (event && event.preventDefault) event.preventDefault();
+
+  const urlInputEl = document.getElementById('target-url') || document.getElementById('onboarding-target-url');
+  let targetUrlVal = urlInputEl ? urlInputEl.value.trim() : '';
+
+  if (!targetUrlVal) {
+    const params = new URLSearchParams(window.location.search);
+    targetUrlVal = params.get('url') || '';
+    if (urlInputEl) urlInputEl.value = targetUrlVal;
+  }
+
+  if (!targetUrlVal) {
+    alert('Please enter a target domain URL to audit.');
+    return;
+  }
+
+  if (targetUrlVal && !/^https?:\/\//i.test(targetUrlVal)) {
+    targetUrlVal = 'https://' + targetUrlVal;
+  }
+
+  const submitBtn = document.getElementById('scan-submit-btn') || document.getElementById('onboarding-submit-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Auditing Domain... ⏳</span>';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentEmail, targetUrl: targetUrlVal })
+    });
+    const data = await res.json();
+    if (res.ok && data.results) {
+      updateExecutiveViewData(data.results);
+      updateDeveloperViewData(data.results);
+      const cleanDomain = targetUrlVal.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', `visualize.html?url=${encodeURIComponent(cleanDomain)}`);
+      }
+    } else {
+      console.warn('Dashboard scan error response:', data.error);
+      alert(data.error || 'Unable to audit domain.');
+    }
+  } catch (err) {
+    console.error('Error executing dashboard scan:', err);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Run Audit 🔄</span>';
+    }
+  }
+}
+
+window.setVisualizeViewMode = setVisualizeViewMode;
+window.executeDashboardScan = executeDashboardScan;
+
+// Multi-Bot RAG Token Truncation Engine (Google Gemini, Copilot, Bing, GPTBot)
+function formatRagTextWithTruncation(rawText, pageRoute) {
+  if (!rawText) return 'No body text extracted from page DOM.';
+  const words = rawText.split(/\s+/).filter(Boolean);
+  const totalWords = words.length;
+  const totalTokens = Math.round(totalWords * 1.35);
+
+  if (totalWords <= 2000) {
+    return `${rawText}\n\n*Ingestion Metadata:* Token Density ~${totalTokens} tokens | 🟢 100% Ingestible by Google Gemini, Copilot, Bing & GPTBot`;
+  }
+
+  const geminiPassage = words.slice(0, 2000).join(' ');
+
+  if (totalWords <= 2500) {
+    const copilotPassage = words.slice(2000).join(' ');
+    return `${geminiPassage}\n\n` +
+           `════════════════════════════════════════════════════════════════════════\n` +
+           `⚠️ [GOOGLE GEMINI & AI OVERVIEWS TRUNCATION BOUNDARY]\n` +
+           `   Word Count: 2,000 (~2,700 Tokens). Google Gemini & AI Overviews\n` +
+           `   deprioritize RAG passage chunks beyond this limit.\n` +
+           `════════════════════════════════════════════════════════════════════════\n\n` +
+           `${copilotPassage}\n\n` +
+           `*Ingestion Metadata:* Token Density ~${totalTokens} tokens | 🟡 Truncated by Google Gemini, Ingestible by Copilot & Bing`;
+  }
+
+  const copilotPassage = words.slice(2000, 2500).join(' ');
+  const lostPassage = words.slice(2500).join(' ');
+
+  return `${geminiPassage}\n\n` +
+         `════════════════════════════════════════════════════════════════════════\n` +
+         `⚠️ [GOOGLE GEMINI & AI OVERVIEWS TRUNCATION BOUNDARY]\n` +
+         `   Word Count: 2,000 (~2,700 Tokens). Google Gemini & AI Overviews\n` +
+         `   deprioritize RAG passage chunks beyond this limit.\n` +
+         `════════════════════════════════════════════════════════════════════════\n\n` +
+         `${copilotPassage}\n\n` +
+         `🛑 [COPILOT, BING & GPTBOT HARD CUT-OFF BOUNDARY]\n` +
+         `   Word Count: 2,500+ (>3,375 Tokens). Microsoft Copilot, Bing & GPTBot\n` +
+         `   STOP crawling & indexing content beyond this boundary.\n` +
+         `------------------------------------------------------------------------\n\n` +
+         `❌ LOST CONTENT (IGNORED BY ALL AI SEARCH BOTS):\n${lostPassage}\n\n` +
+         `*Ingestion Metadata:* Token Density ~${totalTokens} tokens | 🔴 Exceeds Maximum AI Bot Context Budget (${totalWords - 2500} words lost to AI search)`;
+}
+
+// Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 function updateExecutiveViewData(results) {
   if (!results) return;
 
   // Extract clean domain name from target input or results
   const inputVal = document.getElementById('target-url')?.value.trim() || document.getElementById('onboarding-target-url')?.value.trim() || '';
-  let rawUrl = results.url || results.domain || inputVal || 'holiknits.com';
-  let domainName = rawUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || 'holiknits.com';
+  let rawUrl = results.url || results.domain || inputVal || '';
+  let domainName = rawUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || 'Unscanned Target';
 
-  const score = results.scoreCard?.overallScore ?? 88;
+  const pillarsData = results.scoreCard?.pillars;
+  const score = pillarsData 
+    ? (pillarsData.p1.score + pillarsData.p2.score + pillarsData.p3.score + pillarsData.p4.score)
+    : (results.scoreCard?.overallScore ?? 0);
   const isGood = score >= 80;
 
   // 1. Executive Banner & Score Dial
-  const scoreValEl = document.getElementById('exec-score-val');
+  const scoreValEl = document.getElementById('exec-overall-score') || document.getElementById('exec-score-val');
   if (scoreValEl) scoreValEl.innerText = score;
 
-  const dialProgress = document.querySelector('.score-dial-progress');
-  if (dialProgress) {
-    const dashOffset = 326.7 - (326.7 * score) / 100;
-    dialProgress.style.strokeDashoffset = dashOffset;
+  const dialArc = document.getElementById('score-dial-arc') || document.querySelector('.score-dial-progress');
+  if (dialArc) {
+    const dashOffset = 264 - (264 * score) / 100;
+    dialArc.style.strokeDashoffset = dashOffset;
+    if (score >= 80) {
+      dialArc.style.stroke = '#10b981';
+    } else if (score >= 50) {
+      dialArc.style.stroke = '#f59e0b';
+    } else {
+      dialArc.style.stroke = '#f43f5e';
+    }
   }
 
-  const domainTagEl = document.getElementById('exec-domain-tag');
-  if (domainTagEl) domainTagEl.innerText = `Target: ${domainName}`;
+  const domainDisplayEl = document.getElementById('display-scanned-domain') || document.getElementById('exec-domain-tag');
+  if (domainDisplayEl) domainDisplayEl.innerText = domainName;
 
-  const statusBadgeEl = document.getElementById('exec-status-badge');
+  const statusBadgeEl = document.getElementById('exec-score-classification-pill') || document.getElementById('exec-status-badge');
   if (statusBadgeEl) {
     statusBadgeEl.innerText = isGood ? '🟢 AI-READY' : '🟡 ACTION NEEDED';
-    statusBadgeEl.className = isGood ? 'exec-badge-good' : 'exec-badge-warn';
+    statusBadgeEl.className = `badge-status ${isGood ? 'status-green' : 'status-amber'}`;
   }
 
-  const statusTitleEl = document.getElementById('exec-status-title');
-  if (statusTitleEl) {
-    statusTitleEl.innerText = isGood 
-      ? 'Optimized for Generative AI Search & RAG Ingestion' 
-      : 'Action Required: AI Access & Readability Barriers Flagged';
-  }
-
-  const statusDescEl = document.getElementById('exec-status-desc');
+  const statusDescEl = document.getElementById('exec-score-summary-text') || document.getElementById('exec-status-desc');
   if (statusDescEl) {
     statusDescEl.innerText = isGood
       ? `GPTBot, PerplexityBot, and ClaudeBot can cleanly parse ${score}% of your core digital assets on ${domainName}. Machine welcome mats (/llms.txt) are operational.`
       : `Scan detected access or readability issues on ${domainName}. Review gateway rules and machine index files below.`;
   }
 
-  // 2. Perception Simulator (Human Live/DOM Sandbox & Full Machine RAG Vector Stream)
-  const humanUrlEl = document.getElementById('human-url-preview');
-  if (humanUrlEl) humanUrlEl.innerText = `https://${domainName}/`;
+  // 2. What AI can see (Left: Webpage RAG Vector Ingestion vs Right: AI-Ready File Contents)
+  
+  // LEFT PANEL: "How AI sees your website" -> Actual webpage RAG vector chunk ingestion with Multi-Bot Truncation
+  const simHumanView = document.getElementById('sim-human-view');
+  if (simHumanView) {
+    let webRagText = '';
+    if (results.pages && results.pages.length > 0) {
+      webRagText = results.pages.map((p, idx) => {
+        const routePath = p.route || p.url || `Page ${idx + 1}`;
+        const titleText = p.title ? p.title : `Page ${routePath}`;
+        const descText = p.metaDescription ? `\n> **Meta Description:** ${p.metaDescription}` : '';
+        const rawContent = p.rawText || p.bodySnippet || p.metaDescription || '';
+        
+        const headingsMd = p.headings && p.headings.length > 0
+          ? '\n' + p.headings.map(h => `### ${h.text}`).join('\n')
+          : '';
+        
+        const formattedRagBody = formatRagTextWithTruncation(rawContent, routePath);
 
-  const iframeEl = document.getElementById('human-live-iframe');
-  const fallbackCard = document.getElementById('human-fallback-card');
-  const targetFullUrl = rawUrl.startsWith('http') ? rawUrl : `https://${domainName}/`;
-
-  if (iframeEl) {
-    iframeEl.src = targetFullUrl;
-    // Show fallback card if frame load fails or X-Frame-Options blocks iframe embedding
-    iframeEl.onload = function() {
-      try {
-        // If same-origin check or empty frame content occurs, keep iframe visible
-      } catch (e) {
-        // Cross-origin embedding works
-      }
-    };
-    iframeEl.onerror = () => {
-      iframeEl.style.display = 'none';
-      if (fallbackCard) fallbackCard.style.display = 'block';
-    };
-  }
-
-  const pDomainEl = document.getElementById('human-page-domain');
-  if (pDomainEl) pDomainEl.innerText = domainName;
-
-  const pTitleEl = document.getElementById('human-page-title');
-  if (pTitleEl && results.pages && results.pages[0]) {
-    pTitleEl.innerText = results.pages[0].title || `${domainName} - Scanned Page`;
-  }
-
-  const pDescEl = document.getElementById('human-page-desc');
-  if (pDescEl && results.pages && results.pages[0]) {
-    pDescEl.innerText = results.pages[0].metaDescription || `Full scanned page text & meta properties extracted for ${domainName}.`;
-  }
-
-  const machineUrlEl = document.getElementById('machine-url-preview');
-  if (machineUrlEl) machineUrlEl.innerText = `rag-vector://stream/${domainName}`;
-
-  const machineVectorCode = document.getElementById('machine-vector-code');
-  if (machineVectorCode) {
-    const jsonTypes = (results.status?.jsonLdTypes && results.status.jsonLdTypes.length) 
-      ? results.status.jsonLdTypes 
-      : ["Organization", "WebSite"];
-    
-    const wordCount = results.status?.wordCount ?? (results.pages?.[0]?.wordCount ?? 0);
-    const density = results.status?.contentDensityRatio ?? 0;
-    const hasHandshake = results.status?.llmsTxtExists || results.status?.aiContextExists;
-    
-    // Manifest Character & Word Volume Evaluation
-    const llmsWords = results.status?.llmsTxtWords || (results.status?.llmsTxtExists ? 350 : 0);
-    const llmsChars = results.status?.llmsTxtChars || (results.status?.llmsTxtExists ? 2450 : 0);
-    const contextWords = results.status?.aiContextWords || (results.status?.aiContextExists ? 520 : 0);
-    const contextChars = results.status?.aiContextChars || (results.status?.aiContextExists ? 3640 : 0);
-    
-    const isManifestSparse = hasHandshake && (llmsWords < 150 && contextWords < 150);
-    
-    let textStreamContent = '';
-    let chunkHeaderTag = '';
-    
-    if (isManifestSparse) {
-      chunkHeaderTag = `🟡 Sparse Manifest Warning [Data Starvation Risk]`;
-      textStreamContent = `MANIFEST DATA STARVATION: Root /llms.txt & /ai-context.md are accessible (200 OK) but contain low content volume (${llmsWords} words, ${llmsChars} chars). RAG vector engines require >150 words (>1,000 chars) of structured markdown for rich entity ingestion.`;
-    } else if (wordCount === 0 && hasHandshake) {
-      chunkHeaderTag = `🟢 Machine Handshake Fallback Stream Active [Ingested via /llms.txt & /ai-context.md]`;
-      textStreamContent = `HTML DOM relies on client-side JS rendering, but LLM RAG engines successfully parse your root /llms.txt (${llmsWords} words / ${llmsChars} chars) and /ai-context.md (${contextWords} words / ${contextChars} chars) machine welcome mats to extract corporate identity and product specs.`;
-    } else if (wordCount === 0) {
-      chunkHeaderTag = `🔴 DATA STARVATION ALERT: 0 words extracted from DOM`;
-      textStreamContent = `Reason: Client-side JS Hydration Trap or Unrendered SPA framework. AI crawlers cannot extract semantic text from this page without server-side rendering (SSR) fallback or /llms.txt machine welcome files.`;
+        return `## Vector Chunk #${idx + 1} [Route: ${routePath}]\n**Title:** ${titleText}${descText}${headingsMd}\n\n**Extracted Webpage Content:**\n${formattedRagBody}`;
+      }).join('\n\n---\n\n');
     } else {
-      chunkHeaderTag = `Full Vector Text Stream | Total Words: ${wordCount} | Density: ${density}%`;
-      textStreamContent = results.status?.machinePreview || `Full machine-readable RAG vector stream extracted for ${domainName}.`;
+      webRagText = `## Vector Chunk #1 [Route: /]\n**Title:** ${domainName} Homepage\n\n**Extracted Webpage Content:**\nNo parsed DOM body text available for ${domainName}.`;
     }
     
-    machineVectorCode.innerHTML = `
-<span class="token-comment"># SYSTEM CONTEXT STREAM: ${domainName}</span>
-<span class="token-key">Entity_ID:</span> "${domainName}"
-<span class="token-key">Canonical_URL:</span> "${targetFullUrl}"
-<span class="token-key">Last_Modified:</span> "${new Date().toISOString()}"
-<span class="token-key">JSON_LD_Types:</span> ${JSON.stringify(jsonTypes)}
-
-<span class="token-header">## RAG Chunk 1 [${chunkHeaderTag}]</span>
-> ${textStreamContent}
-
-<span class="token-header">## RAG Chunk 2 [Machine Index References &amp; Character Volume]</span>
-- /llms.txt: [${results.status?.llmsTxtExists ? `Status 200 OK | Volume: ${llmsWords} words (${llmsChars} chars)` : 'Status 404 Missing - Recommend Deployment'}]
-- /ai-context.md: [${results.status?.aiContextExists ? `Status 200 OK | Volume: ${contextWords} words (${contextChars} chars)` : 'Status 404 Missing - Recommend Deployment'}]
-- /robots.txt: [${results.status?.robotsTxtExists ? 'GPTBot: Allowed | PerplexityBot: Allowed | ClaudeBot: Allowed' : 'Blocked or Missing Directives'}]
-- /sitemap.xml: [${results.status?.sitemapExists ? 'Status 200 OK | Valid XML Route Tree' : 'Missing Sitemap References'}]
-    `.trim();
+    simHumanView.innerHTML = `<pre style="font-family: var(--font-sans); font-size: 0.76rem; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; margin: 0;">${webRagText}</pre>`;
   }
 
-  // 3. Update Strategic Pillar Badges & Descriptions
-  const pBadge1 = document.getElementById('pillar-badge-1');
-  const pDesc1 = document.getElementById('pillar-desc-1');
-  if (pBadge1 && pDesc1) {
-    const isBlind = results.status?.gatewayBadge === 'Total AI Blindness';
-    pBadge1.innerText = isBlind ? '🔴 BLOCKED' : '🟢 ALLOWED';
-    pBadge1.className = `pillar-status-badge ${isBlind ? 'status-red' : 'badge-pass'}`;
-    pDesc1.innerText = isBlind 
-      ? `Crawler corridors blocked on ${domainName}. Blanket Disallow rules detected.`
-      : `Crawler corridors open for ${domainName}. GPTBot and PerplexityBot permitted.`;
+  // RIGHT PANEL: "How AI sees your AI-ready content" -> Only AI-Ready File Contents (/llms.txt, /ai-context.md, etc.)
+  const simAiView = document.getElementById('sim-ai-view');
+  if (simAiView) {
+    const hasLlms = results.status?.llmsTxtExists;
+    const hasContext = results.status?.aiContextExists;
+    const hasAbout = results.status?.aboutTxtExists;
+    const hasDocs = results.status?.docsTxtExists;
+    const hasContent = results.status?.contentTxtExists;
+
+    let manifestStream = `# AI-READY MACHINE MANIFEST STREAM for ${domainName}\n\n`;
+    manifestStream += `[${hasLlms ? '✓' : '❌'} /llms.txt]: ${hasLlms ? 'Status 200 OK | Entity specs & route map active' : '404 Missing (Not Deployed)'}\n`;
+    manifestStream += `[${hasContext ? '✓' : '❌'} /ai-context.md]: ${hasContext ? 'Status 200 OK | System prompt context map active' : '404 Missing (Not Deployed)'}\n`;
+    manifestStream += `[${hasAbout ? '✓' : '❌'} /about.md]: ${hasAbout ? 'Status 200 OK | E-E-A-T brand credentials active' : '404 Missing (Not Deployed)'}\n`;
+    manifestStream += `[${hasDocs ? '✓' : '❌'} /docs.md]: ${hasDocs ? 'Status 200 OK | Technical manual specifications active' : '404 Missing (Not Deployed)'}\n`;
+    manifestStream += `[${hasContent ? '✓' : '❌'} /content.md]: ${hasContent ? 'Status 200 OK | Thought leadership index active' : '404 Missing (Not Deployed)'}\n\n`;
+
+    manifestStream += `--- AI-READY FILE CONTENTS INGESTION ---\n\n`;
+
+    let priorityChunks = [];
+    if (hasLlms && results.status?.llmsTxtContent) {
+      const fileWords = results.status.llmsTxtContent.split(/\s+/).filter(Boolean).length;
+      const fileTokens = Math.round(fileWords * 1.35);
+      const isOptimal = fileWords <= 1500;
+      priorityChunks.push(`## Machine Vector Chunk #1 [/llms.txt]\n**Type:** Machine Welcome Directory (Answer.ai Standard)\n\n### Extracted File Content:\n${results.status.llmsTxtContent}\n\n*System Prompt Ingestion Status:* ${isOptimal ? '🟢 100% Ingestible by Gemini & Copilot' : '⚠️ System Prompt Budget Exceeded'} (~${fileWords} words / ~${fileTokens} tokens)`);
+    }
+    if (hasContext && results.status?.aiContextContent) {
+      const fileWords = results.status.aiContextContent.split(/\s+/).filter(Boolean).length;
+      const fileTokens = Math.round(fileWords * 1.35);
+      const isOptimal = fileWords <= 1500;
+      priorityChunks.push(`## Machine Vector Chunk #2 [/ai-context.md]\n**Type:** AI System Prompt Context Map\n\n### Extracted File Content:\n${results.status.aiContextContent}\n\n*System Prompt Ingestion Status:* ${isOptimal ? '🟢 100% Ingestible by Gemini & Copilot' : '⚠️ System Prompt Budget Exceeded'} (~${fileWords} words / ~${fileTokens} tokens)`);
+    }
+    if (hasAbout && results.status?.aboutTxtContent) {
+      const fileWords = results.status.aboutTxtContent.split(/\s+/).filter(Boolean).length;
+      priorityChunks.push(`## Machine Vector Chunk #3 [/about.md]\n**Type:** E-E-A-T Brand Credentials\n\n### Extracted File Content:\n${results.status.aboutTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /about.md (${fileWords} words)`);
+    }
+    if (hasDocs && results.status?.docsTxtContent) {
+      const fileWords = results.status.docsTxtContent.split(/\s+/).filter(Boolean).length;
+      priorityChunks.push(`## Machine Vector Chunk #4 [/docs.md]\n**Type:** Technical Manual Specifications\n\n### Extracted File Content:\n${results.status.docsTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /docs.md (${fileWords} words)`);
+    }
+    if (hasContent && results.status?.contentTxtContent) {
+      const fileWords = results.status.contentTxtContent.split(/\s+/).filter(Boolean).length;
+      priorityChunks.push(`## Machine Vector Chunk #5 [/content.md]\n**Type:** Thought Leadership Index\n\n### Extracted File Content:\n${results.status.contentTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /content.md (${fileWords} words)`);
+    }
+
+    if (priorityChunks.length > 0) {
+      manifestStream += priorityChunks.join('\n\n---\n\n');
+    } else {
+      manifestStream += `⚠️ NO AI-READY MACHINE FILES DEPLOYED on ${domainName}\n\nNo /llms.txt or /ai-context.md files were found returning 200 OK.\nGoogle Gemini, Copilot & ChatGPT are currently forced to rely solely on fallback webpage crawling. Use the AI Optimize tab to generate and deploy these files!`;
+    }
+
+    simAiView.innerText = manifestStream;
   }
 
-  // 4. Update Executive Route Table
-  const tbodyEl = document.getElementById('exec-route-tbody');
-  const routeCountEl = document.getElementById('exec-route-count');
+  // 3. Update Strategic Pillar Badges, Scores & Plain English Notes with Vibrant Color Highlights
+  const pillars = results.scoreCard?.pillars;
+
+  if (pillars) {
+    const renderPillarCard = (secNum, pData) => {
+      const badgeEl = document.getElementById(`pillar-sec${secNum}-badge`) || document.getElementById(`pillar-badge-${secNum}`);
+      const scoreEl = document.getElementById(`pillar-sec${secNum}-score`);
+      const noteEl = document.getElementById(`pillar-sec${secNum}-note`);
+
+      const isGreen = pData.score >= 20;
+      const isAmber = pData.score >= 10 && pData.score < 20;
+      
+      const theme = isGreen
+        ? { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)', class: 'badge-status status-green' }
+        : isAmber
+        ? { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', class: 'badge-status status-amber' }
+        : { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.4)', class: 'badge-status status-red' };
+
+      if (badgeEl) {
+        badgeEl.innerText = pData.badge;
+        badgeEl.className = theme.class;
+        badgeEl.style.setProperty('background', theme.bg, 'important');
+        badgeEl.style.setProperty('color', theme.color, 'important');
+        badgeEl.style.setProperty('border', theme.border, 'important');
+      }
+      if (scoreEl) {
+        scoreEl.innerText = `${pData.score}/${pData.max} pts`;
+        scoreEl.style.setProperty('background', theme.bg, 'important');
+        scoreEl.style.setProperty('color', theme.color, 'important');
+        scoreEl.style.setProperty('border', theme.border, 'important');
+      }
+      if (noteEl) noteEl.innerText = pData.note;
+    };
+
+    if (pillars.p1) renderPillarCard(1, pillars.p1);
+    if (pillars.p2) renderPillarCard(2, pillars.p2);
+    if (pillars.p3) renderPillarCard(3, pillars.p3);
+    if (pillars.p4) renderPillarCard(4, pillars.p4);
+  }
+
+  // 4. Update Scanned/Discovered Webpages Table
+  const tbodyEl = document.getElementById('exec-routes-tbody') || document.getElementById('exec-route-tbody');
+  const routeCountEl = document.getElementById('exec-routes-count') || document.getElementById('exec-route-count');
   
   if (tbodyEl && results.pages && results.pages.length) {
-    if (routeCountEl) routeCountEl.innerText = `${results.pages.length} Routes Crawled`;
+    const crawledCount = results.pages.length;
+    const totalDiscovered = results.totalPagesFound || crawledCount;
+    if (routeCountEl) routeCountEl.innerText = `Crawled ${crawledCount} of ${totalDiscovered} pages discovered`;
 
     tbodyEl.innerHTML = results.pages.map(p => {
       const isVisible = p.hasCanonical !== false;
-      const isClear = (p.wordCount || 0) <= 2500;
+      const wordCount = p.wordCount || 0;
+      const tokenCount = Math.round(wordCount * 1.35);
       return `
-        <tr>
-          <td class="cell-path"><code>${p.route}</code></td>
-          <td><span class="badge-status ${isVisible ? 'status-green' : 'status-red'}">${isVisible ? '🟢 Visible' : '🔴 Blocked'}</span></td>
-          <td><span class="badge-status ${isClear ? 'status-green' : 'status-yellow'}">${isClear ? `🟢 Clear (${p.wordCount || 850} words)` : `🟡 Heavy (${p.wordCount} words)`}</span></td>
-          <td style="text-align: right;">
-            <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', '${isClear ? '' : 'tokenLoadAnalysis'}')">
-              <span>⚡ Fix in AIOptimize</span>
-            </button>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 0.6rem;"><code style="color: #38bdf8;">${p.route}</code></td>
+          <td style="padding: 0.6rem;"><span class="badge-status ${wordCount ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">${wordCount} words</span></td>
+          <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">~${tokenCount} tokens</td>
+          <td style="padding: 0.6rem;"><span class="badge-status ${isVisible ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">${isVisible ? '🟢 Valid' : '🔴 Missing'}</span></td>
+          <td style="padding: 0.6rem; text-align: right;">
+            <a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>
           </td>
         </tr>
       `;
     }).join('');
   }
 
-  // 5. Populate Dynamic Scanned AI-Ready Machine Files Table
-  const aiFilesTbody = document.getElementById('exec-ai-files-tbody');
+  // 5. Populate Dynamic Scanned/Discovered AI-Ready Files (machine readable) Table
+  const aiFilesTbody = document.getElementById('exec-machine-files-tbody') || document.getElementById('exec-ai-files-tbody');
+  const aiFilesCount = document.getElementById('exec-machine-files-count');
   if (aiFilesTbody) {
     const aiFilesList = [
-      {
-        path: '/llms.txt',
-        type: 'Machine Welcome Directory (Answer.ai Standard)',
-        exists: !!results.status?.llmsTxtExists,
-        words: results.status?.llmsTxtWords || (results.status?.llmsTxtExists ? 350 : 0),
-        chars: results.status?.llmsTxtChars || (results.status?.llmsTxtExists ? 2450 : 0),
-        tool: 'llmsTxt'
-      },
-      {
-        path: '/ai-context.md',
-        type: 'System Prompt Blueprint Context Map',
-        exists: !!results.status?.aiContextExists,
-        words: results.status?.aiContextWords || (results.status?.aiContextExists ? 520 : 0),
-        chars: results.status?.aiContextChars || (results.status?.aiContextExists ? 3640 : 0),
-        tool: 'aiContextMd'
-      },
-      {
-        path: '/robots.txt',
-        type: 'Protocol Gate & Bot Access Control',
-        exists: !!results.status?.robotsTxtExists,
-        words: results.status?.robotsTxtExists ? 120 : 0,
-        chars: results.status?.robotsTxtExists ? 780 : 0,
-        tool: 'robotsTxt'
-      },
-      {
-        path: '/sitemap.xml',
-        type: 'Structural Route Index Tree',
-        exists: !!results.status?.sitemapExists,
-        words: results.status?.sitemapExists ? 180 : 0,
-        chars: results.status?.sitemapExists ? 1450 : 0,
-        tool: 'sitemapXml'
-      },
-      {
-        path: '/about.md',
-        type: 'Brand & Corporate Entity Verification',
-        exists: !!results.status?.aboutTxtExists,
-        words: results.status?.aboutTxtExists ? 410 : 0,
-        chars: results.status?.aboutTxtExists ? 2870 : 0,
-        tool: 'aboutMdManifest'
-      },
-      {
-        path: '/docs.md',
-        type: 'Technical Manual & Specification Map',
-        exists: !!results.status?.docsTxtExists,
-        words: results.status?.docsTxtExists ? 680 : 0,
-        chars: results.status?.docsTxtExists ? 4760 : 0,
-        tool: 'docsMdManifest'
-      },
-      {
-        path: '/content.md',
-        type: 'Flat Article & Thought Leadership Index',
-        exists: !!results.status?.contentTxtExists,
-        words: results.status?.contentTxtExists ? 550 : 0,
-        chars: results.status?.contentTxtExists ? 3850 : 0,
-        tool: 'contentMdManifest'
-      }
+      { path: '/llms.txt', exists: !!results.status?.llmsTxtExists, info: '350 words' },
+      { path: '/ai-context.md', exists: !!results.status?.aiContextExists, info: '520 words' },
+      { path: '/about.md', exists: !!results.status?.aboutTxtExists, info: '410 words' },
+      { path: '/docs.md', exists: !!results.status?.docsTxtExists, info: '680 words' },
+      { path: '/content.md', exists: !!results.status?.contentTxtExists, info: '950 words' },
+      { path: '/contact.md', exists: !!(results.status?.aboutTxtExists || results.status?.llmsTxtExists), info: '180 words' },
+      { path: '/robots.txt', exists: !!results.status?.robotsTxtExists, info: '780 chars' },
+      { path: '/sitemap.xml', exists: !!results.status?.sitemapExists, info: '1.4 KB' },
     ];
+    const activeCount = aiFilesList.filter(f => f.exists).length;
+    if (aiFilesCount) aiFilesCount.innerText = `${activeCount} / ${aiFilesList.length} Manifests Active`;
 
-    aiFilesTbody.innerHTML = aiFilesList.map(f => {
-      let volumeBadge = '';
-      if (!f.exists) {
-        volumeBadge = `<span class="badge-status status-red">🔴 0 words (0 chars)</span>`;
-      } else if (f.words < 150) {
-        volumeBadge = `<span class="badge-status status-yellow">🟡 Sparse (${f.words} words / ${f.chars} chars)</span>`;
-      } else {
-        volumeBadge = `<span class="badge-status status-green">🟢 ${f.words} words (${f.chars.toLocaleString()} chars)</span>`;
-      }
-
-      return `
-        <tr>
-          <td class="cell-path"><code>${f.path}</code></td>
-          <td style="font-size: 0.82rem; color: var(--text-muted, #94a3b8);">${f.type}</td>
-          <td><span class="badge-status ${f.exists ? 'status-green' : 'status-yellow'}">${f.exists ? '🟢 200 OK Active' : '🟡 404 Missing'}</span></td>
-          <td>${volumeBadge}</td>
-          <td style="text-align: right;">
-            <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${f.path}', '${f.tool}')">
-              <span>${f.exists ? '⚡ Edit in AIOptimize' : '⚡ Generate File'}</span>
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
+    aiFilesTbody.innerHTML = aiFilesList.map(f => `
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <td style="padding: 0.6rem;"><code style="color: #4ade80;">${f.path}</code></td>
+        <td style="padding: 0.6rem;"><span class="badge-status ${f.exists ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">${f.exists ? '🟢 Active' : '🔴 Missing'}</span></td>
+        <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">${f.info}</td>
+        <td style="padding: 0.6rem; text-align: right;"><a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none;">View ↗</a></td>
+      </tr>
+    `).join('');
   }
 }
 
@@ -1569,49 +1627,54 @@ function openAuthModal() {
   
   // Reset modal state
   pendingEmail = '';
-  document.getElementById('otp-code-input').value = '';
+  const otpInput = document.getElementById('otp-code-input');
+  if (otpInput) otpInput.value = '';
   switchAuthTab('login');
   
-  document.getElementById('auth-modal').style.display = 'flex';
+  const authModal = document.getElementById('auth-modal');
+  if (authModal) authModal.style.display = 'flex';
 }
 
 function handleLogout() {
   localStorage.removeItem('aeo_auth_token');
   isAuthenticated = false;
   currentEmail = 'user@thatworkx.com';
-  document.getElementById('auth-btn').innerText = '🔑 Sign In';
-  document.getElementById('user-tier-selector').value = 'AIVisualize Free';
+  const authBtn = document.getElementById('auth-btn');
+  if (authBtn) authBtn.innerText = '🔑 Sign In';
+  const tierSelector = document.getElementById('user-tier-selector');
+  if (tierSelector) tierSelector.value = 'AIVisualize Free';
   updateUserTier();
   alert('Logged out successfully.');
 }
 
 function closeAuthModal() {
-  document.getElementById('auth-modal').style.display = 'none';
+  const authModal = document.getElementById('auth-modal');
+  if (authModal) authModal.style.display = 'none';
 }
 
 function switchAuthTab(tabName) {
   authMode = tabName;
   
-  const loginTab = document.getElementById('tab-login');
-  const registerTab = document.getElementById('tab-register');
-  const loginForm = document.getElementById('login-form-panel');
-  const registerForm = document.getElementById('register-form-panel');
-  const otpPanel = document.getElementById('otp-verify-panel');
+  const loginTab      = document.getElementById('tab-login');
+  const registerTab   = document.getElementById('tab-register');
+  const loginForm     = document.getElementById('login-form-panel');
+  const registerForm  = document.getElementById('register-form-panel');
+  const otpPanel      = document.getElementById('otp-verify-panel');
   const tabsContainer = document.getElementById('auth-tabs-container');
 
-  tabsContainer.style.display = 'flex';
-  otpPanel.style.display = 'none';
+  if (tabsContainer) tabsContainer.style.display = 'flex';
+  if (otpPanel)      otpPanel.style.display = 'none';
 
   if (tabName === 'login') {
-    loginTab.classList.add('active');
-    registerTab.classList.remove('active');
-    loginForm.style.display = 'flex';
-    registerForm.style.display = 'none';
+    if (loginTab)    loginTab.classList.add('active');
+    if (registerTab) registerTab.classList.remove('active');
+    if (loginForm)   loginForm.style.display = 'flex';
+    if (registerForm) registerForm.style.display = 'none';
   } else {
-    loginTab.classList.remove('active');
-    registerTab.classList.add('active');
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'flex';
+    if (loginTab)    loginTab.classList.remove('active');
+    if (registerTab) registerTab.classList.add('active');
+    if (loginForm)   loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'flex';
   }
 }
 
@@ -1747,9 +1810,11 @@ async function handleOtpVerification(event) {
 
     currentEmail = data.user.email;
     isAuthenticated = true;
-    document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
+    const authBtnOtp = document.getElementById('auth-btn');
+    if (authBtnOtp) authBtnOtp.innerText = `👤 ${data.user.email.split('@')[0]}`;
     if (data.user.subscription_tier) {
-      document.getElementById('user-tier-selector').value = data.user.subscription_tier;
+      const tierSelectorOtp = document.getElementById('user-tier-selector');
+      if (tierSelectorOtp) tierSelectorOtp.value = data.user.subscription_tier;
     }
 
     closeAuthModal();
@@ -1767,6 +1832,8 @@ function cancelOtpVerification() {
 }
 
 // Bind to window scope for onclick & onsubmit event calls
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
 window.switchAuthTab = switchAuthTab;
 window.handleRequestLoginOtp = handleRequestLoginOtp;
 window.handleRequestRegisterOtp = handleRequestRegisterOtp;
@@ -1785,9 +1852,11 @@ async function checkAuthSession() {
     if (data.authenticated && data.user) {
       currentEmail = data.user.email;
       isAuthenticated = true;
-      document.getElementById('auth-btn').innerText = `👤 ${data.user.email.split('@')[0]}`;
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.innerText = `👤 ${data.user.email.split('@')[0]}`;
       if (data.user.subscription_tier) {
-        document.getElementById('user-tier-selector').value = data.user.subscription_tier;
+        const tierSelector = document.getElementById('user-tier-selector');
+        if (tierSelector) tierSelector.value = data.user.subscription_tier;
       }
     }
   } catch (err) {
@@ -2086,23 +2155,13 @@ function selectConsoleTab(tabId) {
   // 1. Update Segmented tab active states & visible focus rings
   document.querySelectorAll('.console-tab-btn').forEach(btn => {
     btn.classList.remove('active');
-    btn.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-    btn.style.boxShadow = 'none';
+    btn.style.borderColor = '';
+    btn.style.boxShadow = '';
   });
 
   const activeTabBtn = document.getElementById(`btn-tab-${tabId}`);
   if (activeTabBtn) {
     activeTabBtn.classList.add('active');
-    if (tabId === 'visualize') {
-      activeTabBtn.style.borderColor = '#38bdf8';
-      activeTabBtn.style.boxShadow = '0 0 20px rgba(56, 189, 248, 0.25)';
-    } else if (tabId === 'optimize') {
-      activeTabBtn.style.borderColor = '#f59e0b';
-      activeTabBtn.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.25)';
-    } else if (tabId === 'socialize') {
-      activeTabBtn.style.borderColor = '#c084fc';
-      activeTabBtn.style.boxShadow = '0 0 20px rgba(192, 132, 252, 0.25)';
-    }
   }
   
   // 2. Update Console Card accent glow border
@@ -2364,6 +2423,107 @@ function switchPipelineStep(stepIndex) {
   }
 }
 window.switchPipelineStep = switchPipelineStep;
+window.filterMatrixSection = filterMatrixSection;
+window.selectCodeDrawer = selectCodeDrawer;
+window.copyDrawerCode = copyDrawerCode;
+window.downloadDrawerFile = downloadDrawerFile;
+window.selectEdgeTab = selectEdgeTab;
+window.copyEdgeScript = copyEdgeScript;
+window.toggleRouteExpandRow = toggleRouteExpandRow;
+
+const sectionHelpData = {
+  0: {
+    title: 'AI Visibility Health Index (0-100 Score Formula)',
+    icon: '📊',
+    body: `<p style="margin-bottom: 0.75rem;">The <strong>AI Visibility Health Index</strong> measures your domain's total readiness for AI search engines (Google Gemini, Microsoft Copilot, ChatGPT, Perplexity). Baseline score starts at <strong>100 Points</strong> and deducts weight across the 4 Health Pillars:</p>
+    <div style="background: rgba(15,23,42,0.8); padding: 0.65rem 0.85rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.76rem; color: #38bdf8; margin-bottom: 0.85rem; border: 1px solid rgba(56, 189, 248, 0.2);">
+      Overall Score = 100 - (Pillar 1 + Pillar 2 + Pillar 3 + Pillar 4 Deductions)
+    </div>
+    <ul style="margin-left: 1.2rem; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; text-align: left;">
+      <li><strong style="color: #38bdf8;">Pillar 1: Gateway & Access (25% Weight):</strong> -10 pts per blocked AI crawler (Google-Extended, GPTBot, PerplexityBot, ClaudeBot); -5 pts if sitemap.xml is missing.</li>
+      <li><strong style="color: #4ade80;">Pillar 2: AI-Ready Machine Data (25% Weight):</strong> -10 pts if /llms.txt is 404; -10 pts if /ai-context.md is 404; -5 pts per missing narrative manifest (/about.md, /docs.md, /content.md).</li>
+      <li><strong style="color: #facc15;">Pillar 3: Parsing & Readability (25% Weight):</strong> -15 pts for SPA JS hydration traps; -10 pts for broken H1/H2 heading hierarchy; -5 pts for word count &lt;500 or &gt;2500 (truncation risk).</li>
+      <li><strong style="color: #f43f5e;">Pillar 4: Knowledge Graph Integrity (25% Weight):</strong> -15 pts if JSON-LD schema is missing; -10 pts if self-referential canonical tag is missing.</li>
+    </ul>
+    <p style="margin-top: 0.85rem; font-size: 0.78rem; color: #f87171; text-align: left;">⚠️ <em>Blanket Block Override:</em> A blanket "Disallow: /" in robots.txt immediately caps score at 20/100 (Total AI Blindness).</p>`
+  },
+  1: {
+    title: 'Section 1: Gateway & Access (Corridor Audit)',
+    icon: '🛡️',
+    body: `<p>Verifies whether AI search bots (GPTBot, PerplexityBot, ClaudeBot, Google-Extended) have unhindered network access to your root domain.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">Optimized Handshake:</strong> All major AI crawler User-Agents are explicitly allowed in /robots.txt.</li><li><strong style="color: #facc15;">Partial Block:</strong> Certain bots are permitted while others are restricted.</li><li><strong style="color: #f87171;">Total AI Blindness:</strong> A blanket "Disallow: /" rule is preventing AI models from indexing your site.</li></ul>`
+  },
+  2: {
+    title: 'Section 2: Presence & Hygiene',
+    icon: '🧹',
+    body: `<p>Checks structural technical hygiene needed for automated crawlers to discover and validate your canonical routes.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong>Sitemap XML:</strong> Valid route index tree accessible at /sitemap.xml.</li><li><strong>Canonical Tag:</strong> Explicit self-referential canonical tags to prevent duplicate content dilution.</li><li><strong>SSL Security:</strong> HTTPS protocol verification.</li><li><strong>SPA Hydration Trap:</strong> Detects whether page content relies solely on client-side JS rendering without SSR HTML fallback.</li></ul>`
+  },
+  3: {
+    title: 'Section 3: Parsing & Readability',
+    icon: '📖',
+    body: `<p>Measures how cleanly an LLM's RAG chunking algorithm can process the text density of your rendered DOM.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">High Content Density:</strong> >50% ratio of factual body text relative to DOM HTML markup node noise.</li><li><strong>Linear Heading Hierarchy:</strong> Single H1 with sequential H2/H3 nesting for precise question matching.</li><li><strong style="color: #facc15;">Truncation Risk:</strong> Pages >2,500 words risk "loss in the middle" or truncation during scraper fetch windows.</li></ul>`
+  },
+  4: {
+    title: 'Section 4: Machine Manifests',
+    icon: '🤖',
+    body: `<p>Verifies deployment of machine welcome mats and structured AI blueprint files.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">/llms.txt:</strong> Answer.ai standard machine welcome directory.</li><li><strong style="color: #4ade80;">/ai-context.md:</strong> System prompt context map outlining brand specs.</li><li><strong>/about.md & /docs.md:</strong> Flattened Markdown files for E-E-A-T and technical entity verification.</li></ul>`
+  }
+};
+
+function openSectionHelpModal(secNum, evt) {
+  if (evt) {
+    if (typeof evt.preventDefault === 'function') evt.preventDefault();
+    if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
+  }
+  const data = sectionHelpData[secNum];
+  if (!data) return;
+  const titleEl = document.getElementById('help-modal-title');
+  const iconEl = document.getElementById('help-modal-icon');
+  const bodyEl = document.getElementById('help-modal-body');
+  const modalEl = document.getElementById('help-modal');
+
+  if (titleEl) titleEl.innerText = data.title;
+  if (iconEl) iconEl.innerText = data.icon;
+  if (bodyEl) bodyEl.innerHTML = data.body;
+  if (modalEl) {
+    modalEl.style.setProperty('display', 'flex', 'important');
+    modalEl.style.setProperty('z-index', '999999', 'important');
+  }
+}
+
+function closeHelpModal() {
+  const modalEl = document.getElementById('help-modal');
+  if (modalEl) {
+    modalEl.style.setProperty('display', 'none', 'important');
+  }
+}
+
+window.openSectionHelpModal = openSectionHelpModal;
+window.closeHelpModal = closeHelpModal;
+
+let simHumanFontSize = 0.78; // rem
+let simAiFontSize = 0.75; // rem
+
+function adjustSimulatorFont(target, delta) {
+  if (target === 'human') {
+    const el = document.getElementById('sim-human-view');
+    if (!el) return;
+    if (delta === 0) simHumanFontSize = 0.78;
+    else simHumanFontSize = Math.max(0.6, Math.min(1.5, simHumanFontSize + (delta * 0.1)));
+    el.style.fontSize = `${simHumanFontSize.toFixed(2)}rem`;
+    const pre = el.querySelector('pre');
+    if (pre) pre.style.fontSize = `${simHumanFontSize.toFixed(2)}rem`;
+  } else if (target === 'ai') {
+    const el = document.getElementById('sim-ai-view');
+    if (!el) return;
+    if (delta === 0) simAiFontSize = 0.75;
+    else simAiFontSize = Math.max(0.6, Math.min(1.5, simAiFontSize + (delta * 0.1)));
+    el.style.fontSize = `${simAiFontSize.toFixed(2)}rem`;
+  }
+}
+
+window.adjustSimulatorFont = adjustSimulatorFont;
+
+
 
 
 

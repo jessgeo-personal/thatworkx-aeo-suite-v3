@@ -18,14 +18,21 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   }
 
   const $ = cheerio.load(htmlContent);
-  const titleText = $('title').text() || '';
-  const descText = $('meta[name="description"]').attr('content') || '';
+  const titleText = $('title').text().trim() || $('h1').first().text().trim() || '';
+  const descText = $('meta[name="description"]').attr('content')?.trim() || '';
 
-  // Clean raw body text extraction
+  // Clean raw text extraction using root text fallback
   const $clean = cheerio.load(htmlContent);
-  $clean('script, style, svg, noscript, nav, footer, iframe').remove();
-  const rawText = $clean('body').text().replace(/\s+/g, ' ').trim();
+  $clean('script, style, svg, noscript, nav, footer, iframe, header').remove();
+  const rawText = ($clean('body').length > 0 ? $clean('body').text() : $clean.root().text()).replace(/\s+/g, ' ').trim();
   const wordCount = rawText ? rawText.split(/\s+/).filter(Boolean).length : 0;
+
+  const headings = [];
+  $('h1, h2, h3, h4').each((_, el) => {
+    const tag = el.tagName.toLowerCase();
+    const text = $(el).text().trim();
+    if (text) headings.push({ tag, text });
+  });
 
   const h1Count = $('h1').length;
   const h2Count = $('h2').length;
@@ -38,9 +45,17 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
 
   const canonicalUrl = $('link[rel="canonical"]').attr('href') || '';
 
+  const words = rawText.split(/\s+/).filter(Boolean);
+  const bodySnippet = words.slice(0, 180).join(' ') + (words.length > 180 ? '...' : '');
+
   return {
     route: pageRoute,
+    title: titleText || `Page ${pageRoute}`,
+    metaDescription: descText,
     wordCount,
+    rawText,
+    bodySnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
+    headings,
     hasTitle: titleText.length > 0,
     titleLength: titleText.length,
     hasDescription: descText.length > 0,
@@ -107,8 +122,14 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
     },
     alerts: [],
     scoreCard: {
-      overallScore: 100,
-      classification: 'Good'
+      overallScore: 0,
+      classification: 'Pending',
+      pillars: {
+        p1: { score: 0, max: 25, badge: 'UNAUDITED', note: 'Pending scan.' },
+        p2: { score: 0, max: 25, badge: 'UNAUDITED', note: 'Pending scan.' },
+        p3: { score: 0, max: 25, badge: 'UNAUDITED', note: 'Pending scan.' },
+        p4: { score: 0, max: 25, badge: 'UNAUDITED', note: 'Pending scan.' }
+      }
     },
     pages: []
   };
@@ -117,67 +138,51 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
     const parsedUrl = new url.URL(targetUrl);
     const domainOrigin = parsedUrl.origin;
 
-    // 1. Fetch robots.txt at root domain
+    // 1. Fetch robots.txt and machine manifests in parallel
+    const [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled] = await Promise.allSettled([
+      axios.get(`${domainOrigin}/robots.txt`, { timeout: 2500 }),
+      axios.get(`${domainOrigin}/llms.txt`, { timeout: 2000 }),
+      axios.get(`${domainOrigin}/ai-context.md`, { timeout: 2000 }),
+      axios.get(`${domainOrigin}/about.md`, { timeout: 2000 }),
+      axios.get(`${domainOrigin}/docs.md`, { timeout: 2000 }),
+      axios.get(`${domainOrigin}/content.md`, { timeout: 2000 }),
+      axios.get(`${domainOrigin}/sitemap.xml`, { timeout: 2000 })
+    ]);
+
     let robotsContent = '';
-    try {
-      const robotsRes = await axios.get(`${domainOrigin}/robots.txt`, { timeout: 3000 });
-      robotsContent = robotsRes.data;
+    if (robotsSettled.status === 'fulfilled' && robotsSettled.value.data) {
+      robotsContent = robotsSettled.value.data;
       result.status.robotsTxtExists = true;
-    } catch (e) {
-      result.status.robotsTxtExists = false;
     }
 
-    // 2. Fetch /llms.txt and /ai-context.md in parallel
-    try {
-      const llmsRes = await axios.get(`${domainOrigin}/llms.txt`, { timeout: 2000 });
-      if (llmsRes.status === 200 && llmsRes.data) {
-        result.status.llmsTxtExists = true;
-      }
-    } catch (e) {
-      result.status.llmsTxtExists = false;
+    if (llmsSettled.status === 'fulfilled' && llmsSettled.value.status === 200 && llmsSettled.value.data) {
+      result.status.llmsTxtExists = true;
+      result.status.llmsTxtContent = typeof llmsSettled.value.data === 'string' ? llmsSettled.value.data : JSON.stringify(llmsSettled.value.data);
+    }
+    if (aiContextSettled.status === 'fulfilled' && aiContextSettled.value.status === 200 && aiContextSettled.value.data) {
+      result.status.aiContextExists = true;
+      result.status.aiContextContent = typeof aiContextSettled.value.data === 'string' ? aiContextSettled.value.data : JSON.stringify(aiContextSettled.value.data);
+    }
+    if (aboutSettled.status === 'fulfilled' && aboutSettled.value.status === 200 && aboutSettled.value.data) {
+      result.status.aboutTxtExists = true;
+      result.status.aboutTxtContent = typeof aboutSettled.value.data === 'string' ? aboutSettled.value.data : JSON.stringify(aboutSettled.value.data);
+    }
+    if (docsSettled.status === 'fulfilled' && docsSettled.value.status === 200 && docsSettled.value.data) {
+      result.status.docsTxtExists = true;
+      result.status.docsTxtContent = typeof docsSettled.value.data === 'string' ? docsSettled.value.data : JSON.stringify(docsSettled.value.data);
+    }
+    if (contentSettled.status === 'fulfilled' && contentSettled.value.status === 200 && contentSettled.value.data) {
+      result.status.contentTxtExists = true;
+      result.status.contentTxtContent = typeof contentSettled.value.data === 'string' ? contentSettled.value.data : JSON.stringify(contentSettled.value.data);
+    }
+    if (sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data) {
+      result.status.sitemapExists = true;
     }
 
-    try {
-      const aiContextRes = await axios.get(`${domainOrigin}/ai-context.md`, { timeout: 2000 });
-      if (aiContextRes.status === 200 && aiContextRes.data) {
-        result.status.aiContextExists = true;
-      }
-    } catch (e) {
-      result.status.aiContextExists = false;
-    }
-
-    try {
-      const aboutRes = await axios.get(`${domainOrigin}/about.md`, { timeout: 2000 });
-      if (aboutRes.status === 200 && aboutRes.data) {
-        result.status.aboutTxtExists = true;
-      }
-    } catch (e) {
-      result.status.aboutTxtExists = false;
-    }
-
-    try {
-      const docsRes = await axios.get(`${domainOrigin}/docs.md`, { timeout: 2000 });
-      if (docsRes.status === 200 && docsRes.data) {
-        result.status.docsTxtExists = true;
-      }
-    } catch (e) {
-      result.status.docsTxtExists = false;
-    }
-
-    try {
-      const contentRes = await axios.get(`${domainOrigin}/content.md`, { timeout: 2000 });
-      if (contentRes.status === 200 && contentRes.data) {
-        result.status.contentTxtExists = true;
-      }
-    } catch (e) {
-      result.status.contentTxtExists = false;
-    }
-
-    // Check robots.txt for total AI blindness block & specific AI Bot blocks
+    // 2. Parse Robots.txt for blanket disallow vs targeted AI bot rules
+    result.status.xRobotsIndexable = true;
     if (result.status.robotsTxtExists && robotsContent) {
-      const normalizedRobots = robotsContent.replace(/\s+/g, ' ');
-
-      // Look for User-agent: * Disallow: /
+      const normalizedRobots = robotsContent.toLowerCase();
       const disallowRegex = /User-agent:\s*\*\s*Disallow:\s*\/\s*(?!\w)/i;
       const blanketDisallowMatch = disallowRegex.test(normalizedRobots) || 
                                    robotsContent.includes('User-agent: *\r\nDisallow: /') ||
@@ -231,7 +236,12 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
       htmlContent = mainRes.data;
     } catch (e) {
-      htmlContent = `<html><body><div id="app"><h1>Mock Content for ${targetUrl}</h1><p>Failed to retrieve live content. Displaying simulation layout.</p></div></body></html>`;
+      htmlContent = '';
+      result.alerts.push({
+        type: 'FETCH_ERROR',
+        severity: 'critical',
+        message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
+      });
     }
 
     // Run Level 2 Parser Service
@@ -357,6 +367,95 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
       const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
       result.pages.push(parsedPage);
     }
+
+    // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores
+    const disallowRegex = /User-agent:\s*\*\s*Disallow:\s*\/\s*(?!\w)/i;
+    const isBlanketBlock = disallowRegex.test(robotsContent || '');
+
+    // Pillar 1: Gateway & Access (Max 25 pts)
+    let p1Score = 25;
+    let p1Notes = [];
+    const blockedBots = Object.values(result.status.botPermissions || {}).filter(allowed => !allowed).length;
+    if (blockedBots > 0) {
+      p1Score -= (blockedBots * 10);
+      p1Notes.push(`${blockedBots} AI bot(s) blocked (-${blockedBots * 10} pts)`);
+    }
+    if (!result.status.sitemapExists) {
+      p1Score -= 5;
+      p1Notes.push('Sitemap.xml missing (-5 pts)');
+    }
+    p1Score = Math.max(0, p1Score);
+    const p1NoteText = p1Notes.length > 0 ? p1Notes.join(', ') : 'All AI crawlers allowed and sitemap active.';
+
+    // Pillar 2: AI-Ready Machine Data (Max 25 pts)
+    let p2Score = 25;
+    let p2Notes = [];
+    if (!result.status.llmsTxtExists) {
+      p2Score -= 10;
+      p2Notes.push('Missing /llms.txt (-10 pts)');
+    }
+    if (!result.status.aiContextExists) {
+      p2Score -= 10;
+      p2Notes.push('Missing /ai-context.md (-10 pts)');
+    }
+    const missingNarratives = [!result.status.aboutTxtExists, !result.status.docsTxtExists, !result.status.contentTxtExists].filter(Boolean).length;
+    if (missingNarratives > 0) {
+      p2Score -= 5;
+      p2Notes.push(`Missing ${missingNarratives} narrative manifest(s) (-5 pts)`);
+    }
+    p2Score = Math.max(0, p2Score);
+    const p2NoteText = p2Notes.length > 0 ? p2Notes.join(', ') : 'All machine welcome mats and brand manifests active.';
+
+    // Pillar 3: Parsing & Readability (Max 25 pts)
+    let p3Score = 25;
+    let p3Notes = [];
+    if (result.status.spaTrapDetected) {
+      p3Score -= 15;
+      p3Notes.push('Client-Side SPA JS trap detected (-15 pts)');
+    }
+    if (!result.status.hasProperHierarchy) {
+      p3Score -= 10;
+      p3Notes.push('H1 tag or heading hierarchy missing (-10 pts)');
+    }
+    if (parsedMetrics.wordCount < 500) {
+      p3Score -= 5;
+      p3Notes.push('Word count under 500 words (-5 pts)');
+    } else if (parsedMetrics.wordCount > 2500) {
+      p3Score -= 5;
+      p3Notes.push('Word count over 2,500 words truncation risk (-5 pts)');
+    }
+    p3Score = Math.max(0, p3Score);
+    const p3NoteText = p3Notes.length > 0 ? p3Notes.join(', ') : 'High content density and linear heading structure.';
+
+    // Pillar 4: Knowledge Graph Integrity (Max 25 pts)
+    let p4Score = 25;
+    let p4Notes = [];
+    if (!result.status.jsonLdExists) {
+      p4Score -= 15;
+      p4Notes.push('JSON-LD schema markup missing (-15 pts)');
+    }
+    const canonicalCount = $('link[rel="canonical"]').length;
+    if (canonicalCount === 0) {
+      p4Score -= 10;
+      p4Notes.push('Self-referential canonical tag missing (-10 pts)');
+    }
+    p4Score = Math.max(0, p4Score);
+    const p4NoteText = p4Notes.length > 0 ? p4Notes.join(', ') : 'JSON-LD schema active and canonical tag verified.';
+
+    // Overall Score (Sum of 4 Pillars, max 100)
+    let totalOverallScore = isBlanketBlock ? 20 : (p1Score + p2Score + p3Score + p4Score);
+    totalOverallScore = Math.max(15, Math.min(100, totalOverallScore));
+
+    result.scoreCard = {
+      overallScore: totalOverallScore,
+      classification: totalOverallScore >= 80 ? 'Good' : totalOverallScore >= 50 ? 'Bad' : 'Ugly',
+      pillars: {
+        p1: { score: p1Score, max: 25, badge: isBlanketBlock ? 'BLOCKED GATEWAY' : (p1Score === 25 ? 'OPTIMIZED HANDSHAKE' : p1Score >= 15 ? 'PARTIAL GATEWAY' : 'RESTRICTED CRAWL'), note: isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-80 pts).' : p1NoteText },
+        p2: { score: p2Score, max: 25, badge: p2Score === 25 ? 'WELCOME MAT ACTIVE' : p2Score >= 15 ? 'PARTIAL MANIFESTS' : '404 MISSING', note: p2NoteText },
+        p3: { score: p3Score, max: 25, badge: p3Score === 25 ? 'HIGH DENSITY' : p3Score >= 15 ? 'READABILITY GAPS' : 'POOR READABILITY', note: p3NoteText },
+        p4: { score: p4Score, max: 25, badge: p4Score === 25 ? 'SCHEMA VERIFIED' : p4Score >= 15 ? 'SCHEMA GAPS' : 'NO KNOWLEDGE GRAPH', note: p4NoteText }
+      }
+    };
 
   } catch (err) {
     console.error('Crawler Service Execution Warning:', err.message);

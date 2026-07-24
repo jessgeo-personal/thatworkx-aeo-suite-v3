@@ -2841,12 +2841,13 @@ body.light-theme .faq-item h4 {
    Inactive: height:0 + overflow:hidden + visibility:hidden
    keeps text in DOM for bots but invisible to humans. */
 .deck-panel {
-  padding: 1.5rem;
+  padding: 0;
   height: 0;
   overflow: hidden;
   visibility: hidden;
 }
 .deck-panel--active {
+  padding: 1.5rem;
   height: auto;
   overflow: visible;
   visibility: visible;
@@ -3356,7 +3357,7 @@ body.light-theme .details-sublist {
 
 /* Panel visibility system (height:0 for BOT indexability) */
 .pipeline-panel {
-  padding: 1.5rem;
+  padding: 0;
   height: 0;
   overflow: hidden;
   visibility: hidden;
@@ -3364,6 +3365,7 @@ body.light-theme .details-sublist {
 }
 
 .pipeline-panel--active {
+  padding: 1.5rem;
   height: auto;
   overflow: visible;
   visibility: visible;
