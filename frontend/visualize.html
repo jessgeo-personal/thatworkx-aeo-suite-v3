@@ -414,6 +414,11 @@
     </div>
   </div>
 
+  <script type="module">
+    import { evaluateAllCapabilities, CAPABILITY_MATRIX } from './src/services/capabilityEvaluator.js';
+    window.evaluateAllCapabilities = evaluateAllCapabilities;
+    window.CAPABILITY_MATRIX = CAPABILITY_MATRIX;
+  </script>
   <script src="index.js"></script>
 </body>
 </html>

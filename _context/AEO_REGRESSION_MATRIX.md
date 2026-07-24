@@ -63,4 +63,5 @@ This document outlines the core functional behaviors and safety boundaries that 
 | **Mockup-Based Glow-Card Redesign** | Onboarding UI | `index.html` & `index.css` | Replicates the Slide1.png layout outlines, font tag elements, and amber banner | `PASS 🟢` |
 | **Console Tab Switcher Buttons (AIVisualize, AIOptimize, AISocialize)** | Landing Page UI | `consoleTabSwitcher.test.js` | Verifies 3-column desktop grid alignment, visual text presence, active theme accents, and mobile single-column responsiveness | `PASS 🟢` |
 | **Visualize Dashboard HTML Structure** | HTML Validation | `visualize.html` | Verifies clean closing container divs, no duplicate IDs, and zero orphaned text | `PASS 🟢` |
+| **Diagnostic Matrix Data Binding** | Reference Safety | `visualize.html` | Evaluates evaluateAllCapabilities and CAPABILITY_MATRIX window binding on scan | `PASS 🟢` |
 

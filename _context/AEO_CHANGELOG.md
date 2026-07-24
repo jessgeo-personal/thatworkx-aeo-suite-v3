@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Resizable Perception Simulator Boxes (`frontend/visualize.html`)**: Added native vertical drag handles (`resize: vertical; min-height: 180px; max-height: 800px;`) and font zoom controls (`A+`, `A-`, `↺`).
 
 ### Fixed
+- **Diagnostic Matrix Data Binding Crash (`frontend/visualize.html`)**: Added a module script loader for `capabilityEvaluator.js` to define and bind `evaluateAllCapabilities` and `CAPABILITY_MATRIX` to the window object, resolving the uncaught `ReferenceError` that crashed rendering and left the '32-Capability Granular Diagnostic Matrix' empty on scan completion.
 - **Orphaned Markup & DOM Nesting in Visualize Dashboard (`frontend/visualize.html`)**: Removed a stray, duplicate Section 4 paragraph with literal text `04 MISSING` and four extra trailing closing divs that broke container constraints, restoring clean HTML validation and visual alignment of the RAG perception simulator.
 - **Clean Panel Separation under "What AI Can See" (`frontend/index.js`)**: Separated webpage RAG vector chunk ingestion (Left Panel) from machine welcome mat file contents (Right Panel: `/llms.txt`, `/ai-context.md`, `/about.md`, `/docs.md`, `/content.md`). Zero DOM duplication.
 - **RAG Body Text Extraction (`backend/services/crawlerService.js`)**: Updated Cheerio text parsing using `$clean.root().text()` to extract body text cleanly even on pages without explicit `<h1-h6>` headings or `<body>` tag wrappers.
