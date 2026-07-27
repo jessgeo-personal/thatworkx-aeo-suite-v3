@@ -2573,6 +2573,16 @@ body.light-theme .auth-trigger-btn {
   background: #FFFFFF;
 }
 
+body.light-theme .tier-select {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border-color: #E2E8F0;
+}
+
+body.light-theme .tier-label {
+  color: var(--text-secondary);
+}
+
 body.light-theme .onboarding-badge-capsule {
   background: #FFFFFF;
   border-color: #E2E8F0;

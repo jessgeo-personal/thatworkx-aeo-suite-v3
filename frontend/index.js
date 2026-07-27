@@ -1212,7 +1212,7 @@ function updateExecutiveViewData(results) {
       webRagText = `## Vector Chunk #1 [Route: /]\n**Title:** ${domainName} Homepage\n\n**Extracted Webpage Content:**\nNo parsed DOM body text available for ${domainName}.`;
     }
     
-    simHumanView.innerHTML = `<pre style="font-family: var(--font-sans); font-size: 0.76rem; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; margin: 0;">${webRagText}</pre>`;
+    simHumanView.innerHTML = `<pre style="font-family: var(--font-sans); font-size: 0.76rem; line-height: 1.5; color: var(--text-secondary); white-space: pre-wrap; margin: 0;">${webRagText}</pre>`;
   }
 
   // RIGHT PANEL: "How AI sees your AI-ready content" -> Only AI-Ready File Contents (/llms.txt, /ai-context.md, etc.)
