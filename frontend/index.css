@@ -3336,6 +3336,19 @@ body.light-theme .details-sublist {
   box-shadow: 0 4px 20px rgba(159, 18, 57, 0.12);
 }
 
+/* Progressive downward tree-like stair-step indent per layer for horizontal layouts */
+@media (min-width: 861px) {
+  .pipeline-step-card:nth-child(2) {
+    margin-top: 1.25rem;
+  }
+  .pipeline-step-card:nth-child(3) {
+    margin-top: 2.5rem;
+  }
+  .pipeline-step-card:nth-child(4) {
+    margin-top: 3.75rem;
+  }
+}
+
 /* Colors for step numbers */
 .step-num {
   font-family: 'JetBrains Mono', monospace;
