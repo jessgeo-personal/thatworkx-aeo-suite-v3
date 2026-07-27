@@ -414,6 +414,22 @@
     </div>
   </div>
 
+  <!-- Audit Progress Overlay -->
+  <div id="audit-overlay" class="audit-overlay-backdrop" style="display: none;">
+    <div class="audit-overlay-card glassmorphic border-glow-cyan">
+      <div class="audit-overlay-loader">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+        </svg>
+      </div>
+      <h3 class="audit-overlay-title">Audit in progress</h3>
+      <p class="audit-overlay-subtitle">Analyzing visibility, RAG performance, and AI-readiness metrics...</p>
+      <button type="button" class="cancel-audit-btn" onclick="cancelActiveAudit()">
+        <span>Cancel Audit 🛑</span>
+      </button>
+    </div>
+  </div>
+
   <script type="module">
     import { evaluateAllCapabilities, CAPABILITY_MATRIX } from './src/services/capabilityEvaluator.js';
     window.evaluateAllCapabilities = evaluateAllCapabilities;

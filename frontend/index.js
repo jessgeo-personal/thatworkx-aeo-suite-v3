@@ -15,6 +15,7 @@ let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
 let activeVisualizeViewMode = 'executive'; // Default active state: Executive Mode
 let currentEmail = 'user@thatworkx.com'; // Default user session email
+let activeScanController = null;
 
 // Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
 const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) 
@@ -1093,11 +1094,20 @@ async function executeDashboardScan(event) {
     submitBtn.innerHTML = '<span>Auditing Domain... ⏳</span>';
   }
 
+  // Cancel any existing running audit before starting a new one
+  if (activeScanController) {
+    activeScanController.abort();
+  }
+
+  activeScanController = new AbortController();
+  showAuditOverlay();
+
   try {
     const res = await fetch(`${API_BASE}/api/scan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: currentEmail, targetUrl: targetUrlVal })
+      body: JSON.stringify({ email: currentEmail, targetUrl: targetUrlVal }),
+      signal: activeScanController.signal
     });
     const data = await res.json();
     if (res.ok && data.results) {
@@ -1112,8 +1122,15 @@ async function executeDashboardScan(event) {
       alert(data.error || 'Unable to audit domain.');
     }
   } catch (err) {
-    console.error('Error executing dashboard scan:', err);
+    if (err.name === 'AbortError') {
+      console.log('Audit scan request aborted by the user.');
+    } else {
+      console.error('Error executing dashboard scan:', err);
+      alert('An error occurred during the audit scan.');
+    }
   } finally {
+    activeScanController = null;
+    hideAuditOverlay();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<span>Run Audit 🔄</span>';
@@ -1121,8 +1138,40 @@ async function executeDashboardScan(event) {
   }
 }
 
+function showAuditOverlay() {
+  const overlay = document.getElementById('audit-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    // Force reflow
+    overlay.offsetHeight;
+    overlay.classList.add('show');
+  }
+}
+
+function hideAuditOverlay() {
+  const overlay = document.getElementById('audit-overlay');
+  if (overlay) {
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (!overlay.classList.contains('show')) {
+        overlay.style.display = 'none';
+      }
+    }, 400);
+  }
+}
+
+function cancelActiveAudit() {
+  if (activeScanController) {
+    activeScanController.abort();
+    activeScanController = null;
+  }
+}
+
 window.setVisualizeViewMode = setVisualizeViewMode;
 window.executeDashboardScan = executeDashboardScan;
+window.showAuditOverlay = showAuditOverlay;
+window.hideAuditOverlay = hideAuditOverlay;
+window.cancelActiveAudit = cancelActiveAudit;
 
 // Multi-Bot RAG Token Truncation Engine (Google Gemini, Copilot, Bing, GPTBot)
 function formatRagTextWithTruncation(rawText, pageRoute) {
