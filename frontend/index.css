@@ -3296,17 +3296,17 @@ body.light-theme .details-sublist {
 }
 
 .pipeline-grid {
-  display: grid;
-  grid-template-columns: 2fr 3fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   max-width: 1000px;
   margin: 0 auto;
-  align-items: start;
+  align-items: stretch;
 }
 
 .pipeline-steps-col {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.8rem;
 }
 
@@ -3326,7 +3326,7 @@ body.light-theme .details-sublist {
 
 .pipeline-step-card:hover {
   background: #1C1E26;
-  transform: translateX(4px);
+  transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -3508,8 +3508,8 @@ body.light-theme .details-sublist {
 
 /* Mobile responsive styles */
 @media (max-width: 860px) {
-  .pipeline-grid {
-    grid-template-columns: 1fr;
+  .pipeline-steps-col {
+    grid-template-columns: repeat(2, 1fr);
   }
   .pipeline-panel {
     height: auto;
@@ -3526,6 +3526,9 @@ body.light-theme .details-sublist {
 }
 
 @media (max-width: 520px) {
+  .pipeline-steps-col {
+    grid-template-columns: 1fr;
+  }
   .delivery-channels-bar {
     grid-template-columns: 1fr;
   }
