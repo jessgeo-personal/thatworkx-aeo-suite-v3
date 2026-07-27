@@ -61,16 +61,16 @@ let cooldownInterval = null;
 // Developer Mode HTML Template Builders
 function buildDevMatrixHtml() {
   return `
-    <div class="developer-matrix-card glassmorphic" id="dev-matrix-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+    <div class="developer-matrix-card glassmorphic" id="dev-matrix-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
             <span>🛠️ 32-Capability Granular Diagnostic Matrix</span>
-            <span class="badge-status status-green" style="font-size: 0.72rem;">Full Technical Audit</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Full Technical Audit</span>
           </h4>
-          <p style="font-size: 0.85rem; color: #94a3b8;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
         </div>
-        <span class="table-count-badge" style="font-size: 0.85rem; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.25rem 0.75rem; border-radius: 12px;">32 Checks Evaluated</span>
+        <span class="table-count-badge status-amber-badge">32 Checks Evaluated</span>
       </div>
 
       <div class="matrix-filter-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
@@ -104,14 +104,14 @@ function buildDevMatrixHtml() {
 
 function buildDevDrawersHtml(domainName = '') {
   return `
-    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
             <span>💻 Machine File Code Inspection Drawers</span>
-            <span class="badge-status status-green" style="font-size: 0.72rem;">Syntax Highlighted</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Syntax Highlighted</span>
           </h4>
-          <p style="font-size: 0.85rem; color: #94a3b8;">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
         </div>
       </div>
 
@@ -153,14 +153,14 @@ function buildDevDrawersHtml(domainName = '') {
 
 function buildDevEdgeHtml() {
   return `
-    <div class="edge-network-card glassmorphic" id="dev-edge-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
+    <div class="edge-network-card glassmorphic" id="dev-edge-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
             <span>🌐 Edge Network &amp; WAF Deployment Sandbox</span>
-            <span class="badge-status status-green" style="font-size: 0.72rem;">Cloudflare &amp; Falcon Hooks</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Cloudflare &amp; Falcon Hooks</span>
           </h4>
-          <p style="font-size: 0.85rem; color: #94a3b8;">Deploy edge worker proxies to serve /llms.txt and bypass closed CMS restrictions.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Deploy edge worker proxies to serve /llms.txt and bypass closed CMS restrictions.</p>
         </div>
       </div>
 
@@ -170,9 +170,9 @@ function buildDevEdgeHtml() {
         <button type="button" class="edge-tab-btn control-menu-item" onclick="selectEdgeTab('crowdstrike')">Crowdstrike Falcon Bypass</button>
       </div>
 
-      <div class="edge-tab-content" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
+      <div class="edge-tab-content" style="background: var(--canvas-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
         <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #f59e0b;">Cloudflare Worker Edge Router (worker.js)</span>
+          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--burnt-copper);">Cloudflare Worker Edge Router (worker.js)</span>
           <button type="button" class="drawer-btn" onclick="copyEdgeScript()">📋 Copy Worker Script</button>
         </div>
         <div class="drawer-code-body">
@@ -202,16 +202,16 @@ async function handleRequest(request) {
 
 function buildDevRoutesHtml() {
   return `
-    <div class="expandable-routes-card glassmorphic" id="dev-expandable-routes-section" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+    <div class="expandable-routes-card glassmorphic" id="dev-expandable-routes-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
             <span>📂 Scanned Routes Directory (Expandable DOM Metrics)</span>
-            <span class="badge-status status-green" style="font-size: 0.72rem;">[▶] Click to Expand</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">[▶] Click to Expand</span>
           </h4>
-          <p style="font-size: 0.85rem; color: #94a3b8;">Expand individual route rows to inspect raw DOM heading arrays, token counts, and canonical link tags.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Expand individual route rows to inspect raw DOM heading arrays, token counts, and canonical link tags.</p>
         </div>
-        <span class="table-count-badge" id="dev-routes-count" style="font-size: 0.85rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 12px;">4 Routes Tracked</span>
+        <span class="table-count-badge" id="dev-routes-count">4 Routes Tracked</span>
       </div>
 
       <div class="table-responsive-wrapper">

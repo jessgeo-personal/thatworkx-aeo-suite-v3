@@ -50,7 +50,7 @@
   <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
 
     <!-- Optimize Header Console -->
-    <div class="optimize-header-card glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(245, 158, 11, 0.2);">
+    <div class="optimize-header-card glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
@@ -101,12 +101,12 @@
     </div>
 
     <!-- Canvas Remediation Viewer Card -->
-    <div class="workspace-card glassmorphic" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(255,255,255,0.08);">
+    <div class="workspace-card glassmorphic" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
       
       <!-- Dynamic Tool View Panels -->
       <div id="opt-tool-robots" class="optimize-tool-view active">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h4 style="color: #fff; font-size: 1rem;">Robots.txt Protocol Gate Fixer</h4>
+          <h4 style="color: var(--text-primary); font-size: 1rem;">Robots.txt Protocol Gate Fixer</h4>
           <button type="button" class="drawer-btn" onclick="copyCodeFromPre('robots-output')">📋 Copy Robots.txt</button>
         </div>
         <pre><code id="robots-output" class="language-markdown"># User-agent Bot Permission Rules for thatworkx.com
@@ -230,7 +230,7 @@ Sitemap: https://thatworkx.com/sitemap.xml</code></pre>
     </div>
 
   <!-- Mega Footer Section -->
-  <footer class="app-footer mega-footer" id="mega-footer" style="padding: 3rem 0 2rem; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 4rem; background: rgba(15, 23, 42, 0.4);">
+  <footer class="app-footer mega-footer" id="mega-footer" style="padding: 3rem 0 2rem; margin-top: 4rem;">
     <div class="mega-footer-inner max-w-6xl mx-auto px-6" style="max-width: 1200px; margin: 0 auto;">
       
       <!-- 4-Column Directory Grid -->

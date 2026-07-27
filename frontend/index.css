@@ -9,6 +9,7 @@
   --border-color: #3c4043;      /* Google Fonts dark divider lines */
   --glass-bg: #1f1f1f;
   --glass-border: #3c4043;
+  --header-footer-bg: #1f1f1f;
 
   /* Typography Colors */
   --text-primary: #ffffff;      /* High emphasis primary headers */
@@ -142,7 +143,7 @@ body.light-theme .logo-placeholder {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 5%;
-  background-color: rgba(2, 6, 23, 0.7);
+  background-color: var(--header-footer-bg);
   border-bottom: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   position: sticky;
@@ -2538,6 +2539,7 @@ body.light-theme {
   --border-color: #dadce0;      /* Google light border lines */
   --glass-bg: #ffffff;
   --glass-border: #dadce0;
+  --header-footer-bg: #f1f3f4;
   
   /* Typography Colors */
   --text-primary: #000000;      /* Pure black high emphasis */
@@ -2550,9 +2552,9 @@ body.light-theme {
 }
 
 body.light-theme .app-header {
-  background-color: rgba(250, 250, 250, 0.85);
-  border-bottom-color: #E2E8F0;
-  color: #0F172A;
+  background-color: var(--header-footer-bg);
+  border-bottom-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 body.light-theme .logo-text,
@@ -3544,8 +3546,8 @@ body.light-mode .method-text p { color: #64748B; }
    MEGA-FOOTER SECTION STYLES
 ───────────────────────────────────────────────────────────────────────── */
 .mega-footer {
-  background: #0D0E11;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--header-footer-bg);
+  border-top: 1px solid var(--border-color);
   padding: 4rem 0 2rem 0;
   margin-top: 4rem;
 }
@@ -3634,8 +3636,8 @@ body.light-mode .method-text p { color: #64748B; }
 
 /* Light Theme Mega Footer overrides */
 body.light-theme .mega-footer {
-  background: #F8FAFC;
-  border-top-color: #E2E8F0;
+  background: var(--header-footer-bg);
+  border-top-color: var(--border-color);
 }
 
 body.light-theme .footer-bento-wrapper {
@@ -4255,12 +4257,45 @@ body.light-theme .footer-col h4 {
 .table-count-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #38BDF8;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.25);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-family: var(--font-mono);
+  display: inline-block;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+/* Specific Badge colors (Default/Dark) */
+.table-count-badge#exec-machine-files-count {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.25);
+}
+
+.table-count-badge.status-amber-badge {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* Light Theme Overrides */
+body.light-theme .table-count-badge {
+  color: #0369a1;
+  background: rgba(3, 105, 161, 0.08);
+  border-color: rgba(3, 105, 161, 0.25);
+}
+
+body.light-theme .table-count-badge#exec-machine-files-count {
+  color: #15803d;
+  background: rgba(21, 128, 61, 0.08);
+  border-color: rgba(21, 128, 61, 0.25);
+}
+
+body.light-theme .table-count-badge.status-amber-badge {
+  color: #b45309;
+  background: rgba(180, 83, 9, 0.08);
+  border-color: rgba(180, 83, 9, 0.25);
 }
 
 .table-responsive-wrapper {
