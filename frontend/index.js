@@ -1,3 +1,15 @@
+// Initialize theme from localStorage immediately to minimize styling flashes
+try {
+  const savedTheme = localStorage.getItem('aeo-theme');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    const themeToggleIcon = document.getElementById('theme-toggle-icon');
+    if (themeToggleIcon) themeToggleIcon.innerText = '☀️';
+  }
+} catch (e) {
+  console.warn('Early theme initialization issue:', e);
+}
+
 // Current Client State
 let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
@@ -237,6 +249,22 @@ function buildDevRoutesHtml() {
 
 // 4-Page Architecture Router Initialization
 document.addEventListener('DOMContentLoaded', () => {
+  // Sync theme again once DOM elements are fully loaded
+  try {
+    const savedTheme = localStorage.getItem('aeo-theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      const themeToggleIcon = document.getElementById('theme-toggle-icon');
+      if (themeToggleIcon) themeToggleIcon.innerText = '☀️';
+    } else {
+      document.body.classList.remove('light-theme');
+      const themeToggleIcon = document.getElementById('theme-toggle-icon');
+      if (themeToggleIcon) themeToggleIcon.innerText = '🌙';
+    }
+  } catch (e) {
+    console.warn('DOM theme initialization issue:', e);
+  }
+
   try {
     if (document.getElementById('code-robots')) generateRobotsTxt();
     if (document.getElementById('code-cloudflare')) generateCloudflareWorker();
@@ -2320,8 +2348,10 @@ function toggleTheme() {
   
   if (isLight) {
     if (themeToggleIcon) themeToggleIcon.innerText = '☀️';
+    localStorage.setItem('aeo-theme', 'light');
   } else {
     if (themeToggleIcon) themeToggleIcon.innerText = '🌙';
+    localStorage.setItem('aeo-theme', 'dark');
   }
 }
 
