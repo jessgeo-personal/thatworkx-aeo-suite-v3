@@ -2747,7 +2747,7 @@ body.light-theme .faq-item h4 {
    so ALL text is in DOM for GPTBot/ClaudeBot to index.
 ══════════════════════════════════════════════════════ */
 .onboarding-deck-section {
-  margin-top: 5rem;
+  margin-top: 4rem;
   border-top: 1px solid rgba(255,255,255,0.05);
   padding-top: 4rem;
   margin-bottom: 2rem;
@@ -3256,7 +3256,7 @@ body.light-theme .details-sublist {
    4-LAYER MACHINE HIERARCHY & DELIVERY PIPELINE STYLES
 ───────────────────────────────────────────────────────────────────────── */
 .pipeline-section {
-  margin-top: 5rem;
+  margin-top: 4rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   padding-top: 4rem;
   margin-bottom: 2rem;
