@@ -14,16 +14,16 @@
 
   <!-- Top Navigation Header -->
   <header class="app-header">
-    <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
-      <span class="logo-symbol">🌐</span>
-      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+    <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
+      <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
+      <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
+      <div class="logo-placeholder" data-logo="AIVisualize" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AI Visualize</div>
     </div>
     
     <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
-      <a href="index.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">Home</a>
-      <a href="visualize.html" class="nav-link active" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #ffffff; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); text-decoration: none;">👁️ AI Visualize</a>
-      <a href="optimize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">🩺 AI Optimize</a>
-      <a href="socialize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">📣 AI Socialize</a>
+      <a href="visualize.html" class="nav-logo-btn active" data-logo="AIVisualize">AI Visualize</a>
+      <a href="optimize.html" class="nav-logo-btn" data-logo="AIOptimize">AIOptimize</a>
+      <a href="socialize.html" class="nav-logo-btn" data-logo="AISocialize">AISocialize</a>
     </nav>
 
 

@@ -14,16 +14,16 @@
 
   <!-- Top Navigation Header -->
   <header class="app-header">
-    <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
-      <span class="logo-symbol">🌐</span>
-      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+    <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
+      <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
+      <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
+      <div class="logo-placeholder" data-logo="AIOptimize" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AIOptimize</div>
     </div>
     
     <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
-      <a href="index.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">Home</a>
-      <a href="visualize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">👁️ AI Visualize</a>
-      <a href="optimize.html" class="nav-link active" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #ffffff; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); text-decoration: none;">🩺 AI Optimize</a>
-      <a href="socialize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">📣 AI Socialize</a>
+      <a href="visualize.html" class="nav-logo-btn" data-logo="AIVisualize">AI Visualize</a>
+      <a href="optimize.html" class="nav-logo-btn active" data-logo="AIOptimize">AIOptimize</a>
+      <a href="socialize.html" class="nav-logo-btn" data-logo="AISocialize">AISocialize</a>
     </nav>
 
 
@@ -53,9 +53,10 @@
     <div class="optimize-header-card glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: rgba(22, 24, 29, 0.7); border: 1px solid rgba(245, 158, 11, 0.2);">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
-            <span>🩺 AIOptimize Remediation Sandbox</span>
-            <span class="badge-status status-amber" style="font-size: 0.75rem;">Prescriptive Code Generators</span>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="logo-placeholder" data-logo="AIOptimize" style="height: 30px; min-width: 115px; font-size: 0.8rem; padding: 0.2rem 0.6rem;">AIOptimize</div>
+            <span>Remediation Sandbox</span>
+            <span class="badge-status" style="font-size: 0.75rem; background: var(--burnt-copper); border: 1px solid var(--burnt-copper); color: #ffffff;">Prescriptive Code Generators</span>
           </h2>
           <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.25rem;">
             Generate one-click code fixes, edge worker scripts, and AI-First markdown blueprint manifests.

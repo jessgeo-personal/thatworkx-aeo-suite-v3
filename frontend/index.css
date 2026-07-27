@@ -1,68 +1,52 @@
 /* Greenfield CSS Design System - Thatworkx AEO Suite */
 
 :root {
-  /* Colors from design-tokens.json */
-  --primary-50: #f0f9ff;
-  --primary-100: #e0f2fe;
-  --primary-200: #bae6fd;
-  --primary-300: #7dd3fc;
-  --primary-400: #38bdf8;
-  --primary-500: #0ea5e9;
-  --primary-600: #0284c7;
-  --primary-700: #0369a1;
-  --primary-800: #075985;
-  --primary-900: #0c4a6e;
+  /* Google Fonts inspired Dark Theme Palette (Default) */
+  --canvas-bg: #202124;         /* Google dark background grey */
+  --surface-bg: #1f1f1f;        /* Google card/container background */
+  --surface-nested-bg: #121212; /* Darker nested wells and inputs */
+  --input-code-bg: #121212;
+  --border-color: #3c4043;      /* Google Fonts dark divider lines */
+  --glass-bg: #1f1f1f;
+  --glass-border: #3c4043;
 
-  --visualize-color: #0ea5e9;
-  --visualize-bg-glow: rgba(14, 165, 233, 0.25);
-  
-  --optimize-color: #f59e0b;
-  --optimize-bg-glow: rgba(245, 158, 11, 0.25);
+  /* Typography Colors */
+  --text-primary: #ffffff;      /* High emphasis primary headers */
+  --text-secondary: #e8eaed;    /* Medium emphasis secondary/body text */
+  --text-muted: #bdc1c6;        /* Muted caption text */
+  --text-main: #e8eaed;
 
-  --socialize-color: #f43f5e;
-  --socialize-bg-glow: rgba(244, 63, 94, 0.25);
+  /* Burnt Copper Accent exception (Primary buttons, active highlights) */
+  --burnt-copper: #b7410e;
+  --burnt-copper-hover: #d45d2a;
+  --burnt-copper-active: #a03000;
+  --burnt-copper-glow: rgba(183, 65, 14, 0.25);
 
-  --dark-50: #f8fafc;
-  --dark-100: #f1f5f9;
-  --dark-200: #e2e8f0;
-  --dark-300: #cbd5e1;
-  --dark-400: #94a3b8;
-  --dark-500: #64748b;
-  --dark-600: #475569;
-  --dark-700: #334155;
-  --dark-800: #1e293b;
-  --dark-900: #0f172a;
-  --dark-950: #020617;
+  /* Fallback/compatibility aliases */
+  --primary-500: var(--burnt-copper);
+  --primary-600: var(--burnt-copper-hover);
+  --visualize-color: var(--burnt-copper);
+  --visualize-bg-glow: var(--burnt-copper-glow);
+  --optimize-color: var(--burnt-copper);
+  --optimize-bg-glow: var(--burnt-copper-glow);
+  --socialize-color: var(--burnt-copper);
+  --socialize-bg-glow: var(--burnt-copper-glow);
 
-  /* Theme defaults & AIVisualize Design System Tokens */
-  --canvas-bg: #0D0E11;
-  --surface-bg: #16181D;
-  --input-code-bg: #1F222A;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-main: #F8FAFC;
-  --text-muted: #94A3B8;
+  --accent-rose: var(--burnt-copper);
+  --accent-rose-dark: var(--burnt-copper-active);
+  --accent-rose-glow: var(--burnt-copper-glow);
 
-  /* Primary Accent: Deep Rose Crimson (AI Visualize) */
-  --accent-rose: #E11D48;
-  --accent-rose-dark: #9F1239;
-  --accent-rose-glow: rgba(225, 29, 72, 0.25);
-
-  /* Secondary Accent: Safety Amber (AIOptimize Upsell) */
-  --accent-amber: #F59E0B;
-  --accent-amber-dark: #B45309;
-  --accent-amber-glow: rgba(245, 158, 11, 0.25);
+  --accent-amber: var(--burnt-copper);
+  --accent-amber-dark: var(--burnt-copper-active);
+  --accent-amber-glow: var(--burnt-copper-glow);
 
   /* Typography */
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', 'TT Interphases', monospace;
   --font-headline: 'Plus Jakarta Sans', sans-serif;
-  
-  --text-primary: #ffffff;
-  
-  /* Shadows */
-  --glow-shadow: 0 0 20px var(--visualize-bg-glow);
-  --glass-bg: #111318;
-  --glass-border: rgba(255, 255, 255, 0.08);
+
+  /* Shadows & Glows */
+  --glow-shadow: 0 0 20px var(--burnt-copper-glow);
 }
 
 * {
@@ -81,6 +65,75 @@ body {
   flex-direction: column;
   overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Logo Placeholder Design System */
+.logo-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--burnt-copper);
+  background: var(--surface-bg);
+  border: 1.5px dashed var(--burnt-copper);
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-width: 140px;
+  height: 38px;
+  text-align: center;
+  transition: all 0.25s ease;
+  user-select: none;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .logo-placeholder {
+  background: var(--surface-bg);
+  border-color: var(--burnt-copper);
+}
+
+.logo-placeholder:hover {
+  border-style: solid;
+  border-color: var(--burnt-copper-hover);
+  color: var(--burnt-copper-hover);
+  box-shadow: 0 0 10px var(--burnt-copper-glow);
+}
+
+/* Navigation Logo Buttons */
+.nav-logo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+  height: 34px;
+  min-width: 110px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.nav-logo-btn:hover {
+  border-color: var(--burnt-copper-hover);
+  color: var(--burnt-copper-hover);
+  background: rgba(183, 65, 14, 0.05);
+}
+
+.nav-logo-btn.active {
+  background: var(--burnt-copper) !important;
+  border-color: var(--burnt-copper) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px var(--burnt-copper-glow);
 }
 
 /* Header & Toggle Switch */
@@ -277,11 +330,11 @@ body {
 }
 
 .glowing-btn {
-  box-shadow: 0 0 20px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 0 20px var(--burnt-copper-glow);
 }
 
 .glowing-btn:hover {
-  box-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
+  box-shadow: 0 0 30px var(--burnt-copper-glow);
 }
 
 /* Checkbox Toggle */
@@ -1510,38 +1563,20 @@ body {
   transform: scale(1.02);
 }
 
-/* CTA Buttons — updated to spec accent tones */
-.onboarding-submit-btn.bg-cyan {
-  background: #9F1239;
-  color: #ffffff;
-  box-shadow: 0 4px 20px rgba(159, 18, 57, 0.35);
-}
-
-.onboarding-submit-btn.bg-cyan:hover {
-  background: #BE1846;
-  box-shadow: 0 4px 30px rgba(159, 18, 57, 0.5);
-}
-
-.onboarding-submit-btn.bg-amber {
-  background: #B45309;
-  color: #ffffff;
-  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.35);
-}
-
-.onboarding-submit-btn.bg-amber:hover {
-  background: #D0640C;
-  box-shadow: 0 4px 30px rgba(180, 83, 9, 0.5);
-}
-
+/* CTA Buttons — updated to spec accent tones (Burnt Copper) */
+.onboarding-submit-btn.bg-cyan,
+.onboarding-submit-btn.bg-amber,
 .onboarding-submit-btn.bg-violet {
-  background: #9A3412;
+  background: var(--burnt-copper);
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(154, 52, 18, 0.35);
+  box-shadow: 0 4px 20px var(--burnt-copper-glow);
 }
 
+.onboarding-submit-btn.bg-cyan:hover,
+.onboarding-submit-btn.bg-amber:hover,
 .onboarding-submit-btn.bg-violet:hover {
-  background: #B64016;
-  box-shadow: 0 4px 30px rgba(154, 52, 18, 0.5);
+  background: var(--burnt-copper-hover);
+  box-shadow: 0 4px 30px var(--burnt-copper-glow);
 }
 
 /* ── AISocialize Extension Badge (styled class) ── */
@@ -2495,13 +2530,23 @@ body.light-mode .tool-card__cta         { border-color: #E2E8F0; color: #64748b;
   }
 }
 
-/* LIGHT THEME OVERRIDES */
 body.light-theme {
-  --canvas-bg: #FAFAFA;
-  --glass-bg: #FFFFFF;
-  --glass-border: #E2E8F0;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
+  --canvas-bg: #ffffff;         /* Google crisp white background */
+  --surface-bg: #f1f3f4;        /* Google light grey container background */
+  --surface-nested-bg: #f8f9fa; /* Faintest grey for inner wells */
+  --input-code-bg: #f8f9fa;
+  --border-color: #dadce0;      /* Google light border lines */
+  --glass-bg: #ffffff;
+  --glass-border: #dadce0;
+  
+  /* Typography Colors */
+  --text-primary: #000000;      /* Pure black high emphasis */
+  --text-secondary: #202124;    /* Very dark grey body text */
+  --text-muted: #3c4043;        /* Muted caption text */
+  --text-main: #202124;
+
+  --burnt-copper-glow: rgba(183, 65, 14, 0.15);
+  --glow-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 body.light-theme .app-header {
@@ -4482,14 +4527,9 @@ body.light-theme .footer-col h4 {
 }
 
 .mode-pill-btn.active {
-  background: linear-gradient(135deg, var(--accent-rose, #E11D48) 0%, var(--accent-rose-dark, #9F1239) 100%);
-  color: #FFFFFF;
-  box-shadow: 0 4px 14px var(--accent-rose-glow, rgba(225, 29, 72, 0.35));
-}
-
-.mode-pill-btn#btn-mode-developer.active {
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  background: var(--burnt-copper);
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px var(--burnt-copper-glow);
 }
 
 @media (max-width: 640px) {

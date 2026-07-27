@@ -2175,14 +2175,14 @@ function selectConsoleTab(tabId) {
   const toolLabel = document.getElementById('onboarding-form-tool-label');
   if (toolLabel) {
     if (tabId === 'visualize') {
-      toolLabel.innerHTML = '👁️ AI Visualize Diagnostic Scanner';
-      toolLabel.style.color = '#38bdf8';
+      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AIVisualize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AI Visualize</span> Diagnostic Scanner';
+      toolLabel.style.color = 'var(--text-primary)';
     } else if (tabId === 'optimize') {
-      toolLabel.innerHTML = '🩺 AIOptimize Remediation Workspace';
-      toolLabel.style.color = '#f59e0b';
+      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AIOptimize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AIOptimize</span> Remediation Workspace';
+      toolLabel.style.color = 'var(--text-primary)';
     } else if (tabId === 'socialize') {
-      toolLabel.innerHTML = '📣 AISocialize Citation Footprint Engine';
-      toolLabel.style.color = '#c084fc';
+      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AISocialize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AISocialize</span> Citation Footprint Engine';
+      toolLabel.style.color = 'var(--text-primary)';
     }
   }
 

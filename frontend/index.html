@@ -15,15 +15,13 @@
   <!-- Top Navigation Header -->
   <header class="app-header">
     <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">
-      <span class="logo-symbol">🌐</span>
-      <span class="logo-text">THATWORKX <span class="logo-highlight">AEO SUITE</span></span>
+      <div class="logo-placeholder" data-logo="AI@thatworkx">AI@thatworkx</div>
     </div>
     
     <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
-      <a href="index.html" class="nav-link active" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #ffffff; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); text-decoration: none;">Home</a>
-      <a href="visualize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">👁️ AI Visualize</a>
-      <a href="optimize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">🩺 AI Optimize</a>
-      <a href="socialize.html" class="nav-link" style="padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-decoration: none; transition: all 0.2s ease;">📣 AI Socialize</a>
+      <a href="visualize.html" class="nav-logo-btn" data-logo="AIVisualize">AI Visualize</a>
+      <a href="optimize.html" class="nav-logo-btn" data-logo="AIOptimize">AIOptimize</a>
+      <a href="socialize.html" class="nav-logo-btn" data-logo="AISocialize">AISocialize</a>
     </nav>
 
     <div class="header-actions flex items-center gap-3">
@@ -82,7 +80,7 @@
                 <div class="tool-card__header mb-1">
                   <span class="tool-card__badge tool-card__badge--rose">Diagnostic Engine</span>
                 </div>
-                <div class="tab-title text-cyan">👁️ AI Visualize</div>
+                <div class="tab-title text-cyan" style="margin-bottom: 0.5rem;"><div class="logo-placeholder" data-logo="AIVisualize">AI Visualize</div></div>
                 <div class="tab-subhead">Let us show you what AI can see.</div>
                 <ul class="tab-list">
                   <li>1. Are you blocking out AI?</li>
@@ -105,7 +103,7 @@
                 <div class="tool-card__header mb-1">
                   <span class="tool-card__badge tool-card__badge--amber">Prescriptive Fixer</span>
                 </div>
-                <div class="tab-title text-amber">🩺 AIOptimize</div>
+                <div class="tab-title text-amber" style="margin-bottom: 0.5rem;"><div class="logo-placeholder" data-logo="AIOptimize">AIOptimize</div></div>
                 <div class="tab-subhead">If you already know that you are AI-ready, let's show you how to be Optimized for AI.</div>
                 <ul class="tab-list mt-2">
                   <li>• Optimizing for AI-Ready</li>
@@ -126,7 +124,7 @@
                 <div class="tool-card__header mb-1">
                   <span class="tool-card__badge tool-card__badge--copper">Social Citation Engine</span>
                 </div>
-                <div class="tab-title text-violet">📣 AISocialize</div>
+                <div class="tab-title text-violet" style="margin-bottom: 0.5rem;"><div class="logo-placeholder" data-logo="AISocialize">AISocialize</div></div>
                 <div class="tab-subhead">Go further, ensure your social footprint is Optimized for AI.</div>
                 <div class="tab-nested-list-wrapper mt-2">
                   <div class="mb-2">
@@ -158,8 +156,8 @@
           </div>
 
           <!-- Focused Form Tool Indicator & Input Form -->
-          <div id="onboarding-form-tool-label" style="text-align: center; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 800; color: #38bdf8;">
-            👁️ AI Visualize Diagnostic Scanner
+          <div id="onboarding-form-tool-label" style="text-align: center; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <span class="logo-placeholder" data-logo="AIVisualize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AI Visualize</span> Diagnostic Scanner
           </div>
           <form id="onboarding-scan-form" onsubmit="executeOnboardingScan(event)" class="onboarding-form-layout">
             <div class="onboarding-input-wrapper">
