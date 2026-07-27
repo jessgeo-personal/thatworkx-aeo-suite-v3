@@ -4593,5 +4593,13 @@ body.light-theme .footer-brand-bar {
   color: #94A3B8;
 }
 
+/* Ensure copy/action buttons in code inspection drawers and sandboxes stay readable (white) on dark panels in light mode */
+body.light-theme .drawer-code-window .drawer-btn,
+body.light-theme .edge-tab-content .drawer-btn {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+
 
 

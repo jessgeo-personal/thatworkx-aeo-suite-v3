@@ -163,9 +163,9 @@ export function renderEdgeNetworkTab() {
         <button type="button" class="edge-tab-btn" onclick="selectEdgeTab('crowdstrike')">Crowdstrike Falcon WAF Bypass</button>
       </div>
 
-      <div class="edge-tab-content">
-        <div class="drawer-code-bar">
-          <span class="drawer-file-path" id="edge-current-title">Cloudflare Worker Edge Router (worker.js)</span>
+      <div class="edge-tab-content drawer-code-window" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
+        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8;">Cloudflare Worker Edge Router (worker.js)</span>
           <button type="button" class="drawer-btn" onclick="copyEdgeScript()">
             <span>📋 Copy Worker Script</span>
           </button>

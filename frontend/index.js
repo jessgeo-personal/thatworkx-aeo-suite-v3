@@ -170,9 +170,9 @@ function buildDevEdgeHtml() {
         <button type="button" class="edge-tab-btn control-menu-item" onclick="selectEdgeTab('crowdstrike')">Crowdstrike Falcon Bypass</button>
       </div>
 
-      <div class="edge-tab-content" style="background: var(--canvas-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--burnt-copper);">Cloudflare Worker Edge Router (worker.js)</span>
+      <div class="edge-tab-content drawer-code-window" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
+        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+          <span class="drawer-file-path" id="edge-current-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8;">Cloudflare Worker Edge Router (worker.js)</span>
           <button type="button" class="drawer-btn" onclick="copyEdgeScript()">📋 Copy Worker Script</button>
         </div>
         <div class="drawer-code-body">
