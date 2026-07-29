@@ -217,6 +217,10 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     
     const contentBox = $('#sec2-scraped-content-box');
     expect(contentBox.length).toBe(1);
+    const styleAttr = contentBox.attr('style') || '';
+    expect(styleAttr).toContain('white-space: pre-wrap');
+    expect(styleAttr).toContain('word-break: break-word');
+    expect(styleAttr).toContain('font-family: monospace');
 
     // 3. Essential Pages Sub-block
     const foundList = $('#sec2-found-essential-pages');
@@ -237,6 +241,55 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     // 5. Zero occurrences of "AI-first" string
     const sectionText = $('#exec-section2-card').text();
     expect(/AI-first/i.test(sectionText)).toBe(false);
+  });
+
+  it('Scenario G: Executive Mode scrapedContentPreview payload contains line breaks and Markdown syntax when HTML is parsed', () => {
+    const profile = {
+      url: 'https://example.com',
+      scrapedContentPreview: [
+        {
+          route: '/',
+          content: '<h1>Main Title</h1><p>Welcome to our site.</p><ul><li>First Item</li></ul>'
+        }
+      ]
+    };
+
+    const evaluation = evaluateCapabilities(profile);
+    const preview = evaluation.scrapedContentPreview;
+
+    expect(Array.isArray(preview)).toBe(true);
+    expect(preview.length).toBe(1);
+    expect(preview[0].route).toBe('/');
+    
+    const parsedText = preview[0].content;
+    
+    expect(parsedText).toContain('# Main Title');
+    expect(parsedText).toContain('\n');
+    expect(parsedText).toContain('- First Item');
+  });
+
+  it('Scenario H: Executive Mode scrapedContentPreview integration with crawled page html', () => {
+    const scanData = {
+      url: 'https://example.com',
+      pages: [
+        {
+          route: '/',
+          html: '<h1>Main Page Title</h1><p>We build outstanding solutions.</p><ul><li>Feature one</li></ul>'
+        }
+      ]
+    };
+
+    const evaluation = evaluateCapabilities(scanData);
+    const preview = evaluation.scrapedContentPreview;
+
+    expect(Array.isArray(preview)).toBe(true);
+    expect(preview.length).toBe(1);
+    expect(preview[0].route).toBe('/');
+    
+    const parsedText = preview[0].content;
+    expect(parsedText).toContain('# Main Page Title');
+    expect(parsedText).toContain('\n');
+    expect(parsedText).toContain('- Feature one');
   });
 
 });

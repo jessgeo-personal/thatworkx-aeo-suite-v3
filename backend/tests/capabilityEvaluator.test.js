@@ -210,4 +210,23 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(res.emailValue).toBe('explicit@domain.com');
     expect(res.phoneValue).toBe('+1-555-999-8888');
   });
+
+  it('should parse structural HTML tags to Markdown and line breaks in scrapedContentPreview', () => {
+    const res = evaluateAllCapabilities({
+      url: 'https://example.com',
+      scrapedContentPreview: [
+        {
+          route: '/details',
+          content: '<h1>Main Header</h1><p>Paragraph text here.</p><br/><ul><li>Item One</li><li>Item Two</li></ul>'
+        }
+      ]
+    });
+
+    const parsedContent = res.scrapedContentPreview[0].content;
+    
+    expect(parsedContent).toContain('# Main Header');
+    expect(parsedContent).toContain('\n');
+    expect(parsedContent).toContain('- Item One');
+    expect(parsedContent).toContain('- Item Two');
+  });
 });

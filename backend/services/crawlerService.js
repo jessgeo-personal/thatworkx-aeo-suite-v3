@@ -26,6 +26,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   const $clean = cheerio.load(htmlContent);
   $clean('script, style, svg, noscript, nav, footer, iframe, header').remove();
   const rawText = ($clean('body').length > 0 ? $clean('body').text() : $clean.root().text()).replace(/\s+/g, ' ').trim();
+  const cleanHtml = ($clean('body').length > 0 ? $clean('body').html() : $clean.html()) || '';
   const wordCount = rawText ? rawText.split(/\s+/).filter(Boolean).length : 0;
 
   const headings = [];
@@ -55,6 +56,8 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     metaDescription: descText,
     wordCount,
     rawText,
+    content: cleanHtml,
+    html: cleanHtml,
     bodySnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
     headings,
     hasTitle: titleText.length > 0,

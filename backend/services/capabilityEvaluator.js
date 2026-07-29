@@ -998,7 +998,27 @@ function evaluateCapabilities(crawledData = {}) {
   // b) Scraped Content & Manifest Previews
   const stripHtmlTags = (str) => {
     if (typeof str !== 'string') return '';
-    return str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    let md = str;
+    // 1. h1-h6 conversion
+    md = md.replace(/<h([1-6])\b[^>]*>/gi, (match, level) => '\n\n' + '#'.repeat(parseInt(level)) + ' ');
+    md = md.replace(/<\/h[1-6]>/gi, '\n\n');
+    // 2. p, div, article, section conversion
+    md = md.replace(/<\/p>/gi, '\n\n');
+    md = md.replace(/<\/div>/gi, '\n\n');
+    md = md.replace(/<\/article>/gi, '\n\n');
+    md = md.replace(/<\/section>/gi, '\n\n');
+    // 3. li conversion
+    md = md.replace(/<li\b[^>]*>/gi, '\n- ');
+    md = md.replace(/<\/li>/gi, '\n');
+    // 4. br conversion
+    md = md.replace(/<br\s*\/?>/gi, '\n');
+    // 5. Strip remaining tags
+    md = md.replace(/<[^>]*>/g, '');
+    // 6. Clean whitespace and line breaks
+    let lines = md.split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim());
+    md = lines.join('\n');
+    md = md.replace(/\n{3,}/g, '\n\n');
+    return md.trim();
   };
 
   let scrapedContentPreview = [];
@@ -1009,7 +1029,7 @@ function evaluateCapabilities(crawledData = {}) {
       if (item && typeof item === 'object') {
         return {
           route: item.route || item.path || '/',
-          content: stripHtmlTags(item.content || item.rawText || '')
+          content: stripHtmlTags(item.content || item.html || item.rawText || '')
         };
       }
       return {
@@ -1025,7 +1045,7 @@ function evaluateCapabilities(crawledData = {}) {
   } else if (Array.isArray(crawledData.pages) && crawledData.pages.length > 0) {
     scrapedContentPreview = crawledData.pages.map(p => ({
       route: p.route || p.path || '/',
-      content: stripHtmlTags(p.rawText || p.content || p.html || '')
+      content: stripHtmlTags(p.content || p.html || p.rawText || '')
     }));
   } else {
     const fallbackText = status.machinePreview || sec2.rawText || '';

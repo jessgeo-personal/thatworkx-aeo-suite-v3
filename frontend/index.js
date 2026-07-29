@@ -1684,6 +1684,7 @@ function updateExecutiveViewData(results) {
     }).join('');
 
     window.sec2ScrapedContent = results.scrapedContentPreview;
+    // Explicitly binding with .innerText to preserve all whitespace, newlines, and Markdown formatting intact
     scrapedBoxEl.innerText = results.scrapedContentPreview[0].content || 'No content parsed for this page.';
   } else if (scrapedBoxEl) {
     scrapedBoxEl.innerText = 'No parsed DOM body text available.';
@@ -3124,6 +3125,7 @@ function openHelpTooltip(key, evt) {
 function switchSec2RouteTab(idx) {
   const contentBox = document.getElementById('sec2-scraped-content-box');
   if (contentBox && window.sec2ScrapedContent && window.sec2ScrapedContent[idx]) {
+    // Explicitly binding with .innerText to preserve all whitespace, newlines, and Markdown formatting intact
     contentBox.innerText = window.sec2ScrapedContent[idx].content || 'No content parsed for this page.';
   }
 
