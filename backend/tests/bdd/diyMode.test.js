@@ -101,4 +101,45 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(sampleLinkHtml).toContain('View ↗');
   });
 
+  it('Scenario E: DIY Mode Hero banner in visualize.html renders headline, audience badge, scan metrics, and 4-section summary cards', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. DIY Welcome Banner presence
+    const devBanner = $('#dev-welcome-banner');
+    expect(devBanner.length).toBe(1);
+
+    const bannerText = devBanner.text();
+
+    // 2. Audience Badge & Headline
+    expect(bannerText).toContain('DIY Mode — Aimed at the technically inclined business user / DIY user');
+    expect(bannerText).toContain('How to Improve Your');
+    expect(bannerText).toContain('AI-Visibility');
+
+    // 3. Scan Metrics Bar Badges
+    const devDurationBadge = $('#dev-scan-duration-badge');
+    expect(devDurationBadge.length).toBe(1);
+    expect(devDurationBadge.text()).toContain('Time to Scan:');
+
+    const devTimestampBadge = $('#dev-scan-timestamp-badge');
+    expect(devTimestampBadge.length).toBe(1);
+    expect(devTimestampBadge.text()).toContain('Last Scanned:');
+
+    // 4. 4-Section Summary Grid Cards
+    expect(bannerText).toContain('Gateway & Access');
+    expect(bannerText).toContain('Presence & Hygiene');
+    expect(bannerText).toContain('Parsing & Readability');
+    expect(bannerText).toContain('Machine Manifests');
+
+    // 5. Governance vocabulary rules
+    expect(bannerText).toContain('AI-Optimized');
+    expect(bannerText).toContain('AI-Ready');
+    expect(/AI-first/i.test(bannerText)).toBe(false);
+  });
+
 });

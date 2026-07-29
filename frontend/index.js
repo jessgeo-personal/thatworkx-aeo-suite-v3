@@ -1487,20 +1487,41 @@ function updateExecutiveViewData(results) {
     }
   }
 
-  const domainDisplayEl = document.getElementById('display-scanned-domain') || document.getElementById('exec-domain-tag');
-  if (domainDisplayEl) domainDisplayEl.innerText = rawUrl || domainName;
+  const domainDisplayEls = [
+    document.getElementById('display-scanned-domain'),
+    document.getElementById('dev-scanned-domain'),
+    document.getElementById('exec-domain-tag')
+  ].filter(Boolean);
+  domainDisplayEls.forEach(el => { el.innerText = rawUrl || domainName; });
 
-  const timestampEl = document.getElementById('scan-timestamp-badge');
-  if (timestampEl) {
+  const timestampEls = [
+    document.getElementById('scan-timestamp-badge'),
+    document.getElementById('dev-scan-timestamp-badge')
+  ].filter(Boolean);
+  timestampEls.forEach(el => {
     const lastScannedVal = results.scanMetrics?.lastScanned || results.lastScanned || new Date().toLocaleString();
-    timestampEl.innerText = `Last Scanned: ${lastScannedVal}`;
-  }
+    el.innerText = `Last Scanned: ${lastScannedVal}`;
+  });
 
-  const durationEl = document.getElementById('scan-duration-badge');
-  if (durationEl) {
+  const durationEls = [
+    document.getElementById('scan-duration-badge'),
+    document.getElementById('dev-scan-duration-badge')
+  ].filter(Boolean);
+  durationEls.forEach(el => {
     const scanTimeSeconds = results.scanMetrics?.scanTimeSeconds ?? results.scanTimeSeconds ?? 1.8;
-    durationEl.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
-  }
+    el.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
+  });
+
+  // Section score pills in DIY mode hero
+  const secScores = results.scores || {};
+  const s1 = document.getElementById('diy-sec1-score');
+  if (s1) s1.innerText = `${secScores.p1 ?? 0}/25 pts`;
+  const s2 = document.getElementById('diy-sec2-score');
+  if (s2) s2.innerText = `${secScores.p2 ?? 0}/25 pts`;
+  const s3 = document.getElementById('diy-sec3-score');
+  if (s3) s3.innerText = `${secScores.p3 ?? 0}/25 pts`;
+  const s4 = document.getElementById('diy-sec4-score');
+  if (s4) s4.innerText = `${secScores.p4 ?? 0}/25 pts`;
 
   const statusBadgeEl = document.getElementById('exec-score-classification-pill') || document.getElementById('exec-status-badge');
   if (statusBadgeEl) {
