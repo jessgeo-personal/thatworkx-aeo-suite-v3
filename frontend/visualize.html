@@ -49,41 +49,69 @@
   <!-- Main Visualize Workspace -->
   <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
 
-    <!-- Audit Action Bar -->
-    <div class="visualize-search-bar-card glassmorphic border-glow-cyan mb-6" style="padding: 1.25rem 1.5rem; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; background: var(--surface-bg); border: 1px solid var(--border-color);">
+    <!-- Executive Mode Hero Header Card -->
+    <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 2.25rem 2.5rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
       
-      <form id="scan-form" onsubmit="executeDashboardScan(event)" style="display: flex; gap: 0.75rem; align-items: center; flex: 1; min-width: 320px;">
-        <div class="input-wrapper" style="position: relative; flex: 1;">
-          <span class="input-icon" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem;">🌐</span>
-          <input type="text" id="target-url" placeholder="Enter target domain (e.g. example.com)..." required style="width: 100%; padding: 0.7rem 1rem 0.7rem 2.8rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface-nested-bg); color: var(--text-primary); font-size: 0.95rem;">
+      <!-- Top Capsule Badge & Mode Switcher Row -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+        
+        <!-- Platform Capsule Badge -->
+        <div class="onboarding-badge-capsule" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: #cbd5e1; text-transform: uppercase;">
+          <span class="pulsing-dot-wrapper" style="display: inline-flex; width: 8px; height: 8px; position: relative; margin-right: 0.4rem;">
+            <span class="pulsing-dot-ping" style="position: absolute; width: 100%; height: 100%; border-radius: 9999px; background-color: #0ea5e9; opacity: 0.75;"></span>
+            <span class="pulsing-dot" style="position: relative; width: 8px; height: 8px; border-radius: 9999px; background-color: #38bdf8;"></span>
+          </span>
+          AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE
         </div>
-        <button type="submit" class="submit-btn glowing-btn bg-cyan" id="scan-submit-btn" style="padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
-          <span>Run Audit 🔄</span>
-        </button>
-      </form>
 
-      <!-- View Mode Switcher Toggle Pill -->
-      <div class="view-mode-pill-container" style="display: flex; background: var(--surface-nested-bg); border: 1px solid var(--border-color); padding: 0.25rem; border-radius: 8px; gap: 0.25rem;">
-        <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;">
-          🏢 Executive Mode
-        </button>
-        <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;">
-          🛠️ Developer / DIY Mode
-        </button>
+        <!-- View Mode Switcher Toggle Pill -->
+        <div class="view-mode-pill-container" style="display: flex; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.25rem; border-radius: 9999px; gap: 0.25rem;">
+          <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
+            🏢 Executive Mode
+          </button>
+          <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
+            🛠️ Developer / DIY Mode
+          </button>
+        </div>
       </div>
 
-    </div>
-
-    <!-- Active Target Domain Header Display -->
-    <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8; flex-wrap: wrap; gap: 0.5rem;">
-      <div>Scanned page: <strong id="display-scanned-domain" style="color: #38bdf8;">--</strong></div>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span id="scan-timestamp-badge">Last Scanned: Not scanned</span>
-        <span id="scan-duration-badge" style="color: #cbd5e1; font-weight: 600;">Time to Scan: -- seconds</span>
-        <button type="button" class="drawer-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">📄 Export Raw JSON</button>
-        <button type="button" class="drawer-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">🖨️ Export PDF Summary</button>
+      <!-- Hero Headline Group -->
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: #f8fafc; margin-bottom: 0.4rem; letter-spacing: -0.02em;">
+          Measure <span style="color: #38bdf8;">AI Visibility</span> &amp; Auditable <span style="color: #4ade80;">Readiness</span>
+        </h1>
+        <p style="font-size: 0.95rem; color: #94a3b8; line-height: 1.5; margin: 0; max-width: 800px;">
+          Discover how search engines and LLM web scrapers perceive, process, and cite your digital brand presence in real time.
+        </p>
       </div>
-    </div>
+
+      <!-- Main Audit Input Form -->
+      <div class="visualize-search-bar-card" style="margin-bottom: 1.25rem;">
+        <form id="scan-form" onsubmit="executeDashboardScan(event)" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <div class="input-wrapper" style="position: relative; flex: 1; min-width: 280px;">
+            <span class="input-icon" style="position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); font-size: 1.15rem;">🌐</span>
+            <input type="text" id="target-url" placeholder="Enter target domain (e.g. example.com)..." required style="width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(15, 23, 42, 0.8); color: #f8fafc; font-size: 0.95rem; font-weight: 500; transition: all 0.2s ease;">
+          </div>
+          <button type="submit" class="submit-btn glowing-btn bg-cyan" id="scan-submit-btn" style="padding: 0.8rem 1.75rem; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 0.95rem; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);">
+            <span>Run Audit 🔄</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Active Target Domain Header & Action Buttons -->
+      <div id="active-domain-header-bar" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; color: #94a3b8; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1.1rem; background: rgba(15, 23, 42, 0.65); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06);">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="color: #cbd5e1; font-weight: 500;">Scanned page:</span>
+          <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">--</strong>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+          <button type="button" class="drawer-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">📄 Export Raw JSON</button>
+          <button type="button" class="drawer-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">🖨️ Export PDF Summary</button>
+        </div>
+      </div>
+
+    </section>
 
     <style>
     @media print {
@@ -114,19 +142,84 @@
     <div id="exec-mode-container" class="view-mode-section">
       
       <!-- Executive Welcome & Business Explainer Banner -->
-      <div id="exec-welcome-banner" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">## Let us show you what AI can See ##</h2>
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">### Welcome to the Executive Mode - aimed at the business user.</h3>
-        <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.75rem;">#### AI uses 2 methods to source content from your web presence</h4>
-        <ol style="list-style-type: none; padding-left: 0; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">
-          <li style="padding: 0.6rem 0.85rem; background: var(--surface-nested-bg); border-radius: 8px; border-left: 4px solid #0ea5e9;">
-            1. Your existing human-centric web presence - if this is formatted appropriately, is optimally content rich and has no technical blocks, the site could be considered AI-Optimized
-          </li>
-          <li style="padding: 0.6rem 0.85rem; background: var(--surface-nested-bg); border-radius: 8px; border-left: 4px solid #10b981;">
-            2. Your complimentary Machine-friendly web presence - following the Generative AI Industry standard file hierarchy that helps AI to efficiently read, ingest, process and cite your content. <strong>Done correctly, your web presence could become AI-ready</strong>, without changing your human-centric web presence.
-          </li>
-        </ol>
-        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">#### Take a look at how your web presence is helping your brand be visible to AI engines</h4>
+      <div id="exec-welcome-banner" class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 2rem 2.25rem; border-radius: 20px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 20%, rgba(6, 182, 212, 0.12) 0%, rgba(245, 158, 11, 0.05) 40%, rgba(139, 92, 246, 0.06) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.06) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); margin-bottom: 1.5rem;">
+        
+        <!-- Top Row: Audience Tag & Scan Metrics Bar -->
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem;">
+          
+          <!-- Audience Tag Pill Badge -->
+          <div class="onboarding-badge-capsule" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(14, 165, 233, 0.3); padding: 0.45rem 1.1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em; color: #38bdf8; text-transform: uppercase; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.15);">
+            <span class="pulsing-dot-wrapper" style="display: inline-flex; width: 8px; height: 8px; position: relative; margin-right: 0.45rem;">
+              <span class="pulsing-dot-ping" style="position: absolute; width: 100%; height: 100%; border-radius: 9999px; background-color: #38bdf8; opacity: 0.75;"></span>
+              <span class="pulsing-dot" style="position: relative; width: 8px; height: 8px; border-radius: 9999px; background-color: #0ea5e9;"></span>
+            </span>
+            Welcome to Executive Mode — aimed at the business user
+          </div>
+
+          <!-- Scan Metrics Bar -->
+          <div class="scan-metrics-bar" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <span id="scan-timestamp-badge" class="pill-badge" style="display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Last Scanned: Not scanned</span>
+            <span id="scan-duration-badge" class="pill-badge" style="display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.78rem; color: #38bdf8; font-weight: 600;">Time to Scan: -- seconds</span>
+          </div>
+
+        </div>
+
+        <!-- Main Hero Title Group -->
+        <div style="margin-bottom: 1.5rem;">
+          <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(2rem, 3.8vw, 2.75rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; color: #ffffff; margin-bottom: 0.5rem;">
+            Let us show you what <span class="text-gradient-cyan">AI can See</span>
+          </h1>
+          <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; font-weight: 700; color: #cbd5e1; margin: 0; line-height: 1.4;">
+            AI uses 2 methods to source content from your web presence
+          </h3>
+        </div>
+
+        <!-- 2-Method Business Explainer Hero Cards Grid -->
+        <div class="explainer-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+          
+          <!-- Card 1: Human-centric web presence card -->
+          <div class="explainer-card glassmorphic" style="padding: 1.25rem 1.4rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(14, 165, 233, 0.25); border-left: 4px solid #0ea5e9; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+                <span style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(14, 165, 233, 0.2); color: #38bdf8; font-size: 0.82rem; font-weight: 800;">1</span>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin: 0;">Human-centric web presence</h4>
+              </div>
+              <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.55; margin: 0;">
+                1. Your existing human-centric web presence — if this is formatted appropriately, is optimally content rich and has no technical blocks, the site could be considered <strong style="color: #38bdf8; font-weight: 800;">AI-Optimized</strong>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2: Machine-friendly web presence card -->
+          <div class="explainer-card glassmorphic" style="padding: 1.25rem 1.4rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.25); border-left: 4px solid #10b981; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+                <span style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.82rem; font-weight: 800;">2</span>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin: 0;">Machine-friendly web presence</h4>
+              </div>
+              <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.55; margin: 0;">
+                2. Your complimentary Machine-friendly web presence — following the Generative AI Industry standard file hierarchy that helps AI to efficiently read, ingest, process and cite your content. <em style="color: #34d399; font-style: italic; font-weight: 600;">Done correctly, your web presence could become <strong style="font-style: normal; font-weight: 800;">AI-Ready</strong>, without changing your human-centric web presence.</em>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Key Accented Callout Container -->
+        <div class="key-callout-container" style="padding: 0.9rem 1.25rem; border-radius: 12px; background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 1.2rem; line-height: 1;">💡</span>
+          <p style="font-size: 0.9rem; color: #e2e8f0; margin: 0; line-height: 1.45;">
+            <strong style="color: #4ade80; font-weight: 800;">Done correctly, your web presence could become <em style="font-style: italic;">AI-Ready</em></strong>, without changing your human-centric web presence.
+          </p>
+        </div>
+
+        <!-- Sub-hero Section Lead-in Title -->
+        <div class="sub-hero-title-container" style="padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+          <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin: 0; letter-spacing: -0.01em;">
+            Take a look at how your web presence is helping your brand be visible to AI engines
+          </h2>
+        </div>
+
       </div>
       
       <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
