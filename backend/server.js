@@ -5,6 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
+const { evaluateCapabilities } = require('./services/capabilityEvaluator');
 const {
   generateLlmsTxt,
   generateAiContextMd,
@@ -60,6 +61,12 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
       });
     }
 
+    // Server-side capability evaluation
+    const evaluation = evaluateCapabilities(scanResults);
+    scanResults.overallScore = evaluation.overallScore;
+    scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+
     // Save scan transaction tracking metrics
     const user = req.userRecord;
     user.daily_scans_performed += 1;
@@ -98,7 +105,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
           page_depth_budget: req.userLimits.maxPages,
           pages_actually_crawled: scanResults.pageDepthCrawled,
           headless_session_executed: headless ? true : false,
-          score_achieved: scanResults.scoreCard.overallScore,
+          score_achieved: evaluation.overallScore,
           visibility_classification: scanResults.scoreCard.classification
         });
         await scanLog.save();
@@ -116,7 +123,10 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
         dailyHeadlessRunsPerformed: user.daily_headless_runs_performed,
         tier: user.subscription_tier
       },
-      results: scanResults
+      results: scanResults,
+      overallScore: evaluation.overallScore,
+      pillarScores: evaluation.pillarScores,
+      capabilityMatrix: evaluation.capabilityMatrix
     });
 
   } catch (error) {
@@ -214,11 +224,19 @@ app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
       targetUrl = 'https://' + targetUrl;
     }
     const scanResults = await analyzeUrl(targetUrl, req.userLimits);
+    const evaluation = evaluateCapabilities(scanResults);
+    scanResults.overallScore = evaluation.overallScore;
+    scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+
     res.json({
       success: true,
       api_version: 'v1',
       target_url: targetUrl,
-      results: scanResults
+      results: scanResults,
+      overallScore: evaluation.overallScore,
+      pillarScores: evaluation.pillarScores,
+      capabilityMatrix: evaluation.capabilityMatrix
     });
   } catch (error) {
     console.error('API v1 Scan Error:', error);
@@ -238,11 +256,19 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
       target = 'https://' + target;
     }
     const scanResults = await analyzeUrl(target, req.userLimits);
+    const evaluation = evaluateCapabilities(scanResults);
+    scanResults.overallScore = evaluation.overallScore;
+    scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+
     res.json({
       success: true,
       api_version: 'v1',
       target_url: target,
-      results: scanResults
+      results: scanResults,
+      overallScore: evaluation.overallScore,
+      pillarScores: evaluation.pillarScores,
+      capabilityMatrix: evaluation.capabilityMatrix
     });
   } catch (error) {
     console.error('API v1 POST Scan Error:', error);

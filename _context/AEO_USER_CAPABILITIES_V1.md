@@ -12,15 +12,15 @@ To guide the user along an educational onboarding path, all capabilities and dia
   - Audits robots.txt existence and addresses specific crawl permissions for GPTBot, PerplexityBot, ClaudeBot, and Google-Extended to prevent domain invisibility.
 * **Section 2: Is your web presence optimized for AI?**
   - Audits XML sitemaps, HTTP response headers (x-robots-tag), Single Page App (SPA) hydration traps, and HTTPS SSL secure encryption.
-* **Section 3: Is your content AI-Ready?**
+* **Section 3: Is your content AI-Optimized?**
   - Assesses title tag length sweet spots, meta description presence, heading nesting outline trees, and Flesch readability ratings (content density vs boilerplate noise).
-* **Section 4: Are you setup to be AI-First?**
+* **Section 4: Are you setup to be AI-Ready?**
   - Audits presence of machine directories (`/llms.txt`), corporate profiles (`/ai-context.md`), narrative profiles (`/about.md`, `/docs.md`, `/content.md`), and deterministic JSON-LD schema.
 
 ### ⚡ AIOptimize Tracks (The Remediation Sandbox)
-* **Track 1: AI-Ready Page Fixes**
+* **Track 1: AI-Optimized Page Fixes**
   - Interactive sandboxes for Robots.txt editing, Cloudflare WAF Workers (SPA bypass), Edge Scripts (custom header injection), and organization JSON-LD entity schema.
-* **Track 2: AI-First File Generators**
+* **Track 2: AI-Ready File Generators**
   - Dynamic copy-pasteable generators for `/llms.txt`, `/ai-context.md`, `/about.md`, `/docs.md`, `/content.md`, and sitemap.xml files.
 
 ## FILE DEFINITIONS

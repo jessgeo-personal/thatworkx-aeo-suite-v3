@@ -1,14 +1,19 @@
 /**
  * capabilityEvaluator.js
  * 
- * Comprehensive 32-Capability Evaluation Engine for AIVisualize Dashboard.
- * Evaluates DOM text & Machine Welcome Mats (/llms.txt, /ai-context.md).
- * When HTML DOM is JS-heavy, active /llms.txt or /ai-context.md acts as a verified RAG fallback stream.
+ * Server-Side 32-Capability Evaluation & Diagnostic Scoring Engine.
+ * Calculates 4 Pillars (P1, P2, P3, P4, 0-25 pts each) and overallScore (0-100).
+ * 
+ * Strict Vocabulary Constraint:
+ * NEVER use the term "AI-first".
+ * Use "AI-Optimized" for core site checks and "AI-Ready" for machine manifest checks.
  */
 
-export const CAPABILITY_MATRIX = [
+const CAPABILITY_MATRIX = [
   // ═════════════════════════════════════════════════════════════════════════
   // SECTION 1: Are You Blocking Out AI? (Bot Gateway & Access Control - 3)
+  // Evaluate ONLY robots.txt, WAF/CDN blocks, and X-Robots-Tag headers.
+  // DO NOT check or penalize sitemap.xml in Section 1!
   // ═════════════════════════════════════════════════════════════════════════
   {
     id: 'cdnFirewallBlocking',
@@ -64,6 +69,8 @@ export const CAPABILITY_MATRIX = [
 
   // ═════════════════════════════════════════════════════════════════════════
   // SECTION 2: Is Your Web Presence Optimized for AI? (Presence & Hygiene - 7)
+  // Evaluate sitemap.xml presence/validity (missing sitemap penalties belong 100% here),
+  // HTTPS SSL, SPA hydration traps, and response headers.
   // ═════════════════════════════════════════════════════════════════════════
   {
     id: 'essentialPagesIndex',
@@ -73,7 +80,7 @@ export const CAPABILITY_MATRIX = [
     category: 'Hygiene',
     description: 'Verifies presence of /about, /contact, and /privacy-policy.',
     evaluate: (data = {}) => {
-      const found = data.sec2?.essentialPagesFound ?? (data.status?.aboutTxtExists ? 2 : 1);
+      const found = data.sec2?.essentialPagesFound ?? (data.status?.aboutTxtExists ? 3 : 2);
       return {
         status: found >= 3 ? 'pass' : 'warning',
         score: Math.min(100, (found / 3) * 100),
@@ -185,7 +192,8 @@ export const CAPABILITY_MATRIX = [
     category: 'Hygiene',
     description: 'HTTPS / SSL certificate validation.',
     evaluate: (data = {}) => {
-      const isHttps = data.sec2?.isHttps !== false && (!data.url || data.url.startsWith('https'));
+      const targetUrl = data.url || data.sec2?.url || '';
+      const isHttps = data.sec2?.isHttps !== false && (!targetUrl || targetUrl.startsWith('https'));
       return {
         status: isHttps ? 'pass' : 'blocked',
         score: isHttps ? 100 : 0,
@@ -195,18 +203,21 @@ export const CAPABILITY_MATRIX = [
     }
   },
   {
-    id: 'domainAgeTrust',
+    id: 'sitemapXmlPresence',
     section: 2,
     sectionName: 'Is Your Web Presence Optimized for AI?',
-    name: 'Domain Age & Trust Factor',
+    name: 'Sitemap.xml Presence & Hygiene',
     category: 'Hygiene',
-    description: 'Domain registration age trust factor.',
-    evaluate: (data = {}) => ({
-      status: 'pass',
-      score: 95,
-      details: 'Domain registration history verified with positive trust score',
-      recommendation: 'Keep domain registration active for >2 years to maintain authority signals.'
-    })
+    description: 'Verifies presence and accessibility of /sitemap.xml route directory index.',
+    evaluate: (data = {}) => {
+      const exists = data.status?.sitemapExists ?? data.sec2?.sitemapExists ?? data.sec4?.sitemapFound ?? false;
+      return {
+        status: exists ? 'pass' : 'warning',
+        score: exists ? 100 : 0,
+        details: exists ? '/sitemap.xml present with indexed routes' : '/sitemap.xml missing or invalid format',
+        recommendation: 'Generate an updated XML sitemap and reference it inside /robots.txt.'
+      };
+    }
   },
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -348,7 +359,7 @@ export const CAPABILITY_MATRIX = [
     evaluate: (data = {}) => {
       const q = data.sec3?.faqQuestions ?? 4;
       const a = data.sec3?.faqAnswers ?? 4;
-      const hasSchema = data.status?.jsonLdExists ?? true;
+      const hasSchema = data.status?.jsonLdExists ?? data.sec3?.hasFaqSchema ?? true;
       const isParity = q > 0 && q === a;
       return {
         status: isParity && hasSchema ? 'pass' : 'warning',
@@ -423,7 +434,8 @@ export const CAPABILITY_MATRIX = [
   },
 
   // ═════════════════════════════════════════════════════════════════════════
-  // SECTION 4: Are You Setup to be AI-Ready? (Machine Manifests & Handshake - 12)
+  // SECTION 4: Are You Setup to be AI-Ready? (Machine Manifest Readiness - 12)
+  // Evaluate /llms.txt, /ai-context.md, /about.md, /docs.md, and 4-level machine hierarchy.
   // ═════════════════════════════════════════════════════════════════════════
   {
     id: 'robotsTxt',
@@ -450,7 +462,7 @@ export const CAPABILITY_MATRIX = [
     category: 'Manifests',
     description: 'Availability, page path coverage comparison, missing essential routes flag, sample generator.',
     evaluate: (data = {}) => {
-      const exists = data.status?.sitemapExists ?? data.sec4?.sitemapFound ?? true;
+      const exists = data.status?.sitemapExists ?? data.sec4?.sitemapFound ?? false;
       return {
         status: exists ? 'pass' : 'warning',
         score: exists ? 100 : 30,
@@ -623,28 +635,177 @@ export const CAPABILITY_MATRIX = [
 ];
 
 /**
- * Execute evaluation for all 32 capabilities
+ * Server-Side Diagnostic Scoring Evaluator
+ * Evaluates 4 Pillars (P1, P2, P3, P4, 0-25 pts each) and overallScore (0-100).
+ * 
+ * Strict Categorization:
+ * - Section 1 (Gateway & Access): Evaluate ONLY robots.txt, WAF/CDN blocks, X-Robots-Tag headers. NO sitemap penalties!
+ * - Section 2 (Presence & Hygiene): Evaluate sitemap.xml presence/validity, HTTPS SSL, SPA hydration traps, and response headers.
+ * - Section 3 (Content AI-Readiness): Evaluate title tag length, meta descriptions, heading trees, Flesch readability.
+ * - Section 4 (Machine Manifest Readiness): Evaluate /llms.txt, /ai-context.md, /about.md, /docs.md, 4-level hierarchy.
  */
-export function evaluateAllCapabilities(scanData = {}) {
-  const results = CAPABILITY_MATRIX.map(cap => {
-    const evaluation = cap.evaluate(scanData);
+function evaluateCapabilities(crawledData = {}) {
+  const status = crawledData.status || {};
+  const sec1 = crawledData.sec1 || {};
+  const sec2 = crawledData.sec2 || {};
+  const sec3 = crawledData.sec3 || {};
+  const sec4 = crawledData.sec4 || {};
+
+  // 1. Pillar 1: Gateway & Access (0-25 pts)
+  // Evaluate ONLY robots.txt, WAF/CDN blocks, and X-Robots-Tag headers.
+  // DO NOT check or penalize sitemap.xml in Section 1!
+  let p1Score = 25;
+  const robotsTxtExists = status.robotsTxtExists ?? sec1.robotsTxtExists ?? sec4.robotsTxtFound ?? true;
+  const isDisallowed = status.xRobotsIndexable === false || sec1.disallowAll === true || (!robotsTxtExists);
+  const cdnBlocked = sec1.cdnBlocked === true;
+  const botPermissions = status.botPermissions || {};
+  const blockedBotCount = Object.values(botPermissions).filter(allowed => allowed === false).length;
+
+  if (isDisallowed) {
+    p1Score -= 25;
+  } else {
+    if (cdnBlocked) {
+      p1Score -= 15;
+    }
+    if (blockedBotCount > 0) {
+      p1Score -= Math.min(10, blockedBotCount * 5);
+    }
+    if (sec1.xRobotsNoIndex === true) {
+      p1Score -= 10;
+    }
+  }
+  p1Score = Math.max(0, Math.min(25, p1Score));
+
+  // 2. Pillar 2: Presence & Hygiene (0-25 pts)
+  // Evaluate sitemap.xml presence/validity (missing sitemap penalties belong 100% here), HTTPS SSL, SPA hydration traps, response headers.
+  let p2Score = 25;
+  const sitemapExists = status.sitemapExists ?? sec2.sitemapExists ?? sec4.sitemapFound ?? false;
+  if (!sitemapExists) {
+    p2Score -= 10; // Missing sitemap penalty belongs 100% here
+  }
+
+  const targetUrl = crawledData.url || sec2.url || '';
+  const isHttps = sec2.isHttps ?? (targetUrl ? targetUrl.startsWith('https') : true);
+  if (!isHttps) {
+    p2Score -= 5;
+  }
+
+  const spaTrapDetected = status.spaTrapDetected ?? sec2.isHeavyJs ?? false;
+  if (spaTrapDetected) {
+    p2Score -= 5;
+  }
+
+  const essentialPagesFound = sec2.essentialPagesFound ?? (status.aboutTxtExists ? 3 : 2);
+  if (essentialPagesFound < 3) {
+    p2Score -= 3;
+  }
+  p2Score = Math.max(0, Math.min(25, p2Score));
+
+  // 3. Pillar 3: Content AI-Readiness (0-25 pts)
+  // Evaluate title tag length, meta descriptions, heading trees, Flesch readability.
+  let p3Score = 25;
+  const seoOptimalTitle = status.seoOptimalTitle ?? sec3.seoOptimalTitle ?? true;
+  if (!seoOptimalTitle) {
+    p3Score -= 5;
+  }
+
+  const seoOptimalDesc = status.seoOptimalDesc ?? sec3.seoOptimalDesc ?? true;
+  if (!seoOptimalDesc) {
+    p3Score -= 5;
+  }
+
+  const hasProperHierarchy = status.hasProperHierarchy ?? sec3.hasProperHierarchy ?? true;
+  if (!hasProperHierarchy) {
+    p3Score -= 10;
+  }
+
+  const wordCount = status.wordCount ?? sec3.wordCount ?? 800;
+  const fleschScore = sec3.fleschScore ?? 68;
+  if (wordCount < 500 || fleschScore < 50) {
+    p3Score -= 5;
+  }
+  p3Score = Math.max(0, Math.min(25, p3Score));
+
+  // 4. Pillar 4: Machine Manifest Readiness (0-25 pts)
+  // Evaluate /llms.txt, /ai-context.md, /about.md, /docs.md, 4-level machine hierarchy.
+  let p4Score = 25;
+  const llmsTxtExists = status.llmsTxtExists ?? sec4.llmsTxtFound ?? false;
+  if (!llmsTxtExists) {
+    p4Score -= 10;
+  }
+
+  const aiContextExists = status.aiContextExists ?? sec4.aiContextFound ?? false;
+  if (!aiContextExists) {
+    p4Score -= 8;
+  }
+
+  const aboutTxtExists = status.aboutTxtExists ?? sec4.aboutMdFound ?? false;
+  if (!aboutTxtExists) {
+    p4Score -= 4;
+  }
+
+  const docsTxtExists = status.docsTxtExists ?? sec4.docsMdFound ?? false;
+  if (!docsTxtExists) {
+    p4Score -= 3;
+  }
+  p4Score = Math.max(0, Math.min(25, p4Score));
+
+  // Blanket Disallow Block Enforcement
+  const isBlanketBlock = status.xRobotsIndexable === false || sec1.disallowAll === true;
+  if (isBlanketBlock) {
+    p1Score = 0;
+    p2Score = Math.min(p2Score, 10);
+    p3Score = Math.min(p3Score, 10);
+    p4Score = 0;
+  }
+
+  // overallScore is exact sum of P1 + P2 + P3 + P4
+  const overallScore = p1Score + p2Score + p3Score + p4Score;
+
+  // Evaluate individual 32 capability items
+  const capabilityMatrix = CAPABILITY_MATRIX.map(cap => {
+    const evaluation = cap.evaluate(crawledData);
     return {
       ...cap,
       ...evaluation
     };
   });
 
-  const totalScore = Math.round(results.reduce((acc, curr) => acc + curr.score, 0) / results.length);
-  
   return {
-    totalScore,
-    totalCapabilities: results.length, // Exactly 32
-    sectionScores: {
-      section1: Math.round(results.filter(r => r.section === 1).reduce((a, b) => a + b.score, 0) / 3),
-      section2: Math.round(results.filter(r => r.section === 2).reduce((a, b) => a + b.score, 0) / 7),
-      section3: Math.round(results.filter(r => r.section === 3).reduce((a, b) => a + b.score, 0) / 10),
-      section4: Math.round(results.filter(r => r.section === 4).reduce((a, b) => a + b.score, 0) / 12)
+    overallScore,
+    pillarScores: {
+      P1: p1Score,
+      P2: p2Score,
+      P3: p3Score,
+      P4: p4Score
     },
-    capabilities: results
+    capabilityMatrix
   };
 }
+
+/**
+ * Backwards compatibility wrapper for evaluateAllCapabilities
+ */
+function evaluateAllCapabilities(scanData = {}) {
+  const evalResult = evaluateCapabilities(scanData);
+  return {
+    totalScore: evalResult.overallScore,
+    overallScore: evalResult.overallScore,
+    pillarScores: evalResult.pillarScores,
+    totalCapabilities: evalResult.capabilityMatrix.length,
+    sectionScores: {
+      section1: evalResult.pillarScores.P1,
+      section2: evalResult.pillarScores.P2,
+      section3: evalResult.pillarScores.P3,
+      section4: evalResult.pillarScores.P4
+    },
+    capabilities: evalResult.capabilityMatrix,
+    capabilityMatrix: evalResult.capabilityMatrix
+  };
+}
+
+module.exports = {
+  evaluateCapabilities,
+  evaluateAllCapabilities,
+  CAPABILITY_MATRIX
+};

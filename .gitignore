@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+_archive/
+.geminiignore*
 
 # Environment Variables & Local Configs
 .env
@@ -12,6 +14,7 @@ npm-debug.log*
 
 # Coverage / Test artifacts
 coverage/
+source-only.zip*
 
 # OS Files
 .DS_Store

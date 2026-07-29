@@ -2,6 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const url = require('url');
 const { parseHtmlMetrics } = require('./parserService');
+const { evaluateCapabilities } = require('./capabilityEvaluator');
 
 const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   if (!htmlContent) {
@@ -368,92 +369,22 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
       result.pages.push(parsedPage);
     }
 
-    // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores
-    const disallowRegex = /User-agent:\s*\*\s*Disallow:\s*\/\s*(?!\w)/i;
-    const isBlanketBlock = disallowRegex.test(robotsContent || '');
+    // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores via capabilityEvaluator
+    const evaluation = evaluateCapabilities(result);
+    const totalOverallScore = evaluation.overallScore;
 
-    // Pillar 1: Gateway & Access (Max 25 pts)
-    let p1Score = 25;
-    let p1Notes = [];
-    const blockedBots = Object.values(result.status.botPermissions || {}).filter(allowed => !allowed).length;
-    if (blockedBots > 0) {
-      p1Score -= (blockedBots * 10);
-      p1Notes.push(`${blockedBots} AI bot(s) blocked (-${blockedBots * 10} pts)`);
-    }
-    if (!result.status.sitemapExists) {
-      p1Score -= 5;
-      p1Notes.push('Sitemap.xml missing (-5 pts)');
-    }
-    p1Score = Math.max(0, p1Score);
-    const p1NoteText = p1Notes.length > 0 ? p1Notes.join(', ') : 'All AI crawlers allowed and sitemap active.';
-
-    // Pillar 2: AI-Ready Machine Data (Max 25 pts)
-    let p2Score = 25;
-    let p2Notes = [];
-    if (!result.status.llmsTxtExists) {
-      p2Score -= 10;
-      p2Notes.push('Missing /llms.txt (-10 pts)');
-    }
-    if (!result.status.aiContextExists) {
-      p2Score -= 10;
-      p2Notes.push('Missing /ai-context.md (-10 pts)');
-    }
-    const missingNarratives = [!result.status.aboutTxtExists, !result.status.docsTxtExists, !result.status.contentTxtExists].filter(Boolean).length;
-    if (missingNarratives > 0) {
-      p2Score -= 5;
-      p2Notes.push(`Missing ${missingNarratives} narrative manifest(s) (-5 pts)`);
-    }
-    p2Score = Math.max(0, p2Score);
-    const p2NoteText = p2Notes.length > 0 ? p2Notes.join(', ') : 'All machine welcome mats and brand manifests active.';
-
-    // Pillar 3: Parsing & Readability (Max 25 pts)
-    let p3Score = 25;
-    let p3Notes = [];
-    if (result.status.spaTrapDetected) {
-      p3Score -= 15;
-      p3Notes.push('Client-Side SPA JS trap detected (-15 pts)');
-    }
-    if (!result.status.hasProperHierarchy) {
-      p3Score -= 10;
-      p3Notes.push('H1 tag or heading hierarchy missing (-10 pts)');
-    }
-    if (parsedMetrics.wordCount < 500) {
-      p3Score -= 5;
-      p3Notes.push('Word count under 500 words (-5 pts)');
-    } else if (parsedMetrics.wordCount > 2500) {
-      p3Score -= 5;
-      p3Notes.push('Word count over 2,500 words truncation risk (-5 pts)');
-    }
-    p3Score = Math.max(0, p3Score);
-    const p3NoteText = p3Notes.length > 0 ? p3Notes.join(', ') : 'High content density and linear heading structure.';
-
-    // Pillar 4: Knowledge Graph Integrity (Max 25 pts)
-    let p4Score = 25;
-    let p4Notes = [];
-    if (!result.status.jsonLdExists) {
-      p4Score -= 15;
-      p4Notes.push('JSON-LD schema markup missing (-15 pts)');
-    }
-    const canonicalCount = $('link[rel="canonical"]').length;
-    if (canonicalCount === 0) {
-      p4Score -= 10;
-      p4Notes.push('Self-referential canonical tag missing (-10 pts)');
-    }
-    p4Score = Math.max(0, p4Score);
-    const p4NoteText = p4Notes.length > 0 ? p4Notes.join(', ') : 'JSON-LD schema active and canonical tag verified.';
-
-    // Overall Score (Sum of 4 Pillars, max 100)
-    let totalOverallScore = isBlanketBlock ? 20 : (p1Score + p2Score + p3Score + p4Score);
-    totalOverallScore = Math.max(15, Math.min(100, totalOverallScore));
+    result.overallScore = evaluation.overallScore;
+    result.pillarScores = evaluation.pillarScores;
+    result.capabilityMatrix = evaluation.capabilityMatrix;
 
     result.scoreCard = {
       overallScore: totalOverallScore,
       classification: totalOverallScore >= 80 ? 'Good' : totalOverallScore >= 50 ? 'Bad' : 'Ugly',
       pillars: {
-        p1: { score: p1Score, max: 25, badge: isBlanketBlock ? 'BLOCKED GATEWAY' : (p1Score === 25 ? 'OPTIMIZED HANDSHAKE' : p1Score >= 15 ? 'PARTIAL GATEWAY' : 'RESTRICTED CRAWL'), note: isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-80 pts).' : p1NoteText },
-        p2: { score: p2Score, max: 25, badge: p2Score === 25 ? 'WELCOME MAT ACTIVE' : p2Score >= 15 ? 'PARTIAL MANIFESTS' : '404 MISSING', note: p2NoteText },
-        p3: { score: p3Score, max: 25, badge: p3Score === 25 ? 'HIGH DENSITY' : p3Score >= 15 ? 'READABILITY GAPS' : 'POOR READABILITY', note: p3NoteText },
-        p4: { score: p4Score, max: 25, badge: p4Score === 25 ? 'SCHEMA VERIFIED' : p4Score >= 15 ? 'SCHEMA GAPS' : 'NO KNOWLEDGE GRAPH', note: p4NoteText }
+        p1: { score: evaluation.pillarScores.P1, max: 25, badge: evaluation.pillarScores.P1 === 25 ? 'OPTIMIZED HANDSHAKE' : 'RESTRICTED CRAWL' },
+        p2: { score: evaluation.pillarScores.P2, max: 25, badge: evaluation.pillarScores.P2 === 25 ? 'WELCOME MAT ACTIVE' : 'PARTIAL MANIFESTS' },
+        p3: { score: evaluation.pillarScores.P3, max: 25, badge: evaluation.pillarScores.P3 === 25 ? 'HIGH DENSITY' : 'READABILITY GAPS' },
+        p4: { score: evaluation.pillarScores.P4, max: 25, badge: evaluation.pillarScores.P4 === 25 ? 'SCHEMA VERIFIED' : 'NO KNOWLEDGE GRAPH' }
       }
     };
 

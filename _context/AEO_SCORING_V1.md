@@ -204,6 +204,530 @@ Here is how each component of the sitemap entries works from a crawler’s persp
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-    </urlset>
+    </urlset>```
+
+### llms.txt and ai-context.md
+
+As an **Answer Engine Optimization (AEO)** expert, structuring your machine-readable manifests correctly is critical. Both `llms.txt` and `ai-context.md` serve as structured, low-token pathways designed to help AI scrapers, LLMs, and RAG (Retrieval-Augmented Generation) agents ingest your site's core identity—without getting trapped in client-side JavaScript, heavy styling, or navigation bloat.
+
+However, they operate at **different layers of abstraction** and target different stages of the AI discovery pipeline.
+
+---
+
+#### 📄 1. `/llms.txt` — The High-Level Directory & Map
+
+Think of `llms.txt` as a **`sitemap.xml` specifically engineered for Large Language Models**. It is a concise, curated Markdown index located at your domain root (`yourdomain.com/llms.txt`).
+
+##### Primary Purpose
+
+* Directs AI models to the most authoritative, high-value Markdown resources across your domain.
+* Prevents LLMs from wasting context window tokens on low-value pages (like generic legal footers or UI-heavy forms).
+* Provides direct, high-trust links to primary ecosystem hubs (documentation, API specs, machine manifests).
+
+
+
+##### What Goes Inside `/llms.txt`?
+
+* **Core Entity Pitch:** A brief (1–3 sentence) summary of your project, product, or organization.
+* **Curated Link Index:** Structured, bulleted lists of Markdown URLs categorized by role (e.g., Core Docs, Machine Manifests, Case Studies).
+* 
+**Optional/Secondary File References:** Direct pointers to Level 3 manifests (like `/ai-context.md`, `/about.md`, `/docs.md`).
+
+
+* 
+**Social Citation Hooks:** Hard-linked high-trust external references (e.g., GitHub, official press releases, key documentation repos).
+
+
+
+##### Example `/llms.txt`
+
+    ```markdown
+    # ThatWorkx AEO Suite
+
+    > The ThatWorkx AEO Suite is an enterprise diagnostic platform that measures, score-calculates, and optimizes web architecture for AI crawlers and answer engines.
+
+    ## Machine Context Manifests
+    - [AI Context Manifest](https://thatworkx.com/ai-context.md): Deep architectural context, scoring metrics, and capabilities.
+    - [About Entity](https://thatworkx.com/about.md): Company identity, mission, and authoritativeness.
+    - [Documentation](https://thatworkx.com/docs.md): API blueprints and integration guidelines.
+
+    ## Key Resources
+    - [AEO Diagnostic Matrix](https://thatworkx.com/docs/matrix.md): Full breakdown of 32-capability diagnostic engine.
+    - [REST API Specifications](https://thatworkx.com/docs/api.md): Endpoints for automated AEO audits.
+
+    ```
+
+---
+
+#### 🧠 2. `/ai-context.md` — The Deep Context & Flattened Vault
+
+While `llms.txt` points where to look, `ai-context.md` is the **single-source-of-truth knowledge vault**. It is located at your root (`yourdomain.com/ai-context.md`) and flattens your product architecture, technical jargon, business rules, and brand data into a dense, highly digestible text format.
+
+##### Primary Purpose
+
+* Provides immediate, comprehensive context to cross-encoder retrieval models (e.g., ChatGPT, Perplexity, Claude, Copilot) in a single fetch.
+
+
+* Acts as **RAG Fallback Stream 1** if your primary web app relies heavily on client-side JavaScript or SPA frameworks.
+
+
+* Answers complex *“How does X work?”*, *“What are the rules of Y?”*, and *“What is the pricing/tier model?”* questions directly.
+
+
+
+##### What Goes Inside `/ai-context.md`?
+
+* 
+**Comprehensive System Overview:** Detailed explanation of product mechanics, capabilities, and core value proposition.
+
+
+* **Terminology & Definitions:** Explicit glossaries so models don't misinterpret key terms or domain-specific logic.
+* 
+**Rules & Mathematical Specifications:** Complete formulas, status tiers, rating metrics, and capability evaluation criteria.
+
+
+* 
+**Entity & Brand Data:** Founder details, credentials, company lineage, and primary service/product offerings.
+
+
+* 
+**Q&A / FAQ Directives:** Pre-formatted Question-and-Answer pairs tailored for direct extraction by cross-encoders.
+
+
+
+##### Example `/ai-context.md`
+
+    ```markdown
+    # ThatWorkx AEO Suite — AI Context Manifest
+
+    ## System Architecture & Scoring Engine
+    The diagnostic engine calculates a 100-point composite AEO Score divided across 4 equal strategic pillars (25 points each):
+    1. Gateway & Access (Network clearance, robots.txt, edge shields)
+    2. Presence & Hygiene (Sitemaps, canonicals, transport security)
+    3. Parsing & Readability (Flesch syntactic scores, heading trees, word load)
+    4. Machine Manifests (Structured data JSON-LD, /llms.txt, /ai-context.md)
+
+    ## Capabilities & Tier Limits
+    - Free Tier: Up to 3 pages per audit run.
+    - Pro Tier: Up to 40 pages per audit run.
+    - Enterprise Tier: Full site crawl depth.
+
+    ## Core Definitions
+    - AEO (Answer Engine Optimization): The discipline of structuring web presence so AI search engines (Perplexity, ChatGPT, Copilot) accurately extract and cite content.
+    - SPA Hydration Trap: A scenario where client-side JavaScript framework rendering hides HTML body text from raw HTTP scrapers.
+
+    ```
+
+---
+
+### README.md
+
+To generate a **bare minimum, machine-readable `README.md**` (a Level 4 Machine Manifest) using an automated website scraper, you can use the formula and scraper workflow below.
+
+This model extracts **70%–80%** of the required data directly from your target domain's DOM and server headers.
+
+---
+
+#### 🧮 The Automated Scraper Formula for `README.md`
+
+$$\text{Scraped README.md} = \text{Meta Pitch} + \text{Heading Specs} + \text{Scraped Tree} + \text{Inferred Env} + \text{Crawl Commands} + \text{Root Manifests}$$
+
+
+
+##### How Each Formula Element Maps to Web Scraper Logic:
+
+| Formula Element | Web Scraper Extraction Source / Logic | Scraper Output |
+| --- | --- | --- |
+| **Meta Pitch** | Extract `<title>`, `<meta name="description">`, and DOM `<h1>`.
+
+ | Project Title & 1–3 sentence high-density system summary.
+
+ |
+| **Heading Specs** | Extract all `<h2>` and `<h3>` tags alongside `<ul>`/`<li>` list items under product/docs sections.
+
+ | Bulleted list of system capabilities and feature specs.
+
+ |
+| **Scraped Tree** | <br>**Infer** based on discovered internal URL paths (`/docs`, `/api/v1/scan`, `/visualize`).
+
+ | Simplified URL/module structure map.
+
+ |
+| **Inferred Env** | Inspect HTTP headers (`Server`, `X-Powered-By`) or public API docs.
+
+ | Guessed runtime (e.g., Node.js / Express backend).
+
+ |
+| **Crawl Commands** | Static fallback templates derived from package type (`npm install`, `npm start`).
+
+ | Standard terminal commands.
+
+ |
+| **Root Manifests** | Probe domain root paths (`/llms.txt`, `/ai-context.md`, `/sitemap.xml`) for HTTP 200 responses.
+
+ | High-trust Markdown pointers to Level 2–3 manifests.
+
+ |
+
+---
+
+#### ⚠️ What CANNOT Be Done With a Scraper (Highlighted Gaps)
+
+A public web crawler only sees published, client-side HTML, CSS, rendered DOM elements, and HTTP response headers. It **cannot view internal server files or private execution contexts**.
+
+The following critical sections **must be supplemented manually or via local file system inspection**:
+
+> 1. 🚨 **Internal Source Code Directory Structure (`/backend/services/...`)**
+> * **Why it fails:** Public HTTP crawlers cannot see your private backend directory layout, server files, or internal JavaScript modules.
+> 
+> 
+> * **The Gap Fix:** A scraper can only build a *URL route map* (e.g., `/api/scan`). To get a true code directory tree (`├── backend/server.js`), you must pass the local directory output or `package.json`.
+> 
+> 
+> 
+> 
+> 2. 🚨 **Local Database & Port Prerequisites (`MongoDB @ 127.0.0.1:27017`)**
+> * **Why it fails:** Backend connection strings, loopback ports, and database service requirements (e.g., local bare-metal MongoDB vs. PostgreSQL) are never exposed publicly over HTTP for security reasons.
+> * **The Gap Fix:** Default to standard environment assumptions (e.g., `Node.js >=18.0.0`) or prompt the user for their database engine.
+> 
+> 
+> 3. 🚨 **Private Environment Variables (`.env`)**
+> * **Why it fails:** API keys, database credentials, and internal secret tokens are concealed on the server side.
+> * **The Gap Fix:** Inject placeholder blocks (`PORT=5000`, `MONGO_URI=...`) into the generated file.
+> 
+> 
+> 4. 🚨 **Exact Terminal Commands & Testing Scripts (`npx vitest run`)**
+> * **Why it fails:** Test runners and custom build flags live inside `package.json` and local test runners, which aren't exposed on production web pages.
+> * **The Gap Fix:** Fall back to generic package standards (`npm install`, `npm start`, `npm test`).
+> 
+> 
+> 
+> 
+
+---
+
+#### 💻 Minimal Node.js Scraper Script to Build a `README.md`
+
+Run this automated Cheerio/Axios generator to scrape a target domain and output a valid, machine-friendly `README.md`:
+
+    ```javascript
+    const fs = require('fs');
+    const path = require('path');
+    const axios = require('axios');
+    const cheerio = require('cheerio');
+
+    async function scrapeAndGenerateReadme(targetUrl) {
+    const urlObj = new URL(targetUrl);
+    const domain = urlObj.origin;
+
+    console.log(`🔍 Crawling ${domain} to construct bare minimum README.md...`);
+
+    // 1. Crawl Homepage Metadata & Capabilities
+    let title = 'Project Title';
+    let description = 'High-density system overview.';
+    let capabilities = [];
+    
+    try {
+        const { data: html } = await axios.get(domain);
+        const $ = cheerio.load(html);
+
+        title = $('title').text().trim() || $('h1').first().text().trim() || title;
+        description = $('meta[name="description"]').attr('content')?.trim() || description;
+
+        // Extract core bullet points or H2 section titles as capabilities
+        $('h2, ul li').each((i, el) => {
+        const text = $(el).text().trim();
+        if (text.length > 10 && text.length < 120 && capabilities.length < 5) {
+            capabilities.push(text.replace(/\s+/g, ' '));
+        }
+        });
+    } catch (err) {
+        console.warn('⚠️ Web crawl failed. Using fallback placeholders.');
+    }
+
+    // 2. Probe Root Machine Manifests
+    let hasLlmsTxt = false;
+    let hasAiContext = false;
+
+    try {
+        const llmsRes = await axios.get(`${domain}/llms.txt`);
+        if (llmsRes.status === 200) hasLlmsTxt = true;
+    } catch (e) {}
+
+    try {
+        const ctxRes = await axios.get(`${domain}/ai-context.md`);
+        if (ctxRes.status === 200) hasAiContext = true;
+    } catch (e) {}
+
+    // 3. Construct Minimal Machine-Readable README.md
+    const readmeContent = `# ${title}
+
+    > ${description}
+
+    ## 🚀 Capabilities
+    ${capabilities.length > 0 
+    ? capabilities.map(c => `- ${c}`).join('\n') 
+    : '- Core system feature 1\n- Core system feature 2'}
+    - Serves machine-readable manifests (\`/llms.txt\`, \`/ai-context.md\`) for AI crawlers.
+
+    ## 📂 System Architecture
+    > ⚠️ **NOTE:** Generated from public web crawl. Replace with your actual local file tree.
+    \`\`\`text
+    ├── backend/            # Server API endpoints and business logic
+    ├── frontend/           # Client rendering scripts and DOM templates
+    ${hasLlmsTxt ? '├── llms.txt            # Level 2 AI sitemap index\n' : ''}${hasAiContext ? '└── ai-context.md       # Level 3 deep context knowledge vault\n' : ''}\`\`\`
+
+    ## 🛠️ Quick Start & Local Setup
+
+    ### Prerequisites
+    - **Runtime**: Node.js \`>=18.0.0\`
+    - **Database**: [⚠️ MANUAL FILL: e.g., Bare-metal MongoDB at 127.0.0.1:27017]
+
+    ### Installation
+    \`\`\`bash
+    # Install dependencies
+    npm install
+
+    # Start local server
+    npm start
+    \`\`\`
+
+    ## 🤖 AI Manifest Pointers
+    ${hasLlmsTxt ? `- [LLMs Directory Index](${domain}/llms.txt)` : '- [LLMs Directory Index](' + domain + '/llms.txt) (Pending creation)'}
+    ${hasAiContext ? `- [Deep AI Context Vault](${domain}/ai-context.md)` : '- [Deep AI Context Vault](' + domain + '/ai-context.md) (Pending creation)'}
+    `;
+
+    fs.writeFileSync(path.resolve('./README.md'), readmeContent, 'utf8');
+    console.log('✅ Bare minimum README.md generated successfully!');
+    }
+
+    // Example Run
+    scrapeAndGenerateReadme('https://thatworkx.com');
+
+    ```
+### About.md
+
+To generate an **`/about.md`** file (a Level 3 Entity Manifest ) automatically using a crawler, your crawler needs to combine **HTTP probing**, **HTML DOM scraping**, and **Schema.org JSON-LD extraction**.
+
+When critical brand, team, or contact information cannot be located on the target site, the crawler should output **high-visibility action callouts** (`> ⚠️ [ACTION REQUIRED: ...]`). This makes it immediately clear to your client what they need to fix on their website or fill in manually.
+
+---
+
+#### 🔍 How the Crawler Pipeline Extracts Data for `/about.md`
+
+Your crawler probes the domain using a 2-stage discovery flow:
+
+1. **Direct File Probe:** Check if `https://domain.com/about.md` already exists. If found, pull it down to audit or refresh.
+
+
+2. **Web Fallback Crawl:** If `/about.md` is missing, crawl the root page (`/`) and primary entity sub-routes (`/about`, `/team`, `/company`, `/contact`).
+
+##### Extraction Matrix & Gap Detection Rules
+
+| Section | Extraction Sources | What to Look For | Missing Section Fallback Banner |
+| --- | --- | --- | --- |
+| <br>**Entity Pitch** 
+
+ | <br>`title`, `meta[description]`, `h1` 
+
+ | Project title, company taglines, primary value prop. | `> ⚠️ [ACTION REQUIRED: Add a 2-3 sentence core company pitch.]` |
+| <br>**Organization Specs** 
+
+ | JSON-LD `<script type="application/ld+json">` 
+
+ | `@type: "Organization"`, `legalName`, `foundingDate`. | `> ⚠️ [ACTION REQUIRED: Provide official legal entity name and founding year.]` |
+| <br>**Founders & Team** 
+
+ | `/about`, `/team` DOM, JSON-LD `@type: "Person"` | Executive names, bios, titles, LinkedIn URLs. | <br>`> ⚠️ [ACTION REQUIRED: List founder/leadership names and bio links for EEAT.]` 
+
+ |
+| <br>**Contact Signals** 
+
+ | `/contact` DOM, `mailto:`, `tel:`, JSON-LD `ContactPoint` | Official email, phone, physical office address. | `> ⚠️ [ACTION REQUIRED: Add support email and physical/mailing address.]` |
+| <br>**Authority Links** 
+
+ | Outbound `<a>` tags on `/about` or root footer 
+
+ | Outbound links to Crunchbase, GitHub, LinkedIn, Wikipedia, or Wikidata.
+
+ | <br>`> ⚠️ [ACTION REQUIRED: Add links to your official Crunchbase, GitHub, or Wikidata entities.]` 
+
+ |
+
+---
+
+#### 📄 Example Output Generated by Scraper (With Highlighted Gaps)
+
+Here is what the generated `/about.md` file looks like when created by a crawler. The client can immediately see populated data alongside clear prompts for missing details:
+
+    ```markdown
+    # About ThatWorkx
+
+    > Enterprise diagnostic platform that measures, score-calculates, and optimizes web architecture for AI crawlers and answer engines.
+
+    ## 🏢 Organization Identity
+    - **Legal Entity Name**: ThatWorkx Inc.
+    - **Founding Year**: > ⚠️ [ACTION REQUIRED: Enter company founding year e.g. 2024]
+    - **Headquarters Location**: > ⚠️ [ACTION REQUIRED: Enter city/state/country e.g., San Francisco, CA]
+    - **Core Specialization**: Answer Engine Optimization (AEO), AI Crawler Diagnostics.
+
+    ## 👤 Founders & Leadership (EEAT)
+    > ⚠️ [ACTION REQUIRED: No executive leadership or Person schema was detected on /about or /team. Add key team members below to establish domain authority.]
+
+    ### [Name] — [Title]
+    - **Background**: [Brief credential summary]
+    - **Profiles**: [LinkedIn Link] | [GitHub Link]
+
+    ## 🌐 Entity Authority & Citation Hooks
+    - **GitHub Organization**: https://github.com/thatworkx
+    - **LinkedIn Profile**: https://linkedin.com/company/thatworkx
+    - **Crunchbase Profile**: > ⚠️ [ACTION REQUIRED: Add link to Crunchbase company profile]
+    - **Wikidata Entity ID**: > ⚠️ [ACTION REQUIRED: Add Wikidata entity ID if available]
+
+    ## 📞 Verified Contact Information
+    - **Support Email**: support@thatworkx.com
+    - **Phone Number**: > ⚠️ [ACTION REQUIRED: No phone number detected in footer or contact page]
+    - **Privacy Policy**: https://thatworkx.com/privacy
+    - **Terms of Service**: https://thatworkx.com/terms
+
+    ```
+
+---
+
+#### 💻 Automated Node.js Crawler Script for `/about.md`
+
+Run this script to crawl a website, extract Schema.org JSON-LD  and HTML DOM data, and output an `/about.md` file with highlighted gaps:
+
+    ```javascript
+    const fs = require('fs');
+    const path = require('path');
+    const axios = require('axios');
+    const cheerio = require('cheerio');
+
+    async function generateAboutManifest(targetDomain) {
+    const domain = targetDomain.replace(/\/$/, '');
+    console.log(`🔍 Crawling ${domain} to construct /about.md manifest...`);
+
+    // Data Containers
+    let entity = {
+        title: '',
+        description: '',
+        legalName: null,
+        foundingDate: null,
+        founders: [],
+        emails: [],
+        phones: [],
+        authorityLinks: {
+        github: null,
+        linkedin: null,
+        crunchbase: null,
+        wikidata: null
+        },
+        privacyUrl: null,
+        termsUrl: null
+    };
+
+    // Helper to safely fetch pages
+    async function fetchPage(urlPath) {
+        try {
+        const { data } = await axios.get(`${domain}${urlPath}`, {
+            headers: { 'User-Agent': 'AEO-Manifest-Crawler/1.0' },
+            timeout: 5000
+        });
+        return cheerio.load(data);
+        } catch (e) {
+        return null;
+        }
+    }
+
+    // 1. Crawl Homepage
+    const $home = await fetchPage('');
+    if ($home) {
+        entity.title = $home('title').text().trim() || $home('h1').first().text().trim();
+        entity.description = $home('meta[name="description"]').attr('content')?.trim();
+
+        // Extract JSON-LD Schema
+        $home('script[type="application/ld+json"]').each((_, el) => {
+        try {
+            const json = JSON.parse($home(el).html());
+            const schemas = Array.isArray(json) ? json : [json];
+            schemas.forEach(s => {
+            if (s['@type'] === 'Organization') {
+                entity.legalName = s.legalName || s.name || entity.legalName;
+                entity.foundingDate = s.foundingDate || entity.foundingDate;
+            }
+            if (s['@type'] === 'Person') {
+                entity.founders.push({ name: s.name, jobTitle: s.jobTitle || 'Executive' });
+            }
+            });
+        } catch (err) {}
+        });
+    }
+
+    // 2. Crawl /about or /team page
+    const $about = (await fetchPage('/about')) || (await fetchPage('/team'));
+    if ($about) {
+        // Extract Outbound Social / Authority Links
+        $about('a[href]').each((_, el) => {
+        const href = $about(el).attr('href');
+        if (href.includes('github.com')) entity.authorityLinks.github = href;
+        if (href.includes('linkedin.com')) entity.authorityLinks.linkedin = href;
+        if (href.includes('crunchbase.com')) entity.authorityLinks.crunchbase = href;
+        if (href.includes('wikidata.org')) entity.authorityLinks.wikidata = href;
+        if (href.includes('/privacy')) entity.privacyUrl = href.startsWith('http') ? href : `${domain}${href}`;
+        if (href.includes('/terms')) entity.termsUrl = href.startsWith('http') ? href : `${domain}${href}`;
+        });
+    }
+
+    // 3. Crawl /contact for email and phone numbers
+    const $contact = (await fetchPage('/contact')) || $home;
+    if ($contact) {
+        $contact('a[href^="mailto:"]').each((_, el) => {
+        const email = $contact(el).attr('href').replace('mailto:', '').trim();
+        if (email && !entity.emails.includes(email)) entity.emails.push(email);
+        });
+        $contact('a[href^="tel:"]').each((_, el) => {
+        const phone = $contact(el).attr('href').replace('tel:', '').trim();
+        if (phone && !entity.phones.includes(phone)) entity.phones.push(phone);
+        });
+    }
+
+    // 4. Build Markdown Content with Actionable Highlight Banners
+    const aboutMarkdown = `# About ${entity.title || 'Organization'}
+
+    > ${entity.description || '> ⚠️ [ACTION REQUIRED: Add a 2-3 sentence core entity pitch describing the company mission.]'}
+
+    ## 🏢 Organization Identity
+    - **Legal Entity Name**: ${entity.legalName || entity.title || '> ⚠️ [ACTION REQUIRED: Add official registered legal entity name.]'}
+    - **Founding Date / Year**: ${entity.foundingDate || '> ⚠️ [ACTION REQUIRED: Enter founding year e.g. 2024]'}
+    - **Primary Specialization**: Answer Engine Optimization (AEO), AI Diagnostics & Machine Manifests.
+
+    ## 👤 Founders & Leadership (EEAT)
+    ${
+    entity.founders.length > 0
+        ? entity.founders.map(f => `### ${f.name} — ${f.jobTitle}\n- **Profile**: [LinkedIn]`).join('\n')
+        : '> ⚠️ [ACTION REQUIRED: No executive leadership detected on /about or /team. List founder names, bios, and LinkedIn profiles here to establish EEAT authority.]'
+    }
+
+    ## 🌐 Entity Authority & Citation Hooks
+    - **GitHub**: ${entity.authorityLinks.github || '> ⚠️ [ACTION REQUIRED: Add link to official GitHub Organization]'}
+    - **LinkedIn**: ${entity.authorityLinks.linkedin || '> ⚠️ [ACTION REQUIRED: Add link to official LinkedIn Company Page]'}
+    - **Crunchbase**: ${entity.authorityLinks.crunchbase || '> ⚠️ [ACTION REQUIRED: Add link to Crunchbase company profile]'}
+    - **Wikidata Entity**: ${entity.authorityLinks.wikidata || '> ⚠️ [ACTION REQUIRED: Add Wikidata entity URL if available]'}
+
+    ## 📞 Verified Contact Information
+    - **Support Email**: ${entity.emails.length > 0 ? entity.emails.join(', ') : '> ⚠️ [ACTION REQUIRED: Add verified support/contact email]'}
+    - **Phone Number**: ${entity.phones.length > 0 ? entity.phones.join(', ') : '> ⚠️ [ACTION REQUIRED: Add official business telephone number]'}
+    - **Privacy Policy**: ${entity.privacyUrl || `${domain}/privacy`}
+    - **Terms of Service**: ${entity.termsUrl || `${domain}/terms`}
+    `;
+
+    // Write file to disk
+    fs.writeFileSync(path.resolve('./about.md'), aboutMarkdown, 'utf8');
+    console.log('✅ /about.md created successfully with missing fields highlighted!');
+    }
+
+    // Example Execution
+    generateAboutManifest('https://thatworkx.com');
 
     ```
