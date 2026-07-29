@@ -86,7 +86,7 @@ const CAPABILITY_CARDS = [
       { text: 'Are you blocking out AI crawlers?', detail: 'Robots.txt & WAF check' },
       { text: 'Is your web presence optimized for AI?' },
       { text: 'Is your content AI-Ready?', detail: 'Readability & Token Load' },
-      { text: 'Are you setup to be AI-First?' },
+      { text: 'Is your website AI-Ready?' },
     ],
     deliverables: [
       'Real-time diagnostic scorecard',
@@ -102,7 +102,7 @@ const CAPABILITY_CARDS = [
     scopeLabel: 'Scope & Fixes',
     items: [
       { text: 'Optimizing for AI-Ready', detail: 'Code stripping & JSON-LD injection' },
-      { text: 'Optimizing for AI-First', detail: 'llms.txt & ai-context.md generation' },
+      { text: 'Optimizing for AI-Optimized', detail: 'llms.txt & ai-context.md generation' },
     ],
     deliverables: [
       'One-click code remediation',
@@ -566,7 +566,7 @@ export default function HeroSection() {
                        [font-family:'Plus_Jakarta_Sans',sans-serif]">
           Educating Brands to be{' '}
           <span style={{ color: '#9F1239' }}>AI-Ready</span>
-          {', AI-First, and '}
+          {' and '}
           <span style={{ color: '#B45309' }}>AIOptimized</span>.
         </h1>
 

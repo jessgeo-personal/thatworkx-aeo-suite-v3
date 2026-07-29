@@ -1357,45 +1357,63 @@ function updateExecutiveViewData(results) {
     simAiView.innerText = manifestStream;
   }
 
-  // 3. Update Strategic Pillar Badges, Scores & Plain English Notes with Vibrant Color Highlights
+  // 3. Update Strategic Pillar Badges, Scores & Executive Inquiry Cards with Vibrant Highlights & Deduction Reasons
+  const execSections = results.executiveSections;
   const pillars = results.scoreCard?.pillars;
 
-  if (pillars) {
-    const renderPillarCard = (secNum, pData) => {
-      const badgeEl = document.getElementById(`pillar-sec${secNum}-badge`) || document.getElementById(`pillar-badge-${secNum}`);
-      const scoreEl = document.getElementById(`pillar-sec${secNum}-score`);
-      const noteEl = document.getElementById(`pillar-sec${secNum}-note`);
+  const renderPillarCard = (secNum, key, pData) => {
+    const secObj = execSections ? execSections[key] : null;
+    const badgeEl = document.getElementById(`pillar-sec${secNum}-badge`) || document.getElementById(`pillar-badge-${secNum}`);
+    const scoreEl = document.getElementById(`pillar-sec${secNum}-score`);
+    const noteEl = document.getElementById(`pillar-sec${secNum}-note`);
+    const titleEl = document.getElementById(`pillar-sec${secNum}-title`);
 
-      const isGreen = pData.score >= 20;
-      const isAmber = pData.score >= 10 && pData.score < 20;
-      
-      const theme = isGreen
-        ? { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)', class: 'badge-status status-green' }
-        : isAmber
-        ? { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', class: 'badge-status status-amber' }
-        : { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.4)', class: 'badge-status status-red' };
+    const currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
+    const currentMax = secObj ? secObj.max : (pData ? pData.max : 25);
+    const badgeText = secObj ? (currentScore === 25 ? 'OPTIMIZED' : (currentScore >= 15 ? 'PARTIAL' : 'CRITICAL')) : (pData ? pData.badge : 'UNAUDITED');
+    
+    // deductionReason resolution: if 25/25, "🟢 No deductions — All protocols clean.", never undefined
+    let deductionReason = '🟢 No deductions — All protocols clean.';
+    if (currentScore < currentMax) {
+      deductionReason = (secObj && secObj.deductionReason) 
+        ? secObj.deductionReason 
+        : (pData && pData.note ? pData.note : 'Deductions identified during scan.');
+    }
 
-      if (badgeEl) {
-        badgeEl.innerText = pData.badge;
-        badgeEl.className = theme.class;
-        badgeEl.style.setProperty('background', theme.bg, 'important');
-        badgeEl.style.setProperty('color', theme.color, 'important');
-        badgeEl.style.setProperty('border', theme.border, 'important');
-      }
-      if (scoreEl) {
-        scoreEl.innerText = `${pData.score}/${pData.max} pts`;
-        scoreEl.style.setProperty('background', theme.bg, 'important');
-        scoreEl.style.setProperty('color', theme.color, 'important');
-        scoreEl.style.setProperty('border', theme.border, 'important');
-      }
-      if (noteEl) noteEl.innerText = pData.note;
-    };
+    const isGreen = currentScore >= 20;
+    const isAmber = currentScore >= 10 && currentScore < 20;
+    
+    const theme = isGreen
+      ? { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)', class: 'badge-status status-green' }
+      : isAmber
+      ? { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', class: 'badge-status status-amber' }
+      : { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.4)', class: 'badge-status status-red' };
 
-    if (pillars.p1) renderPillarCard(1, pillars.p1);
-    if (pillars.p2) renderPillarCard(2, pillars.p2);
-    if (pillars.p3) renderPillarCard(3, pillars.p3);
-    if (pillars.p4) renderPillarCard(4, pillars.p4);
-  }
+    if (titleEl && secObj && secObj.title) {
+      titleEl.innerText = secObj.title;
+    }
+    if (badgeEl) {
+      badgeEl.innerText = badgeText;
+      badgeEl.className = theme.class;
+      badgeEl.style.setProperty('background', theme.bg, 'important');
+      badgeEl.style.setProperty('color', theme.color, 'important');
+      badgeEl.style.setProperty('border', theme.border, 'important');
+    }
+    if (scoreEl) {
+      scoreEl.innerText = `${currentScore}/${currentMax} pts`;
+      scoreEl.style.setProperty('background', theme.bg, 'important');
+      scoreEl.style.setProperty('color', theme.color, 'important');
+      scoreEl.style.setProperty('border', theme.border, 'important');
+    }
+    if (noteEl) {
+      noteEl.innerText = deductionReason;
+    }
+  };
+
+  renderPillarCard(1, 'section1', pillars?.p1);
+  renderPillarCard(2, 'section2', pillars?.p2);
+  renderPillarCard(3, 'section3', pillars?.p3);
+  renderPillarCard(4, 'section4', pillars?.p4);
 
   // 4. Update Scanned/Discovered Webpages Table
   const tbodyEl = document.getElementById('exec-routes-tbody') || document.getElementById('exec-route-tbody');

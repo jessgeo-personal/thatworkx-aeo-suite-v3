@@ -65,6 +65,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     const evaluation = evaluateCapabilities(scanResults);
     scanResults.overallScore = evaluation.overallScore;
     scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
 
     // Save scan transaction tracking metrics
@@ -126,6 +127,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
       results: scanResults,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
+      executiveSections: evaluation.executiveSections,
       capabilityMatrix: evaluation.capabilityMatrix
     });
 
@@ -227,6 +229,7 @@ app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
     const evaluation = evaluateCapabilities(scanResults);
     scanResults.overallScore = evaluation.overallScore;
     scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
 
     res.json({
@@ -236,6 +239,7 @@ app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
       results: scanResults,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
+      executiveSections: evaluation.executiveSections,
       capabilityMatrix: evaluation.capabilityMatrix
     });
   } catch (error) {
@@ -259,6 +263,7 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
     const evaluation = evaluateCapabilities(scanResults);
     scanResults.overallScore = evaluation.overallScore;
     scanResults.pillarScores = evaluation.pillarScores;
+    scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
 
     res.json({
@@ -268,6 +273,7 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
       results: scanResults,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
+      executiveSections: evaluation.executiveSections,
       capabilityMatrix: evaluation.capabilityMatrix
     });
   } catch (error) {
