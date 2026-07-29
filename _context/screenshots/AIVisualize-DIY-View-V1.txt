@@ -1,0 +1,152 @@
+                                       Header
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	-----------------------
+	|                     |                                 ----------------------------------------     
+	| AIVisualize Logo    |                                 | Executive Mode | DIY(Developer) Mode | 
+	|                     |                                 ----------------------------------------
+	-----------------------                                 
+	
+	<< Scan another Page
+	
+	Scanned page: <page URL>
+	Last Scanned: <scanned date and time>
+	Time to Scan: <scanned time in seconds>
+	
+	## Welcome to the DIY Mode - aimed at the Technially inclined business user/DIY user.
+	#### Lets show you how you can improve your AI-visibility
+	
+	Summary: 
+	---------------------------------  -------------------------------------  ------------------------
+	|								|  |Section 1                          |  |Section 2             |
+	|								|  |Gateway & Access                   |  |Presence & Hygeine    | 
+	|								|  |- CDN / Edge Firewall Blocks       |  |-isSecure             |
+	[Graphic that shows AI readiness]  |- X-Robots-Tag Blocks              |  |-SPA Hydration Trap & Content Density Ratio     |  
+	|								|  |- robots.txt useragents Disallow   |  |		- RAG Offest: /llms.txt and /ai-context.md presence    |
+	|								|  |- robots.txt ai-bots Disallow      |  |- Essential Entity Nodes discovered
+	|								|  |                                   |  |		- Missing Essential Entity Nodes    |
+	|								|	------------------------------------  ------------------------
+	|								|
+	|								|  -----------------------------------------------  ------------------------
+	|								|  |Section 3                                    |  |Section 4             |
+	|								|  |Parsing & Readability                        |  |Machine Manifests     |
+	|								|  |- Title & Meta Desc Sweet Spots              |  |├── Level 1 Gate: robots.txt (Protocol directive active)    |
+	|								|  |- Token Load Status                          |  |├── Level 2 Welcome Mats: /llms.txt (2.5 pts) & /sitemap.xml (2.5 pts)     |
+	|								|  |- Reading Ease Rating(Flesch Score)          |  |├── Level 3 Blueprint: /ai-context.md (5.0 pts - Flattened brand context)     |
+	|								|  |- Ans/Ques Parity Ratio                      |  |└── Level 4 Workspaces: /README.md, /about.md, /docs.md, /content.md (2.0 pts each)     |
+	|								|  |- Page-Level E-E-A-T (review with AIOptimize)|  |- Site-Level EEAT(review with AIOptimize)     |
+	|								|  |                                   |  |                      |
+	---------------------------------  -------------------------------------  ------------------------
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	1. Your site - Ready for AI?  (Gateway and Access)
+	-----------------------------------------------------------------------
+		Scanned Site Fixes
+			1. Has JSON-LD Schema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+				- HasOrganizationSchema in (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+				- HasFAQSchema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+			2. HasEmailVisibletoAI
+			3. HasPhoneVisbiletoAI
+			4. AuthorityStatus
+			5. Diagnostic Summary
+			6. Identified EssentialPages
+				- Missing EssentialPages(upgrade to AIV Pro/ENT so if pages exist, they can be fixed, or create sample about.md/README.md/docs.md to supplement.  Conversely upgrade to AIO Pro to use headless browser to identify and fix existing essentialpages)
+				
+	-----------------------------------------------------------------------		
+	2. Your human-centric pages - what to fix so its optimized for AI.  (Gateway and Access)
+	-----------------------------------------------------------------------
+		Scanned/Discovered Webpages (lets keep the existing 'Scanned Routes Directory (Expandable DOM Metrics)')
+			- Existing fields
+				1. Route Path
+				2. Word Count
+				3. Token Load Count
+				4. Canonical Tag
+				5. Heading Heirarchy Errors
+			- Additional fields
+				6. X-Robots-Tag Blocks
+				7. IsMobileFriendly
+				8. HasSemanticTags
+				9. ImagesWithoutAlt
+				10. Visible ai-bot content from page(pop-up or preview section)
+				11. Heavy Page Analysis: too much markup (upgrade to AIV Pro/ENT for sample ai-context.md and AIO Pro for custom ai-context.md)
+				12. Heavy Page Analysis: heavy client side rendering (upgrade to AIV Pro/ENT for sample ai-context.md and AIO Pro for custom ai-context.md)
+				13. Title Length (Optimal)
+				14. Meta Description (Optimal)
+				15. Internal Links Analysis(list links in pop-up or preview section.  In AIV Pro/ENT, confirms if links are valid and accessible.  AIO Pro for custom llms.txt, content.md and docs.md)
+				16. JSON-LD Schema in header 
+				17. Page Level EEAT Score (upgrade to AIO Pro to review at individual level)
+				18. Last Updated - provide date if found (advise that a Last Updated date should be available per page and made visible)
+				19. Answer/Question parity ratio(if not equal, upgrade to AIO Pro to read through site using headless browser to identify and fix Q and A to follow FAQ schema)
+				20. Hidden by robots.txt (upgrade to AIV Pro/ENT for sample robots.txt or AIO Pro for custom robots.txt)
+				21. Token Load Analysis (upgrade to AIV Pro/ENT for sample ai-context.md and content from page and AIO Pro for custom ai-context.md)
+				22. Reading Comeplexity(Flesch score): (upgrade to AIO Pro to reduce complexity using AI**)
+				23. 
+	
+	-----------------------------------------------------------------------		
+	3. Your Machine-friendly web presence - what to build and what to fix so you are AI-ready.
+	-----------------------------------------------------------------------
+		The AI-ready framework across GenerativeAI engines follow this standardised form (?)
+	
+	🌐 Inbound AI Bot Connection Request
+	   │
+	   ├──► 🔒 LEVEL 1: PROTOCOL GATES (The Gatekeepers)
+	   │     └── robots.txt (Permissions Verification)	🔴 Not available
+	   │
+	   ├──► 🗺️ LEVEL 2: MACHINE WELCOME MATS (The Directories)
+	   │     ├── llms.txt (Modern AI Directory Index)	🟢 Available
+	   │     └── sitemap.xml (Structural URL Web Tree)	🔴 Not available
+	   │
+	   ├──► 🤝 LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)
+	   │     └── ai-context.md (System Prompts & Context Map)	🟢Available
+	   │
+	   └──► 🗂️ LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)
+			 ├── README.md (Rapid Portal Summary)	🔴 Not available
+			 ├── about.md  (Identity, Trust & E-E-A-T Signatures)	🟢 Available
+			 ├── docs.md   (Hard Metrics, Specs & Technical Blueprints)	🟢 Available
+			 └── content.md (Long-Form Case Studies & Narrative Vault)	🔴 Not available
+	
+	
+	----------------------------------------------------------------------------------------------
+	Scanned/Discovered AI-Ready Files(machine readable) (4/8 Manifests Active)  |
+																				|
+	Machine File		           Status		In Robots.txt		ChatGPT		Gemini-bot 	Perplexity-bot User-agents 	Words / Chars		Inspection
+	/robots.txt		           🔴Not Active	      					Yes			Yes			No				Yes			350 words				View ↗
+	|--> /llms.txt	           🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+	|--> /sitemap.xml	       🔴Not Active	      No				Yes			Yes			No				Yes			350 words				View ↗
+		|--> /ai-context.md    🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+			|-->README.md      🔴Not Active	      No 				Yes			Yes			No				Yes			350 words				View ↗
+			|-->about.md       🔴Not Active	      No				Yes			Yes			No				Yes			350 words				View ↗
+			|-->docs.md        🟢Active			  Yes				Yes			Yes			No				Yes			350 words				View ↗
+			|-->content.md     🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+	----------------------------------------------------------------------------------------------
+	
+	----------------------------------------------------------------------------------------------
+	Robots.txt  |
+	- Shows current status of robots.txt
+	- If existent, shows contents
+	- If non-existent or disallow's, 
+		- provides sample file where all bots are unblocked (AIV Pro)
+		- provides actively updated robots.txt (AIO Pro)
+	----------------------------------------------------------------------------------------------
+	            | llms.txt  |
+	- Shows current status of llms.txt
+	- If Existent, shows contents
+	- If non-existent, provide sample file where the (AIV Pro)
+		- meta description is included as 'Core Entity Pitch'
+		- all links are provided as link index (AIO Pro provides active updates to llms.txt when links change/add/delete)
+		- pointers to existing Manifest files (ai-context.md, about.md, docs.md etc.)  (AIO Pro provides active updates to llms.txt when Manifest files change)
+		- Social Citation Hooks: (use AIO Pro to source github references, official press releases, and key documentation repos from website.  use AISocialize to get snippets to add to llms.txt for social posts and other media pointers)
+	----------------------------------------------------------------------------------------------
+	                        | sitemap.xml  |
+							
+	----------------------------------------------------------------------------------------------
+	                                       | JSON-LD Schema  |
+	- Shows current status of llms.txt
+	- If Existent, shows contents
+				
+	----------------------------------------------------------------------------------------------
+	                                                         | ai-context.md  |
+	-Shows current status of ai-context.md
+	- if existent, show contents
+	 - if non-existent, provide sample file which 
+		- pulls content from homepage and available essential pages, strips off all tags and markups, structures as markdown (AIV Pro)
+		- pulls content from all pages, heavy pages and updates FAQs in p

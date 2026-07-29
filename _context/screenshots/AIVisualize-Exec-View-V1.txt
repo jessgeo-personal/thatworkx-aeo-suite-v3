@@ -1,0 +1,121 @@
+                                       Header
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	-----------------------
+	|                     |                                 ----------------------------------------     
+	| AIVisualize Logo    |                                 | Executive Mode | DIY(Developer) Mode | 
+	|                     |                                 ----------------------------------------
+	-----------------------                                 
+	
+	<< Scan another Page
+	
+	Scanned page: <page URL>
+	Last Scanned: <scanned date and time>
+	Time to Scan: <scanned time in seconds>
+	
+	## Let us show you what AI can See ##
+	### Welcome to the Executive Mode - aimed at the business user.
+	#### AI uses 2 methods to source content from your web presence
+		1. Your existing human-centric web presence - if this is formatted appropriately, is optimally content rich and has no technical blocks, the site could be considered AI-Optimized
+		2. Your complimentary Machine-friendly web presence - following the Generative AI Industry standard file heirarchy that helps AI to efficiently read, ingest, process and cite your content.  **Done correctly, your web presence could become AI-ready**, without changing your human-centric web presence.  
+	#### Take a look at how your web presence is helping your brand be visible to AI engines
+	
+	Summary: 
+	---------------------------------  ---------------------------------------  ------------------------
+	|								|  |Section 1                            |  |Section 2             |
+	|								|  |Gateway & Access                     |  |Presence & Hygeine    |
+	|								|  |-Are flags on your site blocking AI? |  |-Is your site considered secure?    |
+	|								|  |-Is your firewall blocking AI?       |  |-Is your site's content/formating ratio optimal?   |
+	|								|  |-Is your Provider blocking AI?       |  |-Does your site have essential info like about,contact etc.?   |
+	|								|  |                                     |  |	- Any essential info missing or not visible?    |
+	[Graphic that shows AI readiness]  ---------------------------------------  ------------------------
+	|								|
+	|								|  -------------------------------------------------------------------  ------------------------
+	|								|  |Section 3                                      					 |  |Section 4             |
+	|								|  |Parsing & Readability                          					 |  |Machine Friendliness     |
+	|								|  |-IS your title and desc optimal for AI?        					 |  |├── Level 1 Gate: robots.txt (Protocol directive active)     |
+	|								|  |-Is your site's content AI-Optimal(token load) 					 |  |├── Level 2 Welcome Mats: /llms.txt (2.5 pts) & /sitemap.xml (2.5 pts)
+	|								|  |-Is your content simple enough for AI to understand(Reading Ease)|  |├── Level 3 Blueprint: /ai-context.md (5.0 pts - Flattened brand context)
+	|								|  |-Do you have Ques/Ans section that AI Can use?					 |  |└── Level 4 Workspaces: /README.md, /about.md, /docs.md, /content.md (2.0 pts each)
+	---------------------------------  --------------------------------------------------
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	1. Can AI see your website?  (Gateway and Access)
+	- Are flags on your site blocking AI from reading your site 🟢 (?) - learn more about X-Robots-Tag 🟢
+	- Is your firewall blocking AI-bots from reading your site 🟢 (?) - learn more about CDN/Edge Firewall blocking
+	- Is your provider blocking AI-bots from reading your site 🟢 (?) - learn more about hosting provider managed files like robots.txt, and if they are blocking AI-bots from reading your site (Check DIY for more details)
+	
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	2. What can AI see on your website (?) - take a look and see if the brand message that AI sees matches what you intended to communicate. 
+		- ai-bot readable content from actual website [current code box that shows content of scraped website split by webpages and formatted according to html tags that have been stripped]
+	- Can AI find your essentialPages (?) - take a look at the essential pages that AI engines look for.
+		- Missing essentialPages (?) - take a look at what AI engines are looking for in your essential pages.
+	- Can AI cite you in their answers (?) - understand how AI uses your content to cite you content in their answers.
+		- HasFAQSchema (?) - does your site clearly show AI which parts of your site are Questions and answers?
+		- Answer/Question parity (?) - learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?
+		- HasOrganizationSchema (?) - does your site clearly show AI how to identify your Organization details?
+		- hasEmailVisibleToAI : <email identified on page> (?) - learn how AI finds your email on your site
+		- hasPhoneVixibleToAI : <phone identified on page> (?) - learn how AI finds your phone number on your site
+	
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	| Scanned/Discovered webpages(Crawled 1 of 1 pages discovered)  |  	
+	| 																|
+	| Route Path	Words		Token load(?)		Hidden from AI(?)	InSitemap(?)	IsEssentialPage(?)	Action			|                  |
+	| /			  205 words		100 tokens	No					No				Yes🔴 			Missing	Fix ↗       |  	
+	| /about	   20 words		5 tokens	No					Yes				Yes🔴 			Missing	Fix ↗       |  |
+	|																|  
+	|																|           
+    ----------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	3. Does AI trust your web presence (?) Learn how Generative AI engines value EEAT - Experience, Expertise, Authority and Trust 
+	- isSecure 🟢 (?) - learn how ai-bots check if your site is secure
+	- hasContactInfo 🟢 (?) - learn how ai-bots confirm how people can reach you if they are interested in what your offering
+	- hasPrivacyPolicy 🟢 (?) - learn how ai-bots check how you treat your user's data
+	- AgeEstimate = 2 years 8 months (?) - learn how ai-bots assess your domain age and how that builds trusts.
+	- AuthorityStatus: <Optimized Anchor, Information Isolation or Abstention Risk> (?) - learn how AI assesses your Authority status
+	- DiagnosticSummary: 
+
+	----------------------------------------------------------------------------------------------------------------------------------------------------
+	4. Is your website already AI-ready?
+	Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.
+	
+	The AI-ready framework across GenerativeAI engines follow this standardised form (?)
+	
+	🌐 Inbound AI Bot Connection Request
+	   │
+	   ├──► 🔒 LEVEL 1: PROTOCOL GATES (The Gatekeepers)
+	   │     └── robots.txt (Permissions Verification)	🔴 Not available
+	   │
+	   ├──► 🗺️ LEVEL 2: MACHINE WELCOME MATS (The Directories)
+	   │     ├── llms.txt (Modern AI Directory Index)	🟢 Available
+	   │     └── sitemap.xml (Structural URL Web Tree)	🔴 Not available
+	   │
+	   ├──► 🤝 LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)
+	   │     └── ai-context.md (System Prompts & Context Map)	🟢Available
+	   │
+	   └──► 🗂️ LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)
+			 ├── README.md (Rapid Portal Summary)	🔴 Not available
+			 ├── about.md  (Identity, Trust & E-E-A-T Signatures)	🟢 Available
+			 ├── docs.md   (Hard Metrics, Specs & Technical Blueprints)	🟢 Available
+			 └── content.md (Long-Form Case Studies & Narrative Vault)	🔴 Not available
+			
+	What can AI see in the AI-ready files on your website (?) - take a look and see if the brand message that AI sees matches what you intended to communicate.
+		- ai-bot readable content from ai-context.md [current code box that shows content from ai-context.md]
+		- ai-bot readable content from about.md [current code box that shows contents from about.md]
+
+	
+	
+	----------------------------------------------------------------------------------------------
+	Scanned/Discovered AI-Ready Files(machine readable) (4/8 Manifests Active)  |
+																				|
+	Machine File		           Status		In Robots.txt		ChatGPT		Gemini-bot 	Perplexity-bot User-agents 	Words / Chars		Inspection
+	/robots.txt		           🔴Not Active	      					Yes			Yes			No				Yes			350 words				View ↗
+	|--> /llms.txt	           🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+	|--> /sitemap.xml	       🔴Not Active	      No				Yes			Yes			No				Yes			350 words				View ↗
+		|--> /ai-context.md    🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+			|-->README.md      🔴Not Active	      No 				Yes			Yes			No				Yes			350 words				View ↗
+			|-->about.md       🔴Not Active	      No				Yes			Yes			No				Yes			350 words				View ↗
+			|-->docs.md        🟢Active			  Yes				Yes			Yes			No				Yes			350 words				View ↗
+			|-->content.md     🟢Active	          Yes				Yes			Yes			No				Yes			350 words				View ↗
+	----------------------------------------------------------------------------------------------

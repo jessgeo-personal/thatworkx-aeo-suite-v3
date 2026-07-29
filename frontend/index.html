@@ -816,6 +816,21 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
     </div>
   </div>
 
+
+  <!-- Section Explanation Modal (needed here: audit stays on index.html via replaceState) -->
+  <div id="help-modal" class="modal-backdrop help-modal-hidden">
+    <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 520px; margin: 0 auto; padding: 1.75rem;">
+      <span class="modal-close" onclick="closeHelpModal()">×</span>
+      <div id="help-modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🛡️</div>
+      <h3 id="help-modal-title" style="text-align: center; color: #fff; margin-bottom: 1rem; font-size: 1.15rem;">Section Explanation</h3>
+      <div id="help-modal-body" style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+        <!-- Filled dynamically by JS -->
+      </div>
+      <button type="button" onclick="closeHelpModal()" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; border-radius: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 600; cursor: pointer;">Got It 👍</button>
+    </div>
+  </div>
+
   <script src="index.js"></script>
+
 </body>
 </html>

@@ -14,3 +14,7 @@ EXPECTED PIPELINE EXECUTION:
 4. Stage 5 & 6: Verify integrity and execute Git commit + push to remote 'dev' branch.
 
 Begin Stage 1 Pre-Flight Analysis now and await my approval.
+
+
+[DIRECTIVE: FRESH SESSION RE-INITIALIZATION]
+Read and lock all files in '_context/'. Check 'AEO_MASTER_PROJECT_PLAN.md' for current sprint status, features and debug sessions.  Confirm readiness for final MSP activation directive./

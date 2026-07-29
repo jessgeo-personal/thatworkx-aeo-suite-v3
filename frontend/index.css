@@ -757,6 +757,10 @@ body.light-theme .logo-placeholder {
   align-items: center;
 }
 
+.help-modal-hidden {
+  display: none !important;
+}
+
 .modal-card {
   max-width: 450px;
   width: 90%;

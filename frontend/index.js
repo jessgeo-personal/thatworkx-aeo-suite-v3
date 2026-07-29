@@ -309,6 +309,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // Default initial scan load for demo
       executeDashboardScan(null);
     }
+
+    // Attach ? help button listeners via event delegation (reliable, no inline onclick needed)
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.info-help-btn[data-section]');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const secNum = parseInt(btn.dataset.section, 10);
+        console.log('[HelpModal] ? button clicked, section:', secNum);
+        openSectionHelpModal(secNum, null);
+      }
+    });
   }
 
   // Page 3: AI Optimize Workspace (optimize.html or /optimize)
@@ -2564,15 +2576,14 @@ function openSectionHelpModal(secNum, evt) {
   if (iconEl) iconEl.innerText = data.icon;
   if (bodyEl) bodyEl.innerHTML = data.body;
   if (modalEl) {
-    modalEl.style.setProperty('display', 'flex', 'important');
-    modalEl.style.setProperty('z-index', '999999', 'important');
+    modalEl.classList.remove('help-modal-hidden');
   }
 }
 
 function closeHelpModal() {
   const modalEl = document.getElementById('help-modal');
   if (modalEl) {
-    modalEl.style.setProperty('display', 'none', 'important');
+    modalEl.classList.add('help-modal-hidden');
   }
 }
 

@@ -90,7 +90,7 @@
         
         <!-- Overall AI Visibility Score Dial Gauge -->
         <div class="score-dial-card glassmorphic border-glow-cyan" style="position: relative; padding: 1.5rem; border-radius: 12px; text-align: center; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-          <button type="button" class="info-help-btn" onclick="openSectionHelpModal(0, event)" title="Calculation Logic of AI Visibility Health Index" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+          <button type="button" class="info-help-btn" data-section="0" title="Calculation Logic of AI Visibility Health Index" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
           <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">AI Visibility Health Index</h4>
           
           <div class="dial-wrapper" style="position: relative; width: 140px; height: 140px; margin: 0 auto 0.75rem;">
@@ -123,7 +123,7 @@
                   <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 1</span>
                   <span id="pillar-sec1-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
-                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Learn more about Gateway & Access" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                <button type="button" class="info-help-btn" data-section="1" onclick="openSectionHelpModal(1, event)" title="Learn more about Gateway & Access" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
               </div>
               <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">Gateway &amp; Access</div>
             </div>
@@ -141,7 +141,7 @@
                   <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 2</span>
                   <span id="pillar-sec2-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
-                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="Learn more about Presence & Hygiene" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                <button type="button" class="info-help-btn" data-section="2" onclick="openSectionHelpModal(2, event)" title="Learn more about Presence & Hygiene" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
               </div>
               <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">Presence &amp; Hygiene</div>
             </div>
@@ -159,7 +159,7 @@
                   <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 3</span>
                   <span id="pillar-sec3-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
-                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(3, event)" title="Learn more about Parsing & Readability" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                <button type="button" class="info-help-btn" data-section="3" onclick="openSectionHelpModal(3, event)" title="Learn more about Parsing & Readability" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
               </div>
               <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">Parsing &amp; Readability</div>
             </div>
@@ -177,7 +177,7 @@
                   <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 4</span>
                   <span id="pillar-sec4-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
-                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(4, event)" title="Learn more about Machine Manifests" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                <button type="button" class="info-help-btn" data-section="4" title="Learn more about Machine Manifests" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
               </div>
               <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">Machine Manifests</div>
             </div>
@@ -399,10 +399,11 @@
         </div>
         <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
       </form>
+    </div>
   </div>
 
   <!-- Section Explanation Modal -->
-  <div id="help-modal" class="modal-backdrop" style="display: none;">
+  <div id="help-modal" class="modal-backdrop help-modal-hidden">
     <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 520px; margin: 0 auto; padding: 1.75rem;">
       <span class="modal-close" onclick="closeHelpModal()">×</span>
       <div id="help-modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🛡️</div>
