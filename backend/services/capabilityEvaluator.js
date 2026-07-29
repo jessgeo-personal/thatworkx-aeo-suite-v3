@@ -1159,7 +1159,7 @@ function evaluateCapabilities(crawledData = {}) {
     discoveredRoutes = crawledData.discoveredRoutes.map(r => ({
       path: r.path || r.route || '/',
       wordCount: typeof r.wordCount === 'number' ? r.wordCount : 0,
-      tokenLoad: typeof r.tokenLoad === 'number' ? r.tokenLoad : Math.round((r.wordCount || 0) * 1.3),
+      tokenLoad: typeof r.tokenLoad === 'number' ? r.tokenLoad : Math.round((r.wordCount || 0) / 2),
       hiddenFromAi: typeof r.hiddenFromAi === 'boolean' ? r.hiddenFromAi : (status.xRobotsIndexable === false || sec1.disallowAll === true),
       inSitemap: typeof r.inSitemap === 'boolean' ? r.inSitemap : Boolean(status.sitemapExists || sec2.sitemapExists),
       isEssential: typeof r.isEssential === 'boolean' ? r.isEssential : ['/', '/about', '/contact', '/privacy-policy', '/privacy'].includes(r.path || r.route || ''),
@@ -1174,7 +1174,7 @@ function evaluateCapabilities(crawledData = {}) {
       return {
         path: routePath,
         wordCount: words,
-        tokenLoad: Math.round(words * 1.3),
+        tokenLoad: Math.round(words / 2),
         hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: isEss,
@@ -1189,7 +1189,7 @@ function evaluateCapabilities(crawledData = {}) {
       {
         path: '/',
         wordCount: rootWords,
-        tokenLoad: Math.round(rootWords * 1.3),
+        tokenLoad: Math.round(rootWords / 2),
         hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: true,
@@ -1199,7 +1199,7 @@ function evaluateCapabilities(crawledData = {}) {
       {
         path: '/about',
         wordCount: status.aboutTxtExists ? 350 : 0,
-        tokenLoad: status.aboutTxtExists ? Math.round(350 * 1.3) : 0,
+        tokenLoad: status.aboutTxtExists ? Math.round(350 / 2) : 0,
         hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: true,
@@ -1259,6 +1259,14 @@ function evaluateCapabilities(crawledData = {}) {
     authorityStatus,
     diagnosticSummary
   };
+
+  // Mutate crawledData in place to ensure these fields get returned in response JSON
+  crawledData.discoveredRoutes = discoveredRoutes;
+  crawledData.eeatMetrics = eeatMetrics;
+  crawledData.emailValue = emailValue;
+  crawledData.phoneValue = phoneValue;
+  crawledData.missingEssentialPages = missingEssentialPages;
+  crawledData.scrapedContentPreview = scrapedContentPreview;
 
   return {
     overallScore,

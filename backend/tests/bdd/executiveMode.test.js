@@ -292,4 +292,64 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(parsedText).toContain('- Feature one');
   });
 
+  it('Scenario I: Discovered webpages table renders inside Section 2 container and has correct headers and rows', () => {
+    // 1. Check static template structure in visualize.html
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const sec2Card = $('#exec-section2-card');
+    expect(sec2Card.length).toBe(1);
+
+    // Verify table block exists inside section 2 card
+    const table = sec2Card.find('table.exec-table');
+    expect(table.length).toBe(1);
+
+    // Verify table headers exist in DOM
+    const headers = [];
+    table.find('th').each((i, el) => {
+      // Strip out the help tooltip (?) triggers to check core header names
+      headers.push($(el).text().trim().replace(/\s*\(\?\)\s*$/, '').trim());
+    });
+    expect(headers).toContain('Route Path');
+    expect(headers).toContain('Words');
+    expect(headers.some(h => h.startsWith('Token load'))).toBe(true);
+    expect(headers.some(h => h.startsWith('Hidden from AI'))).toBe(true);
+    expect(headers.some(h => h.startsWith('InSitemap'))).toBe(true);
+    expect(headers.some(h => h.startsWith('IsEssentialPage'))).toBe(true);
+    expect(headers).toContain('Action');
+
+    // 2. Check capabilityEvaluator discoveredRoutes calculation & validation
+    const mockScan = {
+      url: 'https://example.com',
+      discoveredRoutes: [
+        {
+          path: '/test-route',
+          wordCount: 300,
+          tokenLoad: 150,
+          hiddenFromAi: false,
+          inSitemap: true,
+          isEssential: false,
+          missingStatus: 'Active',
+          actionUrl: 'https://example.com/test-route'
+        }
+      ]
+    };
+    const evaluation = evaluateCapabilities(mockScan);
+    expect(evaluation.discoveredRoutes).toBeDefined();
+    expect(evaluation.discoveredRoutes.length).toBe(1);
+    
+    const r = evaluation.discoveredRoutes[0];
+    expect(r.path).toBe('/test-route');
+    expect(r.wordCount).toBe(300);
+    expect(r.tokenLoad).toBe(150);
+    expect(r.hiddenFromAi).toBe(false);
+    expect(r.inSitemap).toBe(true);
+    expect(r.isEssential).toBe(false);
+    expect(r.missingStatus).toBe('Active');
+
+    // 3. Verify zero occurrences of legacy phrase "AI-first" in section HTML and scenario
+    expect(/AI-first/i.test(sec2Card.html() || '')).toBe(false);
+  });
+
 });

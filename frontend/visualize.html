@@ -359,6 +359,41 @@
           </div>
         </div>
 
+        <!-- Scanned/Discovered webpages Table Block -->
+        <div style="margin-top: 1.5rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h5 style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0;" id="exec-routes-subheader">
+              Scanned/Discovered webpages (<span id="exec-routes-count">Crawled 0 of 0 pages discovered</span>)
+            </h5>
+          </div>
+          <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
+            <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted);">
+                  <th style="padding: 0.6rem; font-weight: 600;">Route Path</th>
+                  <th style="padding: 0.6rem; font-weight: 600;">Words</th>
+                  <th style="padding: 0.6rem; font-weight: 600;">
+                    Token load <button type="button" class="info-help-btn" onclick="openHelpTooltip('token-load', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                  </th>
+                  <th style="padding: 0.6rem; font-weight: 600;">
+                    Hidden from AI <button type="button" class="info-help-btn" onclick="openHelpTooltip('hidden-from-ai', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                  </th>
+                  <th style="padding: 0.6rem; font-weight: 600;">
+                    InSitemap <button type="button" class="info-help-btn" onclick="openHelpTooltip('in-sitemap', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                  </th>
+                  <th style="padding: 0.6rem; font-weight: 600;">
+                    IsEssentialPage <button type="button" class="info-help-btn" onclick="openHelpTooltip('is-essential', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                  </th>
+                  <th style="padding: 0.6rem; font-weight: 600; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="exec-routes-tbody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Sub-block grid for Essential Pages and Citation Signals -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;" class="sec2-subgrid">
           
@@ -460,33 +495,9 @@
 
       </div>
 
-      <!-- Scanned/Discovered webpages & Scanned/Discovered AI-Ready Files Table -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <!-- Scanned/Discovered AI-Ready Files Table -->
+      <div style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
         
-        <!-- Scanned/Discovered webpages -->
-        <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">📂 Scanned/Discovered webpages</h4>
-            <span class="table-count-badge" id="exec-routes-count">Crawled 1 of 12 pages discovered</span>
-          </div>
-          <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
-            <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-              <thead>
-                <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted);">
-                  <th style="padding: 0.6rem;">Route Path</th>
-                  <th style="padding: 0.6rem;">Words</th>
-                  <th style="padding: 0.6rem;">Tokens</th>
-                  <th style="padding: 0.6rem;">Canonical</th>
-                  <th style="padding: 0.6rem; text-align: right;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="exec-routes-tbody">
-                <!-- Rendered by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
         <!-- Scanned/Discovered AI-Ready Files (machine readable) -->
         <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -766,10 +777,10 @@
   <!-- Section Explanation Modal -->
   <div id="help-modal" class="modal-backdrop help-modal-hidden">
     <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 520px; margin: 0 auto; padding: 1.75rem;">
-      <span class="modal-close" onclick="closeHelpModal()">×</span>
+      <span class="modal-close" onclick="closeHelpModal()" style="color: var(--text-primary);">×</span>
       <div id="help-modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🛡️</div>
-      <h3 id="help-modal-title" style="text-align: center; color: #fff; margin-bottom: 1rem; font-size: 1.15rem;">Section Explanation</h3>
-      <div id="help-modal-body" style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+      <h3 id="help-modal-title" style="text-align: center; color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem;">Section Explanation</h3>
+      <div id="help-modal-body" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
         <!-- Filled dynamically by JS -->
       </div>
       <button type="button" onclick="closeHelpModal()" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; border-radius: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 600; cursor: pointer;">Got It 👍</button>

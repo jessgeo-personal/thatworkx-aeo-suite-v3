@@ -1821,23 +1821,47 @@ function updateExecutiveViewData(results) {
   const tbodyEl = document.getElementById('exec-routes-tbody') || document.getElementById('exec-route-tbody');
   const routeCountEl = document.getElementById('exec-routes-count') || document.getElementById('exec-route-count');
   
-  if (tbodyEl && results.pages && results.pages.length) {
-    const crawledCount = results.pages.length;
-    const totalDiscovered = results.totalPagesFound || crawledCount;
-    if (routeCountEl) routeCountEl.innerText = `Crawled ${crawledCount} of ${totalDiscovered} pages discovered`;
+  if (tbodyEl && results.discoveredRoutes && results.discoveredRoutes.length) {
+    const crawledCount = results.pages ? results.pages.length : results.discoveredRoutes.filter(r => r.missingStatus === 'Active').length;
+    const totalDiscovered = results.totalPagesFound || results.discoveredRoutes.length;
+    if (routeCountEl) {
+      routeCountEl.innerText = `Crawled ${crawledCount} of ${totalDiscovered} pages discovered`;
+    }
 
-    tbodyEl.innerHTML = results.pages.map(p => {
-      const isVisible = p.hasCanonical !== false;
+    tbodyEl.innerHTML = results.discoveredRoutes.map(p => {
       const wordCount = p.wordCount || 0;
-      const tokenCount = Math.round(wordCount * 1.35);
+      const tokenCount = p.tokenLoad || Math.round(wordCount / 2);
+      
+      const hiddenDot = p.hiddenFromAi
+        ? `<span alt="Yes" title="Yes" style="font-size: 0.9rem; cursor: help;">🟢</span>`
+        : `<span alt="No" title="No" style="font-size: 0.9rem; cursor: help;">🔴</span>`;
+        
+      const sitemapDot = p.inSitemap
+        ? `<span alt="Yes" title="Yes" style="font-size: 0.9rem; cursor: help;">🟢</span>`
+        : `<span alt="No" title="No" style="font-size: 0.9rem; cursor: help;">🔴</span>`;
+      
+      const isEssentialYes = p.isEssential && p.missingStatus === 'Active';
+      const essentialDot = isEssentialYes
+        ? `<span alt="Yes" title="Yes" style="font-size: 0.9rem; cursor: help;">🟢</span>`
+        : `<span alt="No" title="No" style="font-size: 0.9rem; cursor: help;">🔴</span>`;
+
+      let actionHtml = '';
+      if (p.missingStatus === 'Missing') {
+        actionHtml = `<a href="#" onclick="showUpgradeModal('PRO_REQUIRED', 'Upgrade to AIOptimize Pro to enable workarounds and manage your AI-Ready files yourself', 'AIOptimize Pro'); return false;" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>`;
+      } else {
+        actionHtml = `<a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>`;
+      }
+
       return `
         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-          <td style="padding: 0.6rem;"><code style="color: #38bdf8;">${p.route}</code></td>
-          <td style="padding: 0.6rem;"><span class="badge-status ${wordCount ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">${wordCount} words</span></td>
-          <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">~${tokenCount} tokens</td>
-          <td style="padding: 0.6rem;"><span class="badge-status ${isVisible ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">${isVisible ? '🟢 Valid' : '🔴 Missing'}</span></td>
+          <td style="padding: 0.6rem;"><code style="color: #38bdf8;">${p.path}</code></td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${wordCount} words</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${tokenCount} tokens</td>
+          <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${hiddenDot}</td>
+          <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${sitemapDot}</td>
+          <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${essentialDot}</td>
           <td style="padding: 0.6rem; text-align: right;">
-            <a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>
+            ${actionHtml}
           </td>
         </tr>
       `;
@@ -3099,6 +3123,26 @@ const tooltipExplanationData = {
     title: 'Phone Visibility (hasPhoneVisibleToAI)',
     icon: '📞',
     body: '<p>AI models require accessible phone details to evaluate brand support reliability and prevent fraud flagging.</p>'
+  },
+  'token-load': {
+    title: 'Token Load Analysis',
+    icon: '🪙',
+    body: '<p>Token load measures the length of content translated into tokens for AI consumption. Keeping token size optimized prevents truncation during RAG ingestion.</p>'
+  },
+  'hidden-from-ai': {
+    title: 'Hidden From AI Status',
+    icon: '👁️',
+    body: '<p>Shows if this page is blocked from AI systems via robots.txt disallows or X-Robots-Tag: noindex HTTP response headers.</p>'
+  },
+  'in-sitemap': {
+    title: 'In Sitemap Status',
+    icon: '🗺️',
+    body: '<p>Indicates if the page is indexed inside the sitemap.xml file, enabling automated path discovery for search AI crawlers.</p>'
+  },
+  'is-essential': {
+    title: 'Is Essential Page Status',
+    icon: '⭐',
+    body: '<p>Identifies whether the page is a core trust page (e.g. /, /about, /contact, /privacy) required for authority verification by AI engines.</p>'
   }
 };
 
