@@ -946,7 +946,7 @@ function evaluateCapabilities(crawledData = {}) {
     },
     section3: {
       title: 'Does AI trust your web presence?',
-      category: 'Content AI-Readiness',
+      category: 'Content AI-Optimization & Trust',
       score: p3Score,
       max: 25,
       status: getStatusFromScore(p3Score, 25),
@@ -1267,6 +1267,25 @@ function evaluateCapabilities(crawledData = {}) {
   crawledData.phoneValue = phoneValue;
   crawledData.missingEssentialPages = missingEssentialPages;
   crawledData.scrapedContentPreview = scrapedContentPreview;
+
+  // Map trust and E-E-A-T metrics into executiveSections.section3 and executiveSections[2] (Section 3)
+  if (executiveSections && executiveSections.section3) {
+    executiveSections.section3.isSecure = isSecure;
+    executiveSections.section3.hasContactInfo = hasContactInfo;
+    executiveSections.section3.hasPrivacyPolicy = hasPrivacyPolicy;
+    executiveSections.section3.ageEstimate = ageEstimate;
+    executiveSections.section3.authorityStatus = authorityStatus;
+    executiveSections.section3.diagnosticSummary = diagnosticSummary;
+    executiveSections.section3.eeatMetrics = eeatMetrics;
+  }
+
+  // Ensure index-based access is supported for results.executiveSections
+  if (executiveSections) {
+    executiveSections[0] = executiveSections.section1;
+    executiveSections[1] = executiveSections.section2;
+    executiveSections[2] = executiveSections.section3;
+    executiveSections[3] = executiveSections.section4;
+  }
 
   return {
     overallScore,

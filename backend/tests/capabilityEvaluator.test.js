@@ -229,4 +229,55 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(parsedContent).toContain('- Item One');
     expect(parsedContent).toContain('- Item Two');
   });
+
+  it('should verify and refine Executive Section 3 (E-E-A-T & Trust Metrics) Backend Payload and mapping to executiveSections[2]', () => {
+    const res = evaluateAllCapabilities({
+      url: 'https://example.com',
+      eeatMetrics: {
+        isSecure: true,
+        hasContactInfo: true,
+        hasPrivacyPolicy: true,
+        ageEstimate: '2 years 8 months',
+        authorityStatus: 'Optimized Anchor',
+        diagnosticSummary: 'Dynamic summary explaining the trust rating.'
+      }
+    });
+
+    // 1. Validate eeatMetrics in main payload
+    expect(res.eeatMetrics).toBeDefined();
+    expect(res.eeatMetrics.isSecure).toBe(true);
+    expect(res.eeatMetrics.hasContactInfo).toBe(true);
+    expect(res.eeatMetrics.hasPrivacyPolicy).toBe(true);
+    expect(res.eeatMetrics.ageEstimate).toBe('2 years 8 months');
+    expect(res.eeatMetrics.authorityStatus).toBe('Optimized Anchor');
+    expect(res.eeatMetrics.diagnosticSummary).toBe('Dynamic summary explaining the trust rating.');
+
+    // 2. Validate executiveSections mapping for Section 3 (index 2)
+    expect(res.executiveSections).toBeDefined();
+    expect(res.executiveSections.section3).toBeDefined();
+    expect(res.executiveSections[2]).toBeDefined();
+    expect(res.executiveSections[2]).toBe(res.executiveSections.section3);
+
+    const section3 = res.executiveSections[2];
+    expect(section3.category).toBe('Content AI-Optimization & Trust');
+    expect(section3.isSecure).toBe(true);
+    expect(section3.hasContactInfo).toBe(true);
+    expect(section3.hasPrivacyPolicy).toBe(true);
+    expect(section3.ageEstimate).toBe('2 years 8 months');
+    expect(section3.authorityStatus).toBe('Optimized Anchor');
+    expect(section3.diagnosticSummary).toBe('Dynamic summary explaining the trust rating.');
+
+    expect(section3.eeatMetrics).toBeDefined();
+    expect(section3.eeatMetrics.isSecure).toBe(true);
+    expect(section3.eeatMetrics.hasContactInfo).toBe(true);
+    expect(section3.eeatMetrics.hasPrivacyPolicy).toBe(true);
+    expect(section3.eeatMetrics.ageEstimate).toBe('2 years 8 months');
+    expect(section3.eeatMetrics.authorityStatus).toBe('Optimized Anchor');
+    expect(section3.eeatMetrics.diagnosticSummary).toBe('Dynamic summary explaining the trust rating.');
+
+    // 3. Adhere to governance rules: 0 "AI-first" strings
+    const jsonStr = JSON.stringify(res);
+    expect(jsonStr).not.toContain('AI-first');
+    expect(jsonStr).not.toContain('ai-first');
+  });
 });

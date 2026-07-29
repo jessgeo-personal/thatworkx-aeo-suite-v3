@@ -352,4 +352,40 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(/AI-first/i.test(sec2Card.html() || '')).toBe(false);
   });
 
+  it('Scenario J: Executive Mode Section 3 (Content AI-Optimization & Trust) UI refactoring assertions', () => {
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. Container presence & headers
+    const card = $('#exec-section3-card');
+    expect(card.length).toBe(1);
+
+    const cardTitle = $('#exec-section3-card h4');
+    expect(cardTitle.text()).toContain('3. Does AI trust your web presence (?)');
+    expect(cardTitle.attr('onclick')).toContain("openHelpTooltip('sec3_overview')");
+
+    const subheading = $('#exec-section3-card p');
+    expect(subheading.text()).toContain('Learn how Generative AI engines value EEAT');
+
+    // 2. Badges and signal rows checks
+    expect($('#sec3-secure-status').length).toBe(1);
+    expect($('#sec3-contact-status').length).toBe(1);
+    expect($('#sec3-privacy-status').length).toBe(1);
+    expect($('#sec3-age-estimate').length).toBe(1);
+    expect($('#sec3-authority-status').length).toBe(1);
+    expect($('#sec3-diagnostic-summary').length).toBe(1);
+
+    // 3. Tooltip button mapping check
+    const sectionHtml = card.html() || '';
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('isSecure'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('hasContactInfo'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('hasPrivacyPolicy'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('ageEstimate'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('authorityStatus'");
+
+    // 4. Zero occurrences of legacy phrase "AI-first"
+    expect(/AI-first/i.test(card.html() || '')).toBe(false);
+  });
+
 });

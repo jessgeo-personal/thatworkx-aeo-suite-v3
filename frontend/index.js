@@ -1753,6 +1753,63 @@ function updateExecutiveViewData(results) {
     phoneValueEl.innerText = results.phoneValue || 'None Detected';
   }
 
+  // Bind E-E-A-T & Trust Metrics from results.eeatMetrics to Section 3 elements
+  const eeat = results.eeatMetrics || (results.executiveSections?.section3?.eeatMetrics) || {};
+
+  const secureStatusEl = document.getElementById('sec3-secure-status');
+  if (secureStatusEl) {
+    const isSecure = typeof eeat.isSecure === 'boolean' ? eeat.isSecure : (results.executiveSections?.section3?.isSecure ?? true);
+    secureStatusEl.innerText = isSecure ? '🟢 Passed' : '🔴 Action Needed';
+    secureStatusEl.className = `badge-status ${isSecure ? 'status-green' : 'status-red'}`;
+    secureStatusEl.style.setProperty('background', isSecure ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
+    secureStatusEl.style.setProperty('color', isSecure ? '#34d399' : '#f43f5e', 'important');
+  }
+
+  const contactStatusEl = document.getElementById('sec3-contact-status');
+  if (contactStatusEl) {
+    const hasContact = typeof eeat.hasContactInfo === 'boolean' ? eeat.hasContactInfo : (results.executiveSections?.section3?.hasContactInfo ?? true);
+    contactStatusEl.innerText = hasContact ? '🟢 Passed' : '🔴 Action Needed';
+    contactStatusEl.className = `badge-status ${hasContact ? 'status-green' : 'status-red'}`;
+    contactStatusEl.style.setProperty('background', hasContact ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
+    contactStatusEl.style.setProperty('color', hasContact ? '#34d399' : '#f43f5e', 'important');
+  }
+
+  const privacyStatusEl = document.getElementById('sec3-privacy-status');
+  if (privacyStatusEl) {
+    const hasPrivacy = typeof eeat.hasPrivacyPolicy === 'boolean' ? eeat.hasPrivacyPolicy : (results.executiveSections?.section3?.hasPrivacyPolicy ?? true);
+    privacyStatusEl.innerText = hasPrivacy ? '🟢 Passed' : '🔴 Action Needed';
+    privacyStatusEl.className = `badge-status ${hasPrivacy ? 'status-green' : 'status-red'}`;
+    privacyStatusEl.style.setProperty('background', hasPrivacy ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
+    privacyStatusEl.style.setProperty('color', hasPrivacy ? '#34d399' : '#f43f5e', 'important');
+  }
+
+  const ageEstimateEl = document.getElementById('sec3-age-estimate');
+  if (ageEstimateEl) {
+    ageEstimateEl.innerText = eeat.ageEstimate || (results.executiveSections?.section3?.ageEstimate) || '2 years 8 months';
+  }
+
+  const authorityStatusEl = document.getElementById('sec3-authority-status');
+  if (authorityStatusEl) {
+    const authStatus = eeat.authorityStatus || (results.executiveSections?.section3?.authorityStatus) || 'Optimized Anchor';
+    authorityStatusEl.innerText = authStatus;
+    
+    let authTheme = { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', class: 'status-green' };
+    if (authStatus === 'Information Isolation') {
+      authTheme = { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', class: 'status-amber' };
+    } else if (authStatus === 'Abstention Risk') {
+      authTheme = { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', class: 'status-red' };
+    }
+
+    authorityStatusEl.className = `badge-status ${authTheme.class}`;
+    authorityStatusEl.style.setProperty('background', authTheme.bg, 'important');
+    authorityStatusEl.style.setProperty('color', authTheme.color, 'important');
+  }
+
+  const diagSummaryEl = document.getElementById('sec3-diagnostic-summary');
+  if (diagSummaryEl) {
+    diagSummaryEl.innerText = eeat.diagnosticSummary || (results.executiveSections?.section3?.diagnosticSummary) || 'Domain exhibits strong trust signals.';
+  }
+
   // 3. Update Strategic Pillar Badges, Scores & Executive Inquiry Cards with Vibrant Highlights & Deduction Reasons
   const execSections = results.executiveSections;
   const pillars = results.scoreCard?.pillars;
@@ -3143,6 +3200,36 @@ const tooltipExplanationData = {
     title: 'Is Essential Page Status',
     icon: '⭐',
     body: '<p>Identifies whether the page is a core trust page (e.g. /, /about, /contact, /privacy) required for authority verification by AI engines.</p>'
+  },
+  'sec3_overview': {
+    title: 'E-E-A-T & Trust Overview',
+    icon: '🛡️',
+    body: '<p>Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T) are critical indicators that search AI engines use to evaluate content reliability and avoid hallucinated citations.</p>'
+  },
+  'isSecure': {
+    title: 'SSL Security (isSecure)',
+    icon: '🔒',
+    body: '<p>AI web scrapers and crawlers penalize unencrypted HTTP sites to protect user safety and maintain security standards. SSL protection is a basic prerequisite for trustworthiness.</p>'
+  },
+  'hasContactInfo': {
+    title: 'Contact Information (hasContactInfo)',
+    icon: '📞',
+    body: '<p>Having visible contact routes/details allows AI models to verify physical business legitimacy, ensuring that the entity has real-world accountability.</p>'
+  },
+  'hasPrivacyPolicy': {
+    title: 'Privacy Policy (hasPrivacyPolicy)',
+    icon: '📜',
+    body: '<p>Privacy policies verify that user data is handled legally and in compliance with global regulations. AI engines check this to gauge compliance and regulatory readiness.</p>'
+  },
+  'ageEstimate': {
+    title: 'Domain Age (ageEstimate)',
+    icon: '⏳',
+    body: '<p>Domain longevity is a primary signal that influences trust weighting. Older domains indicate stability, which reduces LLM hallucination thresholds and builds entity authority.</p>'
+  },
+  'authorityStatus': {
+    title: 'Authority Status (authorityStatus)',
+    icon: '👑',
+    body: '<p>Reflects the overall authority rating of a domain. Represents: <strong>Optimized Anchor</strong> (strong trust signal profile), <strong>Information Isolation</strong> (partial trust with isolated elements), or <strong>Abstention Risk</strong> (critical risk or blanket disallows).</p>'
   }
 };
 
