@@ -1013,6 +1013,8 @@ function evaluateAllCapabilities(scanData = {}) {
       section3: evalResult.pillarScores.P3,
       section4: evalResult.pillarScores.P4
     },
+    status: scanData.status || {},
+    url: scanData.url || '',
     capabilities: evalResult.capabilityMatrix,
     capabilityMatrix: evalResult.capabilityMatrix
   };

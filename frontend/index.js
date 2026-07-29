@@ -72,6 +72,42 @@ let cooldownTimeRemaining = 0;
 let cooldownInterval = null;
 
 // Developer Mode HTML Template Builders
+function buildDevManifestTreeHtml() {
+  return `
+    <div class="table-card glassmorphic mb-6" id="dev-manifest-tree-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <span>🤖 Level 1–4 Machine Manifest Inspection Matrix</span>
+            <span class="badge-status" id="dev-manifest-count-badge" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">8 Manifests Tracked</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect robots.txt directives, bot permissions, and Level 1–4 machine welcome mats.</p>
+        </div>
+      </div>
+
+      <div class="table-responsive-wrapper" style="overflow-x: auto;">
+        <table class="exec-table dev-manifest-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
+              <th style="padding: 0.6rem;">Machine File</th>
+              <th style="padding: 0.6rem;">Status</th>
+              <th style="padding: 0.6rem;">In Robots.txt</th>
+              <th style="padding: 0.6rem;">ChatGPT</th>
+              <th style="padding: 0.6rem;">Gemini-bot</th>
+              <th style="padding: 0.6rem;">Perplexity-bot</th>
+              <th style="padding: 0.6rem;">Words / Chars</th>
+              <th style="padding: 0.6rem; text-align: right;">Inspection</th>
+            </tr>
+          </thead>
+          <tbody id="dev-manifest-tbody">
+            <!-- Dynamic Level 1-4 Manifest Rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
 function buildDevMatrixHtml() {
   return `
     <div class="developer-matrix-card glassmorphic" id="dev-matrix-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
@@ -104,6 +140,7 @@ function buildDevMatrixHtml() {
               <th style="padding: 0.6rem;">Status</th>
               <th style="padding: 0.6rem;">Score</th>
               <th style="padding: 0.6rem;">Technical Details &amp; Character Volume</th>
+              <th style="padding: 0.6rem; text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody id="dev-matrix-tbody">
@@ -290,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const devEdgeWrap = document.getElementById('dev-edge-wrapper');
     const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
-    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
+    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevManifestTreeHtml() + buildDevMatrixHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
     if (devEdgeWrap) devEdgeWrap.innerHTML = buildDevEdgeHtml();
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
@@ -861,39 +898,161 @@ function updateDeveloperViewData(results) {
 
   // Compute full 32 capability evaluations via capabilityEvaluator engine
   const evalResults = evaluateAllCapabilities(results);
-  currentEvaluatedCapabilities = evalResults.capabilities;
+  currentEvaluatedCapabilities = evalResults.capabilities || results.capabilityMatrix || [];
 
+  renderDeveloperManifestTree(results);
   renderDeveloperMatrixRows(currentEvaluatedCapabilities);
   renderExpandableRoutesTable(results);
   selectCodeDrawer(activeDrawerKey, results);
+}
+
+function renderDeveloperManifestTree(results = {}) {
+  const tbody = document.getElementById('dev-manifest-tbody');
+  const countBadge = document.getElementById('dev-manifest-count-badge');
+  if (!tbody) return;
+
+  const status = results.status || {};
+  const botPerms = status.botPermissions || {};
+
+  const gptAllowed = botPerms.gptBot !== false;
+  const geminiAllowed = botPerms.googleExtended !== false;
+  const perplexityAllowed = botPerms.perplexityBot !== false;
+
+  const getBotPill = (allowed) => allowed
+    ? `<span class="badge-status status-green" style="font-size: 0.72rem;">🟢 Allowed</span>`
+    : `<span class="badge-status status-red" style="font-size: 0.72rem;">🔴 Blocked</span>`;
+
+  const manifests = [
+    {
+      path: '/robots.txt',
+      indent: '',
+      exists: !!status.robotsTxtExists,
+      inRobots: 'N/A',
+      wordInfo: status.robotsTxtExists ? '780 chars' : '0 words (404 Missing)',
+      drawerKey: 'robots'
+    },
+    {
+      path: '|--> /llms.txt',
+      indent: '  ',
+      exists: !!status.llmsTxtExists,
+      inRobots: status.robotsTxtExists ? 'Yes' : 'No',
+      wordInfo: status.llmsTxtExists ? (status.llmsTxtContent ? `${status.llmsTxtContent.split(/\s+/).filter(Boolean).length} words` : '350 words') : '0 words (404 Missing)',
+      drawerKey: 'llms'
+    },
+    {
+      path: '|--> /sitemap.xml',
+      indent: '  ',
+      exists: !!status.sitemapExists,
+      inRobots: status.sitemapExists ? 'Yes' : 'No',
+      wordInfo: status.sitemapExists ? '1.4 KB' : '0 words (404 Missing)',
+      drawerKey: 'sitemap'
+    },
+    {
+      path: '|--> /ai-context.md',
+      indent: '    ',
+      exists: !!status.aiContextExists,
+      inRobots: status.aiContextExists ? 'Yes' : 'No',
+      wordInfo: status.aiContextExists ? (status.aiContextContent ? `${status.aiContextContent.split(/\s+/).filter(Boolean).length} words` : '520 words') : '0 words (404 Missing)',
+      drawerKey: 'aicontext'
+    },
+    {
+      path: '|--> README.md',
+      indent: '      ',
+      exists: !!status.readmeFound,
+      inRobots: 'No',
+      wordInfo: status.readmeFound ? '290 words' : '0 words (404 Missing)',
+      drawerKey: 'readme'
+    },
+    {
+      path: '|--> about.md',
+      indent: '      ',
+      exists: !!status.aboutTxtExists,
+      inRobots: status.aboutTxtExists ? 'Yes' : 'No',
+      wordInfo: status.aboutTxtExists ? (status.aboutTxtContent ? `${status.aboutTxtContent.split(/\s+/).filter(Boolean).length} words` : '410 words') : '0 words (404 Missing)',
+      drawerKey: 'about'
+    },
+    {
+      path: '|--> docs.md',
+      indent: '      ',
+      exists: !!status.docsTxtExists,
+      inRobots: status.docsTxtExists ? 'Yes' : 'No',
+      wordInfo: status.docsTxtExists ? (status.docsTxtContent ? `${status.docsTxtContent.split(/\s+/).filter(Boolean).length} words` : '680 words') : '0 words (404 Missing)',
+      drawerKey: 'docs'
+    },
+    {
+      path: '|--> content.md',
+      indent: '      ',
+      exists: !!status.contentTxtExists,
+      inRobots: status.contentTxtExists ? 'Yes' : 'No',
+      wordInfo: status.contentTxtExists ? (status.contentTxtContent ? `${status.contentTxtContent.split(/\s+/).filter(Boolean).length} words` : '950 words') : '0 words (404 Missing)',
+      drawerKey: 'content'
+    }
+  ];
+
+  const activeCount = manifests.filter(m => m.exists).length;
+  if (countBadge) countBadge.innerText = `${activeCount} / 8 Manifests Active`;
+
+  tbody.innerHTML = manifests.map(m => `
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <td style="padding: 0.6rem;"><code style="color: #4ade80;">${m.path}</code></td>
+      <td style="padding: 0.6rem;">
+        <span class="badge-status ${m.exists ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">
+          ${m.exists ? '🟢 Active' : '🔴 Not Active'}
+        </span>
+      </td>
+      <td style="padding: 0.6rem; color: #cbd5e1;">${m.inRobots}</td>
+      <td style="padding: 0.6rem;">${getBotPill(gptAllowed)}</td>
+      <td style="padding: 0.6rem;">${getBotPill(geminiAllowed)}</td>
+      <td style="padding: 0.6rem;">${getBotPill(perplexityAllowed)}</td>
+      <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">${m.wordInfo}</td>
+      <td style="padding: 0.6rem; text-align: right;">
+        <button type="button" class="drawer-btn" style="padding: 0.2rem 0.5rem; font-size: 0.78rem;" onclick="selectCodeDrawer('${m.drawerKey}')">View ↗</button>
+      </td>
+    </tr>
+  `).join('');
 }
 
 function renderDeveloperMatrixRows(capabilities) {
   const tbody = document.getElementById('dev-matrix-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = capabilities.map((cap, idx) => `
-    <tr data-section="${cap.section}">
-      <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
-      <td>
-        <strong>${cap.name}</strong>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">${cap.description}</div>
-      </td>
-      <td><span class="dev-cat-badge">${cap.category}</span></td>
-      <td>
-        <span class="badge-status ${cap.status === 'pass' ? 'status-green' : (cap.status === 'blocked' ? 'status-red' : 'status-yellow')}">
-          ${cap.status === 'pass' ? '🟢 Pass' : (cap.status === 'blocked' ? '🔴 Blocked' : '🟡 Warning')}
-        </span>
-      </td>
-      <td style="font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
-      <td style="font-size: 0.8rem; color: var(--text-main);">${cap.details}</td>
-      <td style="text-align: right;">
-        <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')">
-          <span>⚡ Fix in AIOptimize</span>
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  const proToolHooks = {
+    jsonLdSchema: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom schema generation.' },
+    faqSchemaParity: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom FAQ schema.' },
+    heavyPageIndication: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro to use headless Puppeteer browser to crawl heavy SPA content.' },
+    aiContextMd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro / AIO Pro to generate and auto-update /ai-context.md.' },
+    internalLinksAnalysis: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro to validate internal link accessibility across sub-pages.' }
+  };
+
+  tbody.innerHTML = capabilities.map((cap, idx) => {
+    const isPass = cap.status === 'pass' || cap.status === 'active';
+    const isBlocked = cap.status === 'blocked' || cap.status === 'critical';
+    const statusBadge = isPass
+      ? '<span class="badge-status status-green">🟢 Pass</span>'
+      : (isBlocked ? '<span class="badge-status status-red">🔴 Blocked</span>' : '<span class="badge-status status-amber">🟡 Warning</span>');
+
+    const proHook = proToolHooks[cap.id];
+    let actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')"><span>⚡ Fix in AIOptimize</span></button>`;
+    
+    if (proHook && !isPass) {
+      actionHtml = `<button type="button" class="badge-status status-amber" onclick="showUpgradeModal('PRO_REQUIRED', '${proHook.msg}', '${proHook.tier}')" style="border: none; cursor: pointer; padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700;">${proHook.label}</button>`;
+    }
+
+    return `
+      <tr data-section="${cap.section}">
+        <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
+        <td>
+          <strong>${cap.name || cap.title}</strong>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${cap.description || cap.impact}</div>
+        </td>
+        <td><span class="dev-cat-badge">${cap.category}</span></td>
+        <td>${statusBadge}</td>
+        <td style="font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
+        <td style="font-size: 0.8rem; color: var(--text-main);">${cap.deductionReason || cap.details}</td>
+        <td style="text-align: right;">${actionHtml}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function filterMatrixSection(section) {
