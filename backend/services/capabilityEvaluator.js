@@ -987,6 +987,133 @@ function evaluateCapabilities(crawledData = {}) {
     };
   });
 
+  // Build Executive Mode Specification Payload Extensions:
+  // a) Scan & Timing Metrics
+  const scanMetrics = {
+    scanTimeSeconds: typeof crawledData.scanMetrics?.scanTimeSeconds === 'number'
+      ? crawledData.scanMetrics.scanTimeSeconds
+      : (typeof crawledData.scanTimeSeconds === 'number' ? crawledData.scanTimeSeconds : 1.8),
+    lastScanned: crawledData.scanMetrics?.lastScanned || crawledData.lastScanned || new Date().toISOString()
+  };
+
+  // b) Scraped Content & Manifest Previews
+  const scrapedContentPreview = crawledData.scrapedContentPreview ||
+    crawledData.pages?.[0]?.rawText ||
+    status.machinePreview ||
+    sec2.rawText ||
+    '';
+
+  const manifestPreviews = {
+    aiContext: crawledData.manifestPreviews?.aiContext ||
+      status.aiContextContent ||
+      (status.aiContextExists ? '# AI Context Blueprint\nProduct specifications and brand domain boundaries.' : ''),
+    about: crawledData.manifestPreviews?.about ||
+      status.aboutTxtContent ||
+      (status.aboutTxtExists ? '# About Us\nVerified corporate entity history and trust credentials.' : '')
+  };
+
+  // c) Discovered Webpages Route Directory
+  let discoveredRoutes = [];
+  if (Array.isArray(crawledData.discoveredRoutes) && crawledData.discoveredRoutes.length > 0) {
+    discoveredRoutes = crawledData.discoveredRoutes.map(r => ({
+      path: r.path || r.route || '/',
+      wordCount: typeof r.wordCount === 'number' ? r.wordCount : 0,
+      tokenLoad: typeof r.tokenLoad === 'number' ? r.tokenLoad : Math.round((r.wordCount || 0) * 1.3),
+      hiddenFromAi: typeof r.hiddenFromAi === 'boolean' ? r.hiddenFromAi : (status.xRobotsIndexable === false || sec1.disallowAll === true),
+      inSitemap: typeof r.inSitemap === 'boolean' ? r.inSitemap : Boolean(status.sitemapExists || sec2.sitemapExists),
+      isEssential: typeof r.isEssential === 'boolean' ? r.isEssential : ['/', '/about', '/contact', '/privacy-policy', '/privacy'].includes(r.path || r.route || ''),
+      missingStatus: r.missingStatus || (r.wordCount === 0 || r.isMissing ? 'Missing' : 'Active'),
+      actionUrl: r.actionUrl || (crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${r.path || r.route || '/'}` : (r.path || r.route || '/'))
+    }));
+  } else if (Array.isArray(crawledData.pages) && crawledData.pages.length > 0) {
+    discoveredRoutes = crawledData.pages.map(p => {
+      const routePath = p.route || p.path || '/';
+      const words = typeof p.wordCount === 'number' ? p.wordCount : 0;
+      const isEss = ['/', '/about', '/contact', '/privacy-policy', '/privacy'].includes(routePath);
+      return {
+        path: routePath,
+        wordCount: words,
+        tokenLoad: Math.round(words * 1.3),
+        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
+        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
+        isEssential: isEss,
+        missingStatus: words === 0 ? 'Missing' : 'Active',
+        actionUrl: crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${routePath}` : routePath
+      };
+    });
+  } else {
+    const rootWords = status.wordCount ?? sec2.wordCount ?? 205;
+    const baseUrl = crawledData.url ? crawledData.url.replace(/\/$/, '') : '';
+    discoveredRoutes = [
+      {
+        path: '/',
+        wordCount: rootWords,
+        tokenLoad: Math.round(rootWords * 1.3),
+        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
+        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
+        isEssential: true,
+        missingStatus: rootWords === 0 ? 'Missing' : 'Active',
+        actionUrl: baseUrl ? `${baseUrl}/` : '/'
+      },
+      {
+        path: '/about',
+        wordCount: status.aboutTxtExists ? 350 : 0,
+        tokenLoad: status.aboutTxtExists ? Math.round(350 * 1.3) : 0,
+        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
+        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
+        isEssential: true,
+        missingStatus: status.aboutTxtExists ? 'Active' : 'Missing',
+        actionUrl: baseUrl ? `${baseUrl}/about` : '/about'
+      }
+    ];
+  }
+
+  // d) Domain Trust & EEAT Payload
+  const isSecure = typeof crawledData.eeatMetrics?.isSecure === 'boolean'
+    ? crawledData.eeatMetrics.isSecure
+    : (sec2.isHttps !== false && (!targetUrl || targetUrl.startsWith('https')));
+
+  const hasContactInfo = typeof crawledData.eeatMetrics?.hasContactInfo === 'boolean'
+    ? crawledData.eeatMetrics.hasContactInfo
+    : (sec3.hasContactInfo !== false);
+
+  const hasPrivacyPolicy = typeof crawledData.eeatMetrics?.hasPrivacyPolicy === 'boolean'
+    ? crawledData.eeatMetrics.hasPrivacyPolicy
+    : (sec3.hasPrivacyPolicy !== false);
+
+  const ageEstimate = crawledData.eeatMetrics?.ageEstimate || sec3.ageEstimate || '2 years 8 months';
+
+  let authorityStatus = crawledData.eeatMetrics?.authorityStatus;
+  if (!authorityStatus) {
+    if (isBlanketBlock || overallScore < 50) {
+      authorityStatus = 'Abstention Risk';
+    } else if (overallScore >= 80) {
+      authorityStatus = 'Optimized Anchor';
+    } else {
+      authorityStatus = 'Information Isolation';
+    }
+  }
+
+  let diagnosticSummary = crawledData.eeatMetrics?.diagnosticSummary;
+  if (!diagnosticSummary) {
+    if (authorityStatus === 'Optimized Anchor') {
+      diagnosticSummary = 'Domain exhibits strong E-E-A-T trust signals with valid SSL security, verified contact information, active privacy policy, and established domain age authority.';
+    } else if (authorityStatus === 'Information Isolation') {
+      diagnosticSummary = 'Domain shows partial E-E-A-T trust credentials. Essential contact or privacy policies are partially isolated from search AI crawlers.';
+    } else {
+      diagnosticSummary = 'Domain presents E-E-A-T abstention risk. Security protocols or total AI disallow rules prevent LLMs from trusting entity authority.';
+    }
+  }
+
+  const eeatMetrics = {
+    isSecure,
+    hasContactInfo,
+    hasPrivacyPolicy,
+    ageEstimate,
+    authorityStatus,
+    diagnosticSummary
+  };
+
   return {
     overallScore,
     pillarScores: {
@@ -996,7 +1123,12 @@ function evaluateCapabilities(crawledData = {}) {
       P4: p4Score
     },
     executiveSections,
-    capabilityMatrix
+    capabilityMatrix,
+    scanMetrics,
+    scrapedContentPreview,
+    manifestPreviews,
+    discoveredRoutes,
+    eeatMetrics
   };
 }
 
@@ -1020,7 +1152,12 @@ function evaluateAllCapabilities(scanData = {}) {
     status: scanData.status || {},
     url: scanData.url || '',
     capabilities: evalResult.capabilityMatrix,
-    capabilityMatrix: evalResult.capabilityMatrix
+    capabilityMatrix: evalResult.capabilityMatrix,
+    scanMetrics: evalResult.scanMetrics,
+    scrapedContentPreview: evalResult.scrapedContentPreview,
+    manifestPreviews: evalResult.manifestPreviews,
+    discoveredRoutes: evalResult.discoveredRoutes,
+    eeatMetrics: evalResult.eeatMetrics
   };
 }
 

@@ -377,6 +377,11 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
     result.pillarScores = evaluation.pillarScores;
     result.executiveSections = evaluation.executiveSections;
     result.capabilityMatrix = evaluation.capabilityMatrix;
+    result.scanMetrics = evaluation.scanMetrics;
+    result.scrapedContentPreview = evaluation.scrapedContentPreview;
+    result.manifestPreviews = evaluation.manifestPreviews;
+    result.discoveredRoutes = evaluation.discoveredRoutes;
+    result.eeatMetrics = evaluation.eeatMetrics;
 
     result.scoreCard = {
       overallScore: totalOverallScore,
