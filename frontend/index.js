@@ -1512,16 +1512,146 @@ function updateExecutiveViewData(results) {
     el.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
   });
 
-  // Section score pills in DIY mode hero
-  const secScores = results.scores || {};
-  const s1 = document.getElementById('diy-sec1-score');
-  if (s1) s1.innerText = `${secScores.p1 ?? 0}/25 pts`;
-  const s2 = document.getElementById('diy-sec2-score');
-  if (s2) s2.innerText = `${secScores.p2 ?? 0}/25 pts`;
-  const s3 = document.getElementById('diy-sec3-score');
-  if (s3) s3.innerText = `${secScores.p3 ?? 0}/25 pts`;
-  const s4 = document.getElementById('diy-sec4-score');
-  if (s4) s4.innerText = `${secScores.p4 ?? 0}/25 pts`;
+  // Section scores & pills from results.executiveSections
+  const sec1 = results.executiveSections?.section1;
+  const sec2 = results.executiveSections?.section2;
+  const sec3 = results.executiveSections?.section3;
+  const sec4 = results.executiveSections?.section4;
+
+  const score1 = sec1?.score ?? results.scores?.p1 ?? 0;
+  const score2 = sec2?.score ?? results.scores?.p2 ?? 0;
+  const score3 = sec3?.score ?? results.scores?.p3 ?? 0;
+  const score4 = sec4?.score ?? results.scores?.p4 ?? 0;
+
+  const getScorePill = (score) => {
+    const isClean = score >= 25;
+    const badgeColor = isClean ? 'var(--badge-pass)' : 'var(--badge-fail)';
+    const badgeBg = isClean ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)';
+    const badgeBorder = isClean ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(239, 68, 68, 0.25)';
+    return `<span class="pillar-status-badge ${isClean ? 'badge-pass' : 'badge-fail'}" style="color: ${badgeColor}; background: ${badgeBg}; border: ${badgeBorder}; font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">${score}/25 pts</span>`;
+  };
+
+  const getStatusIndicator = (passed) => passed
+    ? `<span style="color: #10b981; font-weight: bold; margin-right: 0.35rem;">✓</span>`
+    : `<span style="color: #ef4444; font-weight: bold; margin-right: 0.35rem;">✗</span>`;
+
+  // Dynamically evaluate pass/fail for every individual check inside the 4 section cards against live scan results:
+  // Card 1 Checks:
+  const isCdnPass = !(results.sec1?.cdnBlocked === true);
+  const isXRobotsPass = !(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false);
+  const isUseragentsPass = !(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false);
+  const isAiBotsPass = Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
+
+  // Card 2 Checks:
+  const isSecurePass = results.sec2?.isHttps !== false;
+  const isSpaPass = !(results.status?.spaTrapDetected === true || results.sec2?.isHeavyJs === true);
+  const isRagPass = results.status?.llmsTxtExists === true && results.status?.aiContextExists === true;
+  const isEntityPass = (results.sec2?.essentialPagesFound ?? (results.status?.aboutTxtExists ? 3 : 2)) === 3;
+
+  // Card 3 Checks:
+  const isSeoPass = results.status?.seoOptimalTitle !== false && results.status?.seoOptimalDesc !== false;
+  const isTokenPass = (results.sec3?.fleschScore ?? 68) >= 50 && (results.status?.wordCount ?? results.sec3?.wordCount ?? 800) >= 500;
+  const isParityPass = (results.sec3?.faqQuestions ?? 4) === (results.sec3?.faqAnswers ?? 4) && (results.status?.jsonLdExists ?? results.sec3?.hasFaqSchema ?? true) === true;
+  const isEeatPass = results.sec3?.hasContactInfo !== false && results.sec3?.hasPrivacyPolicy !== false;
+
+  // Card 4 Checks:
+  const isRobotsPass = results.status?.robotsTxtExists === true;
+  const isLlmsPass = results.status?.llmsTxtExists === true && results.status?.sitemapExists === true;
+  const isAiContextPass = results.status?.aiContextExists === true;
+  const isWorkspacesPass = results.status?.aboutTxtExists === true && results.status?.docsTxtExists === true && results.status?.contentTxtExists === true;
+
+  const devSummaryGrid = document.getElementById('dev-summary-grid');
+  if (devSummaryGrid) {
+    devSummaryGrid.innerHTML = `
+      <!-- Section 1 Card: Gateway & Access -->
+      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid #f59e0b; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.8rem; font-weight: 800;">1</span>
+              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Gateway &amp; Access</h4>
+            </div>
+            ${getScorePill(score1)}
+          </div>
+          <p style="font-size: 0.84rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 0.6rem;">
+            <strong style="color: #f59e0b; font-weight: 800;">AI-Optimized</strong> human-centric protocol gate checks:
+          </p>
+          <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isCdnPass)}CDN / Edge Firewall Blocks</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}X-Robots-Tag Headers</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isUseragentsPass)}robots.txt useragents Disallow</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isAiBotsPass)}robots.txt ai-bots Disallow</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 2 Card: Presence & Hygiene -->
+      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(14, 165, 233, 0.25); border-left: 4px solid #0ea5e9; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(14, 165, 233, 0.2); color: #38bdf8; font-size: 0.8rem; font-weight: 800;">2</span>
+              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Presence &amp; Hygiene</h4>
+            </div>
+            ${getScorePill(score2)}
+          </div>
+          <p style="font-size: 0.84rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 0.6rem;">
+            <strong style="color: #38bdf8; font-weight: 800;">AI-Optimized</strong> web structure &amp; hydration hygiene:
+          </p>
+          <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isSpaPass)}SPA Hydration Trap &amp; Density Ratio</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isRagPass)}RAG Offset: /llms.txt &amp; /ai-context.md</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isEntityPass)}Essential Entity Nodes Discovered</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 3 Card: Content AI-Readiness -->
+      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(139, 92, 246, 0.25); border-left: 4px solid #8b5cf6; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(139, 92, 246, 0.2); color: #c084fc; font-size: 0.8rem; font-weight: 800;">3</span>
+              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Content AI-Readiness</h4>
+            </div>
+            ${getScorePill(score3)}
+          </div>
+          <p style="font-size: 0.84rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 0.6rem;">
+            <strong style="color: #c084fc; font-weight: 800;">AI-Optimized</strong> page-level readability &amp; trust:
+          </p>
+          <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isSeoPass)}Title &amp; Meta Desc Sweet Spots</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isTokenPass)}Token Load Status &amp; Flesch Score</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isParityPass)}Ans/Ques Parity Ratio</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isEeatPass)}Page-Level E-E-A-T Diagnostics</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 4 Card: Machine Manifest Readiness -->
+      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.25); border-left: 4px solid #10b981; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.8rem; font-weight: 800;">4</span>
+              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Machine Manifest Readiness</h4>
+            </div>
+            ${getScorePill(score4)}
+          </div>
+          <p style="font-size: 0.84rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 0.6rem;">
+            <em style="color: #34d399; font-style: italic; font-weight: 800;">AI-Ready</em> Level 1–4 manifest hierarchy:
+          </p>
+          <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isRobotsPass)}Level 1 Gate: robots.txt</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isLlmsPass)}Level 2 Welcome Mats: /llms.txt &amp; sitemap.xml</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isAiContextPass)}Level 3 Blueprint: /ai-context.md</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isWorkspacesPass)}Level 4 Workspaces: /README.md, about, docs, content</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
 
   const statusBadgeEl = document.getElementById('exec-score-classification-pill') || document.getElementById('exec-status-badge');
   if (statusBadgeEl) {

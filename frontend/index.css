@@ -48,6 +48,8 @@
 
   /* Shadows & Glows */
   --glow-shadow: 0 0 20px var(--burnt-copper-glow);
+  --badge-pass: #10b981;
+  --badge-fail: #ef4444;
 }
 
 * {
@@ -4221,9 +4223,15 @@ body.light-theme .footer-col h4 {
 }
 
 .badge-pass {
-  color: #10B981;
+  color: var(--badge-pass);
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-fail {
+  color: var(--badge-fail);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .pillar-title {

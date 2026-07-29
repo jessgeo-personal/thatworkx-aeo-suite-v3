@@ -110,11 +110,13 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     const visHtml = fs.readFileSync(visPath, 'utf8');
     const $ = cheerio.load(visHtml);
 
-    // 1. DIY Welcome Banner presence
-    const devBanner = $('#dev-welcome-banner');
+    // 1. DIY Hero Banner presence
+    const devBanner = $('#dev-hero-banner');
     expect(devBanner.length).toBe(1);
 
     const bannerText = devBanner.text();
+    const summaryGridText = $('#dev-summary-grid').text();
+    const combinedText = bannerText + ' ' + summaryGridText;
 
     // 2. Audience Badge & Headline
     expect(bannerText).toContain('DIY Mode — Aimed at the technically inclined business user / DIY user');
@@ -131,15 +133,15 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(devTimestampBadge.text()).toContain('Last Scanned:');
 
     // 4. 4-Section Summary Grid Cards
-    expect(bannerText).toContain('Gateway & Access');
-    expect(bannerText).toContain('Presence & Hygiene');
-    expect(bannerText).toContain('Parsing & Readability');
-    expect(bannerText).toContain('Machine Manifests');
+    expect(combinedText).toContain('Gateway & Access');
+    expect(combinedText).toContain('Presence & Hygiene');
+    expect(combinedText).toContain('Content AI-Readiness');
+    expect(combinedText).toContain('Machine Manifest Readiness');
 
     // 5. Governance vocabulary rules
-    expect(bannerText).toContain('AI-Optimized');
-    expect(bannerText).toContain('AI-Ready');
-    expect(/AI-first/i.test(bannerText)).toBe(false);
+    expect(combinedText).toContain('AI-Optimized');
+    expect(combinedText).toContain('AI-Ready');
+    expect(/AI-first/i.test(combinedText)).toBe(false);
   });
 
 });
