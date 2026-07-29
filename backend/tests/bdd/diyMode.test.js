@@ -142,6 +142,21 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(combinedText).toContain('AI-Optimized');
     expect(combinedText).toContain('AI-Ready');
     expect(/AI-first/i.test(combinedText)).toBe(false);
+
+    // 6. Provider Workaround Callout Banner & Upgrade Modal
+    const providerCallout = $('#dev-provider-callout');
+    expect(providerCallout.length).toBe(1);
+    expect(providerCallout.text()).toContain("Can't manage your own AI-ready files because your provider manages it for you?");
+    
+    const calloutLink = providerCallout.find('a');
+    expect(calloutLink.length).toBe(1);
+    expect(calloutLink.text()).toContain('Upgrade to AIOptimize Pro');
+    expect(calloutLink.attr('onclick')).toContain("showUpgradeModal('AIO_PRO_REQUIRED', 'Enable provider workarounds to manage your AI-Ready files yourself', 'AIOptimize Pro')");
+
+    const alertModal = $('#alert-modal');
+    expect(alertModal.length).toBe(1);
+    expect(alertModal.find('#modal-title').length).toBe(1);
+    expect(alertModal.find('#modal-message').length).toBe(1);
   });
 
 });
