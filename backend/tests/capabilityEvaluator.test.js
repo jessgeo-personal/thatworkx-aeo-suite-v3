@@ -13,7 +13,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
 
     expect(sec1.length).toBe(3);  // Gateway & Access Control (3)
     expect(sec2.length).toBe(7);  // Presence & Hygiene (7)
-    expect(sec3.length).toBe(10); // Content AI-Readiness (10)
+    expect(sec3.length).toBe(10); // Content AI-Optimization (10)
     expect(sec4.length).toBe(12); // Machine Manifest Readiness (12) -> Total: 32
   });
 

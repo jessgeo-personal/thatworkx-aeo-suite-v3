@@ -342,12 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (currentPath.includes('visualize')) {
     const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
     const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
-    const devEdgeWrap = document.getElementById('dev-edge-wrapper');
     const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
     if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevManifestTreeHtml() + buildDevMatrixHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
-    if (devEdgeWrap) devEdgeWrap.innerHTML = buildDevEdgeHtml();
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
 
     const tabParam = params.get('tab');
@@ -395,6 +393,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (domainInput) domainInput.value = cleanDomain;
     }
     switchOptimizeTrack(1);
+
+    const devEdgeWrap = document.getElementById('dev-edge-wrapper');
+    if (devEdgeWrap) {
+      devEdgeWrap.innerHTML = buildDevEdgeHtml();
+      // Initialize with current domain if optimize-target-domain exists
+      const domainInput = document.getElementById('optimize-target-domain');
+      if (domainInput && domainInput.value) {
+        currentScannedDomain = domainInput.value.trim().replace(/^https?:\/\//i, '').split('/')[0];
+      }
+      selectEdgeTab('cloudflare');
+    }
   }
 
   // Page 4: AI Socialize Page (socialize.html or /socialize)
@@ -770,7 +779,7 @@ function displayScanResults(results) {
     const readabilityOk = results.status.readabilityRating === 'Optimal';
     
     if (titleOk && descOk && headingOk && readabilityOk) {
-      secStatus3.innerText = '🟢 AI-Ready';
+      secStatus3.innerText = '🟢 AI-Optimized';
       secStatus3.className = 'gateway-badge badge-handshake';
     } else {
       secStatus3.innerText = '🟡 Quality Alerts';
@@ -1062,7 +1071,7 @@ function renderDeveloperMatrixRows(capabilities) {
   const sectionCategoryNames = {
     1: 'Section 1: Gateway & Access',
     2: 'Section 2: Presence & Hygiene',
-    3: 'Section 3: Content AI-Readiness',
+    3: 'Section 3: Content AI-Optimization',
     4: 'Section 4: Machine Manifest Readiness'
   };
 
@@ -1607,13 +1616,13 @@ function updateExecutiveViewData(results) {
         </div>
       </div>
 
-      <!-- Section 3 Card: Content AI-Readiness -->
+      <!-- Section 3 Card: Content AI-Optimization -->
       <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(139, 92, 246, 0.25); border-left: 4px solid #8b5cf6; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(139, 92, 246, 0.2); color: #c084fc; font-size: 0.8rem; font-weight: 800;">3</span>
-              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Content AI-Readiness</h4>
+              <h4 style="font-size: 0.92rem; font-weight: 700; color: #f8fafc; margin: 0;">Content AI-Optimization</h4>
             </div>
             ${getScorePill(score3)}
           </div>
@@ -2628,7 +2637,7 @@ async function handleModalScanSubmit(event) {
 }
 
 async function generateTrack2File(type) {
-  const domainInput = document.getElementById(`${type}-domain`) || document.getElementById('target-url');
+  const domainInput = document.getElementById(`${type}-domain`) || document.getElementById('optimize-target-domain') || document.getElementById('target-url');
   let domain = domainInput ? domainInput.value || 'example.com' : 'example.com';
   domain = domain.replace(/^https?:\/\//i, '').split('/')[0];
   
@@ -2647,6 +2656,29 @@ async function generateTrack2File(type) {
     }
   } catch (err) {
     console.error(`Error generating ${type}:`, err);
+  }
+}
+
+function updateOptimizeTargetDomain() {
+  const domainInput = document.getElementById('optimize-target-domain');
+  if (!domainInput) return;
+  const domain = domainInput.value.trim().replace(/^https?:\/\//i, '').split('/')[0];
+  if (!domain) return;
+  
+  currentScannedDomain = domain;
+  
+  // Refresh the currently selected tool if it's Track 2
+  if (typeof activeOptimizeTool !== 'undefined' && ['llmstxt', 'aicontext', 'about', 'docs', 'content', 'sitemap'].includes(activeOptimizeTool)) {
+    generateTrack2File(activeOptimizeTool);
+  }
+  
+  // Also refresh the Edge Network Sandbox tab if it exists
+  const activeEdgeTabBtn = document.querySelector('.edge-tab-btn.active');
+  if (activeEdgeTabBtn) {
+    const keyMatch = activeEdgeTabBtn.getAttribute('onclick')?.match(/'([^']+)'/);
+    if (keyMatch && keyMatch[1]) {
+      selectEdgeTab(keyMatch[1]);
+    }
   }
 }
 
@@ -2935,6 +2967,7 @@ window.downloadDrawerFile = downloadDrawerFile;
 window.selectEdgeTab = selectEdgeTab;
 window.copyEdgeScript = copyEdgeScript;
 window.toggleRouteExpandRow = toggleRouteExpandRow;
+window.updateOptimizeTargetDomain = updateOptimizeTargetDomain;
 
 const sectionHelpData = {
   0: {

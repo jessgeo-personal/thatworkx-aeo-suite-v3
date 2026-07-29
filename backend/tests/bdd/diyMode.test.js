@@ -135,7 +135,7 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     // 4. 4-Section Summary Grid Cards
     expect(combinedText).toContain('Gateway & Access');
     expect(combinedText).toContain('Presence & Hygiene');
-    expect(combinedText).toContain('Content AI-Readiness');
+    expect(combinedText).toContain('Content AI-Optimization');
     expect(combinedText).toContain('Machine Manifest Readiness');
 
     // 5. Governance vocabulary rules
