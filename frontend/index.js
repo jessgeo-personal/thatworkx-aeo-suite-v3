@@ -49,8 +49,8 @@ function setVisualizeViewMode(mode) {
   }
 
   // Update URL parameters without reloading
-  if (typeof window !== 'undefined' && window.location.search) {
-    const params = new URLSearchParams(window.location.search);
+  if (typeof window !== 'undefined' && window.history) {
+    const params = new URLSearchParams(window.location.search || '');
     params.set('mode', mode);
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
   }
@@ -59,6 +59,24 @@ function setVisualizeViewMode(mode) {
 // Executive Mode Action: Export PDF Summary
 function exportExecutiveSummaryPdf() {
   window.print();
+}
+
+// Export Engine: Raw JSON Diagnostics Download
+function exportRawJsonDiagnostics() {
+  const payload = window.lastScanResults || currentEvaluatedCapabilities || {};
+  const domain = currentScannedDomain || 'site';
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `aeo-diagnostics-${domain}-${timestamp}.json`;
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Executive Mode Action: Launch AIOptimize Remediation Bridge
@@ -332,10 +350,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (devEdgeWrap) devEdgeWrap.innerHTML = buildDevEdgeHtml();
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
 
+    const tabParam = params.get('tab');
     if (modeParam === 'developer' || modeParam === 'diy') {
       setVisualizeViewMode('developer');
     } else {
       setVisualizeViewMode('executive');
+    }
+
+    if (tabParam) {
+      if (tabParam === 'gateway' || tabParam === '1') filterMatrixSection(1);
+      else if (tabParam === 'hygiene' || tabParam === '2') filterMatrixSection(2);
+      else if (tabParam === 'content' || tabParam === '3') filterMatrixSection(3);
+      else if (tabParam === 'manifests' || tabParam === '4') filterMatrixSection(4);
+      else filterMatrixSection('all');
     }
 
     if (targetUrlParam) {
@@ -760,7 +787,7 @@ function displayScanResults(results) {
     const narrativeOk = (results.status.aboutTxtExists && results.status.docsTxtExists && results.status.contentTxtExists);
     
     if (llmsOk && contextOk && schemaOk && narrativeOk) {
-      secStatus4.innerText = '🟢 AI-First';
+      secStatus4.innerText = '🟢 AI-Ready';
       secStatus4.className = 'gateway-badge badge-handshake';
     } else {
       secStatus4.innerText = '🟡 Missing Manifests';
@@ -1016,10 +1043,14 @@ function getProUpgradeHook(capId = '') {
     spahydrationtrap: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for headless SPA hydration fixes.' },
     aicontextmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro / AIO Pro to generate and auto-update /ai-context.md.' },
     internallinksanalysis: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro to validate internal link accessibility across sub-pages.' },
+    robotstxt: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample unblocked robots.txt or AIO Pro for automated directives.' },
     robotspermission: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample unblocked robots.txt or AIO Pro for automated directives.' },
     aboutmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample about.md corporate entity file.' },
+    aboutmdmanifest: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample about.md corporate entity file.' },
     docsmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample docs.md technical manual file.' },
-    contentmd: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for content.md case study vault.' }
+    docsmdmanifest: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample docs.md technical manual file.' },
+    contentmd: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for content.md case study vault.' },
+    contentmdmanifest: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for content.md case study vault.' }
   };
   return hooks[key] || null;
 }
@@ -1091,11 +1122,19 @@ function filterMatrixSection(section) {
   const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick')?.includes(`'${section}'`) || b.getAttribute('onclick')?.includes(`(${section})`));
   if (targetBtn) targetBtn.classList.add('active');
 
-  if (section === 'all') {
+  if (section === 'all' || section === 'all') {
     renderDeveloperMatrixRows(currentEvaluatedCapabilities);
   } else {
     const filtered = currentEvaluatedCapabilities.filter(c => c.section === Number(section));
     renderDeveloperMatrixRows(filtered);
+  }
+
+  if (typeof window !== 'undefined' && window.history) {
+    const params = new URLSearchParams(window.location.search || '');
+    const tabNameMap = { 1: 'gateway', 2: 'hygiene', 3: 'content', 4: 'manifests', all: 'all' };
+    const tabVal = tabNameMap[section] || section;
+    params.set('tab', tabVal);
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
   }
 }
 
@@ -2388,7 +2427,7 @@ function openUrlModal(mode) {
       subtitle.innerText = "Enter your domain URL to inspect crawl visibility and protocol blocks.";
       icon.innerText = "🔍";
     } else if (mode === 'optimize') {
-      title.innerText = "Optimizing for AI-Ready & AI-First";
+      title.innerText = "Optimizing for AI-Ready & AI-Optimized";
       subtitle.innerText = "Enter your domain URL to generate custom schema, robots, and workers.";
       icon.innerText = "⚡";
     }
@@ -2824,6 +2863,8 @@ function adjustSimulatorFont(target, delta) {
 }
 
 window.adjustSimulatorFont = adjustSimulatorFont;
+window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
+window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
 
 
 

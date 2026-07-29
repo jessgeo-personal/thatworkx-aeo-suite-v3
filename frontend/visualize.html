@@ -75,10 +75,37 @@
     </div>
 
     <!-- Active Target Domain Header Display -->
-    <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8;">
+    <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8; flex-wrap: wrap; gap: 0.5rem;">
       <div>Scanned Target: <strong id="display-scanned-domain" style="color: #38bdf8;">--</strong></div>
-      <div id="scan-timestamp-badge">Last audited: Not scanned</div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span id="scan-timestamp-badge" style="margin-right: 0.5rem;">Last audited: Not scanned</span>
+        <button type="button" class="drawer-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">📄 Export Raw JSON</button>
+        <button type="button" class="drawer-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">🖨️ Export PDF Summary</button>
+      </div>
     </div>
+
+    <style>
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      header, nav, footer, .view-mode-pill-container, #active-domain-header-bar button, .matrix-filter-tabs, #dev-mode-container, .info-help-btn {
+        display: none !important;
+      }
+      #exec-mode-container {
+        display: block !important;
+        width: 100% !important;
+      }
+      .pillar-card, .score-dial-card, .glassmorphic {
+        border: 1px solid #ddd !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+      }
+    }
+    </style>
 
     <!-- ═══════════════════════════════════════════════════════
          EXECUTIVE MODE CONTAINER (#exec-mode-container)
