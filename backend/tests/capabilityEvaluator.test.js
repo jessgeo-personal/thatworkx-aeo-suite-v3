@@ -73,8 +73,10 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
 
     // 2. scrapedContentPreview
     expect(res).toHaveProperty('scrapedContentPreview');
-    expect(typeof res.scrapedContentPreview).toBe('string');
-    expect(res.scrapedContentPreview).toBe('Example Scraped Landing Text');
+    expect(Array.isArray(res.scrapedContentPreview)).toBe(true);
+    expect(res.scrapedContentPreview).toEqual([
+      { route: '/', content: 'Example Scraped Landing Text' }
+    ]);
 
     // 3. manifestPreviews
     expect(res).toHaveProperty('manifestPreviews');
@@ -113,7 +115,10 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.scanMetrics.scanTimeSeconds).toBe('number');
     expect(typeof res.scanMetrics.lastScanned).toBe('string');
 
-    expect(typeof res.scrapedContentPreview).toBe('string');
+    expect(Array.isArray(res.scrapedContentPreview)).toBe(true);
+    expect(res.scrapedContentPreview.length).toBeGreaterThan(0);
+    expect(res.scrapedContentPreview[0]).toHaveProperty('route');
+    expect(res.scrapedContentPreview[0]).toHaveProperty('content');
 
     expect(res.manifestPreviews).not.toBeNull();
     expect(typeof res.manifestPreviews.aiContext).toBe('string');
@@ -139,5 +144,70 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
     expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
+
+    expect(res).toHaveProperty('emailValue');
+    expect(typeof res.emailValue).toBe('string');
+    expect(res).toHaveProperty('phoneValue');
+    expect(typeof res.phoneValue).toBe('string');
+    expect(res).toHaveProperty('missingEssentialPages');
+    expect(Array.isArray(res.missingEssentialPages)).toBe(true);
+  });
+
+  it('should support Section 2 extensions: email/phone extraction, missing essential pages, and HTML stripping in page-split scraped content', () => {
+    const res = evaluateAllCapabilities({
+      url: 'https://example.com',
+      scrapedContentPreview: [
+        { route: '/about', content: '<p>Contact us at info@example.com or call 1-800-555-0199 for help.</p>' },
+        { route: '/contact', content: '<div>Our headquarters is in California.</div>' }
+      ],
+      discoveredRoutes: [
+        { path: '/' },
+        { path: '/about' }
+      ]
+    });
+
+    // 1. scrapedContentPreview formatting & tag stripping
+    expect(Array.isArray(res.scrapedContentPreview)).toBe(true);
+    expect(res.scrapedContentPreview).toEqual([
+      { route: '/about', content: 'Contact us at info@example.com or call 1-800-555-0199 for help.' },
+      { route: '/contact', content: 'Our headquarters is in California.' }
+    ]);
+
+    // 2. Contact extraction via regex
+    expect(res.emailValue).toBe('info@example.com');
+    expect(res.phoneValue).toBe('1-800-555-0199');
+
+    // 3. Missing essential pages logic: '/about' is in discoveredRoutes, so only '/contact', '/privacy', and '/terms' are missing.
+    expect(Array.isArray(res.missingEssentialPages)).toBe(true);
+    expect(res.missingEssentialPages).toEqual(['/contact', '/privacy', '/terms']);
+  });
+
+  it('should fallback to default contact values when they are not present', () => {
+    const res = evaluateAllCapabilities({
+      url: 'https://example.com',
+      scrapedContentPreview: 'No contact information here.',
+      discoveredRoutes: [
+        { path: '/' },
+        { path: '/about' },
+        { path: '/contact' },
+        { path: '/privacy' },
+        { path: '/terms' }
+      ]
+    });
+
+    expect(res.emailValue).toBe('None Detected');
+    expect(res.phoneValue).toBe('None Detected');
+    expect(res.missingEssentialPages).toEqual([]);
+  });
+
+  it('should prioritize explicit emailValue and phoneValue properties', () => {
+    const res = evaluateAllCapabilities({
+      email: 'explicit@domain.com',
+      phoneValue: '+1-555-999-8888',
+      scrapedContentPreview: 'Check out info@fallback.com or 555-111-2222'
+    });
+
+    expect(res.emailValue).toBe('explicit@domain.com');
+    expect(res.phoneValue).toBe('+1-555-999-8888');
   });
 });

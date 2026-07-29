@@ -5,7 +5,6 @@
  * Calculates 4 Pillars (P1, P2, P3, P4, 0-25 pts each), overallScore (0-100), and 4 Executive Inquiry Cards.
  * 
  * Strict Vocabulary Constraint:
- * NEVER use the term "AI-first".
  * Use "AI-Optimized" for core site checks and "AI-Ready" for machine manifest checks.
  */
 
@@ -997,11 +996,133 @@ function evaluateCapabilities(crawledData = {}) {
   };
 
   // b) Scraped Content & Manifest Previews
-  const scrapedContentPreview = crawledData.scrapedContentPreview ||
-    crawledData.pages?.[0]?.rawText ||
-    status.machinePreview ||
-    sec2.rawText ||
-    '';
+  const stripHtmlTags = (str) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  };
+
+  let scrapedContentPreview = [];
+  const rawPreviewInput = crawledData.scrapedContentPreview;
+
+  if (Array.isArray(rawPreviewInput)) {
+    scrapedContentPreview = rawPreviewInput.map(item => {
+      if (item && typeof item === 'object') {
+        return {
+          route: item.route || item.path || '/',
+          content: stripHtmlTags(item.content || item.rawText || '')
+        };
+      }
+      return {
+        route: '/',
+        content: stripHtmlTags(String(item))
+      };
+    });
+  } else if (typeof rawPreviewInput === 'string' && rawPreviewInput.trim() !== '') {
+    scrapedContentPreview = [{
+      route: '/',
+      content: stripHtmlTags(rawPreviewInput)
+    }];
+  } else if (Array.isArray(crawledData.pages) && crawledData.pages.length > 0) {
+    scrapedContentPreview = crawledData.pages.map(p => ({
+      route: p.route || p.path || '/',
+      content: stripHtmlTags(p.rawText || p.content || p.html || '')
+    }));
+  } else {
+    const fallbackText = status.machinePreview || sec2.rawText || '';
+    scrapedContentPreview = [{
+      route: '/',
+      content: stripHtmlTags(fallbackText)
+    }];
+  }
+
+  // a) Contact String Values
+  let emailValue = 'None Detected';
+  let phoneValue = 'None Detected';
+
+  const possibleEmailSources = [
+    crawledData.emailValue,
+    crawledData.email,
+    crawledData.sec3?.emailValue,
+    crawledData.sec3?.email,
+    crawledData.eeatMetrics?.emailValue,
+    crawledData.eeatMetrics?.email,
+    crawledData.status?.emailValue,
+    crawledData.status?.email
+  ];
+  for (const src of possibleEmailSources) {
+    if (typeof src === 'string' && src.trim() !== '' && src.includes('@')) {
+      emailValue = src.trim();
+      break;
+    }
+  }
+
+  const possiblePhoneSources = [
+    crawledData.phoneValue,
+    crawledData.phone,
+    crawledData.sec3?.phoneValue,
+    crawledData.sec3?.phone,
+    crawledData.eeatMetrics?.phoneValue,
+    crawledData.eeatMetrics?.phone,
+    crawledData.status?.phoneValue,
+    crawledData.status?.phone
+  ];
+  for (const src of possiblePhoneSources) {
+    if (typeof src === 'string' && src.trim() !== '') {
+      phoneValue = src.trim();
+      break;
+    }
+  }
+
+  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  const phoneRegex = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
+
+  if (emailValue === 'None Detected') {
+    for (const item of scrapedContentPreview) {
+      if (item && typeof item.content === 'string') {
+        const match = item.content.match(emailRegex);
+        if (match) {
+          emailValue = match[0];
+          break;
+        }
+      }
+    }
+    if (emailValue === 'None Detected' && Array.isArray(crawledData.pages)) {
+      for (const page of crawledData.pages) {
+        const text = page.rawText || page.content || '';
+        if (typeof text === 'string') {
+          const match = text.match(emailRegex);
+          if (match) {
+            emailValue = match[0];
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (phoneValue === 'None Detected') {
+    for (const item of scrapedContentPreview) {
+      if (item && typeof item.content === 'string') {
+        const match = item.content.match(phoneRegex);
+        if (match) {
+          phoneValue = match[0];
+          break;
+        }
+      }
+    }
+    if (phoneValue === 'None Detected' && Array.isArray(crawledData.pages)) {
+      for (const page of crawledData.pages) {
+        const text = page.rawText || page.content || '';
+        if (typeof text === 'string') {
+          const match = text.match(phoneRegex);
+          if (match) {
+            phoneValue = match[0];
+            break;
+          }
+        }
+      }
+    }
+  }
 
   const manifestPreviews = {
     aiContext: crawledData.manifestPreviews?.aiContext ||
@@ -1068,6 +1189,11 @@ function evaluateCapabilities(crawledData = {}) {
     ];
   }
 
+  // c) Missing Essential Pages Array
+  const essentialPagesList = ['/about', '/contact', '/privacy', '/terms'];
+  const detectedRoutes = new Set(discoveredRoutes.map(r => r.path || r.route || '/'));
+  const missingEssentialPages = essentialPagesList.filter(route => !detectedRoutes.has(route));
+
   // d) Domain Trust & EEAT Payload
   const isSecure = typeof crawledData.eeatMetrics?.isSecure === 'boolean'
     ? crawledData.eeatMetrics.isSecure
@@ -1128,7 +1254,10 @@ function evaluateCapabilities(crawledData = {}) {
     scrapedContentPreview,
     manifestPreviews,
     discoveredRoutes,
-    eeatMetrics
+    eeatMetrics,
+    emailValue,
+    phoneValue,
+    missingEssentialPages
   };
 }
 
@@ -1157,7 +1286,10 @@ function evaluateAllCapabilities(scanData = {}) {
     scrapedContentPreview: evalResult.scrapedContentPreview,
     manifestPreviews: evalResult.manifestPreviews,
     discoveredRoutes: evalResult.discoveredRoutes,
-    eeatMetrics: evalResult.eeatMetrics
+    eeatMetrics: evalResult.eeatMetrics,
+    emailValue: evalResult.emailValue,
+    phoneValue: evalResult.phoneValue,
+    missingEssentialPages: evalResult.missingEssentialPages
   };
 }
 
