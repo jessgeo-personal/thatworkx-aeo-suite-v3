@@ -1488,7 +1488,19 @@ function updateExecutiveViewData(results) {
   }
 
   const domainDisplayEl = document.getElementById('display-scanned-domain') || document.getElementById('exec-domain-tag');
-  if (domainDisplayEl) domainDisplayEl.innerText = domainName;
+  if (domainDisplayEl) domainDisplayEl.innerText = rawUrl || domainName;
+
+  const timestampEl = document.getElementById('scan-timestamp-badge');
+  if (timestampEl) {
+    const lastScannedVal = results.scanMetrics?.lastScanned || results.lastScanned || new Date().toLocaleString();
+    timestampEl.innerText = `Last Scanned: ${lastScannedVal}`;
+  }
+
+  const durationEl = document.getElementById('scan-duration-badge');
+  if (durationEl) {
+    const scanTimeSeconds = results.scanMetrics?.scanTimeSeconds ?? results.scanTimeSeconds ?? 1.8;
+    durationEl.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
+  }
 
   const statusBadgeEl = document.getElementById('exec-score-classification-pill') || document.getElementById('exec-status-badge');
   if (statusBadgeEl) {

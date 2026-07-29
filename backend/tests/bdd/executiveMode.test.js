@@ -1,6 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+const cheerio = require('cheerio');
 const { evaluateCapabilities } = require('../../services/capabilityEvaluator');
 
-describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2)', () => {
+describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exec View V1)', () => {
 
   const hasNoUndefinedOrNull = (obj, path = '') => {
     if (obj === null || obj === undefined) {
@@ -104,6 +107,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2)', ()
     expect(section3.deductionReason).toBeDefined();
     expect(typeof section3.deductionReason).toBe('string');
     expect(section3.deductionReason).not.toContain('undefined');
+    expect(section3.deductionReason).not.toContain('undefined');
     expect(Array.isArray(section3.deductions)).toBe(true);
     expect(section3.deductions.length).toBeGreaterThan(0);
 
@@ -150,6 +154,46 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2)', ()
     const containsAiFirst = /AI-first/i.test(jsonString);
 
     expect(containsAiFirst).toBe(false);
+  });
+
+  it('Scenario D: Executive mode payload contains scanMetrics and scanTimeSeconds', () => {
+    const evaluation = evaluateCapabilities({
+      url: 'https://example.com',
+      scanMetrics: { scanTimeSeconds: 1.85, lastScanned: '2026-07-29T12:00:00Z' }
+    });
+
+    expect(evaluation.scanMetrics).toBeDefined();
+    expect(typeof evaluation.scanMetrics.scanTimeSeconds).toBe('number');
+    expect(evaluation.scanMetrics.scanTimeSeconds).toBe(1.85);
+    expect(typeof evaluation.scanMetrics.lastScanned).toBe('string');
+  });
+
+  it('Scenario E: Executive Mode view template (visualize.html) renders scan duration and 2-method business intro copy', () => {
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. Scan duration element presence
+    const durationBadge = $('#scan-duration-badge');
+    expect(durationBadge.length).toBe(1);
+    expect(durationBadge.text()).toContain('Time to Scan:');
+
+    // 2. Executive Welcome Banner presence and exact copy
+    const welcomeBanner = $('#exec-welcome-banner');
+    expect(welcomeBanner.length).toBe(1);
+
+    const bannerText = welcomeBanner.text();
+    expect(bannerText).toContain('## Let us show you what AI can See ##');
+    expect(bannerText).toContain('### Welcome to the Executive Mode - aimed at the business user.');
+    expect(bannerText).toContain('#### AI uses 2 methods to source content from your web presence');
+    expect(bannerText).toContain('1. Your existing human-centric web presence');
+    expect(bannerText).toContain('AI-Optimized');
+    expect(bannerText).toContain('2. Your complimentary Machine-friendly web presence');
+    expect(bannerText).toContain('Done correctly, your web presence could become AI-ready');
+    expect(bannerText).toContain('#### Take a look at how your web presence is helping your brand be visible to AI engines');
+
+    // Zero AI-first check in visualize.html banner
+    expect(/AI-first/i.test(bannerText)).toBe(false);
   });
 
 });

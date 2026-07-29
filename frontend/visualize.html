@@ -76,9 +76,10 @@
 
     <!-- Active Target Domain Header Display -->
     <div id="active-domain-header-bar" class="mb-4" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; color: #94a3b8; flex-wrap: wrap; gap: 0.5rem;">
-      <div>Scanned Target: <strong id="display-scanned-domain" style="color: #38bdf8;">--</strong></div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span id="scan-timestamp-badge" style="margin-right: 0.5rem;">Last audited: Not scanned</span>
+      <div>Scanned page: <strong id="display-scanned-domain" style="color: #38bdf8;">--</strong></div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span id="scan-timestamp-badge">Last Scanned: Not scanned</span>
+        <span id="scan-duration-badge" style="color: #cbd5e1; font-weight: 600;">Time to Scan: -- seconds</span>
         <button type="button" class="drawer-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">📄 Export Raw JSON</button>
         <button type="button" class="drawer-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.35rem 0.7rem; font-size: 0.8rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; cursor: pointer;">🖨️ Export PDF Summary</button>
       </div>
@@ -111,6 +112,22 @@
          EXECUTIVE MODE CONTAINER (#exec-mode-container)
     ════════════════════════════════════════════════════════ -->
     <div id="exec-mode-container" class="view-mode-section">
+      
+      <!-- Executive Welcome & Business Explainer Banner -->
+      <div id="exec-welcome-banner" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">## Let us show you what AI can See ##</h2>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">### Welcome to the Executive Mode - aimed at the business user.</h3>
+        <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.75rem;">#### AI uses 2 methods to source content from your web presence</h4>
+        <ol style="list-style-type: none; padding-left: 0; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">
+          <li style="padding: 0.6rem 0.85rem; background: var(--surface-nested-bg); border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            1. Your existing human-centric web presence - if this is formatted appropriately, is optimally content rich and has no technical blocks, the site could be considered AI-Optimized
+          </li>
+          <li style="padding: 0.6rem 0.85rem; background: var(--surface-nested-bg); border-radius: 8px; border-left: 4px solid #10b981;">
+            2. Your complimentary Machine-friendly web presence - following the Generative AI Industry standard file hierarchy that helps AI to efficiently read, ingest, process and cite your content. <strong>Done correctly, your web presence could become AI-ready</strong>, without changing your human-centric web presence.
+          </li>
+        </ol>
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">#### Take a look at how your web presence is helping your brand be visible to AI engines</h4>
+      </div>
       
       <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
