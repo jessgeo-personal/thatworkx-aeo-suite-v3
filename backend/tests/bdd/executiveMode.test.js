@@ -196,4 +196,47 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(/AI-first/i.test(bannerText)).toBe(false);
   });
 
+  it('Scenario F: Executive Mode Section 2 (Presence & Hygiene) UI refactoring assertions', () => {
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. Title & Subheading
+    const card = $('#exec-section2-card');
+    expect(card.length).toBe(1);
+    
+    const cardTitle = $('#exec-section2-card h4');
+    expect(cardTitle.text()).toContain('2. What can AI see on your website');
+    
+    const subheading = $('#exec-section2-card p');
+    expect(subheading.text()).toContain('take a look and see if the brand message that AI sees matches');
+
+    // 2. Scraped Webpage Code Box
+    const sectionHtml = $('#exec-section2-card').html();
+    expect(sectionHtml).toContain('ai-bot readable content from actual website');
+    
+    const contentBox = $('#sec2-scraped-content-box');
+    expect(contentBox.length).toBe(1);
+
+    // 3. Essential Pages Sub-block
+    const foundList = $('#sec2-found-essential-pages');
+    const missingList = $('#sec2-missing-essential-pages');
+    expect(foundList.length).toBe(1);
+    expect(missingList.length).toBe(1);
+
+    // 4. Citation signal rows
+    const signalsBlock = $('#citation-signals-rows');
+    expect(signalsBlock.length).toBe(1);
+    
+    expect(sectionHtml).toContain('HasFAQSchema');
+    expect(sectionHtml).toContain('Answer/Question parity');
+    expect(sectionHtml).toContain('HasOrganizationSchema');
+    expect(sectionHtml).toContain('emailValue');
+    expect(sectionHtml).toContain('phoneValue');
+
+    // 5. Zero occurrences of "AI-first" string
+    const sectionText = $('#exec-section2-card').text();
+    expect(/AI-first/i.test(sectionText)).toBe(false);
+  });
+
 });

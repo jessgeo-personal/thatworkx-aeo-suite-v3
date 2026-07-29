@@ -1675,85 +1675,81 @@ function updateExecutiveViewData(results) {
       : `Scan detected access or readability issues on ${domainName}. Review gateway rules and machine index files below.`;
   }
 
-  // 2. What AI can see (Left: Webpage RAG Vector Ingestion vs Right: AI-Ready File Contents)
-  
-  // LEFT PANEL: "How AI sees your website" -> Actual webpage RAG vector chunk ingestion with Multi-Bot Truncation
-  const simHumanView = document.getElementById('sim-human-view');
-  if (simHumanView) {
-    let webRagText = '';
-    if (results.pages && results.pages.length > 0) {
-      webRagText = results.pages.map((p, idx) => {
-        const routePath = p.route || p.url || `Page ${idx + 1}`;
-        const titleText = p.title ? p.title : `Page ${routePath}`;
-        const descText = p.metaDescription ? `\n> **Meta Description:** ${p.metaDescription}` : '';
-        const rawContent = p.rawText || p.bodySnippet || p.metaDescription || '';
-        
-        const headingsMd = p.headings && p.headings.length > 0
-          ? '\n' + p.headings.map(h => `### ${h.text}`).join('\n')
-          : '';
-        
-        const formattedRagBody = formatRagTextWithTruncation(rawContent, routePath);
+  // 2. Refactor Section 2 (Presence & Hygiene) Card Dynamic Ingest
+  const routeTabsEl = document.getElementById('sec2-route-tabs');
+  const scrapedBoxEl = document.getElementById('sec2-scraped-content-box');
+  if (routeTabsEl && scrapedBoxEl && Array.isArray(results.scrapedContentPreview) && results.scrapedContentPreview.length > 0) {
+    routeTabsEl.innerHTML = results.scrapedContentPreview.map((item, idx) => {
+      return `<button type="button" class="route-tab-btn ${idx === 0 ? 'active' : ''}" data-idx="${idx}" onclick="switchSec2RouteTab(${idx})" style="padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-color); background: ${idx === 0 ? 'var(--burnt-copper)' : 'var(--surface-bg)'}; color: ${idx === 0 ? '#fff' : 'var(--text-muted)'}; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">${item.route}</button>`;
+    }).join('');
 
-        return `## Vector Chunk #${idx + 1} [Route: ${routePath}]\n**Title:** ${titleText}${descText}${headingsMd}\n\n**Extracted Webpage Content:**\n${formattedRagBody}`;
-      }).join('\n\n---\n\n');
-    } else {
-      webRagText = `## Vector Chunk #1 [Route: /]\n**Title:** ${domainName} Homepage\n\n**Extracted Webpage Content:**\nNo parsed DOM body text available for ${domainName}.`;
-    }
-    
-    simHumanView.innerHTML = `<pre style="font-family: var(--font-sans); font-size: 0.76rem; line-height: 1.5; color: var(--text-secondary); white-space: pre-wrap; margin: 0;">${webRagText}</pre>`;
+    window.sec2ScrapedContent = results.scrapedContentPreview;
+    scrapedBoxEl.innerText = results.scrapedContentPreview[0].content || 'No content parsed for this page.';
+  } else if (scrapedBoxEl) {
+    scrapedBoxEl.innerText = 'No parsed DOM body text available.';
   }
 
-  // RIGHT PANEL: "How AI sees your AI-ready content" -> Only AI-Ready File Contents (/llms.txt, /ai-context.md, etc.)
-  const simAiView = document.getElementById('sim-ai-view');
-  if (simAiView) {
-    const hasLlms = results.status?.llmsTxtExists;
-    const hasContext = results.status?.aiContextExists;
-    const hasAbout = results.status?.aboutTxtExists;
-    const hasDocs = results.status?.docsTxtExists;
-    const hasContent = results.status?.contentTxtExists;
+  const foundListEl = document.getElementById('sec2-found-essential-pages');
+  const missingListEl = document.getElementById('sec2-missing-essential-pages');
+  if (foundListEl && missingListEl) {
+    const missing = results.missingEssentialPages || [];
+    const standard = ['/about', '/contact', '/privacy', '/terms'];
+    const found = standard.filter(route => !missing.includes(route));
 
-    let manifestStream = `# AI-READY MACHINE MANIFEST STREAM for ${domainName}\n\n`;
-    manifestStream += `[${hasLlms ? '✓' : '❌'} /llms.txt]: ${hasLlms ? 'Status 200 OK | Entity specs & route map active' : '404 Missing (Not Deployed)'}\n`;
-    manifestStream += `[${hasContext ? '✓' : '❌'} /ai-context.md]: ${hasContext ? 'Status 200 OK | System prompt context map active' : '404 Missing (Not Deployed)'}\n`;
-    manifestStream += `[${hasAbout ? '✓' : '❌'} /about.md]: ${hasAbout ? 'Status 200 OK | E-E-A-T brand credentials active' : '404 Missing (Not Deployed)'}\n`;
-    manifestStream += `[${hasDocs ? '✓' : '❌'} /docs.md]: ${hasDocs ? 'Status 200 OK | Technical manual specifications active' : '404 Missing (Not Deployed)'}\n`;
-    manifestStream += `[${hasContent ? '✓' : '❌'} /content.md]: ${hasContent ? 'Status 200 OK | Thought leadership index active' : '404 Missing (Not Deployed)'}\n\n`;
+    foundListEl.innerHTML = found.length > 0
+      ? found.map(route => `<li style="color: #10b981; list-style-type: none; display: flex; align-items: center; gap: 0.35rem;"><span>🟢</span> ${route} - Detected</li>`).join('')
+      : '<li style="color: var(--text-muted); list-style-type: none;">None detected</li>';
 
-    manifestStream += `--- AI-READY FILE CONTENTS INGESTION ---\n\n`;
+    missingListEl.innerHTML = missing.length > 0
+      ? missing.map(route => `<li style="color: #ef4444; list-style-type: none; display: flex; align-items: center; gap: 0.35rem;"><span>🔴</span> ${route} - Missing</li>`).join('')
+      : '<li style="color: #10b981; list-style-type: none; display: flex; align-items: center; gap: 0.35rem;"><span>🟢</span> None missing</li>';
+  }
 
-    let priorityChunks = [];
-    if (hasLlms && results.status?.llmsTxtContent) {
-      const fileWords = results.status.llmsTxtContent.split(/\s+/).filter(Boolean).length;
-      const fileTokens = Math.round(fileWords * 1.35);
-      const isOptimal = fileWords <= 1500;
-      priorityChunks.push(`## Machine Vector Chunk #1 [/llms.txt]\n**Type:** Machine Welcome Directory (Answer.ai Standard)\n\n### Extracted File Content:\n${results.status.llmsTxtContent}\n\n*System Prompt Ingestion Status:* ${isOptimal ? '🟢 100% Ingestible by Gemini & Copilot' : '⚠️ System Prompt Budget Exceeded'} (~${fileWords} words / ~${fileTokens} tokens)`);
-    }
-    if (hasContext && results.status?.aiContextContent) {
-      const fileWords = results.status.aiContextContent.split(/\s+/).filter(Boolean).length;
-      const fileTokens = Math.round(fileWords * 1.35);
-      const isOptimal = fileWords <= 1500;
-      priorityChunks.push(`## Machine Vector Chunk #2 [/ai-context.md]\n**Type:** AI System Prompt Context Map\n\n### Extracted File Content:\n${results.status.aiContextContent}\n\n*System Prompt Ingestion Status:* ${isOptimal ? '🟢 100% Ingestible by Gemini & Copilot' : '⚠️ System Prompt Budget Exceeded'} (~${fileWords} words / ~${fileTokens} tokens)`);
-    }
-    if (hasAbout && results.status?.aboutTxtContent) {
-      const fileWords = results.status.aboutTxtContent.split(/\s+/).filter(Boolean).length;
-      priorityChunks.push(`## Machine Vector Chunk #3 [/about.md]\n**Type:** E-E-A-T Brand Credentials\n\n### Extracted File Content:\n${results.status.aboutTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /about.md (${fileWords} words)`);
-    }
-    if (hasDocs && results.status?.docsTxtContent) {
-      const fileWords = results.status.docsTxtContent.split(/\s+/).filter(Boolean).length;
-      priorityChunks.push(`## Machine Vector Chunk #4 [/docs.md]\n**Type:** Technical Manual Specifications\n\n### Extracted File Content:\n${results.status.docsTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /docs.md (${fileWords} words)`);
-    }
-    if (hasContent && results.status?.contentTxtContent) {
-      const fileWords = results.status.contentTxtContent.split(/\s+/).filter(Boolean).length;
-      priorityChunks.push(`## Machine Vector Chunk #5 [/content.md]\n**Type:** Thought Leadership Index\n\n### Extracted File Content:\n${results.status.contentTxtContent}\n\n*System Prompt Ingestion Status:* 🟢 Deployed at /content.md (${fileWords} words)`);
-    }
+  const faqStatusEl = document.getElementById('sec2-faq-status');
+  const parityValueEl = document.getElementById('sec2-parity-value');
+  const orgStatusEl = document.getElementById('sec2-org-status');
+  const emailValueEl = document.getElementById('sec2-email-value');
+  const phoneValueEl = document.getElementById('sec2-phone-value');
 
-    if (priorityChunks.length > 0) {
-      manifestStream += priorityChunks.join('\n\n---\n\n');
+  if (faqStatusEl) {
+    const hasFaqSchema = results.status?.jsonLdExists || results.sec3?.hasFaqSchema || false;
+    faqStatusEl.innerText = hasFaqSchema ? 'PASS' : 'ACTION';
+    faqStatusEl.className = `badge-status ${hasFaqSchema ? 'status-green' : 'status-red'}`;
+    if (hasFaqSchema) {
+      faqStatusEl.style.background = 'rgba(16, 185, 129, 0.18)';
+      faqStatusEl.style.color = '#34d399';
     } else {
-      manifestStream += `⚠️ NO AI-READY MACHINE FILES DEPLOYED on ${domainName}\n\nNo /llms.txt or /ai-context.md files were found returning 200 OK.\nGoogle Gemini, Copilot & ChatGPT are currently forced to rely solely on fallback webpage crawling. Use the AI Optimize tab to generate and deploy these files!`;
+      faqStatusEl.style.background = 'rgba(244, 63, 94, 0.18)';
+      faqStatusEl.style.color = '#f43f5e';
     }
+  }
 
-    simAiView.innerText = manifestStream;
+  if (parityValueEl) {
+    const q = results.sec3?.faqQuestions ?? 0;
+    const a = results.sec3?.faqAnswers ?? 0;
+    const ratio = q > 0 ? (a / q).toFixed(1) : '0.0';
+    parityValueEl.innerText = `${q} Q / ${a} A (Ratio 1:${ratio})`;
+  }
+
+  if (orgStatusEl) {
+    const hasOrgSchema = results.status?.jsonLdTypes?.includes('Organization') || results.status?.jsonLdExists || false;
+    orgStatusEl.innerText = hasOrgSchema ? 'PASS' : 'ACTION';
+    orgStatusEl.className = `badge-status ${hasOrgSchema ? 'status-green' : 'status-red'}`;
+    if (hasOrgSchema) {
+      orgStatusEl.style.background = 'rgba(16, 185, 129, 0.18)';
+      orgStatusEl.style.color = '#34d399';
+    } else {
+      orgStatusEl.style.background = 'rgba(244, 63, 94, 0.18)';
+      orgStatusEl.style.color = '#f43f5e';
+    }
+  }
+
+  if (emailValueEl) {
+    emailValueEl.innerText = results.emailValue || 'None Detected';
+  }
+
+  if (phoneValueEl) {
+    phoneValueEl.innerText = results.phoneValue || 'None Detected';
   }
 
   // 3. Update Strategic Pillar Badges, Scores & Executive Inquiry Cards with Vibrant Highlights & Deduction Reasons
@@ -3061,6 +3057,90 @@ function adjustSimulatorFont(target, delta) {
 window.adjustSimulatorFont = adjustSimulatorFont;
 window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
 window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
+
+const tooltipExplanationData = {
+  'essential-pages': {
+    title: 'Essential Pages Index Coverage',
+    icon: '📂',
+    body: '<p>AI models search for standardized identity pages (/about, /contact, /privacy-policy) to verify entity existence and index domain authority trust signals.</p>'
+  },
+  'missing-essential-pages': {
+    title: 'Missing Essential Pages',
+    icon: '⚠️',
+    body: '<p>If these pages are missing or returning 404s, it weakens your entity trust scores in search AI indexing pipelines.</p>'
+  },
+  'citation-signals': {
+    title: 'AI Citation Signals',
+    icon: '🔗',
+    body: '<p>AI search engines require structured metadata (JSON-LD) and explicit values to quote your site as the source of an answer.</p>'
+  },
+  'faq-schema': {
+    title: 'FAQ Schema (HasFAQSchema)',
+    icon: '❓',
+    body: '<p>FAQ Page schemas explicitly register questions and answers in JSON-LD format. This allows generative AI models to direct-quote solutions for user query cards.</p>'
+  },
+  'faq-parity': {
+    title: 'FAQ Q/A Parity (Answer/Question parity)',
+    icon: '⚖️',
+    body: '<p>A perfect 1:1 question-to-answer parity ensures no orphan questions exist. Orphaned questions in schema or body degrade vector distance trust metrics.</p>'
+  },
+  'org-schema': {
+    title: 'Organization Schema (HasOrganizationSchema)',
+    icon: '🏢',
+    body: '<p>Organization schema maps your brand name, logo, social profiles, and corporate contact details into the global knowledge graph.</p>'
+  },
+  'email-visible': {
+    title: 'Email Visibility (hasEmailVisibleToAI)',
+    icon: '📧',
+    body: '<p>AI crawlers extract plaintext or structured email references to verify customer service channels and build trust signals.</p>'
+  },
+  'phone-visible': {
+    title: 'Phone Visibility (hasPhoneVisibleToAI)',
+    icon: '📞',
+    body: '<p>AI models require accessible phone details to evaluate brand support reliability and prevent fraud flagging.</p>'
+  }
+};
+
+function openHelpTooltip(key, evt) {
+  if (evt) {
+    if (typeof evt.preventDefault === 'function') evt.preventDefault();
+    if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
+  }
+  const data = tooltipExplanationData[key];
+  if (!data) return;
+  const titleEl = document.getElementById('help-modal-title');
+  const iconEl = document.getElementById('help-modal-icon');
+  const bodyEl = document.getElementById('help-modal-body');
+  const modalEl = document.getElementById('help-modal');
+
+  if (titleEl) titleEl.innerText = data.title;
+  if (iconEl) iconEl.innerText = data.icon;
+  if (bodyEl) bodyEl.innerHTML = data.body;
+  if (modalEl) {
+    modalEl.classList.remove('help-modal-hidden');
+  }
+}
+
+function switchSec2RouteTab(idx) {
+  const contentBox = document.getElementById('sec2-scraped-content-box');
+  if (contentBox && window.sec2ScrapedContent && window.sec2ScrapedContent[idx]) {
+    contentBox.innerText = window.sec2ScrapedContent[idx].content || 'No content parsed for this page.';
+  }
+
+  const buttons = document.querySelectorAll('#sec2-route-tabs button');
+  buttons.forEach((btn, bIdx) => {
+    if (bIdx === idx) {
+      btn.style.background = 'var(--burnt-copper)';
+      btn.style.color = '#fff';
+    } else {
+      btn.style.background = 'var(--surface-bg)';
+      btn.style.color = 'var(--text-muted)';
+    }
+  });
+}
+
+window.openHelpTooltip = openHelpTooltip;
+window.switchSec2RouteTab = switchSec2RouteTab;
 
 
 
