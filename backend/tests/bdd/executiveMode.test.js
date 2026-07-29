@@ -96,12 +96,16 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2)', ()
     expect(typeof section2.deductionReason).toBe('string');
     expect(section2.deductionReason).toContain('Missing /sitemap.xml');
     expect(section2.deductionReason).not.toContain('undefined');
+    expect(Array.isArray(section2.deductions)).toBe(true);
+    expect(section2.deductions.length).toBeGreaterThan(0);
 
     // Section 3 deduction check
     expect(section3.score).toBeLessThan(25);
     expect(section3.deductionReason).toBeDefined();
     expect(typeof section3.deductionReason).toBe('string');
     expect(section3.deductionReason).not.toContain('undefined');
+    expect(Array.isArray(section3.deductions)).toBe(true);
+    expect(section3.deductions.length).toBeGreaterThan(0);
 
     // Section 4 deduction check
     expect(section4.score).toBeLessThan(25);
@@ -109,6 +113,8 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2)', ()
     expect(typeof section4.deductionReason).toBe('string');
     expect(section4.deductionReason).toContain('Missing /llms.txt');
     expect(section4.deductionReason).not.toContain('undefined');
+    expect(Array.isArray(section4.deductions)).toBe(true);
+    expect(section4.deductions.length).toBeGreaterThan(0);
 
     // When score is 25/25, deductionReason must be "🟢 No deductions — All protocols clean."
     const perfectScan = {

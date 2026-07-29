@@ -78,7 +78,7 @@ function buildDevManifestTreeHtml() {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
           <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>🤖 Level 1–4 Machine Manifest Inspection Matrix</span>
+            <span>🤖 AI-Ready File (Machine Manifest) Diagnostics</span>
             <span class="badge-status" id="dev-manifest-count-badge" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">8 Manifests Tracked</span>
           </h4>
           <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect robots.txt directives, bot permissions, and Level 1–4 machine welcome mats.</p>
@@ -114,7 +114,7 @@ function buildDevMatrixHtml() {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
           <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>🛠️ 32-Capability Granular Diagnostic Matrix</span>
+            <span>🛠️ AI-Optimized Site Diagnostics</span>
             <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Full Technical Audit</span>
           </h4>
           <p style="font-size: 0.85rem; color: var(--text-muted);">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
@@ -130,10 +130,10 @@ function buildDevMatrixHtml() {
         <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(4)">Section 4: Manifests (12)</button>
       </div>
 
-      <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto;">
+      <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto; position: relative;">
         <table class="exec-table dev-matrix-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-          <thead>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+          <thead style="position: sticky; top: 0; z-index: 10; background-color: var(--surface-bg); border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <tr style="color: #94a3b8; text-align: left;">
               <th style="padding: 0.6rem;">#</th>
               <th style="padding: 0.6rem;">Capability &amp; Parameter</th>
               <th style="padding: 0.6rem;">Category</th>
@@ -922,70 +922,64 @@ function renderDeveloperManifestTree(results = {}) {
     ? `<span class="badge-status status-green" style="font-size: 0.72rem;">🟢 Allowed</span>`
     : `<span class="badge-status status-red" style="font-size: 0.72rem;">🔴 Blocked</span>`;
 
+  const domainUrl = `https://${currentScannedDomain}`;
+
   const manifests = [
     {
       path: '/robots.txt',
-      indent: '',
+      fileRoute: '/robots.txt',
       exists: !!status.robotsTxtExists,
       inRobots: 'N/A',
-      wordInfo: status.robotsTxtExists ? '780 chars' : '0 words (404 Missing)',
-      drawerKey: 'robots'
+      wordInfo: status.robotsTxtExists ? '780 chars' : '0 words (404 Missing)'
     },
     {
       path: '|--> /llms.txt',
-      indent: '  ',
+      fileRoute: '/llms.txt',
       exists: !!status.llmsTxtExists,
       inRobots: status.robotsTxtExists ? 'Yes' : 'No',
-      wordInfo: status.llmsTxtExists ? (status.llmsTxtContent ? `${status.llmsTxtContent.split(/\s+/).filter(Boolean).length} words` : '350 words') : '0 words (404 Missing)',
-      drawerKey: 'llms'
+      wordInfo: status.llmsTxtExists ? (status.llmsTxtContent ? `${status.llmsTxtContent.split(/\s+/).filter(Boolean).length} words` : '350 words') : '0 words (404 Missing)'
     },
     {
       path: '|--> /sitemap.xml',
-      indent: '  ',
+      fileRoute: '/sitemap.xml',
       exists: !!status.sitemapExists,
       inRobots: status.sitemapExists ? 'Yes' : 'No',
-      wordInfo: status.sitemapExists ? '1.4 KB' : '0 words (404 Missing)',
-      drawerKey: 'sitemap'
+      wordInfo: status.sitemapExists ? '1.4 KB' : '0 words (404 Missing)'
     },
     {
       path: '|--> /ai-context.md',
-      indent: '    ',
+      fileRoute: '/ai-context.md',
       exists: !!status.aiContextExists,
       inRobots: status.aiContextExists ? 'Yes' : 'No',
-      wordInfo: status.aiContextExists ? (status.aiContextContent ? `${status.aiContextContent.split(/\s+/).filter(Boolean).length} words` : '520 words') : '0 words (404 Missing)',
-      drawerKey: 'aicontext'
+      wordInfo: status.aiContextExists ? (status.aiContextContent ? `${status.aiContextContent.split(/\s+/).filter(Boolean).length} words` : '520 words') : '0 words (404 Missing)'
     },
     {
       path: '|--> README.md',
-      indent: '      ',
+      fileRoute: '/README.md',
       exists: !!status.readmeFound,
       inRobots: 'No',
-      wordInfo: status.readmeFound ? '290 words' : '0 words (404 Missing)',
-      drawerKey: 'readme'
+      wordInfo: status.readmeFound ? '290 words' : '0 words (404 Missing)'
     },
     {
       path: '|--> about.md',
-      indent: '      ',
+      fileRoute: '/about.md',
       exists: !!status.aboutTxtExists,
       inRobots: status.aboutTxtExists ? 'Yes' : 'No',
-      wordInfo: status.aboutTxtExists ? (status.aboutTxtContent ? `${status.aboutTxtContent.split(/\s+/).filter(Boolean).length} words` : '410 words') : '0 words (404 Missing)',
-      drawerKey: 'about'
+      wordInfo: status.aboutTxtExists ? (status.aboutTxtContent ? `${status.aboutTxtContent.split(/\s+/).filter(Boolean).length} words` : '410 words') : '0 words (404 Missing)'
     },
     {
       path: '|--> docs.md',
-      indent: '      ',
+      fileRoute: '/docs.md',
       exists: !!status.docsTxtExists,
       inRobots: status.docsTxtExists ? 'Yes' : 'No',
-      wordInfo: status.docsTxtExists ? (status.docsTxtContent ? `${status.docsTxtContent.split(/\s+/).filter(Boolean).length} words` : '680 words') : '0 words (404 Missing)',
-      drawerKey: 'docs'
+      wordInfo: status.docsTxtExists ? (status.docsTxtContent ? `${status.docsTxtContent.split(/\s+/).filter(Boolean).length} words` : '680 words') : '0 words (404 Missing)'
     },
     {
       path: '|--> content.md',
-      indent: '      ',
+      fileRoute: '/content.md',
       exists: !!status.contentTxtExists,
       inRobots: status.contentTxtExists ? 'Yes' : 'No',
-      wordInfo: status.contentTxtExists ? (status.contentTxtContent ? `${status.contentTxtContent.split(/\s+/).filter(Boolean).length} words` : '950 words') : '0 words (404 Missing)',
-      drawerKey: 'content'
+      wordInfo: status.contentTxtExists ? (status.contentTxtContent ? `${status.contentTxtContent.split(/\s+/).filter(Boolean).length} words` : '950 words') : '0 words (404 Missing)'
     }
   ];
 
@@ -1006,39 +1000,72 @@ function renderDeveloperManifestTree(results = {}) {
       <td style="padding: 0.6rem;">${getBotPill(perplexityAllowed)}</td>
       <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">${m.wordInfo}</td>
       <td style="padding: 0.6rem; text-align: right;">
-        <button type="button" class="drawer-btn" style="padding: 0.2rem 0.5rem; font-size: 0.78rem;" onclick="selectCodeDrawer('${m.drawerKey}')">View ↗</button>
+        <a href="${domainUrl}${m.fileRoute}" target="_blank" rel="noopener noreferrer" class="drawer-btn" style="text-decoration: none; display: inline-block; padding: 0.2rem 0.5rem; font-size: 0.78rem;">View ↗</a>
       </td>
     </tr>
   `).join('');
+}
+
+function getProUpgradeHook(capId = '') {
+  if (!capId) return null;
+  const key = String(capId).toLowerCase().trim();
+  const hooks = {
+    jsonldschema: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom schema generation.' },
+    faqschemaparity: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom FAQ schema.' },
+    heavypageindication: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro to use headless Puppeteer browser to crawl heavy SPA content.' },
+    spahydrationtrap: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for headless SPA hydration fixes.' },
+    aicontextmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro / AIO Pro to generate and auto-update /ai-context.md.' },
+    internallinksanalysis: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro to validate internal link accessibility across sub-pages.' },
+    robotspermission: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample unblocked robots.txt or AIO Pro for automated directives.' },
+    aboutmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample about.md corporate entity file.' },
+    docsmd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample docs.md technical manual file.' },
+    contentmd: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro for content.md case study vault.' }
+  };
+  return hooks[key] || null;
 }
 
 function renderDeveloperMatrixRows(capabilities) {
   const tbody = document.getElementById('dev-matrix-tbody');
   if (!tbody) return;
 
-  const proToolHooks = {
-    jsonLdSchema: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom schema generation.' },
-    faqSchemaParity: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro for sample JSON-LD Schema or AIO Pro for custom FAQ schema.' },
-    heavyPageIndication: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒', msg: 'Upgrade to AIO Pro to use headless Puppeteer browser to crawl heavy SPA content.' },
-    aiContextMd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro / AIO Pro to generate and auto-update /ai-context.md.' },
-    internalLinksAnalysis: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡', msg: 'Upgrade to AIV Pro to validate internal link accessibility across sub-pages.' }
+  const sectionCategoryNames = {
+    1: 'Section 1: Gateway & Access',
+    2: 'Section 2: Presence & Hygiene',
+    3: 'Section 3: Content AI-Readiness',
+    4: 'Section 4: Machine Manifest Readiness'
   };
 
-  tbody.innerHTML = capabilities.map((cap, idx) => {
+  let rowsHtml = '';
+  let currentSection = null;
+  const isAllView = capabilities.length > 15;
+
+  capabilities.forEach((cap, idx) => {
+    if (isAllView && cap.section !== currentSection) {
+      currentSection = cap.section;
+      const catTitle = sectionCategoryNames[currentSection] || `Section ${currentSection}`;
+      rowsHtml += `
+        <tr class="category-divider" style="background: rgba(255,255,255,0.06); color: var(--burnt-copper); font-weight: 700;">
+          <td colspan="7" style="padding: 0.6rem 0.8rem; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+            <strong>${catTitle}</strong>
+          </td>
+        </tr>
+      `;
+    }
+
     const isPass = cap.status === 'pass' || cap.status === 'active';
     const isBlocked = cap.status === 'blocked' || cap.status === 'critical';
     const statusBadge = isPass
       ? '<span class="badge-status status-green">🟢 Pass</span>'
       : (isBlocked ? '<span class="badge-status status-red">🔴 Blocked</span>' : '<span class="badge-status status-amber">🟡 Warning</span>');
 
-    const proHook = proToolHooks[cap.id];
+    const proHook = getProUpgradeHook(cap.id);
     let actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')"><span>⚡ Fix in AIOptimize</span></button>`;
     
     if (proHook && !isPass) {
       actionHtml = `<button type="button" class="badge-status status-amber" onclick="showUpgradeModal('PRO_REQUIRED', '${proHook.msg}', '${proHook.tier}')" style="border: none; cursor: pointer; padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700;">${proHook.label}</button>`;
     }
 
-    return `
+    rowsHtml += `
       <tr data-section="${cap.section}">
         <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
         <td>
@@ -1052,7 +1079,9 @@ function renderDeveloperMatrixRows(capabilities) {
         <td style="text-align: right;">${actionHtml}</td>
       </tr>
     `;
-  }).join('');
+  });
+
+  tbody.innerHTML = rowsHtml;
 }
 
 function filterMatrixSection(section) {
@@ -1565,7 +1594,13 @@ function updateExecutiveViewData(results) {
       scoreEl.style.setProperty('border', theme.border, 'important');
     }
     if (noteEl) {
-      noteEl.innerText = deductionReason;
+      if (secObj && secObj.deductions && secObj.deductions.length > 0 && currentScore < currentMax) {
+        noteEl.innerHTML = '<ul class="deduction-list" style="margin: 0; padding-left: 1.1rem; list-style-type: disc; color: var(--text-muted); font-size: 0.74rem; line-height: 1.4;">' + 
+          secObj.deductions.map(d => `<li class="deduction-item" style="margin-bottom: 0.2rem;">${d}</li>`).join('') + 
+          '</ul>';
+      } else {
+        noteEl.innerText = deductionReason;
+      }
     }
   };
 

@@ -931,6 +931,7 @@ function evaluateCapabilities(crawledData = {}) {
       score: p1Score,
       max: 25,
       status: getStatusFromScore(p1Score, 25),
+      deductions: p1Deductions,
       deductionReason: p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason),
       impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.'
     },
@@ -940,6 +941,7 @@ function evaluateCapabilities(crawledData = {}) {
       score: p2Score,
       max: 25,
       status: getStatusFromScore(p2Score, 25),
+      deductions: p2Deductions,
       deductionReason: p2Score === 25 ? '🟢 No deductions — All protocols clean.' : p2DeductionReason,
       impact: 'Evaluates whether AI crawlers can discover your pages via sitemap.xml and extract text without SPA JavaScript hydration traps.'
     },
@@ -949,6 +951,7 @@ function evaluateCapabilities(crawledData = {}) {
       score: p3Score,
       max: 25,
       status: getStatusFromScore(p3Score, 25),
+      deductions: p3Deductions,
       deductionReason: p3Score === 25 ? '🟢 No deductions — All protocols clean.' : p3DeductionReason,
       impact: 'Assesses E-E-A-T authority, metadata quality, heading hierarchy, and reading ease for generative AI ingestion.'
     },
@@ -958,6 +961,7 @@ function evaluateCapabilities(crawledData = {}) {
       score: p4Score,
       max: 25,
       status: getStatusFromScore(p4Score, 25),
+      deductions: p4Deductions,
       deductionReason: p4Score === 25 ? '🟢 No deductions — All protocols clean.' : p4DeductionReason,
       impact: 'Verifies presence of machine-readable welcome files (/llms.txt, /ai-context.md, /about.md, /docs.md) for direct RAG ingestion.'
     }

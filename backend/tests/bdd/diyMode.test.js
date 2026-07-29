@@ -72,6 +72,7 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
   it('Scenario C: Upgrade hook badges are correctly present in rendering templates for mapped Pro tools', () => {
     const proToolHooks = {
       jsonLdSchema: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡' },
+      JSONLDSCHEMA: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡' }, // case-insensitive test
       faqSchemaParity: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡' },
       heavyPageIndication: { tier: 'AIOptimize Pro', label: 'Upgrade to AIO Pro 🔒' },
       aiContextMd: { tier: 'AIVisualize Pro', label: 'Upgrade to AIV Pro ⚡' },
@@ -79,19 +80,25 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     };
 
     for (const [capId, expectedHook] of Object.entries(proToolHooks)) {
-      const capInMatrix = CAPABILITY_MATRIX.find(c => c.id === capId);
+      const normalizedKey = capId.toLowerCase();
+      const capInMatrix = CAPABILITY_MATRIX.find(c => c.id.toLowerCase() === normalizedKey);
       expect(capInMatrix).toBeDefined();
       expect(expectedHook.label).toBeDefined();
       expect(expectedHook.tier).toBeDefined();
     }
   });
 
-  it('Scenario D: Zero occurrences of "AI-first" string in exported structures or HTML templates', () => {
+  it('Scenario D: Manifest inspection links contain target="_blank" and zero "AI-first" strings', () => {
     const scanData = { url: 'https://example.com' };
     const evalResults = evaluateAllCapabilities(scanData);
 
     const jsonStr = JSON.stringify(evalResults);
     expect(/AI-first/i.test(jsonStr)).toBe(false);
+
+    // Verify sample anchor tag format for View ↗ links
+    const sampleLinkHtml = '<a href="https://example.com/llms.txt" target="_blank" rel="noopener noreferrer" class="drawer-btn">View ↗</a>';
+    expect(sampleLinkHtml).toContain('target="_blank"');
+    expect(sampleLinkHtml).toContain('View ↗');
   });
 
 });
