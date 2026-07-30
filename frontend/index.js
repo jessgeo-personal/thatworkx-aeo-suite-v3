@@ -3234,32 +3234,32 @@ const tooltipExplanationData = {
   'citation-signals': {
     title: 'AI Citation Signals',
     icon: '🔗',
-    body: '<p>AI search engines require structured metadata (JSON-LD) and explicit values to quote your site as the source of an answer.</p>'
+    body: "<strong>Why AI Citations Are Critical:</strong><br/> In traditional search, getting a user to click a link was the goal. In the age of Generative AI (like ChatGPT, Perplexity, or Gemini), the AI synthesizes the answer directly for the user. To prove its answer is accurate and avoid hallucinations, the AI <em>must</em> cite reliable sources. <br/><br/>If your website's data isn't structured in a way the AI can easily extract, trust, and reference, the AI will simply bypass you and cite your competitor instead. <strong>If you cannot be cited by AI, your brand is practically invisible in the future of search.</strong>"
   },
   'faq-schema': {
     title: 'FAQ Schema (HasFAQSchema)',
     icon: '❓',
-    body: '<p>FAQ Page schemas explicitly register questions and answers in JSON-LD format. This allows generative AI models to direct-quote solutions for user query cards.</p>'
+    body: "<strong>Where AI Looks:</strong> AI engines scan your website's underlying code for a hidden snippet called 'JSON-LD FAQ Schema'.<br/><br/><strong>How it should be formatted:</strong> This is a structured code block that pairs your frequently asked questions and answers together perfectly. Instead of forcing the AI bot to read your whole page to figure out what question you are answering, FAQ Schema feeds the exact Q&A directly into the AI's 'brain' in its native language."
   },
   'faq-parity': {
     title: 'FAQ Q/A Parity (Answer/Question parity)',
     icon: '⚖️',
-    body: '<p>A perfect 1:1 question-to-answer parity ensures no orphan questions exist. Orphaned questions in schema or body degrade vector distance trust metrics.</p>'
+    body: "<strong>Where AI Looks:</strong> AI compares the visible headings (H2/H3 text) on your webpage against your hidden structured code.<br/><br/><strong>How it should be formatted:</strong> AI engines demand consistency to build trust. If you have 5 visible questions on your page, you must have exactly 5 matching answers mapped in your code (a 1:1 parity). If the AI detects a mismatch, it assumes your content is broken, outdated, or deceptive, drastically lowering the chance of your brand being cited."
   },
   'org-schema': {
     title: 'Organization Schema (HasOrganizationSchema)',
     icon: '🏢',
-    body: '<p>Organization schema maps your brand name, logo, social profiles, and corporate contact details into the global knowledge graph.</p>'
+    body: "<strong>Where AI Looks:</strong> AI engines scan the header or footer of your website's code for 'Organization Schema'.<br/><br/><strong>How it should be formatted:</strong> Think of this as your company's digital, machine-readable ID card. It must explicitly list your official brand name, logo URL, physical address, and official social media profiles in a strict JSON-LD format. Without this, AI models might hallucinate your brand details or confuse you with a similarly named competitor."
   },
   'email-visible': {
     title: 'Email Visibility (hasEmailVisibleToAI)',
     icon: '📧',
-    body: '<p>AI crawlers extract plaintext or structured email references to verify customer service channels and build trust signals.</p>'
+    body: "<strong>Where AI Looks:</strong> AI bots crawl your homepage, contact page, and footer looking for explicit email addresses.<br/><br/><strong>How it should be formatted:</strong> Your email must be readable text (e.g., info@yourbrand.com) and ideally wrapped in a clickable standard HTML <code>mailto:</code> link. If your email is trapped inside an image, locked behind a complex contact form, or spelled out to trick humans (like 'info at yourbrand dot com'), the AI bot will fail to extract and verify it."
   },
   'phone-visible': {
     title: 'Phone Visibility (hasPhoneVisibleToAI)',
     icon: '📞',
-    body: '<p>AI models require accessible phone details to evaluate brand support reliability and prevent fraud flagging.</p>'
+    body: "<strong>Where AI Looks:</strong> Similar to email, AI bots scan your primary pages, footer, and directories to verify you are a reachable business.<br/><br/><strong>How it should be formatted:</strong> Phone numbers must be written in a standard international format (e.g., +1-800-555-1234) and ideally wrapped in an HTML <code>tel:</code> link. If your number is embedded in a graphic or split up by unusual characters, the AI cannot confidently verify your business's accessibility."
   },
   'token-load': {
     title: 'Token Load Analysis',
