@@ -334,12 +334,18 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
       headers.push($(el).text().trim().replace(/\s*\(\?\)\s*$/, '').trim());
     });
     expect(headers).toContain('Route Path');
-    expect(headers).toContain('Words');
+    expect(headers).not.toContain('Words');
     expect(headers.some(h => h.startsWith('Token load'))).toBe(true);
     expect(headers.some(h => h.startsWith('Hidden from AI'))).toBe(true);
     expect(headers.some(h => h.startsWith('InSitemap'))).toBe(true);
     expect(headers.some(h => h.startsWith('IsEssentialPage'))).toBe(true);
-    expect(headers).toContain('Action');
+    expect(headers.some(h => h.startsWith('Canonical tag'))).toBe(true);
+    expect(headers.some(h => h.startsWith('Heading hierarchy'))).toBe(true);
+    expect(headers.some(h => h.startsWith('isMobileFriendly'))).toBe(true);
+    expect(headers.some(h => h.startsWith('hasSemanticTags'))).toBe(true);
+    expect(headers.some(h => h.startsWith('Images without Alt'))).toBe(true);
+    expect(headers.some(h => h.startsWith('Last Updated'))).toBe(true);
+    expect(headers).not.toContain('Action');
 
     // 2. Check capabilityEvaluator discoveredRoutes calculation & validation
     const mockScan = {

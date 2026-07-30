@@ -1981,17 +1981,9 @@ function updateExecutiveViewData(results) {
       const altVal = typeof p.imagesWithoutAlt === 'number' ? p.imagesWithoutAlt : 0;
       const updatedVal = p.lastUpdated || 'Unknown';
 
-      let actionHtml = '';
-      if (p.missingStatus === 'Missing') {
-        actionHtml = `<a href="#" onclick="showUpgradeModal('PRO_REQUIRED', 'Upgrade to AIOptimize Pro to enable workarounds and manage your AI-Ready files yourself', 'AIOptimize Pro'); return false;" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>`;
-      } else {
-        actionHtml = `<a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>`;
-      }
-
       return `
         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
           <td style="padding: 0.6rem;"><code style="color: #38bdf8;">${p.path}</code></td>
-          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${wordCount} words</td>
           <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${tokenCount} tokens</td>
           <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${hiddenDot}</td>
           <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${sitemapDot}</td>
@@ -2002,9 +1994,6 @@ function updateExecutiveViewData(results) {
           <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${semanticVal}</td>
           <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${altVal}</td>
           <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${updatedVal}</td>
-          <td style="padding: 0.6rem; text-align: right;">
-            ${actionHtml}
-          </td>
         </tr>
       `;
     }).join('');
@@ -3511,9 +3500,11 @@ function switchSec2RouteTab(idx) {
   const buttons = document.querySelectorAll('#sec2-route-tabs button');
   buttons.forEach((btn, bIdx) => {
     if (bIdx === idx) {
+      btn.classList.add('active');
       btn.style.background = 'var(--burnt-copper)';
       btn.style.color = '#fff';
     } else {
+      btn.classList.remove('active');
       btn.style.background = 'var(--surface-bg)';
       btn.style.color = 'var(--text-muted)';
     }
