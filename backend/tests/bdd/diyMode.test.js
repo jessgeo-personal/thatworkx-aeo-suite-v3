@@ -243,4 +243,108 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(/AI-first/i.test(jsContent)).toBe(false);
   });
 
+  it('Scenario I: Verify that getDynamicDrawerTemplates generates the updated baseline sitemap.xml template with dynamic routes and static manifests', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // 1. Verify that sitemap template structure is defined dynamically
+    expect(jsContent).toContain('sitemap: {');
+    expect(jsContent).toContain("results.discoveredRoutes || results.scannedPages || []");
+    expect(jsContent).toContain("routePath = p.path.startsWith('/') ? p.path : `/${p.path}`");
+    
+    // 2. Verify static manifest locations using Smart Placeholders
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/llms.txt>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/llms-full.txt>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/ai-context.md>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/README.md>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/about.md>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/docs.md>');
+    expect(jsContent).toContain('<Verify Scraped Data: https://${domainName}/content.md>');
+
+    // 3. Verify governance requirements: AI-Optimized and AI-Ready comments present
+    expect(jsContent).toContain('<!-- AI-Optimized Core Site Routes -->');
+    expect(jsContent).toContain('<!-- AI-Ready Machine Manifest Comments -->');
+
+    // 4. Double check that "AI-first" is not in there
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+  });
+
+  it('Scenario J: Verify that getDynamicDrawerTemplates generates ai-context.md baseline template dynamically', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const vm = require('vm');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Extract the getDynamicDrawerTemplates function definition dynamically
+    const funcStartMarker = 'function getDynamicDrawerTemplates';
+    const funcStartIndex = jsContent.indexOf(funcStartMarker);
+    expect(funcStartIndex).toBeGreaterThan(-1);
+
+    const nextFuncMarker = 'function switchDiyManifestTab';
+    const nextFuncIndex = jsContent.indexOf(nextFuncMarker);
+    expect(nextFuncIndex).toBeGreaterThan(funcStartIndex);
+
+    const extractedFunc = jsContent.substring(funcStartIndex, nextFuncIndex);
+    
+    // Run the function inside VM context to isolate and test it
+    const context = vm.createContext({});
+    vm.runInContext(extractedFunc, context);
+    const getDynamicDrawerTemplatesFn = context.getDynamicDrawerTemplates;
+    expect(typeof getDynamicDrawerTemplatesFn).toBe('function');
+
+    // Test Branch A: No live JSON-LD schema exists
+    const resultsNoSchema = {
+      url: 'https://testdomain.com',
+      phoneValue: '555-555-5555',
+      emailValue: 'info@testdomain.com',
+      discoveredRoutes: [
+        { path: '/home', wordCount: 100, tokenLoad: 50, inSitemap: true }
+      ],
+      scrapedContentPreview: [
+        { route: '/home', content: 'Scraped Home text content' }
+      ]
+    };
+
+    const templatesNoSchema = getDynamicDrawerTemplatesFn('testdomain.com', resultsNoSchema);
+    const aiContextContentNoSchema = templatesNoSchema.aicontext.content;
+
+    expect(aiContextContentNoSchema).toContain('# TESTDOMAIN.COM: SYSTEM CONTEXT MAP');
+    expect(aiContextContentNoSchema).toContain('<!-- AI-Ready Machine Manifest File -->');
+    expect(aiContextContentNoSchema).toContain('## Section 2: Structured Entity JSON-LD Data');
+    expect(aiContextContentNoSchema).toContain('"email": "<Verify Scraped Data: info@testdomain.com>"');
+    expect(aiContextContentNoSchema).toContain('"telephone": "<Verify Scraped Data: 555-555-5555>"');
+    expect(aiContextContentNoSchema).toContain('## Section 3: Authoritative Content Directory');
+    expect(aiContextContentNoSchema).toContain('### Route: /home\nScraped Home text content');
+    expect(aiContextContentNoSchema).toContain('## Section 4: Discovered Routing Blueprint');
+    expect(aiContextContentNoSchema).toContain('- /home (Word Count: 100, Tokens: 50, inSitemap: Yes)');
+
+    // Test Branch B: Live JSON-LD schema exists
+    const resultsWithSchema = {
+      url: 'https://testdomain.com',
+      status: {
+        jsonLdSchemaContent: '{\n  "@type": "LocalBusiness",\n  "name": "Live Local Business"\n}'
+      },
+      discoveredRoutes: [],
+      scrapedContentPreview: []
+    };
+
+    const templatesWithSchema = getDynamicDrawerTemplatesFn('testdomain.com', resultsWithSchema);
+    const aiContextContentWithSchema = templatesWithSchema.aicontext.content;
+
+    expect(aiContextContentWithSchema).toContain('LocalBusiness');
+    expect(aiContextContentWithSchema).toContain('Live Local Business');
+    expect(aiContextContentWithSchema).toContain('*No scraped content preview available.*');
+    expect(aiContextContentWithSchema).toContain('*No discovered routes found.*');
+
+    // Double check that "AI-first" is not in any generated content
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+    expect(/AI-first/i.test(aiContextContentNoSchema)).toBe(false);
+    expect(/AI-first/i.test(aiContextContentWithSchema)).toBe(false);
+  });
+
 });

@@ -1233,6 +1233,11 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
     ];
   }
 
+  // 6. Email
+  const rawEmail = results.emailValue || scraper.emailValue || scraper.email || status.emailValue || status.email;
+  const hasEmail = rawEmail && rawEmail !== 'None Detected' && rawEmail.trim().length > 0;
+  const emailVal = hasEmail ? `<Verify Scraped Data: ${rawEmail.trim()}>` : `<Input needed from user: Email Address>`;
+
   return {
     jsonld: {
       path: '/schema.jsonld',
@@ -1297,7 +1302,55 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
     },
     aicontext: {
       path: '/ai-context.md',
-      content: status.aiContextContent || `# ${domainName.toUpperCase()}: SYSTEM CONTEXT MAP\n> Flattened RAG System Context & Entity Blueprint Manifest.\n\n## Target Domain Architecture\n- Host Domain: ${domainName}\n- Primary Canonical Protocol: HTTPS SSL Enabled\n- Level 1 Gateway: /robots.txt directives\n- Level 2 Machine Welcome: /llms.txt index file\n- Level 3 RAG Vector Context: /ai-context.md`
+      content: status.aiContextContent || (() => {
+        // Construct Section 2: JSON-LD Entity Schema
+        const liveJsonLd = status.jsonLdSchemaContent || status.jsonLdContent || results.scrapedJsonLd || '';
+        const hasLiveJsonLd = liveJsonLd && liveJsonLd.trim().length > 0;
+        
+        let jsonLdString = '';
+        if (hasLiveJsonLd) {
+          jsonLdString = liveJsonLd.trim();
+        } else {
+          const synthesizedOrgSchema = {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": rawUrl ? `<Verify Scraped Data: ${rawUrl}/#organization>` : "<Input needed from user: URL>",
+            "name": nameVal,
+            "url": urlVal,
+            "logo": logoVal,
+            "email": emailVal,
+            "telephone": phoneVal,
+            "description": "AI-Optimized Entity Verification Profile",
+            "sameAs": sameAsVal
+          };
+          jsonLdString = JSON.stringify(synthesizedOrgSchema, null, 2);
+        }
+
+        // Construct Section 3: Authoritative Content Directory
+        const scrapedPreview = results.scrapedContentPreview || results.scannedPages || [];
+        let section3Content = '';
+        if (Array.isArray(scrapedPreview) && scrapedPreview.length > 0) {
+          section3Content = scrapedPreview.map(item => {
+            return `### Route: ${item.route || item.path || '/'}\n${item.content || 'No text content scraped for this route.'}`;
+          }).join('\n\n');
+        } else {
+          section3Content = '*No scraped content preview available.*';
+        }
+
+        // Construct Section 4: Discovered Routing Blueprint
+        const routes = results.discoveredRoutes || results.scannedPages || [];
+        let section4Content = '';
+        if (Array.isArray(routes) && routes.length > 0) {
+          section4Content = routes.map(r => {
+            const routePath = r.path || '/';
+            return `- ${routePath} (Word Count: ${r.wordCount || 0}, Tokens: ${r.tokenLoad || Math.round((r.wordCount || 0) / 2)}, inSitemap: ${r.inSitemap ? 'Yes' : 'No'})`;
+          }).join('\n');
+        } else {
+          section4Content = '*No discovered routes found.*';
+        }
+
+        return `# ${domainName.toUpperCase()}: SYSTEM CONTEXT MAP\n<!-- AI-Ready Machine Manifest File -->\n> Flattened RAG System Context & Entity Blueprint Manifest.\n\n## Section 1: Target Domain Architecture & Trust Signals\n- Host Domain: ${domainName}\n- Primary Canonical Protocol: HTTPS SSL Enabled\n- Level 1 Gateway: /robots.txt directives\n- Level 2 Machine Welcome: /llms.txt index file\n- Level 3 RAG Vector Context: /ai-context.md\n\n## Section 2: Structured Entity JSON-LD Data\n\`\`\`json\n${jsonLdString}\n\`\`\`\n\n## Section 3: Authoritative Content Directory\n${section3Content}\n\n## Section 4: Discovered Routing Blueprint\n${section4Content}`;
+      })()
     },
     robots: {
       path: '/robots.txt',
@@ -1340,7 +1393,17 @@ Sitemap: <Verify Scraped Data: ${targetUrl}/sitemap.xml>
     },
     sitemap: {
       path: '/sitemap.xml',
-      content: status.sitemapContent || `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${targetUrl}/</loc>\n    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n    <priority>1.0</priority>\n  </url>\n</urlset>`
+      content: status.sitemapContent || (() => {
+        const routes = results.discoveredRoutes || results.scannedPages || [];
+        const dynamicUrlBlocks = routes.map(p => {
+          const routePath = p.path.startsWith('/') ? p.path : `/${p.path}`;
+          const isHome = routePath === '/';
+          const freq = isHome ? 'daily' : 'weekly';
+          const priority = isHome ? '1.0' : '0.8';
+          return `  <url>\n    <loc><Verify Scraped Data: https://${domainName}${routePath}></loc>\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+        }).join('\n');
+        return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n\n  <!-- AI-Optimized Core Site Routes -->\n${dynamicUrlBlocks ? dynamicUrlBlocks + '\n\n' : ''}  <!-- AI-Ready Machine Manifest Comments -->\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/llms.txt></loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/llms-full.txt></loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/ai-context.md></loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/README.md></loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/about.md></loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/docs.md></loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc><Verify Scraped Data: https://${domainName}/content.md></loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n\n</urlset>`;
+      })()
     },
     readme: {
       path: '/README.md',
