@@ -204,18 +204,24 @@ function buildDevDrawersHtml(domainName = '') {
             <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
           </div>
           <div style="flex-grow: 1;">
-            <pre id="left-pane-content" style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</pre>
+            <pre id="left-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</pre>
           </div>
         </div>
 
         <!-- Right Pane (50% width) -->
         <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
-            <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+            <div id="right-pane-header-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_jsonld_guide')">(?)</span></div>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Copy Code</button>
+              <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Download as File</button>
+            </div>
           </div>
+          <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--badge-fail-bg); margin-bottom: 12px; text-align: left;">⚠️ Please Verify Scraped data before publishing</div>
           <div style="flex-grow: 1;">
-            <pre id="right-pane-content" style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></pre>
+            <pre id="right-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></pre>
           </div>
+          <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem;">To manage this file actively, Upgrade to AI Optimize ↗</a>
         </div>
       </div>
     </div>
@@ -1193,6 +1199,39 @@ let activeDrawerKey = 'jsonld';
 function getDynamicDrawerTemplates(domainName, results = {}) {
   const targetUrl = `https://${domainName}`;
   const status = results.status || {};
+  const scraper = results.scrapedData || results.capabilityEvaluator || results || {};
+
+  // Smart Placeholder Mapping logic
+  // 1. Name
+  const rawName = domainName || scraper.name || scraper.domain;
+  const nameVal = rawName ? `<Verify Scraped Data: ${rawName}>` : `<Input needed from user: Name>`;
+
+  // 2. URL
+  const rawUrl = results.url || scraper.url || (domainName ? `https://${domainName}` : '');
+  const urlVal = rawUrl ? `<Verify Scraped Data: ${rawUrl}>` : `<Input needed from user: URL>`;
+
+  // 3. Logo
+  const rawLogo = scraper.logo || scraper.logoUrl || status.logo || status.logoUrl;
+  const logoVal = rawLogo ? `<Verify Scraped Data: ${rawLogo}>` : `<Input needed from user: Logo>`;
+
+  // 4. Telephone
+  const rawPhone = results.phoneValue || scraper.phoneValue || scraper.phone || status.phoneValue || status.phone;
+  const hasPhone = rawPhone && rawPhone !== 'None Detected' && rawPhone.trim().length > 0;
+  const phoneVal = hasPhone ? `<Verify Scraped Data: ${rawPhone.trim()}>` : `<Input needed from user: Phone Number>`;
+
+  // 5. sameAs (Social Links)
+  const rawSocials = scraper.socialLinks || scraper.sameAs || status.socialLinks || status.sameAs;
+  let sameAsVal = [];
+  if (Array.isArray(rawSocials) && rawSocials.length > 0) {
+    sameAsVal = rawSocials.map(link => `<Verify Scraped Data: ${link}>`);
+  } else if (typeof rawSocials === 'string' && rawSocials.trim().length > 0) {
+    sameAsVal = [`<Verify Scraped Data: ${rawSocials.trim()}>`];
+  } else {
+    sameAsVal = [
+      "<Input needed from user: Social Links>",
+      "<Input needed from user: Social Links>"
+    ];
+  }
 
   return {
     jsonld: {
@@ -1202,18 +1241,16 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
         "@graph": [
           {
             "@type": "Organization",
-            "@id": `${targetUrl}/#organization`,
-            "name": domainName || "Brand Name",
-            "url": targetUrl,
+            "@id": rawUrl ? `${rawUrl}/#organization` : "<Input needed from user: URL>",
+            "name": nameVal,
+            "url": urlVal,
+            "logo": logoVal,
             "description": "AI-Optimized Entity Verification Profile",
-            "sameAs": [
-              `https://www.wikidata.org/wiki/Q11436`,
-              `https://github.com/${(domainName || 'brand').split('.')[0]}`
-            ],
+            "sameAs": sameAsVal,
             "contactPoint": [
               {
                 "@type": "ContactPoint",
-                "telephone": "+1-555-123-4567",
+                "telephone": phoneVal,
                 "contactType": "customer support",
                 "areaServed": "US",
                 "availableLanguage": "English"
@@ -1228,25 +1265,25 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
           },
           {
             "@type": "FAQPage",
-            "@id": `${targetUrl}/#faq`,
+            "@id": rawUrl ? `${rawUrl}/#faq` : "<Input needed from user: URL>",
             "isPartOf": {
-              "@id": `${targetUrl}/#organization`
+              "@id": rawUrl ? `${rawUrl}/#organization` : "<Input needed from user: URL>"
             },
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": `How does ${domainName || 'our brand'} ensure content quality for AI search?`,
+                "name": "<Input needed from user: FAQ Question>",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Our site uses AI-Optimized metadata and structured semantic markup to ensure that LLM crawlers retrieve the most accurate and up-to-date information."
+                  "text": "<Input needed from user: FAQ Answer>"
                 }
               },
               {
                 "@type": "Question",
-                "name": "Where are the AI-Ready machine-readable manifests located?",
+                "name": "<Input needed from user: FAQ Question>",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The machine-readable blueprints and context maps are located at the root of the site, including /llms.txt and /ai-context.md."
+                  "text": "<Input needed from user: FAQ Answer>"
                 }
               }
             ]
@@ -1350,6 +1387,16 @@ function switchDiyManifestTab(fileKey) {
     rightPane.innerText = fileInfo.content || '';
   }
 
+  // Update Right Pane Header Title dynamically with guide tooltip for jsonld
+  const rightHeader = document.getElementById('right-pane-header-title');
+  if (rightHeader) {
+    if (fileKey === 'jsonld') {
+      rightHeader.innerHTML = `AEO Suite Optimized Baseline <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_jsonld_guide')">(?)</span>`;
+    } else {
+      rightHeader.innerHTML = 'AEO Suite Optimized Baseline';
+    }
+  }
+
   // Backwards compatibility for old element IDs if they are on another page/component
   const pathEl = document.getElementById('drawer-current-filepath');
   if (pathEl) pathEl.innerText = fileInfo.path;
@@ -1409,10 +1456,50 @@ function downloadRightPaneFile() {
   downloadDrawerFile();
 }
 
+function copyBaselineCode() {
+  const rightPane = document.getElementById('right-pane-content');
+  if (!rightPane) return;
+  const content = rightPane.innerText;
+  
+  navigator.clipboard.writeText(content).then(() => {
+    const copyBtns = document.querySelectorAll('button[onclick="copyBaselineCode()"]');
+    copyBtns.forEach(copyBtn => {
+      const originalText = copyBtn.innerText;
+      copyBtn.innerText = 'Copied!';
+      setTimeout(() => {
+        copyBtn.innerText = originalText;
+      }, 2000);
+    });
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+  });
+}
+
+function downloadBaselineCode() {
+  const rightPane = document.getElementById('right-pane-content');
+  if (!rightPane) return;
+  const content = rightPane.innerText;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const isJsonLd = (activeDiyManifestKey === 'jsonld' || activeDrawerKey === 'jsonld');
+  const filename = isJsonLd ? 'aeo-optimized-baseline.json' : 'aeo-optimized-baseline.txt';
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 window.copyLeftPaneCode = copyLeftPaneCode;
 window.copyRightPaneCode = copyRightPaneCode;
 window.downloadRightPaneFile = downloadRightPaneFile;
 window.switchDiyManifestTab = switchDiyManifestTab;
+window.copyBaselineCode = copyBaselineCode;
+window.downloadBaselineCode = downloadBaselineCode;
 
 function selectEdgeTab(key) {
   const buttons = document.querySelectorAll('.edge-tab-btn');
@@ -3479,6 +3566,11 @@ window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
 window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
 
 const tooltipExplanationData = {
+  'diy_jsonld_guide': {
+    title: 'JSON-LD Implementation Guide',
+    icon: '💡',
+    body: "<strong>How to implement this JSON-LD Schema:</strong><br/><br/>This baseline provides the exact semantic structure AI engines look for, but it must be populated with your real data.<br/><br/><strong>Step 1:</strong> Copy this code block into a text editor.<br/><strong>Step 2:</strong> Find every instance of <code>&lt;Input needed from user&gt;</code> and replace it with your actual business data (e.g., your real LinkedIn URL, official phone number, and exact FAQ answers).<br/><strong>Step 3:</strong> Validate your completed code using the free Schema Markup Validator (validator.schema.org).<br/><strong>Step 4:</strong> Ask your web developer to inject the finalized <code>&lt;script type=\"application/ld+json\"&gt;</code> block into the <code>&lt;head&gt;</code> section of your homepage."
+  },
   'exec_tbl_canonical': {
     title: 'Canonical Tag',
     icon: '🔗',
