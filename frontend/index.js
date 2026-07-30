@@ -1293,7 +1293,7 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
     },
     llms: {
       path: '/llms.txt',
-      content: status.llmsTxtContent || `# ${domainName} LLMs Machine Directory Index\n> Answer.ai Standard Machine Directory File for ${domainName}.\n\n## Primary Target Domain\n- [Homepage](${targetUrl}/): Core web presence and main offerings.\n- [About](${targetUrl}/about): Corporate identity & verified entity information.\n- [Docs](${targetUrl}/docs): Technical manuals and integration guides.\n\n## System Context Blueprint Pointer\n- [AI System Context](${targetUrl}/ai-context.md): Flattened RAG system context map.`
+      content: status.llmsTxtContent || `# <Verify Scraped Data: ${domainName}> LLMs Machine Directory Index\n> Answer.ai Standard Machine Directory File for <Verify Scraped Data: ${domainName}>.\n\n## Primary Target Domain\n- [Homepage](<Verify Scraped Data: https://${domainName}/>): Core web presence and main business offerings.\n- [About](<Verify Scraped Data: https://${domainName}/about.md>): Corporate identity, E-E-A-T trust signatures, and entity data.\n- [Docs](<Verify Scraped Data: https://${domainName}/docs.md>): Technical manuals, specifications, and integration guides.\n\n## Machine Manifests & System Blueprints\n- [AI System Context](<Verify Scraped Data: https://${domainName}/ai-context.md>): Flattened RAG system context map and prompt guardrails.\n- [Portal Summary](<Verify Scraped Data: https://${domainName}/README.md>): Rapid 30-second elevator pitch and machine overview.\n- [Narrative Vault](<Verify Scraped Data: https://${domainName}/content.md>): Deep-dive case studies, authoritative articles, and proof points.\n\n## Optional Single-File Ingestion\n- [Full Directory Ingestion Vault](<Verify Scraped Data: https://${domainName}/llms-full.txt>): Complete concatenated documentation for large context-window models.`
     },
     aicontext: {
       path: '/ai-context.md',
@@ -1301,7 +1301,42 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
     },
     robots: {
       path: '/robots.txt',
-      content: status.robotsTxtContent || `# robots.txt AI Search & Bot Gateway Directives for ${domainName}\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nSitemap: ${targetUrl}/sitemap.xml`
+      content: status.robotsTxtContent || `# ==========================================
+# AEO Suite: AI-Optimized robots.txt
+# <Verify Scraped Data: ${targetUrl}>
+# ==========================================
+
+# 1. AI-Specific Bot Permissions (The Gatekeepers)
+User-agent: ChatGPT-User
+User-agent: Google-Extended
+User-agent: Claude-Bot
+User-agent: PerplexityBot
+User-agent: OmgiliBot
+Allow: /llms.txt
+Allow: /ai-context.md
+Allow: /about.md
+Allow: /docs.md
+Allow: /content.md
+Allow: /README.md
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+
+# 2. Traditional Search Engine Permissions
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+<Verify Scraped Data: Insert any custom Disallow paths here>
+
+# ==========================================
+# 3. Machine Welcome Mats & Directories
+# ==========================================
+Sitemap: <Verify Scraped Data: ${targetUrl}/sitemap.xml>
+
+# AI Manifest Directory Signposts (Parsed by advanced LLM scrapers)
+# Core AI Index: /llms.txt
+# Blueprint Manifest: /ai-context.md`
     },
     sitemap: {
       path: '/sitemap.xml',

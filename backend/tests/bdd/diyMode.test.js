@@ -218,4 +218,29 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(/AI-first/i.test(combined)).toBe(false);
   });
 
+  it('Scenario H: Verify that getDynamicDrawerTemplates generates the updated baseline llms.txt template cleanly', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Verify key elements of the new llms.txt baseline template string inside frontend/index.js
+    expect(jsContent).toContain('# <Verify Scraped Data: ${domainName}> LLMs Machine Directory Index');
+    expect(jsContent).toContain('> Answer.ai Standard Machine Directory File for <Verify Scraped Data: ${domainName}>.');
+    expect(jsContent).toContain('## Primary Target Domain');
+    expect(jsContent).toContain('- [Homepage](<Verify Scraped Data: https://${domainName}/>): Core web presence and main business offerings.');
+    expect(jsContent).toContain('- [About](<Verify Scraped Data: https://${domainName}/about.md>): Corporate identity, E-E-A-T trust signatures, and entity data.');
+    expect(jsContent).toContain('- [Docs](<Verify Scraped Data: https://${domainName}/docs.md>): Technical manuals, specifications, and integration guides.');
+    expect(jsContent).toContain('## Machine Manifests & System Blueprints');
+    expect(jsContent).toContain('- [AI System Context](<Verify Scraped Data: https://${domainName}/ai-context.md>): Flattened RAG system context map and prompt guardrails.');
+    expect(jsContent).toContain('- [Portal Summary](<Verify Scraped Data: https://${domainName}/README.md>): Rapid 30-second elevator pitch and machine overview.');
+    expect(jsContent).toContain('- [Narrative Vault](<Verify Scraped Data: https://${domainName}/content.md>): Deep-dive case studies, authoritative articles, and proof points.');
+    expect(jsContent).toContain('## Optional Single-File Ingestion');
+    expect(jsContent).toContain('- [Full Directory Ingestion Vault](<Verify Scraped Data: https://${domainName}/llms-full.txt>): Complete concatenated documentation for large context-window models.');
+    
+    // Double check that "AI-first" is not in there
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+  });
+
 });
