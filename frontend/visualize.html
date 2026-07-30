@@ -572,31 +572,50 @@
 
       </div>
 
-      <!-- Scanned/Discovered AI-Ready Files Table -->
-      <div style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+      <!-- Section 4 Card: Machine Friendliness Detail Card -->
+      <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
         
-        <!-- Scanned/Discovered AI-Ready Files (machine readable) -->
-        <div class="table-card glassmorphic" style="padding: 1.25rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">🤖 Scanned/Discovered AI-Ready Files (machine readable)</h4>
-            <span class="table-count-badge" id="exec-machine-files-count">8 Manifests Tracked</span>
-          </div>
-          <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
-            <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-              <thead>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
-                  <th style="padding: 0.6rem;">Machine File</th>
-                  <th style="padding: 0.6rem;">Status</th>
-                  <th style="padding: 0.6rem;">Words / Chars</th>
-                  <th style="padding: 0.6rem; text-align: right;">Inspection</th>
-                </tr>
-              </thead>
-              <tbody id="exec-machine-files-tbody">
-                <!-- Rendered by JS -->
-              </tbody>
-            </table>
+        <!-- a) Title & Subheading -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0;">4. Is your website already AI-ready?</h4>
+              <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">8 Manifests Tracked</span>
+            </div>
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
+              Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.
+            </p>
           </div>
         </div>
+
+        <!-- Collapsible 4-level file hierarchy tree -->
+        <details style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+          <summary style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); cursor: pointer; outline: none; user-select: none;">The 4-level file heirarchy for AI-Readiness</summary>
+          <div style="margin-top: 1rem; font-family: 'JetBrains Mono', monospace, Courier; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); white-space: pre; background: var(--canvas-bg); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color); overflow-x: auto;">
+    🌐 Inbound AI Bot Connection Request
+       │
+       ├──► 🔒 LEVEL 1: PROTOCOL GATES (The Gatekeepers)
+       │     └── robots.txt (Permissions Verification) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_robots')">(?)</span>    [<span id="exec-status-robots"></span>]
+       │
+       ├──► 🗺️ LEVEL 2: MACHINE WELCOME MATS (The Directories)
+       │     ├── llms.txt (Modern AI Directory Index) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_llms')">(?)</span>     [<span id="exec-status-llms"></span>]
+       │     └── sitemap.xml (Structural URL Web Tree) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_sitemap')">(?)</span>    [<span id="exec-status-sitemap"></span>]
+       │
+       ├──► 🤝 LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)
+       │     └── ai-context.md (System Prompts & Context Map) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_aicontext')">(?)</span>   [<span id="exec-status-aicontext"></span>]
+       │
+       └──► 🗂️ LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)
+             ├── README.md (Rapid Portal Summary) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_readme')">(?)</span>                 [<span id="exec-status-readme"></span>]
+             ├── about.md  (Identity, Trust & E-E-A-T Signatures) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_about')">(?)</span> [<span id="exec-status-about"></span>]
+             ├── docs.md   (Hard Metrics, Specs & Technical) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_docs')">(?)</span>      [<span id="exec-status-docs"></span>]
+             └── content.md (Long-Form Case Studies) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_content')">(?)</span>              [<span id="exec-status-content"></span>]
+          </div>
+        </details>
+
+        <!-- Keep hidden tbody for safe fallback in case any script tries to access it -->
+        <table style="display: none;">
+          <tbody id="exec-machine-files-tbody"></tbody>
+        </table>
 
       </div>
 

@@ -388,4 +388,90 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(/AI-first/i.test(card.html() || '')).toBe(false);
   });
 
+  it('Scenario K: Executive Mode Section 4 (Machine Friendliness) UI refactoring assertions', () => {
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. Container presence & headers
+    const card = $('#exec-section4-card');
+    expect(card.length).toBe(1);
+
+    const cardTitle = card.find('h4');
+    expect(cardTitle.text().trim()).toContain('4. Is your website already AI-ready?');
+
+    const subheading = card.find('p');
+    expect(subheading.text().trim()).toContain('Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.');
+
+    // 2. <details> and <summary> presence
+    const details = card.find('details');
+    expect(details.length).toBe(1);
+
+    const summary = details.find('summary');
+    expect(summary.text().trim()).toBe('The 4-level file heirarchy for AI-Readiness');
+
+    // 3. Spans for the tree
+    expect($('#exec-status-robots').length).toBe(1);
+    expect($('#exec-status-llms').length).toBe(1);
+    expect($('#exec-status-sitemap').length).toBe(1);
+    expect($('#exec-status-aicontext').length).toBe(1);
+    expect($('#exec-status-readme').length).toBe(1);
+    expect($('#exec-status-about').length).toBe(1);
+    expect($('#exec-status-docs').length).toBe(1);
+    expect($('#exec-status-content').length).toBe(1);
+
+    // 4. Zero occurrences of legacy phrase "AI-first"
+    expect(/AI-first/i.test(card.html() || '')).toBe(false);
+  });
+
+  it('Scenario L: Verification of Section 4 business-friendly help tooltips', () => {
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const card = $('#exec-section4-card');
+    
+    // Check that each of the 8 file names has a corresponding trigger span
+    const expectedMappings = {
+      'manifest_robots': 'robots.txt',
+      'manifest_llms': 'llms.txt',
+      'manifest_sitemap': 'sitemap.xml',
+      'manifest_aicontext': 'ai-context.md',
+      'manifest_readme': 'README.md',
+      'manifest_about': 'about.md',
+      'manifest_docs': 'docs.md',
+      'manifest_content': 'content.md'
+    };
+
+    for (const [key, fileName] of Object.entries(expectedMappings)) {
+      const span = card.find(`span.help-tooltip-trigger[onclick*="openHelpTooltip('${key}')"]`);
+      expect(span.length).toBe(1);
+      expect(span.text()).toBe('(?)');
+    }
+  });
+
+  it('Scenario M: Verification of dictionary copy in index.js', () => {
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Ensure the keys are present in index.js and match the expected copy patterns
+    const expectedKeys = [
+      'manifest_robots',
+      'manifest_llms',
+      'manifest_sitemap',
+      'manifest_aicontext',
+      'manifest_readme',
+      'manifest_about',
+      'manifest_docs',
+      'manifest_content'
+    ];
+
+    for (const key of expectedKeys) {
+      expect(jsContent).toContain(key);
+    }
+
+    // Ensure zero occurrences of "AI-first" in index.js
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+  });
+
 });

@@ -1925,23 +1925,55 @@ function updateExecutiveViewData(results) {
     }).join('');
   }
 
-  // 5. Populate Dynamic Scanned/Discovered AI-Ready Files (machine readable) Table
+  // 5. Populate Dynamic Scanned/Discovered AI-Ready Files (machine readable) Table & Collapsible Tree
   const aiFilesTbody = document.getElementById('exec-machine-files-tbody') || document.getElementById('exec-ai-files-tbody');
   const aiFilesCount = document.getElementById('exec-machine-files-count');
-  if (aiFilesTbody) {
-    const aiFilesList = [
-      { path: '/llms.txt', exists: !!results.status?.llmsTxtExists, info: '350 words' },
-      { path: '/ai-context.md', exists: !!results.status?.aiContextExists, info: '520 words' },
-      { path: '/about.md', exists: !!results.status?.aboutTxtExists, info: '410 words' },
-      { path: '/docs.md', exists: !!results.status?.docsTxtExists, info: '680 words' },
-      { path: '/content.md', exists: !!results.status?.contentTxtExists, info: '950 words' },
-      { path: '/contact.md', exists: !!(results.status?.aboutTxtExists || results.status?.llmsTxtExists), info: '180 words' },
-      { path: '/robots.txt', exists: !!results.status?.robotsTxtExists, info: '780 chars' },
-      { path: '/sitemap.xml', exists: !!results.status?.sitemapExists, info: '1.4 KB' },
-    ];
-    const activeCount = aiFilesList.filter(f => f.exists).length;
-    if (aiFilesCount) aiFilesCount.innerText = `${activeCount} / ${aiFilesList.length} Manifests Active`;
 
+  const robotsActive = !!results.status?.robotsTxtExists;
+  const llmsActive = !!results.status?.llmsTxtExists;
+  const sitemapActive = !!results.status?.sitemapExists;
+  const aiContextActive = !!results.status?.aiContextExists;
+  const readmeActive = !!(results.status?.readmeFound ?? results.sec4?.readmeFound);
+  const aboutActive = !!(results.status?.aboutTxtExists ?? results.sec4?.aboutMdFound);
+  const docsActive = !!(results.status?.docsTxtExists ?? results.sec4?.docsMdFound);
+  const contentActive = !!(results.status?.contentTxtExists ?? results.sec4?.contentMdFound);
+
+  // Bind the corresponding span IDs
+  const robotsEl = document.getElementById('exec-status-robots');
+  const llmsEl = document.getElementById('exec-status-llms');
+  const sitemapEl = document.getElementById('exec-status-sitemap');
+  const aiContextEl = document.getElementById('exec-status-aicontext');
+  const readmeEl = document.getElementById('exec-status-readme');
+  const aboutEl = document.getElementById('exec-status-about');
+  const docsEl = document.getElementById('exec-status-docs');
+  const contentEl = document.getElementById('exec-status-content');
+
+  const getTreeStatusString = (active) => active ? '🟢 Available' : '🔴 Not available';
+
+  if (robotsEl) robotsEl.innerText = getTreeStatusString(robotsActive);
+  if (llmsEl) llmsEl.innerText = getTreeStatusString(llmsActive);
+  if (sitemapEl) sitemapEl.innerText = getTreeStatusString(sitemapActive);
+  if (aiContextEl) aiContextEl.innerText = getTreeStatusString(aiContextActive);
+  if (readmeEl) readmeEl.innerText = getTreeStatusString(readmeActive);
+  if (aboutEl) aboutEl.innerText = getTreeStatusString(aboutActive);
+  if (docsEl) docsEl.innerText = getTreeStatusString(docsActive);
+  if (contentEl) contentEl.innerText = getTreeStatusString(contentActive);
+
+  // Still compute activeCount for the count badge
+  const aiFilesList = [
+    { path: '/llms.txt', exists: llmsActive, info: '350 words' },
+    { path: '/ai-context.md', exists: aiContextActive, info: '520 words' },
+    { path: '/about.md', exists: aboutActive, info: '410 words' },
+    { path: '/docs.md', exists: docsActive, info: '680 words' },
+    { path: '/content.md', exists: contentActive, info: '950 words' },
+    { path: '/README.md', exists: readmeActive, info: '250 words' },
+    { path: '/robots.txt', exists: robotsActive, info: '780 chars' },
+    { path: '/sitemap.xml', exists: sitemapActive, info: '1.4 KB' },
+  ];
+  const activeCount = aiFilesList.filter(f => f.exists).length;
+  if (aiFilesCount) aiFilesCount.innerText = `${activeCount} / ${aiFilesList.length} Manifests Active`;
+
+  if (aiFilesTbody) {
     aiFilesTbody.innerHTML = aiFilesList.map(f => `
       <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
         <td style="padding: 0.6rem;"><code style="color: #4ade80;">${f.path}</code></td>
@@ -2503,6 +2535,46 @@ const helpContent = {
         <li><strong>On-Demand Auditing:</strong> During the countdown, you can still audit individual sub-pages from the Scanned Paths table below immediately by clicking the 🔄 re-analyze button on that specific row, completely bypassing the cooldown lock!</li>
       </ul>
     `
+  },
+  'manifest_robots': {
+    title: 'robots.txt (Permissions Verification)',
+    icon: '🔒',
+    body: `<p>Think of this as the security guard for your web presence. It explicitly gives permission for AI engines like ChatGPT and Perplexity to scan your content. Without it, polite AI bots will just walk away and ignore your brand entirely. <strong>AEO Suite can instantly generate the perfect AI-friendly permissions file for you.</strong></p>`
+  },
+  'manifest_llms': {
+    title: 'llms.txt (Modern AI Directory Index)',
+    icon: '📖',
+    body: `<p>This is a brand new industry standard—a specialized 'menu' created specifically for Generative AI. Instead of forcing bots to guess what your site is about, this file points them directly to your most important facts. <strong>Mapping this manually is tedious, but AEO Suite can auto-generate it based on your live site structure.</strong></p>`
+  },
+  'manifest_sitemap': {
+    title: 'sitemap.xml (Structural URL Web Tree)',
+    icon: '🗺️',
+    body: `<p>While humans use navigation bars, AI bots need a map. A clean sitemap tells AI exactly how your digital house is structured so it doesn't get lost or miss your key product pages. <strong>AEO Suite verifies your map is optimized for modern AI ingestion, not just legacy search engines.</strong></p>`
+  },
+  'manifest_aicontext': {
+    title: 'ai-context.md (System Prompts & Context Map)',
+    icon: '🤝',
+    body: `<p>This is your brand's instruction manual for AI. It tells the AI *how* to talk about your company, outlining your tone, core messaging, and guardrails to prevent AI hallucinations. <strong>It is critical for brand safety, and AEO Suite's generators can draft it for you in seconds.</strong></p>`
+  },
+  'manifest_readme': {
+    title: 'README.md (Rapid Portal Summary)',
+    icon: '📄',
+    body: `<p>This acts as your 30-second elevator pitch for machines. It gives AI a rapid, high-level summary of your business before it dives into the weeds of your website. <strong>AEO Suite extracts your core value proposition to build this automatically.</strong></p>`
+  },
+  'manifest_about': {
+    title: 'about.md (Identity, Trust & E-E-A-T Signatures)',
+    icon: '🛡️',
+    body: `<p>AI engines prioritize trust. This file consolidates your Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T) into one place, proving to the AI that you are a credible source worth citing. <strong>AEO Suite formats your trust signals into the exact layout AI models look for.</strong></p>`
+  },
+  'manifest_docs': {
+    title: 'docs.md (Hard Metrics, Specs & Technical)',
+    icon: '📊',
+    body: `<p>AI models hate marketing fluff—they want structured data, hard facts, and specifications. This file feeds the AI exactly what it needs to answer technical or specific questions about your offerings. <strong>AEO Suite strips away the fluff and organizes your specs into AI-Ready data.</strong></p>`
+  },
+  'manifest_content': {
+    title: 'content.md (Long-Form Case Studies)',
+    icon: '📚',
+    body: `<p>This is the proof behind your claims. By giving AI direct access to your deep-dive case studies and narrative content, you give it the context it needs to recommend you over competitors. <strong>AEO Suite helps consolidate your best wins into a single machine-readable vault.</strong></p>`
   }
 };
 
@@ -3230,6 +3302,46 @@ const tooltipExplanationData = {
     title: 'Authority Status (authorityStatus)',
     icon: '👑',
     body: '<p>Reflects the overall authority rating of a domain. Represents: <strong>Optimized Anchor</strong> (strong trust signal profile), <strong>Information Isolation</strong> (partial trust with isolated elements), or <strong>Abstention Risk</strong> (critical risk or blanket disallows).</p>'
+  },
+  'manifest_robots': {
+    title: 'robots.txt (Permissions Verification)',
+    icon: '🔒',
+    body: `<p>Think of this as the security guard for your web presence. It explicitly gives permission for AI engines like ChatGPT and Perplexity to scan your content. Without it, polite AI bots will just walk away and ignore your brand entirely. <strong>AEO Suite can instantly generate the perfect AI-friendly permissions file for you.</strong></p>`
+  },
+  'manifest_llms': {
+    title: 'llms.txt (Modern AI Directory Index)',
+    icon: '📖',
+    body: `<p>This is a brand new industry standard—a specialized 'menu' created specifically for Generative AI. Instead of forcing bots to guess what your site is about, this file points them directly to your most important facts. <strong>Mapping this manually is tedious, but AEO Suite can auto-generate it based on your live site structure.</strong></p>`
+  },
+  'manifest_sitemap': {
+    title: 'sitemap.xml (Structural URL Web Tree)',
+    icon: '🗺️',
+    body: `<p>While humans use navigation bars, AI bots need a map. A clean sitemap tells AI exactly how your digital house is structured so it doesn't get lost or miss your key product pages. <strong>AEO Suite verifies your map is optimized for modern AI ingestion, not just legacy search engines.</strong></p>`
+  },
+  'manifest_aicontext': {
+    title: 'ai-context.md (System Prompts & Context Map)',
+    icon: '🤝',
+    body: `<p>This is your brand's instruction manual for AI. It tells the AI *how* to talk about your company, outlining your tone, core messaging, and guardrails to prevent AI hallucinations. <strong>It is critical for brand safety, and AEO Suite's generators can draft it for you in seconds.</strong></p>`
+  },
+  'manifest_readme': {
+    title: 'README.md (Rapid Portal Summary)',
+    icon: '📄',
+    body: `<p>This acts as your 30-second elevator pitch for machines. It gives AI a rapid, high-level summary of your business before it dives into the weeds of your website. <strong>AEO Suite extracts your core value proposition to build this automatically.</strong></p>`
+  },
+  'manifest_about': {
+    title: 'about.md (Identity, Trust & E-E-A-T Signatures)',
+    icon: '🛡️',
+    body: `<p>AI engines prioritize trust. This file consolidates your Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T) into one place, proving to the AI that you are a credible source worth citing. <strong>AEO Suite formats your trust signals into the exact layout AI models look for.</strong></p>`
+  },
+  'manifest_docs': {
+    title: 'docs.md (Hard Metrics, Specs & Technical)',
+    icon: '📊',
+    body: `<p>AI models hate marketing fluff—they want structured data, hard facts, and specifications. This file feeds the AI exactly what it needs to answer technical or specific questions about your offerings. <strong>AEO Suite strips away the fluff and organizes your specs into AI-Ready data.</strong></p>`
+  },
+  'manifest_content': {
+    title: 'content.md (Long-Form Case Studies)',
+    icon: '📚',
+    body: `<p>This is the proof behind your claims. By giving AI direct access to your deep-dive case studies and narrative content, you give it the context it needs to recommend you over competitors. <strong>AEO Suite helps consolidate your best wins into a single machine-readable vault.</strong></p>`
   }
 };
 
@@ -3238,7 +3350,7 @@ function openHelpTooltip(key, evt) {
     if (typeof evt.preventDefault === 'function') evt.preventDefault();
     if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
   }
-  const data = tooltipExplanationData[key];
+  const data = tooltipExplanationData[key] || helpContent[key];
   if (!data) return;
   const titleEl = document.getElementById('help-modal-title');
   const iconEl = document.getElementById('help-modal-icon');
