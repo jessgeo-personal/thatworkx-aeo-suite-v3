@@ -347,4 +347,78 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(/AI-first/i.test(aiContextContentWithSchema)).toBe(false);
   });
 
+  it('Scenario K: Verify that getDynamicDrawerTemplates generates README.md and about.md baseline templates with scraped data placeholders', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const vm = require('vm');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Extract the getDynamicDrawerTemplates function definition dynamically
+    const funcStartMarker = 'function getDynamicDrawerTemplates';
+    const funcStartIndex = jsContent.indexOf(funcStartMarker);
+    expect(funcStartIndex).toBeGreaterThan(-1);
+
+    const nextFuncMarker = 'function switchDiyManifestTab';
+    const nextFuncIndex = jsContent.indexOf(nextFuncMarker);
+    expect(nextFuncIndex).toBeGreaterThan(funcStartIndex);
+
+    const extractedFunc = jsContent.substring(funcStartIndex, nextFuncIndex);
+    
+    // Run the function inside VM context to isolate and test it
+    const context = vm.createContext({});
+    vm.runInContext(extractedFunc, context);
+    const getDynamicDrawerTemplatesFn = context.getDynamicDrawerTemplates;
+    expect(typeof getDynamicDrawerTemplatesFn).toBe('function');
+
+    const results = {
+      url: 'https://testdomain.com',
+      emailValue: 'info@testdomain.com',
+      phoneValue: '555-555-5555',
+      scrapedDescription: 'An optimized enterprise solution provider.',
+      scrapedAddress: '123 Innovation Way, Suite 100',
+      socialLinks: ['https://linkedin.com/company/testdomain']
+    };
+
+    const templates = getDynamicDrawerTemplatesFn('testdomain.com', results);
+    
+    // 1. README.md Checks
+    const readme = templates.readme.content;
+    expect(readme).toContain('# <Verify Scraped Data: testdomain.com> Portal Summary');
+    expect(readme).toContain('<!-- AI-Ready Machine Manifest File -->');
+    expect(readme).toContain('## Executive Summary');
+    expect(readme).toContain('Business Description: <Verify Scraped Data: An optimized enterprise solution provider.>');
+    expect(readme).toContain('## Core Capabilities');
+    expect(readme).toContain('## Quick Machine Manifest Navigation');
+    expect(readme).toContain('- [Machine Welcome Menu](<Verify Scraped Data: https://testdomain.com/llms.txt>)');
+    expect(readme).toContain('## Contact Signals');
+    expect(readme).toContain('**Primary Email:** <Verify Scraped Data: info@testdomain.com>');
+    expect(readme).toContain('**Primary Telephone:** <Verify Scraped Data: 555-555-5555>');
+    expect(readme).toContain('**Corporate Address:** <Verify Scraped Data: 123 Innovation Way, Suite 100>');
+
+    // 2. about.md Checks
+    const about = templates.about.content;
+    expect(about).toContain('# <Verify Scraped Data: testdomain.com> Entity & Corporate Profile');
+    expect(about).toContain('<!-- AI-Ready Machine Manifest File -->');
+    expect(about).toContain('## Corporate Identity & Mission');
+    expect(about).toContain('- **Entity Legal Name:** <Verify Scraped Data: testdomain.com> (Parent Organization)');
+    expect(about).toContain('- **Factual Description:** <Verify Scraped Data: An optimized enterprise solution provider.>');
+    expect(about).toContain('## Leadership & Subject Matter Expertise');
+    expect(about).toContain('## Verified Entity Signals');
+    expect(about).toContain('- **Email Signal:** <Verify Scraped Data: info@testdomain.com>');
+    expect(about).toContain('- **Phone Signal:** <Verify Scraped Data: 555-555-5555>');
+    expect(about).toContain('- **Physical Presence:** <Verify Scraped Data: 123 Innovation Way, Suite 100>');
+    expect(about).toContain('- [Verified Profile](<Verify Scraped Data: https://linkedin.com/company/testdomain>)');
+    expect(about).toContain('## Compliance Links');
+    expect(about).toContain('- [Privacy Policy](<Verify Scraped Data: https://testdomain.com/privacy>)');
+    expect(about).toContain('- [Terms of Service](<Verify Scraped Data: https://testdomain.com/terms>)');
+
+    // 3. Vocabulary Governance checks
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+    expect(/AI-first/i.test(readme)).toBe(false);
+    expect(/AI-first/i.test(about)).toBe(false);
+  });
+
 });
+

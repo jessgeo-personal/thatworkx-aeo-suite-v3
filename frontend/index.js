@@ -1238,6 +1238,22 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
   const hasEmail = rawEmail && rawEmail !== 'None Detected' && rawEmail.trim().length > 0;
   const emailVal = hasEmail ? `<Verify Scraped Data: ${rawEmail.trim()}>` : `<Input needed from user: Email Address>`;
 
+  // Smart Placeholder Mapping
+  const scannedDomain = domainName;
+  const scrapedEmail = emailVal;
+  const scrapedPhone = phoneVal;
+
+  const rawDescription = results.scrapedDescription || scraper.scrapedDescription || status.scrapedDescription || results.descriptionValue || scraper.description || status.description || (() => {
+    const homePage = (results.pages || results.scannedPages || []).find(p => p.route === '/' || p.path === '/');
+    return homePage ? (homePage.metaDescription || homePage.description || '') : '';
+  })();
+  const hasDescription = rawDescription && rawDescription.trim().length > 0 && rawDescription !== 'None Detected';
+  const scrapedDescription = hasDescription ? `<Verify Scraped Data: ${rawDescription.trim()}>` : `<Input needed from user: Business Description>`;
+
+  const rawAddress = results.scrapedAddress || scraper.scrapedAddress || status.scrapedAddress || results.addressValue || scraper.address || status.address || '';
+  const hasAddress = rawAddress && rawAddress.trim().length > 0 && rawAddress !== 'None Detected';
+  const scrapedAddress = hasAddress ? `<Verify Scraped Data: ${rawAddress.trim()}>` : `<Input needed from user: Physical Address>`;
+
   return {
     jsonld: {
       path: '/schema.jsonld',
@@ -1407,11 +1423,11 @@ Sitemap: <Verify Scraped Data: ${targetUrl}/sitemap.xml>
     },
     readme: {
       path: '/README.md',
-      content: `# ${domainName} Orientation Guide\nWelcome to the machine agent orientation guide for ${domainName}.`
+      content: status.readmeContent || `# <Verify Scraped Data: ${scannedDomain}> Portal Summary\n<!-- AI-Ready Machine Manifest File -->\n> Welcome to the machine-readable summary for <Verify Scraped Data: ${scannedDomain}>.\n\n## Executive Summary\nThis document provides a concise high-level overview of <Verify Scraped Data: ${scannedDomain}>, synthesized for automated crawlers and AI search agents.\nBusiness Description: ${scrapedDescription}\n\n## Core Capabilities\n- **Core Offering:** Highly optimized services and solutions tailored to client requirements.\n- **Delivery Framework:** Scalable execution engine with high reliability and direct stakeholder communication.\n- **AI-Optimized Integration:** Designed with clean semantic layouts and structured metadata for AI engines and digital consumers.\n\n## Quick Machine Manifest Navigation\n- [Machine Welcome Menu](<Verify Scraped Data: https://${scannedDomain}/llms.txt>): Complete machine-readable link index of all public resources.\n- [AI System Context](<Verify Scraped Data: https://${scannedDomain}/ai-context.md>): RAG context map, prompt constraints, and structured schemas.\n- [Corporate Profile](<Verify Scraped Data: https://${scannedDomain}/about.md>): E-E-A-T credentials, verified entity signals, and brand signatures.\n\n## Contact Signals\n- **Primary Email:** ${scrapedEmail}\n- **Primary Telephone:** ${scrapedPhone}\n- **Corporate Address:** ${scrapedAddress}`
     },
     about: {
       path: '/about.md',
-      content: `# ${domainName} Entity Verification\nCorporate entity ownership, leadership credentials, and brand verification for ${domainName}.`
+      content: status.aboutTxtContent || results.aboutContent || `# <Verify Scraped Data: ${scannedDomain}> Entity & Corporate Profile\n<!-- AI-Ready Machine Manifest File -->\n> Verified E-E-A-T credentials, leadership credentials, and corporate profiles for <Verify Scraped Data: ${scannedDomain}>.\n\n## Corporate Identity & Mission\n- **Entity Legal Name:** <Verify Scraped Data: ${scannedDomain}> (Parent Organization)\n- **Primary Purpose:** To deliver high-quality, transparent services under robust compliance frameworks.\n- **Mission Statement:** Providing state-of-the-art solutions while maintaining absolute clarity, trust, and ethical operation.\n- **Factual Description:** ${scrapedDescription}\n\n## Leadership & Subject Matter Expertise\n- **Management Structure:** Structured executive leadership overseeing operational efficiency and strategic directives.\n- **Subject Matter Focus:** Artificial Intelligence, Software Engineering, Domain Architecture, and Digital Security.\n- **Expertise Signatures:** Decades of combined industry experience across key technical sectors, driving innovation.\n\n## Verified Entity Signals\n- **Email Signal:** ${scrapedEmail}\n- **Phone Signal:** ${scrapedPhone}\n- **Physical Presence:** ${scrapedAddress}\n- **Social & Web Entity Links:**\n${sameAsVal.map(link => `  - [Verified Profile](${link})`).join('\n')}\n\n## Compliance Links\n- [Privacy Policy](<Verify Scraped Data: https://${scannedDomain}/privacy>): Official user data safety policies and storage directives.\n- [Terms of Service](<Verify Scraped Data: https://${scannedDomain}/terms>): Core service agreements and client-vendor obligations.`
     },
     docs: {
       path: '/docs.md',
