@@ -1166,7 +1166,13 @@ function evaluateCapabilities(crawledData = {}) {
       inSitemap: typeof r.inSitemap === 'boolean' ? r.inSitemap : Boolean(status.sitemapExists || sec2.sitemapExists),
       isEssential: typeof r.isEssential === 'boolean' ? r.isEssential : ['/', '/about', '/contact', '/privacy-policy', '/privacy'].includes(r.path || r.route || ''),
       missingStatus: r.missingStatus || (r.wordCount === 0 || r.isMissing ? 'Missing' : 'Active'),
-      actionUrl: r.actionUrl || (crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${r.path || r.route || '/'}` : (r.path || r.route || '/'))
+      actionUrl: r.actionUrl || (crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${r.path || r.route || '/'}` : (r.path || r.route || '/')),
+      canonicalTag: typeof r.canonicalTag === 'boolean' ? r.canonicalTag : (typeof r.hasCanonical === 'boolean' ? r.hasCanonical : (r.canonicalUrl ? true : false)),
+      headingHierarchy: typeof r.headingHierarchy === 'boolean' ? r.headingHierarchy : (r.headingAudit && typeof r.headingAudit.isHierarchyValid === 'boolean' ? r.headingAudit.isHierarchyValid : false),
+      isMobileFriendly: typeof r.isMobileFriendly === 'boolean' ? r.isMobileFriendly : false,
+      hasSemanticTags: typeof r.hasSemanticTags === 'boolean' ? r.hasSemanticTags : false,
+      imagesWithoutAlt: typeof r.imagesWithoutAlt === 'number' ? r.imagesWithoutAlt : 0,
+      lastUpdated: typeof r.lastUpdated === 'string' ? r.lastUpdated : "Unknown"
     }));
   } else if (Array.isArray(crawledData.pages) && crawledData.pages.length > 0) {
     discoveredRoutes = crawledData.pages.map(p => {
@@ -1181,7 +1187,13 @@ function evaluateCapabilities(crawledData = {}) {
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: isEss,
         missingStatus: words === 0 ? 'Missing' : 'Active',
-        actionUrl: crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${routePath}` : routePath
+        actionUrl: crawledData.url ? `${crawledData.url.replace(/\/$/, '')}${routePath}` : routePath,
+        canonicalTag: typeof p.canonicalTag === 'boolean' ? p.canonicalTag : (typeof p.hasCanonical === 'boolean' ? p.hasCanonical : (p.canonicalUrl ? true : false)),
+        headingHierarchy: typeof p.headingHierarchy === 'boolean' ? p.headingHierarchy : (p.headingAudit && typeof p.headingAudit.isHierarchyValid === 'boolean' ? p.headingAudit.isHierarchyValid : false),
+        isMobileFriendly: typeof p.isMobileFriendly === 'boolean' ? p.isMobileFriendly : false,
+        hasSemanticTags: typeof p.hasSemanticTags === 'boolean' ? p.hasSemanticTags : false,
+        imagesWithoutAlt: typeof p.imagesWithoutAlt === 'number' ? p.imagesWithoutAlt : 0,
+        lastUpdated: typeof p.lastUpdated === 'string' ? p.lastUpdated : "Unknown"
       };
     });
   } else {
@@ -1196,7 +1208,13 @@ function evaluateCapabilities(crawledData = {}) {
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: true,
         missingStatus: rootWords === 0 ? 'Missing' : 'Active',
-        actionUrl: baseUrl ? `${baseUrl}/` : '/'
+        actionUrl: baseUrl ? `${baseUrl}/` : '/',
+        canonicalTag: false,
+        headingHierarchy: false,
+        isMobileFriendly: false,
+        hasSemanticTags: false,
+        imagesWithoutAlt: 0,
+        lastUpdated: "Unknown"
       },
       {
         path: '/about',
@@ -1206,7 +1224,13 @@ function evaluateCapabilities(crawledData = {}) {
         inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
         isEssential: true,
         missingStatus: status.aboutTxtExists ? 'Active' : 'Missing',
-        actionUrl: baseUrl ? `${baseUrl}/about` : '/about'
+        actionUrl: baseUrl ? `${baseUrl}/about` : '/about',
+        canonicalTag: false,
+        headingHierarchy: false,
+        isMobileFriendly: false,
+        hasSemanticTags: false,
+        imagesWithoutAlt: 0,
+        lastUpdated: "Unknown"
       }
     ];
   }

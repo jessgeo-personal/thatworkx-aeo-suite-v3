@@ -1974,6 +1974,13 @@ function updateExecutiveViewData(results) {
         ? `<span alt="Yes" title="Yes" style="font-size: 0.9rem; cursor: help;">🟢</span>`
         : `<span alt="No" title="No" style="font-size: 0.9rem; cursor: help;">🔴</span>`;
 
+      const canonicalVal = p.canonicalTag ? 'Yes' : 'No';
+      const hierarchyVal = p.headingHierarchy ? 'Yes' : 'No';
+      const mobileVal = p.isMobileFriendly ? 'Yes' : 'No';
+      const semanticVal = p.hasSemanticTags ? 'Yes' : 'No';
+      const altVal = typeof p.imagesWithoutAlt === 'number' ? p.imagesWithoutAlt : 0;
+      const updatedVal = p.lastUpdated || 'Unknown';
+
       let actionHtml = '';
       if (p.missingStatus === 'Missing') {
         actionHtml = `<a href="#" onclick="showUpgradeModal('PRO_REQUIRED', 'Upgrade to AIOptimize Pro to enable workarounds and manage your AI-Ready files yourself', 'AIOptimize Pro'); return false;" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Fix ↗</a>`;
@@ -1989,6 +1996,12 @@ function updateExecutiveViewData(results) {
           <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${hiddenDot}</td>
           <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${sitemapDot}</td>
           <td style="padding: 0.6rem; text-align: left; vertical-align: middle;">${essentialDot}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${canonicalVal}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${hierarchyVal}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${mobileVal}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${semanticVal}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${altVal}</td>
+          <td style="padding: 0.6rem; color: var(--text-secondary); font-size: 0.8rem;">${updatedVal}</td>
           <td style="padding: 0.6rem; text-align: right;">
             ${actionHtml}
           </td>
@@ -3291,6 +3304,36 @@ window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
 window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
 
 const tooltipExplanationData = {
+  'exec_tbl_canonical': {
+    title: 'Canonical Tag',
+    icon: '🔗',
+    body: "<strong>Why it matters:</strong> AI bots have strict processing limits (crawl budgets). If they scan 5 duplicate versions of the same page, they waste resources and might penalize your site. A Canonical tag tells the AI exactly which version is the 'master copy' to ingest and cite, ensuring efficiency."
+  },
+  'exec_tbl_hierarchy': {
+    title: 'Heading Hierarchy',
+    icon: '📐',
+    body: "<strong>Why it matters:</strong> AI doesn't have eyes to see big, bold text. It relies on strict code hierarchy (H1, H2, H3) to map the relationships between your ideas. A broken hierarchy means broken context, making the AI less likely to trust or cite your answers."
+  },
+  'exec_tbl_mobile': {
+    title: 'isMobileFriendly',
+    icon: '📱',
+    body: "<strong>Why it matters:</strong> Generative AI engines typically use mobile-first crawling to evaluate modern web presences. If your page isn't mobile-friendly, the AI might receive a distorted, unreadable version of your content, leading to hallucinated facts or skipped citations."
+  },
+  'exec_tbl_semantic': {
+    title: 'hasSemanticTags',
+    icon: '🏷️',
+    body: "<strong>Why it matters:</strong> Semantic tags (like &lt;article&gt; or &lt;main&gt;) act as digital signposts. They help AI quickly separate your valuable core content from useless sidebar menus and footer links, saving the bot's processing power and ensuring only your best content is cited."
+  },
+  'exec_tbl_alt': {
+    title: 'Images without Alt',
+    icon: '🖼️',
+    body: "<strong>Why it matters:</strong> AI bots cannot 'see' images; they only read the code behind them. Without descriptive Alt text, your infographics, charts, and product images are completely invisible to the AI, causing you to lose massive contextual citation opportunities."
+  },
+  'exec_tbl_updated': {
+    title: 'Last Updated',
+    icon: '📅',
+    body: "<strong>Why it matters:</strong> Generative AI models prioritize fresh, up-to-date information to avoid hallucinating outdated facts. Explicitly marking when your content was last updated gives the AI absolute confidence that your data is current and safe to reference in its answers."
+  },
   'exec_x_robots': {
     title: 'X-Robots-Tag Headers',
     icon: '🛡️',

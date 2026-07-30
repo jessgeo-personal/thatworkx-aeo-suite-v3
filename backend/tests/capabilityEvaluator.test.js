@@ -98,6 +98,18 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(route).toHaveProperty('isEssential');
     expect(route).toHaveProperty('missingStatus');
     expect(route).toHaveProperty('actionUrl');
+    expect(route).toHaveProperty('canonicalTag');
+    expect(route).toHaveProperty('headingHierarchy');
+    expect(route).toHaveProperty('isMobileFriendly');
+    expect(route).toHaveProperty('hasSemanticTags');
+    expect(route).toHaveProperty('imagesWithoutAlt');
+    expect(route).toHaveProperty('lastUpdated');
+    expect(typeof route.canonicalTag).toBe('boolean');
+    expect(typeof route.headingHierarchy).toBe('boolean');
+    expect(typeof route.isMobileFriendly).toBe('boolean');
+    expect(typeof route.hasSemanticTags).toBe('boolean');
+    expect(typeof route.imagesWithoutAlt).toBe('number');
+    expect(typeof route.lastUpdated).toBe('string');
 
     // 5. eeatMetrics
     expect(res).toHaveProperty('eeatMetrics');
@@ -135,6 +147,18 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
       expect(route).toHaveProperty('isEssential');
       expect(route).toHaveProperty('missingStatus');
       expect(route).toHaveProperty('actionUrl');
+      expect(route).toHaveProperty('canonicalTag');
+      expect(route).toHaveProperty('headingHierarchy');
+      expect(route).toHaveProperty('isMobileFriendly');
+      expect(route).toHaveProperty('hasSemanticTags');
+      expect(route).toHaveProperty('imagesWithoutAlt');
+      expect(route).toHaveProperty('lastUpdated');
+      expect(typeof route.canonicalTag).toBe('boolean');
+      expect(typeof route.headingHierarchy).toBe('boolean');
+      expect(typeof route.isMobileFriendly).toBe('boolean');
+      expect(typeof route.hasSemanticTags).toBe('boolean');
+      expect(typeof route.imagesWithoutAlt).toBe('number');
+      expect(typeof route.lastUpdated).toBe('string');
     });
 
     expect(res.eeatMetrics).not.toBeNull();
