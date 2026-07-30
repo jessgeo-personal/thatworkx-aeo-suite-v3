@@ -932,7 +932,9 @@ function evaluateCapabilities(crawledData = {}) {
       status: getStatusFromScore(p1Score, 25),
       deductions: p1Deductions,
       deductionReason: p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason),
-      impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.'
+      impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.',
+      xRobotsIndexable: status.xRobotsIndexable !== false && sec1.xRobotsNoIndex !== true,
+      robotsTxtExists: robotsTxtExists && sec1.disallowAll !== true
     },
     section2: {
       title: 'What can AI see?',

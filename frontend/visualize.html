@@ -328,34 +328,44 @@
 
       </div>
 
-      <!-- Section 2 Card: Presence & Hygiene Detail Card -->
-      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+      <!-- Section 1 Card: Gateway & Access Detail Card -->
+      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
         
         <!-- a) Title & Subheading -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
           <div>
             <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-              <span>2. What can AI see on your website</span>
-              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+              <span>1. Can AI see your website?</span>
+              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
             </h4>
             <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
-              take a look and see if the brand message that AI sees matches what you intended to communicate.
+              Verify search and AI crawler protocols and discovered routes for your web presence.
             </p>
           </div>
         </div>
 
-        <!-- b) Scraped Webpage Code Box -->
-        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-            <span style="font-weight: 600; font-size: 0.82rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.03em;">
-              ai-bot readable content from actual website
-            </span>
-            <div id="sec2-route-tabs" style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
-              <!-- Dynamic tabs go here -->
+        <!-- Protocol Flags -->
+        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
+              <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
             </div>
+            <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
           </div>
-          <div id="sec2-scraped-content-box" style="font-family: monospace; font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); height: 240px; min-height: 180px; overflow: auto; background: var(--canvas-bg); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-word;">
-            <!-- Dynamic scraped content preview -->
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
+              <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+            </div>
+            <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
+              <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
+            </div>
+            <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
           </div>
         </div>
 
@@ -391,6 +401,39 @@
                 <!-- Rendered by JS -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Section 2 Card: Presence & Hygiene Detail Card -->
+      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        
+        <!-- a) Title & Subheading -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <div>
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <span>2. What can AI see on your website</span>
+              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+            </h4>
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
+              take a look and see if the brand message that AI sees matches what you intended to communicate.
+            </p>
+          </div>
+        </div>
+
+        <!-- b) Scraped Webpage Code Box -->
+        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-weight: 600; font-size: 0.82rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.03em;">
+              ai-bot readable content from actual website
+            </span>
+            <div id="sec2-route-tabs" style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <!-- Dynamic tabs go here -->
+            </div>
+          </div>
+          <div id="sec2-scraped-content-box" style="font-family: monospace; font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); height: 240px; min-height: 180px; overflow: auto; background: var(--canvas-bg); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-word;">
+            <!-- Dynamic scraped content preview -->
           </div>
         </div>
 
@@ -601,7 +644,7 @@
        │
        ├──► 🗺️ LEVEL 2: MACHINE WELCOME MATS (The Directories)
        │     ├── llms.txt (Modern AI Directory Index) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_llms')">(?)</span>     [<span id="exec-status-llms"></span>]
-       │     └── sitemap.xml (Structural URL Web Tree) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_sitemap')">(?)</span>    [<span id="exec-status-sitemap"></span>]
+       │     └── sitemap.xml (Structural URL Web Tree) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_sitemap')">(?)</span>    [<span id="exec-status-sitemap-tree"></span>]
        │
        ├──► 🤝 LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)
        │     └── ai-context.md (System Prompts & Context Map) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_aicontext')">(?)</span>   [<span id="exec-status-aicontext"></span>]

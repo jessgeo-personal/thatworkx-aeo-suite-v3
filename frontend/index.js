@@ -1876,6 +1876,76 @@ function updateExecutiveViewData(results) {
   renderPillarCard(3, 'section3', pillars?.p3);
   renderPillarCard(4, 'section4', pillars?.p4);
 
+  // Bind live Section 1 gateway payload data to X-Robots-Tag and robots.txt status elements
+  const xRobotsEl = document.getElementById('exec-x-robots-status');
+  const robotsTxtEl = document.getElementById('exec-robots-txt-status');
+
+  const isXRobotsAllowed = 
+    (results.executiveSections?.section1?.xRobotsIndexable === true) || 
+    (results.executiveSections?.[0]?.xRobotsIndexable === true) ||
+    (!(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false));
+
+  const isRobotsTxtAllowed = 
+    (results.executiveSections?.section1?.robotsTxtExists === true) || 
+    (results.executiveSections?.[0]?.robotsTxtExists === true) ||
+    (!(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false));
+
+  if (xRobotsEl) {
+    if (isXRobotsAllowed) {
+      xRobotsEl.innerText = "Passed / Allow";
+      xRobotsEl.className = "badge-status status-green";
+      xRobotsEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
+      xRobotsEl.style.setProperty('color', '#34d399', 'important');
+      xRobotsEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+    } else {
+      xRobotsEl.innerText = "Blocked / Disallow";
+      xRobotsEl.className = "badge-status status-red";
+      xRobotsEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+      xRobotsEl.style.setProperty('color', '#f43f5e', 'important');
+      xRobotsEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+    }
+  }
+
+  if (robotsTxtEl) {
+    if (isRobotsTxtAllowed) {
+      robotsTxtEl.innerText = "Passed / Allow";
+      robotsTxtEl.className = "badge-status status-green";
+      robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
+      robotsTxtEl.style.setProperty('color', '#34d399', 'important');
+      robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+    } else {
+      robotsTxtEl.innerText = "Blocked / Disallow";
+      robotsTxtEl.className = "badge-status status-red";
+      robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+      robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
+      robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+    }
+  }
+
+  // Bind live Section 1 sitemap status element
+  const sitemapEl = document.getElementById('exec-status-sitemap');
+  const isSitemapAvailable = 
+    (results.status?.sitemapExists === true) || 
+    (results.executiveSections?.section2?.sitemapExists === true) ||
+    (results.sec2?.sitemapExists === true) ||
+    (results.sec4?.sitemapFound === true);
+
+  if (sitemapEl) {
+    if (isSitemapAvailable) {
+      sitemapEl.innerText = "🟢 Available / Passed";
+      sitemapEl.className = "badge-status status-green";
+      sitemapEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
+      sitemapEl.style.setProperty('color', '#34d399', 'important');
+      sitemapEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+    } else {
+      sitemapEl.innerText = "🔴 Missing / Action Needed";
+      sitemapEl.className = "badge-status status-red";
+      sitemapEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+      sitemapEl.style.setProperty('color', '#f43f5e', 'important');
+      sitemapEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+    }
+  }
+
   // 4. Update Scanned/Discovered Webpages Table
   const tbodyEl = document.getElementById('exec-routes-tbody') || document.getElementById('exec-route-tbody');
   const routeCountEl = document.getElementById('exec-routes-count') || document.getElementById('exec-route-count');
@@ -1943,7 +2013,7 @@ function updateExecutiveViewData(results) {
   // Bind the corresponding span IDs
   const robotsEl = document.getElementById('exec-status-robots');
   const llmsEl = document.getElementById('exec-status-llms');
-  const sitemapEl = document.getElementById('exec-status-sitemap');
+  const sitemapTreeEl = document.getElementById('exec-status-sitemap-tree');
   const aiContextEl = document.getElementById('exec-status-aicontext');
   const readmeEl = document.getElementById('exec-status-readme');
   const aboutEl = document.getElementById('exec-status-about');
@@ -1960,7 +2030,7 @@ function updateExecutiveViewData(results) {
 
   if (robotsEl) robotsEl.innerHTML = getTreeStatusHtml(robotsActive);
   if (llmsEl) llmsEl.innerHTML = getTreeStatusHtml(llmsActive);
-  if (sitemapEl) sitemapEl.innerHTML = getTreeStatusHtml(sitemapActive);
+  if (sitemapTreeEl) sitemapTreeEl.innerHTML = getTreeStatusHtml(sitemapActive);
   if (aiContextEl) aiContextEl.innerHTML = getTreeStatusHtml(aiContextActive);
   if (readmeEl) readmeEl.innerHTML = getTreeStatusHtml(readmeActive);
   if (aboutEl) aboutEl.innerHTML = getTreeStatusHtml(aboutActive);
@@ -3221,6 +3291,21 @@ window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
 window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
 
 const tooltipExplanationData = {
+  'exec_x_robots': {
+    title: 'X-Robots-Tag Headers',
+    icon: '🛡️',
+    body: "<strong>What it is:</strong> A hidden server-level instruction.<br/><br/><strong>Why it matters:</strong> Even if your website is beautifully designed, a restrictive X-Robots-Tag acts like a digital bouncer, instantly turning away AI bots before they even load the page. If this is configured to block AI crawlers, your brand cannot be ingested, rendering you invisible to Generative AI engines."
+  },
+  'exec_robots_txt': {
+    title: 'robots.txt Status',
+    icon: '🤖',
+    body: "<strong>What it is:</strong> The first file any AI bot checks when visiting your domain.<br/><br/><strong>Why it matters:</strong> It acts as the traffic controller, explicitly telling AI which pages it is allowed to read and which it must ignore. If configured incorrectly, you might accidentally block AI from seeing your most important product, service, or pricing pages."
+  },
+  'exec_sitemap': {
+    title: 'Sitemap Status',
+    icon: '🗺️',
+    body: "<strong>What it is:</strong> A structured directory of all the important pages on your website.<br/><br/><strong>Why it matters:</strong> Unlike human visitors who click through navigation menus, AI bots prefer a direct map to crawl your site efficiently. Without a machine-readable sitemap, AI engines might miss your most critical product, pricing, or case study pages, leading to incomplete or hallucinated answers about your brand."
+  },
   'essential-pages': {
     title: 'Essential Pages Index Coverage',
     icon: '📂',

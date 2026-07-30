@@ -292,17 +292,39 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(parsedText).toContain('- Feature one');
   });
 
-  it('Scenario I: Discovered webpages table renders inside Section 2 container and has correct headers and rows', () => {
+  it('Scenario I: Discovered webpages table renders inside Section 1 container and has correct headers and rows', () => {
     // 1. Check static template structure in visualize.html
     const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
     const visHtml = fs.readFileSync(visPath, 'utf8');
     const $ = cheerio.load(visHtml);
 
-    const sec2Card = $('#exec-section2-card');
-    expect(sec2Card.length).toBe(1);
+    const sec1Card = $('#exec-section1-card');
+    expect(sec1Card.length).toBe(1);
 
-    // Verify table block exists inside section 2 card
-    const table = sec2Card.find('table.exec-table');
+    // Verify Section 1 Header and protocol elements exist
+    const header = sec1Card.find('h4');
+    expect(header.text()).toContain('1. Can AI see your website?');
+
+    const xRobotsRow = sec1Card.find('span:contains("Is your server blocking AI?")');
+    expect(xRobotsRow.length).toBeGreaterThan(0);
+    expect(sec1Card.find('#exec-x-robots-status').length).toBe(1);
+    const xRobotsTooltip = sec1Card.find('span.help-tooltip-trigger[onclick*="openHelpTooltip(\'exec_x_robots\')"]');
+    expect(xRobotsTooltip.length).toBe(1);
+
+    const robotsTxtRow = sec1Card.find('span:contains("Is your hosting provider blocking AI?")');
+    expect(robotsTxtRow.length).toBeGreaterThan(0);
+    expect(sec1Card.find('#exec-robots-txt-status').length).toBe(1);
+    const robotsTxtTooltip = sec1Card.find('span.help-tooltip-trigger[onclick*="openHelpTooltip(\'exec_robots_txt\')"]');
+    expect(robotsTxtTooltip.length).toBe(1);
+
+    const sitemapRow = sec1Card.find('span:contains("Does your site have a machine-readable sitemap?")');
+    expect(sitemapRow.length).toBeGreaterThan(0);
+    expect(sec1Card.find('#exec-status-sitemap').length).toBe(1);
+    const sitemapTooltip = sec1Card.find('span.help-tooltip-trigger[onclick*="openHelpTooltip(\'exec_sitemap\')"]');
+    expect(sitemapTooltip.length).toBe(1);
+
+    // Verify table block exists inside section 1 card
+    const table = sec1Card.find('table.exec-table');
     expect(table.length).toBe(1);
 
     // Verify table headers exist in DOM
@@ -349,7 +371,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(r.missingStatus).toBe('Active');
 
     // 3. Verify zero occurrences of legacy phrase "AI-first" in section HTML and scenario
-    expect(/AI-first/i.test(sec2Card.html() || '')).toBe(false);
+    expect(/AI-first/i.test(sec1Card.html() || '')).toBe(false);
   });
 
   it('Scenario J: Executive Mode Section 3 (Content AI-Optimization & Trust) UI refactoring assertions', () => {
@@ -413,7 +435,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     // 3. Spans for the tree
     expect($('#exec-status-robots').length).toBe(1);
     expect($('#exec-status-llms').length).toBe(1);
-    expect($('#exec-status-sitemap').length).toBe(1);
+    expect($('#exec-status-sitemap-tree').length).toBe(1);
     expect($('#exec-status-aicontext').length).toBe(1);
     expect($('#exec-status-readme').length).toBe(1);
     expect($('#exec-status-about').length).toBe(1);
