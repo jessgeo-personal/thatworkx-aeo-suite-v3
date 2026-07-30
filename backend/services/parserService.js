@@ -24,11 +24,15 @@ const parseHtmlMetrics = (htmlContent) => {
   // 1. Extract JSON-LD Schema.org blocks before stripping script tags
   const jsonLdTypes = [];
   let jsonLdExists = false;
+  let jsonLdSchemaContent = '';
 
   $('script[type="application/ld+json"]').each((_, el) => {
     try {
       const rawJson = $(el).html();
       if (rawJson) {
+        if (!jsonLdSchemaContent) {
+          jsonLdSchemaContent = rawJson.trim();
+        }
         const parsed = JSON.parse(rawJson);
         jsonLdExists = true;
         if (parsed['@type']) {
@@ -73,6 +77,7 @@ const parseHtmlMetrics = (htmlContent) => {
     contentDensityRatio,
     spaTrapDetected,
     jsonLdExists,
+    jsonLdSchemaContent,
     jsonLdTypes: [...new Set(jsonLdTypes)],
     machinePreview
   };

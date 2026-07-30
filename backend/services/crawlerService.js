@@ -254,6 +254,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
     result.status.spaTrapDetected = parsedMetrics.spaTrapDetected;
     result.status.jsonLdExists = parsedMetrics.jsonLdExists;
     result.status.jsonLdTypes = parsedMetrics.jsonLdTypes;
+    result.status.jsonLdSchemaContent = parsedMetrics.jsonLdSchemaContent;
     result.status.machinePreview = parsedMetrics.machinePreview;
 
     if (parsedMetrics.spaTrapDetected) {

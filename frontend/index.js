@@ -197,24 +197,24 @@ function buildDevDrawersHtml(domainName = '') {
         <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')">content.md</button>
       </div>
 
-      <div style="display: flex; gap: 20px;">
-        <!-- Left Window (50% width) -->
+      <div style="display: flex; gap: 20px; align-items: stretch;">
+        <!-- Left Pane (50% width) -->
         <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
             <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
           </div>
           <div style="flex-grow: 1;">
-            <pre style="margin: 0; white-space: pre-wrap;"><code id="left-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</code></pre>
+            <pre id="left-pane-content" style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</pre>
           </div>
         </div>
 
-        <!-- Right Window (50% width) -->
+        <!-- Right Pane (50% width) -->
         <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
             <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline</span>
           </div>
           <div style="flex-grow: 1;">
-            <pre style="margin: 0; white-space: pre-wrap;"><code id="right-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></code></pre>
+            <pre id="right-pane-content" style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></pre>
           </div>
         </div>
       </div>
@@ -1199,10 +1199,59 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
       path: '/schema.jsonld',
       content: JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": domainName || "Brand Name",
-        "url": targetUrl,
-        "description": "AI Engine Optimized Entity Verification Profile"
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": `${targetUrl}/#organization`,
+            "name": domainName || "Brand Name",
+            "url": targetUrl,
+            "description": "AI-Optimized Entity Verification Profile",
+            "sameAs": [
+              `https://www.wikidata.org/wiki/Q11436`,
+              `https://github.com/${(domainName || 'brand').split('.')[0]}`
+            ],
+            "contactPoint": [
+              {
+                "@type": "ContactPoint",
+                "telephone": "+1-555-123-4567",
+                "contactType": "customer support",
+                "areaServed": "US",
+                "availableLanguage": "English"
+              }
+            ],
+            "knowsAbout": [
+              "Artificial Intelligence",
+              "Search Engine Optimization",
+              "Machine Learning",
+              "Entity Verification"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": `${targetUrl}/#faq`,
+            "isPartOf": {
+              "@id": `${targetUrl}/#organization`
+            },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": `How does ${domainName || 'our brand'} ensure content quality for AI search?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Our site uses AI-Optimized metadata and structured semantic markup to ensure that LLM crawlers retrieve the most accurate and up-to-date information."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Where are the AI-Ready machine-readable manifests located?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The machine-readable blueprints and context maps are located at the root of the site, including /llms.txt and /ai-context.md."
+                }
+              }
+            ]
+          }
+        ]
       }, null, 2)
     },
     llms: {
@@ -1240,16 +1289,16 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
   };
 }
 
-function switchDiyManifestTab(key) {
-  activeDiyManifestKey = key;
-  activeDrawerKey = key;
+function switchDiyManifestTab(fileKey) {
+  activeDiyManifestKey = fileKey;
+  activeDrawerKey = fileKey;
   
   // Update active tab styling
   const buttons = document.querySelectorAll('.drawer-tab-btn');
   buttons.forEach(b => {
     b.classList.remove('active');
     const onclickVal = b.getAttribute('onclick') || '';
-    if (onclickVal.includes(`'${key}'`) || onclickVal.includes(`"${key}"`)) {
+    if (onclickVal.includes(`'${fileKey}'`) || onclickVal.includes(`"${fileKey}"`)) {
       b.classList.add('active');
     }
   });
@@ -1260,27 +1309,27 @@ function switchDiyManifestTab(key) {
   const manifestPreviews = results.manifestPreviews || {};
 
   const templates = getDynamicDrawerTemplates(domain, results);
-  const fileInfo = templates[key] || templates.llms;
+  const fileInfo = templates[fileKey] || templates.llms;
 
   // Bind Left Window: Live Site Content (Scraped)
   let liveContent = '';
-  if (key === 'jsonld') {
+  if (fileKey === 'jsonld') {
     liveContent = status.jsonLdSchemaContent || status.jsonLdContent || '';
-  } else if (key === 'robots') {
+  } else if (fileKey === 'robots') {
     liveContent = status.robotsTxtContent || '';
-  } else if (key === 'llms') {
+  } else if (fileKey === 'llms') {
     liveContent = status.llmsTxtContent || '';
-  } else if (key === 'sitemap') {
+  } else if (fileKey === 'sitemap') {
     liveContent = status.sitemapContent || '';
-  } else if (key === 'aicontext') {
+  } else if (fileKey === 'aicontext') {
     liveContent = manifestPreviews.aiContext || status.aiContextContent || '';
-  } else if (key === 'readme') {
+  } else if (fileKey === 'readme') {
     liveContent = status.readmeContent || '';
-  } else if (key === 'about') {
+  } else if (fileKey === 'about') {
     liveContent = manifestPreviews.about || status.aboutTxtContent || '';
-  } else if (key === 'docs') {
+  } else if (fileKey === 'docs') {
     liveContent = status.docsTxtContent || status.docsContent || '';
-  } else if (key === 'content') {
+  } else if (fileKey === 'content') {
     liveContent = status.contentTxtContent || status.contentContent || '';
   }
 
