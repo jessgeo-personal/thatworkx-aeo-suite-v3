@@ -763,6 +763,10 @@ body.light-theme .logo-placeholder {
   display: none !important;
 }
 
+#help-modal-body {
+  text-align: left;
+}
+
 .modal-card {
   max-width: 450px;
   width: 90%;

@@ -3224,12 +3224,12 @@ const tooltipExplanationData = {
   'essential-pages': {
     title: 'Essential Pages Index Coverage',
     icon: '📂',
-    body: '<p>AI models search for standardized identity pages (/about, /contact, /privacy-policy) to verify entity existence and index domain authority trust signals.</p>'
+    body: "<strong>Understanding AI Trust Signals:</strong><br/> Generative AI engines don't just read your marketing pitch—they actively look for structural proof that your business is legitimate, secure, and transparent. To establish this, AI bots specifically crawl for standard foundational pages:<br/><ul><li><strong>About:</strong> Proves your brand identity and expertise.</li><li><strong>Contact:</strong> Proves you are a real, accessible entity.</li><li><strong>Privacy & Terms:</strong> Proves you comply with data safety and legal standards.</li></ul>If AI models cannot easily locate these pages, they may classify your site as a low-trust source, significantly reducing the chances of your brand being recommended in their answers."
   },
   'missing-essential-pages': {
     title: 'Missing Essential Pages',
     icon: '⚠️',
-    body: '<p>If these pages are missing or returning 404s, it weakens your entity trust scores in search AI indexing pipelines.</p>'
+    body: "<strong>How to Fix Missing Essential Pages:</strong><br/> AI web scrapers rely on predictable, standardized naming conventions to categorize your site. If your contact information is buried on a page named <em>/reach-out</em> or <em>/our-story</em>, the AI might completely miss it.<br/><br/><strong>Action Steps:</strong><br/>1. Ensure you have dedicated, standalone pages for these topics.<br/>2. Use industry-standard URL slugs (e.g., <em>/about</em>, <em>/contact</em>, <em>/privacy</em>, <em>/terms</em>).<br/>3. Do not hide this critical information inside a single long scrolling homepage or behind complex interactive menus. Make the URLs explicitly clear for the machine to index."
   },
   'citation-signals': {
     title: 'AI Citation Signals',
