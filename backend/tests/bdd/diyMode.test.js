@@ -159,4 +159,63 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(alertModal.find('#modal-message').length).toBe(1);
   });
 
+  it('Scenario F: Verify index.js appends the conditionally-styled always-visible accordion for X-Robots-Tag capability', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Verify key logic parts are present in renderDeveloperMatrixRows
+    expect(jsContent).toContain('isXRobots');
+    expect(jsContent).toContain('isXRobotsPass');
+    expect(jsContent).toContain('Status: Valid AI-Optimized Configuration');
+    expect(jsContent).toContain('✅ Your server headers are correctly configured and are not blocking AI.');
+    expect(jsContent).toContain('How to Fix: AI-Block Detected');
+    expect(jsContent).toContain('Using a Text Editor (via FTP or cPanel File Manager):');
+    expect(jsContent).toContain('Header unset X-Robots-Tag');
+    expect(jsContent).toContain('fastcgi_hide_header X-Robots-Tag;');
+    expect(jsContent).toContain('proxy_hide_header X-Robots-Tag;');
+    
+    // Ensure no banned vocabulary is used in the newly added block
+    const bannedRegex = /AI-first/i;
+    expect(bannedRegex.test(jsContent)).toBe(false);
+  });
+
+  it('Scenario G: Verify side-by-side Resolving AI-ready File Issues component is structured correctly in visualize.html and index.js', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    // 1. Verify visualize.html structure
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const sectionTitle = $('#dev-drawers-section h4 span').first().text().trim();
+    expect(sectionTitle).toBe('Resolving AI-ready File Issues');
+
+    const leftPane = $('#left-pane-content');
+    const rightPane = $('#right-pane-content');
+    expect(leftPane.length).toBe(1);
+    expect(rightPane.length).toBe(1);
+
+    // 2. Verify index.js script logic
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    expect(jsContent).toContain('switchDiyManifestTab');
+    expect(jsContent).toContain('latestScanResults');
+    expect(jsContent).toContain('copyLeftPaneCode');
+    expect(jsContent).toContain('copyRightPaneCode');
+    expect(jsContent).toContain('downloadRightPaneFile');
+    expect(jsContent).toContain('JSON-LD Schema');
+    expect(jsContent).toContain('robots.txt');
+    expect(jsContent).toContain('llms.txt');
+
+    // 3. Ensure no banned vocabulary is present
+    const combined = visHtml + ' ' + jsContent;
+    expect(/AI-first/i.test(combined)).toBe(false);
+  });
+
 });

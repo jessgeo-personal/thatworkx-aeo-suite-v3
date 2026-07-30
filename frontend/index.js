@@ -16,6 +16,8 @@ let activeOptimizeTool = 'robots';
 let activeVisualizeViewMode = 'executive'; // Default active state: Executive Mode
 let currentEmail = 'user@thatworkx.com'; // Default user session email
 let activeScanController = null;
+let latestScanResults = null;
+let activeDiyManifestKey = 'jsonld';
 
 // Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
 const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) 
@@ -176,7 +178,7 @@ function buildDevDrawersHtml(domainName = '') {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
           <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>💻 Machine File Code Inspection Drawers</span>
+            <span>Resolving AI-ready File Issues</span>
             <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Syntax Highlighted</span>
           </h4>
           <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
@@ -184,35 +186,36 @@ function buildDevDrawersHtml(domainName = '') {
       </div>
 
       <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <button type="button" class="drawer-tab-btn control-menu-item active" onclick="selectCodeDrawer('llms')">/llms.txt</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('aicontext')">/ai-context.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('robots')">/robots.txt</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('sitemap')">/sitemap.xml</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('readme')">/README.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('about')">/about.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('docs')">/docs.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="selectCodeDrawer('content')">/content.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item active" onclick="switchDiyManifestTab('jsonld')">JSON-LD Schema</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('robots')">robots.txt</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('llms')">llms.txt</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('sitemap')">sitemap.xml</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('aicontext')">ai-context.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('readme')">README.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('about')">about.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('docs')">docs.md</button>
+        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')">content.md</button>
       </div>
 
-      <div class="drawer-code-window" style="background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem;">
-        <div class="drawer-code-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
-          <span class="drawer-file-path" id="drawer-current-filepath" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8;">/llms.txt</span>
-          <div class="drawer-action-btns" style="display: flex; gap: 0.5rem;">
-            <button type="button" class="drawer-btn" onclick="copyDrawerCode()">📋 Copy Code</button>
-            <button type="button" class="drawer-btn drawer-btn-download" onclick="downloadDrawerFile()">📥 Download File</button>
+      <div style="display: flex; gap: 20px;">
+        <!-- Left Window (50% width) -->
+        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
+          </div>
+          <div style="flex-grow: 1;">
+            <pre style="margin: 0; white-space: pre-wrap;"><code id="left-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</code></pre>
           </div>
         </div>
-        <div class="drawer-code-body">
-          <pre><code id="drawer-code-content" class="language-markdown"># ${domainName} LLMs Machine Directory Index
-> Comprehensive AI Machine Welcome Directory following the Answer.ai Specification.
 
-## Core Navigation Routes
-- [Home Page](https://${domainName}/): Primary brand homepage & solutions overview.
-- [About Us](https://${domainName}/about): Verified corporate entity & leadership credentials.
-- [Documentation](https://${domainName}/docs): Technical API integration manuals and workflow guides.
-
-## System Context Map Pointer
-- [AI System Context](https://${domainName}/ai-context.md): Flattened RAG system context map.</code></pre>
+        <!-- Right Window (50% width) -->
+        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline</span>
+          </div>
+          <div style="flex-grow: 1;">
+            <pre style="margin: 0; white-space: pre-wrap;"><code id="right-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -1121,6 +1124,42 @@ function renderDeveloperMatrixRows(capabilities) {
         <td style="text-align: right;">${actionHtml}</td>
       </tr>
     `;
+
+    // Task 1.2: Check if capability is X-Robots-Tag and render conditionally styled accordion
+    const isXRobots = cap.id === 'xRobotsTag' || cap.id === 'xRobotsTagHeaders' || (cap.id && cap.id.toLowerCase().includes('xrobots'));
+    if (isXRobots) {
+      const isXRobotsPass = isPass || cap.score === 100 || cap.status === 'pass' || (cap.deductions === 0);
+      let summaryText = '';
+      let bodyContent = '';
+      if (isXRobotsPass) {
+        summaryText = `<summary style="color: var(--badge-pass, #10b981); cursor: pointer; font-weight: 600;">Status: Valid AI-Optimized Configuration</summary>`;
+        bodyContent = `<div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-pass-bg); border-radius: 4px; margin-top: 5px;'><strong>✅ Your server headers are correctly configured and are not blocking AI.</strong></div>`;
+      } else {
+        summaryText = `<summary style="color: var(--badge-fail, #ef4444); cursor: pointer; font-weight: 600;">How to Fix: AI-Block Detected</summary>`;
+        bodyContent = `
+          <div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-fail-bg); border-radius: 4px; margin-top: 5px;'>
+            <strong>Using a Text Editor (via FTP or cPanel File Manager):</strong><br>
+            <span style='font-size: 0.9em; display: block; margin-bottom: 10px;'>The X-Robots-Tag is a hidden server header, not a standalone file. To fix this without using a command-line terminal, open your website's root folder using a file manager or FTP, open the server configuration file in a text editor, and modify or remove the blocking rules.</span>
+            <strong>Apache (Edit your .htaccess file):</strong><br>
+            <code style='color: var(--primary-accent);'>Header unset X-Robots-Tag</code><br><br>
+            <strong>Nginx (Edit your nginx.conf file):</strong><br>
+            <code style='color: var(--primary-accent);'>fastcgi_hide_header X-Robots-Tag;</code><br>
+            <code style='color: var(--primary-accent);'>proxy_hide_header X-Robots-Tag;</code>
+          </div>
+        `;
+      }
+
+      rowsHtml += `
+        <tr>
+          <td colspan="100%">
+            <details>
+              ${summaryText}
+              ${bodyContent}
+            </details>
+          </td>
+        </tr>
+      `;
+    }
   });
 
   tbody.innerHTML = rowsHtml;
@@ -1149,13 +1188,23 @@ function filterMatrixSection(section) {
   }
 }
 
-let activeDrawerKey = 'llms';
+let activeDrawerKey = 'jsonld';
 
 function getDynamicDrawerTemplates(domainName, results = {}) {
   const targetUrl = `https://${domainName}`;
   const status = results.status || {};
 
   return {
+    jsonld: {
+      path: '/schema.jsonld',
+      content: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": domainName || "Brand Name",
+        "url": targetUrl,
+        "description": "AI Engine Optimized Entity Verification Profile"
+      }, null, 2)
+    },
     llms: {
       path: '/llms.txt',
       content: status.llmsTxtContent || `# ${domainName} LLMs Machine Directory Index\n> Answer.ai Standard Machine Directory File for ${domainName}.\n\n## Primary Target Domain\n- [Homepage](${targetUrl}/): Core web presence and main offerings.\n- [About](${targetUrl}/about): Corporate identity & verified entity information.\n- [Docs](${targetUrl}/docs): Technical manuals and integration guides.\n\n## System Context Blueprint Pointer\n- [AI System Context](${targetUrl}/ai-context.md): Flattened RAG system context map.`
@@ -1191,34 +1240,95 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
   };
 }
 
-function selectCodeDrawer(key, results = null) {
+function switchDiyManifestTab(key) {
+  activeDiyManifestKey = key;
   activeDrawerKey = key;
+  
+  // Update active tab styling
   const buttons = document.querySelectorAll('.drawer-tab-btn');
-  buttons.forEach(b => b.classList.remove('active'));
-  const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick')?.includes(`'${key}'`));
-  if (targetBtn) targetBtn.classList.add('active');
+  buttons.forEach(b => {
+    b.classList.remove('active');
+    const onclickVal = b.getAttribute('onclick') || '';
+    if (onclickVal.includes(`'${key}'`) || onclickVal.includes(`"${key}"`)) {
+      b.classList.add('active');
+    }
+  });
 
-  const templates = getDynamicDrawerTemplates(currentScannedDomain, results || {});
+  const domain = currentScannedDomain || 'example.com';
+  const results = latestScanResults || window.lastScanResults || {};
+  const status = results.status || {};
+  const manifestPreviews = results.manifestPreviews || {};
+
+  const templates = getDynamicDrawerTemplates(domain, results);
   const fileInfo = templates[key] || templates.llms;
 
+  // Bind Left Window: Live Site Content (Scraped)
+  let liveContent = '';
+  if (key === 'jsonld') {
+    liveContent = status.jsonLdSchemaContent || status.jsonLdContent || '';
+  } else if (key === 'robots') {
+    liveContent = status.robotsTxtContent || '';
+  } else if (key === 'llms') {
+    liveContent = status.llmsTxtContent || '';
+  } else if (key === 'sitemap') {
+    liveContent = status.sitemapContent || '';
+  } else if (key === 'aicontext') {
+    liveContent = manifestPreviews.aiContext || status.aiContextContent || '';
+  } else if (key === 'readme') {
+    liveContent = status.readmeContent || '';
+  } else if (key === 'about') {
+    liveContent = manifestPreviews.about || status.aboutTxtContent || '';
+  } else if (key === 'docs') {
+    liveContent = status.docsTxtContent || status.docsContent || '';
+  } else if (key === 'content') {
+    liveContent = status.contentTxtContent || status.contentContent || '';
+  }
+
+  const leftPane = document.getElementById('left-pane-content');
+  if (leftPane) {
+    if (liveContent && liveContent.trim().length > 0) {
+      leftPane.innerText = liveContent;
+      leftPane.style.color = 'var(--text-main)';
+    } else {
+      leftPane.innerText = 'No live content detected.';
+      leftPane.style.color = 'var(--text-muted, #64748b)';
+    }
+  }
+
+  // Bind Right Window: AEO Suite Optimized Baseline
+  const rightPane = document.getElementById('right-pane-content');
+  if (rightPane) {
+    rightPane.innerText = fileInfo.content || '';
+  }
+
+  // Backwards compatibility for old element IDs if they are on another page/component
   const pathEl = document.getElementById('drawer-current-filepath');
   if (pathEl) pathEl.innerText = fileInfo.path;
-
   const contentEl = document.getElementById('drawer-code-content');
   if (contentEl) contentEl.innerText = fileInfo.content;
 }
 
+function selectCodeDrawer(key, results = null) {
+  if (results) {
+    latestScanResults = results;
+    window.lastScanResults = results;
+  }
+  switchDiyManifestTab(key);
+}
+
 function copyDrawerCode() {
-  const contentEl = document.getElementById('drawer-code-content');
+  const contentEl = document.getElementById('right-pane-content') || document.getElementById('drawer-code-content');
   if (contentEl) {
     navigator.clipboard.writeText(contentEl.innerText);
-    alert('Copied drawer code to clipboard!');
+    alert('Copied code to clipboard!');
   }
 }
 
 function downloadDrawerFile() {
-  const templates = getDynamicDrawerTemplates(currentScannedDomain);
-  const fileInfo = templates[activeDrawerKey] || templates.llms;
+  const domain = currentScannedDomain || 'example.com';
+  const results = latestScanResults || window.lastScanResults || {};
+  const templates = getDynamicDrawerTemplates(domain, results);
+  const fileInfo = templates[activeDiyManifestKey] || templates[activeDrawerKey] || templates.llms;
   const blob = new Blob([fileInfo.content], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1229,6 +1339,31 @@ function downloadDrawerFile() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+function copyLeftPaneCode() {
+  const leftPane = document.getElementById('left-pane-content');
+  if (leftPane) {
+    navigator.clipboard.writeText(leftPane.innerText);
+    alert('Copied scraped live content to clipboard!');
+  }
+}
+
+function copyRightPaneCode() {
+  const rightPane = document.getElementById('right-pane-content');
+  if (rightPane) {
+    navigator.clipboard.writeText(rightPane.innerText);
+    alert('Copied optimized baseline content to clipboard!');
+  }
+}
+
+function downloadRightPaneFile() {
+  downloadDrawerFile();
+}
+
+window.copyLeftPaneCode = copyLeftPaneCode;
+window.copyRightPaneCode = copyRightPaneCode;
+window.downloadRightPaneFile = downloadRightPaneFile;
+window.switchDiyManifestTab = switchDiyManifestTab;
 
 function selectEdgeTab(key) {
   const buttons = document.querySelectorAll('.edge-tab-btn');

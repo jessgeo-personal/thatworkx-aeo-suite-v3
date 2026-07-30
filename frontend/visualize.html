@@ -820,8 +820,54 @@
       <!-- Manifest Inspection / Tree Section -->
       <div id="dev-manifest-tree-wrapper"></div>
 
-      <!-- Code Inspection Drawers -->
-      <div id="dev-drawers-wrapper"></div>
+      <!-- Resolving AI-ready File Issues -->
+      <div id="dev-drawers-wrapper">
+        <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>Resolving AI-ready File Issues</span>
+                <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Syntax Highlighted</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+            </div>
+          </div>
+
+          <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button type="button" class="drawer-tab-btn control-menu-item active" onclick="switchDiyManifestTab('jsonld')">JSON-LD Schema</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('robots')">robots.txt</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('llms')">llms.txt</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('sitemap')">sitemap.xml</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('aicontext')">ai-context.md</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('readme')">README.md</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('about')">about.md</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('docs')">docs.md</button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')">content.md</button>
+          </div>
+
+          <div style="display: flex; gap: 20px;">
+            <!-- Left Window (50% width) -->
+            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
+              </div>
+              <div style="flex-grow: 1;">
+                <pre style="margin: 0; white-space: pre-wrap;"><code id="left-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</code></pre>
+              </div>
+            </div>
+
+            <!-- Right Window (50% width) -->
+            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline</span>
+              </div>
+              <div style="flex-grow: 1;">
+                <pre style="margin: 0; white-space: pre-wrap;"><code id="right-pane-content" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
 
