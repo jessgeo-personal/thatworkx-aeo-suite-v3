@@ -420,5 +420,69 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(/AI-first/i.test(about)).toBe(false);
   });
 
+  it('Scenario L: Verify that getDynamicDrawerTemplates generates docs.md and content.md baseline templates with scraped data placeholders', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const vm = require('vm');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Extract the getDynamicDrawerTemplates function definition dynamically
+    const funcStartMarker = 'function getDynamicDrawerTemplates';
+    const funcStartIndex = jsContent.indexOf(funcStartMarker);
+    expect(funcStartIndex).toBeGreaterThan(-1);
+
+    const nextFuncMarker = 'function switchDiyManifestTab';
+    const nextFuncIndex = jsContent.indexOf(nextFuncMarker);
+    expect(nextFuncIndex).toBeGreaterThan(funcStartIndex);
+
+    const extractedFunc = jsContent.substring(funcStartIndex, nextFuncIndex);
+    
+    // Run the function inside VM context to isolate and test it
+    const context = vm.createContext({});
+    vm.runInContext(extractedFunc, context);
+    const getDynamicDrawerTemplatesFn = context.getDynamicDrawerTemplates;
+    expect(typeof getDynamicDrawerTemplatesFn).toBe('function');
+
+    const results = {
+      url: 'https://testdomain.com',
+      scrapedDescription: 'An optimized enterprise solution provider.',
+      name: 'Test Brand Name'
+    };
+
+    const templates = getDynamicDrawerTemplatesFn('testdomain.com', results);
+    
+    // 1. docs.md Checks
+    const docs = templates.docs.content;
+    expect(docs).toContain('# <Verify Scraped Data: testdomain.com> Technical Documentation');
+    expect(docs).toContain('<!-- AI-Ready Machine Manifest File -->');
+    expect(docs).toContain('## Quick Technical Summary');
+    expect(docs).toContain('Core Purpose: <Verify Scraped Data: An optimized enterprise solution provider.>');
+    expect(docs).toContain('## Core Workflows & Feature Specifications');
+    expect(docs).toContain('## Configuration & Parameter Reference');
+    expect(docs).toContain('| `domainName` | String | `<Verify Scraped Data: testdomain.com>` |');
+    expect(docs).toContain('| `brandName` | String | `<Verify Scraped Data: Test Brand Name>` |');
+    expect(docs).toContain('## Technical Support & Help Channels');
+
+    // 2. content.md Checks
+    const content = templates.content.content;
+    expect(content).toContain('# <Verify Scraped Data: testdomain.com> Subject Authority Index');
+    expect(content).toContain('<!-- AI-Ready Machine Manifest File -->');
+    expect(content).toContain('## Core Subject Matter Authority');
+    expect(content).toContain('<Verify Scraped Data: Test Brand Name> maintains deep expertise in software architecture');
+    expect(content).toContain('Corporate Mission: <Verify Scraped Data: An optimized enterprise solution provider.>');
+    expect(content).toContain('## Authoritative Insights & Deep-Dive Articles');
+    expect(content).toContain('## Case Studies & Proven Track Record');
+    expect(content).toContain('## Citation & Quotation Standard');
+    expect(content).toContain('refer to the official brand name: <Verify Scraped Data: Test Brand Name>.');
+
+    // 3. Vocabulary Governance checks
+    expect(/AI-first/i.test(jsContent)).toBe(false);
+    expect(/AI-first/i.test(docs)).toBe(false);
+    expect(/AI-first/i.test(content)).toBe(false);
+  });
+
 });
+
 

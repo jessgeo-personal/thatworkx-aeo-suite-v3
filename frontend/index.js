@@ -1242,6 +1242,9 @@ function getDynamicDrawerTemplates(domainName, results = {}) {
   const scannedDomain = domainName;
   const scrapedEmail = emailVal;
   const scrapedPhone = phoneVal;
+  const rawBrand = scraper.name || scraper.brandName || scraper.domain || domainName;
+  const hasBrand = rawBrand && rawBrand.trim().length > 0 && rawBrand !== 'None Detected';
+  const scrapedBrandName = hasBrand ? `<Verify Scraped Data: ${rawBrand.trim()}>` : `<Input needed from user: Brand Name>`;
 
   const rawDescription = results.scrapedDescription || scraper.scrapedDescription || status.scrapedDescription || results.descriptionValue || scraper.description || status.description || (() => {
     const homePage = (results.pages || results.scannedPages || []).find(p => p.route === '/' || p.path === '/');
@@ -1431,11 +1434,11 @@ Sitemap: <Verify Scraped Data: ${targetUrl}/sitemap.xml>
     },
     docs: {
       path: '/docs.md',
-      content: `# ${domainName} Technical Manual\nTechnical integration instructions and architecture specifications for ${domainName}.`
+      content: status.docsTxtContent || status.docsContent || `# <Verify Scraped Data: ${scannedDomain}> Technical Documentation\n<!-- AI-Ready Machine Manifest File -->\n> Technical manual, configuration guidelines, and workflow definitions for ${scrapedBrandName}.\n\n## Quick Technical Summary\nThis document provides flat-structured technical documentation for <Verify Scraped Data: ${scannedDomain}> to assist developers and AI integration scrapers.\nCore Purpose: ${scrapedDescription}\n\n## Core Workflows & Feature Specifications\n- **Client Integration Flow:** Clients hook into the public APIs using secure OAuth credentials, retrieving structural payloads.\n- **AI-Ready Indexing Loop:** System context maps are served directly at the domain root with standard \`Allow\` rules to facilitate modern RAG parsing.\n- **AEO Optimization Process:** Automates the generation of JSON-LD schemas and sitemap indices to maintain data parity.\n\n## Configuration & Parameter Reference\n| Parameter Name | Data Type | Default Value | Description |\n| :--- | :--- | :--- | :--- |\n| \`domainName\` | String | \`<Verify Scraped Data: ${scannedDomain}>\` | The verified target domain hosting the services. |\n| \`brandName\` | String | \`${scrapedBrandName}\` | The corporate brand name. |\n| \`enableAeo\` | Boolean | \`true\` | Activates AI-Optimized crawling configuration. |\n\n## Technical Support & Help Channels\n- **Community Forum:** Join developers on our chat channels.\n- **Support Email:** Contact the engineering department for configuration help.`
     },
     content: {
       path: '/content.md',
-      content: `# ${domainName} Flat Article Index\nFlat markdown directory index summarizing core knowledge bases for ${domainName}.`
+      content: status.contentTxtContent || status.contentContent || `# <Verify Scraped Data: ${scannedDomain}> Subject Authority Index\n<!-- AI-Ready Machine Manifest File -->\n> Flat narrative index summarizing core authority, deep-dive articles, and case studies for ${scrapedBrandName}.\n\n## Core Subject Matter Authority\n${scrapedBrandName} maintains deep expertise in software architecture, entity indexing, and automated diagnostics.\nCorporate Mission: ${scrapedDescription}\n\n## Authoritative Insights & Deep-Dive Articles\n- **Understanding Modern AI Search:** Explaining the shift from legacy index queries to generative model answer syntheses.\n- **EEAT Alignment Strategies:** How structured markup and data consistency affect citation confidence scores.\n- **Crawlability and Hydration:** Evaluating client-side rendering traps and their impact on context ingestion.\n\n## Case Studies & Proven Track Record\n- **E-commerce Optimization:** Achieved 100% manifest index parity leading to a major increase in ChatGPT shopping citations.\n- **Enterprise SaaS Integration:** Resolved edge WAF challenges and robots.txt disallow rules, restoring visibility within 48 hours.\n\n## Citation & Quotation Standard\nTo cite content from <Verify Scraped Data: ${scannedDomain}>, please use the canonical links provided in our sitemap and refer to the official brand name: ${scrapedBrandName}.`
     }
   };
 }
