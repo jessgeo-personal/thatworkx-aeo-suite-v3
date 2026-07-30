@@ -1785,12 +1785,12 @@ function updateExecutiveViewData(results) {
 
   const ageEstimateEl = document.getElementById('sec3-age-estimate');
   if (ageEstimateEl) {
-    ageEstimateEl.innerText = eeat.ageEstimate || (results.executiveSections?.section3?.ageEstimate) || '2 years 8 months';
+    ageEstimateEl.innerText = eeat.ageEstimate || (results.executiveSections?.section3?.ageEstimate) || 'Pending WHOIS Integration';
   }
 
   const authorityStatusEl = document.getElementById('sec3-authority-status');
   if (authorityStatusEl) {
-    const authStatus = eeat.authorityStatus || (results.executiveSections?.section3?.authorityStatus) || 'Optimized Anchor';
+    const authStatus = eeat.authorityStatus || (results.executiveSections?.section3?.authorityStatus) || 'Requires Ahrefs/Moz API';
     authorityStatusEl.innerText = authStatus;
     
     let authTheme = { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', class: 'status-green' };
@@ -1798,6 +1798,8 @@ function updateExecutiveViewData(results) {
       authTheme = { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', class: 'status-amber' };
     } else if (authStatus === 'Abstention Risk') {
       authTheme = { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', class: 'status-red' };
+    } else if (authStatus.includes('Requires') || authStatus.includes('API') || authStatus === 'UNAUDITED') {
+      authTheme = { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', class: 'status-amber' };
     }
 
     authorityStatusEl.className = `badge-status ${authTheme.class}`;
@@ -1807,7 +1809,7 @@ function updateExecutiveViewData(results) {
 
   const diagSummaryEl = document.getElementById('sec3-diagnostic-summary');
   if (diagSummaryEl) {
-    diagSummaryEl.innerText = eeat.diagnosticSummary || (results.executiveSections?.section3?.diagnosticSummary) || 'Domain exhibits strong trust signals.';
+    diagSummaryEl.innerText = eeat.diagnosticSummary || (results.executiveSections?.section3?.diagnosticSummary) || 'Domain E-E-A-T analysis details pending.';
   }
 
   // 3. Update Strategic Pillar Badges, Scores & Executive Inquiry Cards with Vibrant Highlights & Deduction Reasons
@@ -1948,16 +1950,22 @@ function updateExecutiveViewData(results) {
   const docsEl = document.getElementById('exec-status-docs');
   const contentEl = document.getElementById('exec-status-content');
 
-  const getTreeStatusString = (active) => active ? '🟢 Available' : '🔴 Not available';
+  const getTreeStatusHtml = (active) => {
+    if (active) {
+      return '<span class="status-green">🟢 Available</span>';
+    } else {
+      return '<span class="status-red">🔴 Not available</span><a href="?mode=developer&tab=manifests" class="diy-sample-link" style="margin-left: 10px; font-size: 0.85em; text-decoration: underline;">View DIY sample ↗</a>';
+    }
+  };
 
-  if (robotsEl) robotsEl.innerText = getTreeStatusString(robotsActive);
-  if (llmsEl) llmsEl.innerText = getTreeStatusString(llmsActive);
-  if (sitemapEl) sitemapEl.innerText = getTreeStatusString(sitemapActive);
-  if (aiContextEl) aiContextEl.innerText = getTreeStatusString(aiContextActive);
-  if (readmeEl) readmeEl.innerText = getTreeStatusString(readmeActive);
-  if (aboutEl) aboutEl.innerText = getTreeStatusString(aboutActive);
-  if (docsEl) docsEl.innerText = getTreeStatusString(docsActive);
-  if (contentEl) contentEl.innerText = getTreeStatusString(contentActive);
+  if (robotsEl) robotsEl.innerHTML = getTreeStatusHtml(robotsActive);
+  if (llmsEl) llmsEl.innerHTML = getTreeStatusHtml(llmsActive);
+  if (sitemapEl) sitemapEl.innerHTML = getTreeStatusHtml(sitemapActive);
+  if (aiContextEl) aiContextEl.innerHTML = getTreeStatusHtml(aiContextActive);
+  if (readmeEl) readmeEl.innerHTML = getTreeStatusHtml(readmeActive);
+  if (aboutEl) aboutEl.innerHTML = getTreeStatusHtml(aboutActive);
+  if (docsEl) docsEl.innerHTML = getTreeStatusHtml(docsActive);
+  if (contentEl) contentEl.innerHTML = getTreeStatusHtml(contentActive);
 
   // Still compute activeCount for the count badge
   const aiFilesList = [
@@ -3301,7 +3309,7 @@ const tooltipExplanationData = {
   'authorityStatus': {
     title: 'Authority Status (authorityStatus)',
     icon: '👑',
-    body: '<p>Reflects the overall authority rating of a domain. Represents: <strong>Optimized Anchor</strong> (strong trust signal profile), <strong>Information Isolation</strong> (partial trust with isolated elements), or <strong>Abstention Risk</strong> (critical risk or blanket disallows).</p>'
+    body: `<strong>Understanding Page vs. Site-Level E-E-A-T:</strong><br/> Generative AI evaluates your Experience, Expertise, Authoritativeness, and Trustworthiness on two levels. <em>Page-level</em> looks at the specific content's depth and authorship. <em>Site-level</em> looks at your domain's historical authority and backlink profile. <br/><br/> <a href='#' onclick="showUpgradeModal('AIO_PRO_EEAT', 'Review your Page and Site-level EEAT signals in-depth', 'AIOptimize Pro'); return false;" style='color: var(--primary-accent); font-weight: bold;'>⚡ Upgrade to AIOptimize Pro to review your E-E-A-T in-depth ↗</a>`
   },
   'manifest_robots': {
     title: 'robots.txt (Permissions Verification)',

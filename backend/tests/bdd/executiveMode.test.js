@@ -403,12 +403,12 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     const subheading = card.find('p');
     expect(subheading.text().trim()).toContain('Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.');
 
-    // 2. <details> and <summary> presence
+    // 2. Tree container and title presence (accordion details/summary removed)
     const details = card.find('details');
-    expect(details.length).toBe(1);
+    expect(details.length).toBe(0);
 
-    const summary = details.find('summary');
-    expect(summary.text().trim()).toBe('The 4-level file heirarchy for AI-Readiness');
+    const treeContainer = card.find('div:contains("The 4-level file heirarchy for AI-Readiness")');
+    expect(treeContainer.length).toBeGreaterThan(0);
 
     // 3. Spans for the tree
     expect($('#exec-status-robots').length).toBe(1);

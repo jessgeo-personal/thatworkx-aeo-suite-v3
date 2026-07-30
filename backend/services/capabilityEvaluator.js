@@ -1227,18 +1227,10 @@ function evaluateCapabilities(crawledData = {}) {
     ? crawledData.eeatMetrics.hasPrivacyPolicy
     : (sec3.hasPrivacyPolicy !== false);
 
-  const ageEstimate = crawledData.eeatMetrics?.ageEstimate || sec3.ageEstimate || '2 years 8 months';
+  const results = crawledData;
+  const ageEstimate = results.eeatMetrics?.ageEstimate || sec3.ageEstimate || results.domainAge || "Pending WHOIS Integration";
 
-  let authorityStatus = crawledData.eeatMetrics?.authorityStatus;
-  if (!authorityStatus) {
-    if (isBlanketBlock || overallScore < 50) {
-      authorityStatus = 'Abstention Risk';
-    } else if (overallScore >= 80) {
-      authorityStatus = 'Optimized Anchor';
-    } else {
-      authorityStatus = 'Information Isolation';
-    }
-  }
+  let authorityStatus = results.eeatMetrics?.authorityStatus || results.authorityStatus || "Requires Ahrefs/Moz API";
 
   let diagnosticSummary = crawledData.eeatMetrics?.diagnosticSummary;
   if (!diagnosticSummary) {
@@ -1246,10 +1238,13 @@ function evaluateCapabilities(crawledData = {}) {
       diagnosticSummary = 'Domain exhibits strong E-E-A-T trust signals with valid SSL security, verified contact information, active privacy policy, and established domain age authority.';
     } else if (authorityStatus === 'Information Isolation') {
       diagnosticSummary = 'Domain shows partial E-E-A-T trust credentials. Essential contact or privacy policies are partially isolated from search AI crawlers.';
+    } else if (authorityStatus === 'Requires Ahrefs/Moz API') {
+      diagnosticSummary = 'Domain authority status evaluation is pending Ahrefs/Moz API integration.';
     } else {
       diagnosticSummary = 'Domain presents E-E-A-T abstention risk. Security protocols or total AI disallow rules prevent LLMs from trusting entity authority.';
     }
   }
+
 
   const eeatMetrics = {
     isSecure,

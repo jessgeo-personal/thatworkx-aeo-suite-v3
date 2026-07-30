@@ -105,7 +105,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
   });
 
@@ -142,7 +142,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
 
     expect(res).toHaveProperty('emailValue');
