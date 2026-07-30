@@ -341,10 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Page 2: AI Visualize Dashboard (visualize.html or /visualize)
   if (currentPath.includes('visualize')) {
     const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+    const devManifestTreeWrap = document.getElementById('dev-manifest-tree-wrapper');
     const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
     const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
-    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevManifestTreeHtml() + buildDevMatrixHtml();
+    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
+    if (devManifestTreeWrap) devManifestTreeWrap.innerHTML = buildDevManifestTreeHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
 
@@ -1109,7 +1111,7 @@ function renderDeveloperMatrixRows(capabilities) {
       <tr data-section="${cap.section}">
         <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
         <td>
-          <strong>${cap.name || cap.title}</strong>
+          <strong>${cap.name || cap.title}</strong> <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_cap_${cap.id}')" style="cursor: pointer; margin-left: 0.2rem;">(?)</span>
           <div style="font-size: 0.75rem; color: var(--text-muted);">${cap.description || cap.impact}</div>
         </td>
         <td><span class="dev-cat-badge">${cap.category}</span></td>
@@ -3475,7 +3477,26 @@ function openHelpTooltip(key, evt) {
     if (typeof evt.preventDefault === 'function') evt.preventDefault();
     if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
   }
-  const data = tooltipExplanationData[key] || helpContent[key];
+  let data = tooltipExplanationData[key] || helpContent[key];
+  if (!data) {
+    if (key === 'diy_cap_xRobotsTag' || key === 'diy_cap_xRobotsTagHeaders') {
+      data = {
+        title: 'X-Robots-Tag Headers',
+        icon: '🛡️',
+        body: "<strong>X-Robots-Tag Headers:</strong><br/> This is a hidden HTTP response header sent by your server. Unlike robots.txt which acts as a suggestion, the X-Robots-Tag is an absolute directive. If this is set to 'noindex' or 'none', AI web crawlers will instantly drop the connection and refuse to ingest your site, regardless of how good your content is."
+      };
+    } else if (key.startsWith('diy_cap_')) {
+      const capId = key.replace('diy_cap_', '');
+      const cap = window.CAPABILITY_MATRIX ? window.CAPABILITY_MATRIX.find(c => c.id === capId) : null;
+      const title = cap ? (cap.name || cap.title) : capId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+      const desc = cap ? (cap.description || cap.impact) : 'Technical capability audit parameter check for AI search compliance.';
+      data = {
+        title: title,
+        icon: '🛠️',
+        body: `<strong>${title}:</strong><br/> ${desc}<br/><br/>This check measures technical compliance with generative AI crawler rules and indexing standards.`
+      };
+    }
+  }
   if (!data) return;
   const titleEl = document.getElementById('help-modal-title');
   const iconEl = document.getElementById('help-modal-icon');
