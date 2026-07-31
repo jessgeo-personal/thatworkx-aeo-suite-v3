@@ -17,7 +17,7 @@ let activeVisualizeViewMode = 'executive'; // Default active state: Executive Mo
 let currentEmail = 'user@thatworkx.com'; // Default user session email
 let activeScanController = null;
 let latestScanResults = null;
-let activeDiyManifestKey = 'jsonld';
+let activeDiyManifestKey = 'robots';
 
 // Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
 const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) 
@@ -172,7 +172,213 @@ function buildDevMatrixHtml() {
   `;
 }
 
+function getFileStatus(fileKey, results = {}) {
+  const status = results.status || {};
+  const botPerms = status.botPermissions || {};
+  
+  let exists = false;
+  
+  if (fileKey === 'robots') {
+    exists = !!status.robotsTxtExists;
+  } else if (fileKey === 'llms') {
+    exists = !!status.llmsTxtExists;
+  } else if (fileKey === 'aicontext') {
+    exists = !!status.aiContextExists;
+  } else if (fileKey === 'sitemap') {
+    exists = !!status.sitemapExists;
+  } else if (fileKey === 'readme') {
+    exists = !!status.readmeFound;
+  } else if (fileKey === 'about') {
+    exists = !!status.aboutTxtExists;
+  } else if (fileKey === 'docs') {
+    exists = !!status.docsTxtExists;
+  } else if (fileKey === 'content') {
+    exists = !!status.contentTxtExists;
+  } else if (fileKey === 'jsonld') {
+    exists = !!status.jsonLdExists;
+  }
+
+  if (!exists) {
+    return {
+      state: 'missing',
+      label: 'Action Needed: File Missing',
+      icon: '✕',
+      color: '#f43f5e',
+      bgColor: 'rgba(244, 63, 94, 0.1)'
+    };
+  }
+
+  // Check if it's robots.txt and any bot is blocked
+  if (fileKey === 'robots') {
+    const botsBlocked = botPerms && (botPerms.gptBot === false || botPerms.perplexityBot === false || botPerms.claudeBot === false || botPerms.googleExtended === false);
+    if (botsBlocked) {
+      return {
+        state: 'needs_fix',
+        label: 'Action Needed: Optimization Required',
+        icon: '⚠️',
+        color: '#fbbf24',
+        bgColor: 'rgba(251, 191, 36, 0.1)'
+      };
+    }
+  }
+
+  return {
+    state: 'valid',
+    label: 'File Active & Present',
+    icon: '✓',
+    color: '#34d399',
+    bgColor: 'rgba(52, 211, 153, 0.1)'
+  };
+}
+
+function getManifestMetadata(fileKey, domain, results = {}) {
+  const status = results.status || {};
+  const routes = results.discoveredRoutes || results.scannedPages || [];
+  const routeCount = routes.length || 0;
+  
+  const metadata = {
+    robots: {
+      title: 'robots.txt Search Gatekeeper',
+      description: 'Configures crawl permissions and search exclusions for AI search crawlers and traditional search engines.',
+      setupTime: '1 minute'
+    },
+    llms: {
+      title: 'llms.txt Directory Index',
+      description: 'Serves as a high-level table of contents and discovery map for LLM crawlers seeking site context.',
+      setupTime: '1 minute'
+    },
+    aicontext: {
+      title: 'ai-context.md System Context Map',
+      description: 'Provides a flattened markdown context blueprint, structured schemas, and RAG prompt guardrails.',
+      setupTime: '1 minute'
+    },
+    sitemap: {
+      title: 'sitemap.xml Route Directory',
+      description: 'Lists all canonical URL paths to ensure complete and structured indexing of your site pages.',
+      setupTime: '1 minute'
+    },
+    readme: {
+      title: 'README.md Portal Summary',
+      description: 'A concise 30-second summary and landing introduction designed for rapid agent ingestion.',
+      setupTime: '1 minute'
+    },
+    about: {
+      title: 'about.md Corporate Profile',
+      description: 'Verifies E-E-A-T credentials, leadership backgrounds, and organization entity connections.',
+      setupTime: '1 minute'
+    },
+    docs: {
+      title: 'docs.md Technical Documentation',
+      description: 'Exposes flattened API references, configuration parameters, and developer integration guides.',
+      setupTime: '1 minute'
+    },
+    content: {
+      title: 'content.md Subject Authority Index',
+      description: 'Indexes deep-dive articles, case study proof points, and corporate authority matrices.',
+      setupTime: '1 minute'
+    },
+    jsonld: {
+      title: 'JSON-LD Structured Schema',
+      description: 'Injects machine-readable organization and corporate metadata directly into the HTML header.',
+      setupTime: '1 minute'
+    }
+  };
+
+  const meta = metadata[fileKey] || metadata.llms;
+  const fileStatus = getFileStatus(fileKey, results);
+  
+  // Format Live status
+  let filename = '';
+  if (fileKey === 'robots') filename = 'robots.txt';
+  else if (fileKey === 'sitemap') filename = 'sitemap.xml';
+  else if (fileKey === 'aicontext') filename = 'ai-context.md';
+  else if (fileKey === 'jsonld') filename = 'JSON-LD Schema';
+  else if (fileKey === 'llms') filename = 'llms.txt';
+  else if (fileKey === 'readme') filename = 'README.md';
+  else filename = `${fileKey}.md`;
+
+  let liveContent = '';
+  if (fileKey === 'robots') liveContent = status.robotsTxtContent || '';
+  else if (fileKey === 'llms') liveContent = status.llmsTxtContent || '';
+  else if (fileKey === 'aicontext') {
+    const manifestPreviews = results.manifestPreviews || {};
+    liveContent = manifestPreviews.aiContext || status.aiContextContent || '';
+  } else if (fileKey === 'sitemap') liveContent = status.sitemapContent || '';
+  else if (fileKey === 'readme') liveContent = status.readmeContent || '';
+  else if (fileKey === 'about') {
+    const manifestPreviews = results.manifestPreviews || {};
+    liveContent = manifestPreviews.about || status.aboutTxtContent || '';
+  } else if (fileKey === 'docs') liveContent = status.docsTxtContent || status.docsContent || '';
+  else if (fileKey === 'content') liveContent = status.contentTxtContent || status.contentContent || '';
+  else if (fileKey === 'jsonld') liveContent = status.jsonLdSchemaContent || status.jsonLdContent || '';
+
+  let liveStatusText = '';
+  if (fileStatus.state === 'missing') {
+    liveStatusText = `No existing /${filename} file found on web server`;
+  } else {
+    const charCount = liveContent ? liveContent.length : 0;
+    liveStatusText = `Live /${filename} file detected (${charCount} chars)`;
+  }
+
+  return {
+    ...meta,
+    filename,
+    state: fileStatus.state,
+    statusLabel: fileStatus.label,
+    statusColor: fileStatus.color,
+    statusIcon: fileStatus.icon,
+    liveStatusText,
+    domain,
+    routeCount
+  };
+}
+
 function buildDevDrawersHtml(domainName = '') {
+  const domain = domainName || currentScannedDomain || 'example.com';
+  const results = latestScanResults || window.lastScanResults || {};
+  
+  const manifestFiles = [
+    { key: 'robots', name: 'robots.txt' },
+    { key: 'llms', name: 'llms.txt' },
+    { key: 'aicontext', name: 'ai-context.md' },
+    { key: 'sitemap', name: 'sitemap.xml' },
+    { key: 'readme', name: 'README.md' },
+    { key: 'about', name: 'about.md' },
+    { key: 'docs', name: 'docs.md' },
+    { key: 'content', name: 'content.md' }
+  ];
+
+  if (activeDiyManifestKey === 'jsonld') {
+    activeDiyManifestKey = 'robots';
+  }
+  if (activeDrawerKey === 'jsonld') {
+    activeDrawerKey = 'robots';
+  }
+
+  const tabsHtml = manifestFiles.map(file => {
+    const fileStatus = getFileStatus(file.key, results);
+    const isActive = activeDiyManifestKey === file.key;
+    
+    let icon = '✕';
+    let iconColor = 'var(--badge-fail, #f43f5e)';
+    if (fileStatus.state === 'valid') {
+      icon = '✓';
+      iconColor = 'var(--badge-pass, #34d399)';
+    } else if (fileStatus.state === 'needs_fix') {
+      icon = '⚠️';
+      iconColor = 'var(--badge-warning, #fbbf24)';
+    }
+
+    return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+      <span style="color: ${iconColor}; font-weight: bold;">${icon}</span>
+      <span>${file.name}</span>
+    </button>`;
+  }).join('');
+
+  setTimeout(() => {
+    switchDiyManifestTab(activeDiyManifestKey);
+  }, 0);
+
   return `
     <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -186,42 +392,18 @@ function buildDevDrawersHtml(domainName = '') {
       </div>
 
       <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <button type="button" class="drawer-tab-btn control-menu-item active" onclick="switchDiyManifestTab('jsonld')">JSON-LD Schema</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('robots')">robots.txt</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('llms')">llms.txt</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('sitemap')">sitemap.xml</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('aicontext')">ai-context.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('readme')">README.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('about')">about.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('docs')">docs.md</button>
-        <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')">content.md</button>
+        ${tabsHtml}
       </div>
 
       <div style="display: flex; gap: 20px; align-items: stretch;">
         <!-- Left Pane (50% width) -->
-        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
-            <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
-          </div>
-          <div style="flex-grow: 1;">
-            <pre id="left-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</pre>
-          </div>
+        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="left-pane-content">
+          <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
 
         <!-- Right Pane (50% width) -->
-        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
-            <div id="right-pane-header-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_jsonld_guide')">(?)</span></div>
-            <div style="display: flex; gap: 8px;">
-              <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Copy Code</button>
-              <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Download as File</button>
-            </div>
-          </div>
-          <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--badge-fail-bg); margin-bottom: 12px; text-align: left;">⚠️ Please Verify Scraped data before publishing</div>
-          <div style="flex-grow: 1;">
-            <pre id="right-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></pre>
-          </div>
-          <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem;">To manage this file actively, Upgrade to AI Optimize ↗</a>
+        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="right-pane-container">
+          <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
       </div>
     </div>
@@ -1201,7 +1383,7 @@ function filterMatrixSection(section) {
   }
 }
 
-let activeDrawerKey = 'jsonld';
+let activeDrawerKey = 'robots';
 
 function getDynamicDrawerTemplates(domainName, results = {}) {
   const targetUrl = `https://${domainName}`;
@@ -1454,16 +1636,6 @@ function switchDiyManifestTab(fileKey) {
   activeDiyManifestKey = fileKey;
   activeDrawerKey = fileKey;
   
-  // Update active tab styling
-  const buttons = document.querySelectorAll('.drawer-tab-btn');
-  buttons.forEach(b => {
-    b.classList.remove('active');
-    const onclickVal = b.getAttribute('onclick') || '';
-    if (onclickVal.includes(`'${fileKey}'`) || onclickVal.includes(`"${fileKey}"`)) {
-      b.classList.add('active');
-    }
-  });
-
   const domain = currentScannedDomain || 'example.com';
   const results = latestScanResults || window.lastScanResults || {};
   const status = results.status || {};
@@ -1472,46 +1644,120 @@ function switchDiyManifestTab(fileKey) {
   const templates = getDynamicDrawerTemplates(domain, results);
   const fileInfo = templates[fileKey] || templates.llms;
 
-  // Bind Left Window: Live Site Content (Scraped)
-  let liveContent = '';
-  if (fileKey === 'jsonld') {
-    liveContent = status.jsonLdSchemaContent || status.jsonLdContent || '';
-  } else if (fileKey === 'robots') {
-    liveContent = status.robotsTxtContent || '';
-  } else if (fileKey === 'llms') {
-    liveContent = status.llmsTxtContent || '';
-  } else if (fileKey === 'sitemap') {
-    liveContent = status.sitemapContent || '';
-  } else if (fileKey === 'aicontext') {
-    liveContent = manifestPreviews.aiContext || status.aiContextContent || '';
-  } else if (fileKey === 'readme') {
-    liveContent = status.readmeContent || '';
-  } else if (fileKey === 'about') {
-    liveContent = manifestPreviews.about || status.aboutTxtContent || '';
-  } else if (fileKey === 'docs') {
-    liveContent = status.docsTxtContent || status.docsContent || '';
-  } else if (fileKey === 'content') {
-    liveContent = status.contentTxtContent || status.contentContent || '';
+  // Render and update tabs dynamically to ensure proper status icons
+  const manifestFiles = [
+    { key: 'robots', name: 'robots.txt' },
+    { key: 'llms', name: 'llms.txt' },
+    { key: 'aicontext', name: 'ai-context.md' },
+    { key: 'sitemap', name: 'sitemap.xml' },
+    { key: 'readme', name: 'README.md' },
+    { key: 'about', name: 'about.md' },
+    { key: 'docs', name: 'docs.md' },
+    { key: 'content', name: 'content.md' }
+  ];
+
+  const tabsContainer = document.querySelector('.drawer-file-tabs');
+  if (tabsContainer) {
+    tabsContainer.innerHTML = manifestFiles.map(file => {
+      const fileStatus = getFileStatus(file.key, results);
+      const isActive = activeDiyManifestKey === file.key;
+      
+      let icon = '✕';
+      let iconColor = '#f43f5e';
+      if (fileStatus.state === 'valid') {
+        icon = '✓';
+        iconColor = '#34d399';
+      } else if (fileStatus.state === 'needs_fix') {
+        icon = '⚠️';
+        iconColor = '#fbbf24';
+      }
+
+      return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+        <span style="color: ${iconColor}; font-weight: bold;">${icon}</span>
+        <span>${file.name}</span>
+      </button>`;
+    }).join('');
   }
 
+  // Bind Left Window: Summary Card (File Context & Diagnostics)
   const leftPane = document.getElementById('left-pane-content');
   if (leftPane) {
-    if (liveContent && liveContent.trim().length > 0) {
-      leftPane.innerText = liveContent;
-      leftPane.style.color = 'var(--text-main)';
-    } else {
-      leftPane.innerText = 'No live content detected.';
-      leftPane.style.color = 'var(--text-muted, #64748b)';
+    const meta = getManifestMetadata(fileKey, domain, results);
+    
+    leftPane.innerHTML = `
+      <div style="display: flex; flex-direction: column; height: 100%; text-align: left;">
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start;">
+          <span style="font-size: 0.75rem; background: ${meta.state === 'valid' ? 'rgba(52, 211, 153, 0.1)' : meta.state === 'needs_fix' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; border: 1px solid ${meta.statusColor}; color: ${meta.statusColor}; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;">
+            <span>${meta.statusIcon}</span> ${meta.statusLabel}
+          </span>
+        </div>
+        
+        <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.5rem 0;">${meta.title}</h5>
+        <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); line-height: 1.45; margin: 0 0 1.25rem 0;">${meta.description}</p>
+        
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+          <h6 style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted, #94a3b8); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0;">Live Scan Summary</h6>
+          <ul style="font-size: 0.85rem; color: var(--text-main, #cbd5e1); line-height: 1.6; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.4rem;">
+            <li>Scraped target domain: <span style="font-family: var(--font-mono); color: #38bdf8;">${meta.domain}</span></li>
+            <li>Discovered route count: <span style="font-weight: 600; color: var(--text-primary, #ffffff);">${meta.routeCount} pages</span></li>
+            <li>Live status: <span style="color: ${meta.statusColor}; font-weight: 500;">${meta.liveStatusText}</span></li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
+          <span>⏱️ Est. Setup: <strong>${meta.setupTime}</strong></span>
+          <span style="color: var(--badge-pass, #34d399); font-weight: 500;">Halfway to AI-Ready 🎉</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Bind Right Window: Solution & Action
+  const rightContainer = document.getElementById('right-pane-container');
+  if (rightContainer) {
+    const meta = getManifestMetadata(fileKey, domain, results);
+    rightContainer.innerHTML = `
+      <div style="display: flex; flex-direction: column; height: 100%; text-align: left;">
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start;">
+          <span class="badge-status status-green" style="font-size: 0.75rem; background: rgba(52, 211, 153, 0.1); border: 1px solid var(--badge-pass, #34d399); color: var(--badge-pass, #34d399); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700;">Baseline Ready</span>
+        </div>
+        <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.5rem 0;">Deploy Your Optimized File</h5>
+        <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.25rem;">Live site data was synthesized into an optimized baseline below.</p>
+        
+        <!-- Primary Action Buttons -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            <span>📥</span> Download ${meta.filename}
+          </button>
+          <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: var(--text-primary, #ffffff); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+            <span>📋</span> Copy Code
+          </button>
+        </div>
+
+        <!-- Deployment Helper Banner -->
+        <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+          💡 <strong>How to publish:</strong> Save this file and upload it directly to your website's main root folder (e.g., <span style="font-family: var(--font-mono); color: #38bdf8;">https://${domain}/${meta.filename}</span>).
+        </div>
+
+        <!-- Progressive Disclosure (Hidden Code Viewer) -->
+        <details style="margin-top: auto;">
+          <summary style="font-size: 0.82rem; color: #38bdf8; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.25rem; user-select: none;">
+            View generated code & placeholders ▾
+          </summary>
+          <pre id="right-pane-content" style="margin-top: 0.75rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left;"></pre>
+        </details>
+        
+        <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem;">To manage this file actively, Upgrade to AI Optimize ↗</a>
+      </div>
+    `;
+    
+    const rightPane = document.getElementById('right-pane-content');
+    if (rightPane) {
+      rightPane.innerText = fileInfo.content || '';
     }
   }
 
-  // Bind Right Window: AEO Suite Optimized Baseline
-  const rightPane = document.getElementById('right-pane-content');
-  if (rightPane) {
-    rightPane.innerText = fileInfo.content || '';
-  }
-
-  // Update Right Pane Header Title dynamically with guide tooltip for jsonld
+  // Update Right Pane Header Title dynamically (left for backcompat if needed)
   const rightHeader = document.getElementById('right-pane-header-title');
   if (rightHeader) {
     if (fileKey === 'jsonld') {
@@ -1606,8 +1852,16 @@ function downloadBaselineCode() {
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   
-  const isJsonLd = (activeDiyManifestKey === 'jsonld' || activeDrawerKey === 'jsonld');
-  const filename = isJsonLd ? 'aeo-optimized-baseline.json' : 'aeo-optimized-baseline.txt';
+  const fileKey = activeDiyManifestKey || activeDrawerKey || 'llms';
+  let filename = 'llms.txt';
+  if (fileKey === 'robots') filename = 'robots.txt';
+  else if (fileKey === 'aicontext') filename = 'ai-context.md';
+  else if (fileKey === 'sitemap') filename = 'sitemap.xml';
+  else if (fileKey === 'readme') filename = 'README.md';
+  else if (fileKey === 'about') filename = 'about.md';
+  else if (fileKey === 'docs') filename = 'docs.md';
+  else if (fileKey === 'content') filename = 'content.md';
+  else if (fileKey === 'jsonld') filename = 'aeo-optimized-baseline.json';
   
   const a = document.createElement('a');
   a.href = url;

@@ -831,41 +831,93 @@
           </div>
 
           <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
-            <button type="button" class="drawer-tab-btn control-menu-item active" onclick="switchDiyManifestTab('jsonld')">JSON-LD Schema</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('robots')">robots.txt</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('llms')">llms.txt</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('sitemap')">sitemap.xml</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('aicontext')">ai-context.md</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('readme')">README.md</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('about')">about.md</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('docs')">docs.md</button>
-            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')">content.md</button>
+            <button type="button" class="drawer-tab-btn control-menu-item active" onclick="switchDiyManifestTab('robots')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>robots.txt</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('llms')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>llms.txt</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('aicontext')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>ai-context.md</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('sitemap')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>sitemap.xml</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('readme')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>README.md</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('about')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>about.md</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('docs')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>docs.md</span>
+            </button>
+            <button type="button" class="drawer-tab-btn control-menu-item" onclick="switchDiyManifestTab('content')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span style="color: #f43f5e; font-weight: bold;">✕</span>
+              <span>content.md</span>
+            </button>
           </div>
 
           <div style="display: flex; gap: 20px; align-items: stretch;">
             <!-- Left Pane (50% width) -->
-            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
-                <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Live Site Content (Scraped)</span>
-              </div>
-              <div style="flex-grow: 1;">
-                <pre id="left-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);">No live content detected.</pre>
+            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="left-pane-content">
+              <div style="display: flex; flex-direction: column; height: 100%;">
+                <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start;">
+                  <span style="font-size: 0.75rem; background: rgba(244, 63, 94, 0.1); border: 1px solid #f43f5e; color: #f43f5e; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;">
+                    <span>✕</span> Action Needed: File Missing
+                  </span>
+                </div>
+                <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0;">robots.txt Search Gatekeeper</h5>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 1.25rem 0;">Configures crawl permissions and search exclusions for AI search crawlers and traditional search engines.</p>
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                  <h6 style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0;">Live Scan Summary</h6>
+                  <ul style="font-size: 0.85rem; color: var(--text-main); line-height: 1.6; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <li>Scraped target domain: <span style="font-family: var(--font-mono); color: #38bdf8;">example.com</span></li>
+                    <li>Discovered route count: <span style="font-weight: 600; color: var(--text-primary);">0 pages</span></li>
+                    <li>Live status: <span style="color: #f43f5e; font-weight: 500;">No existing /robots.txt found on web server</span></li>
+                  </ul>
+                </div>
+                <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted);">
+                  <span>⏱️ Est. Setup: <strong>1 minute</strong></span>
+                  <span style="color: var(--badge-pass, #34d399); font-weight: 500;">Halfway to AI-Ready 🎉</span>
+                </div>
               </div>
             </div>
 
             <!-- Right Pane (50% width) -->
-            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column;">
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
-                <div id="right-pane-header-title" style="font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">AEO Suite Optimized Baseline <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_jsonld_guide')">(?)</span></div>
-                <div style="display: flex; gap: 8px;">
-                  <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Copy Code</button>
-                  <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 4px 12px; font-size: 0.8rem; background: #ffffff; color: #1e293b; border: 1px solid #ffffff; font-family: var(--font-mono); font-weight: 600; cursor: pointer;">Download as File</button>
-                </div>
+            <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="right-pane-container">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span class="badge-status status-green" style="font-size: 0.75rem; background: rgba(52, 211, 153, 0.1); border: 1px solid var(--badge-pass, #34d399); color: var(--badge-pass, #34d399); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700;">Baseline Ready</span>
               </div>
-              <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--badge-fail-bg); margin-bottom: 12px; text-align: left;">⚠️ Please Verify Scraped data before publishing</div>
-              <div style="flex-grow: 1;">
-                <pre id="right-pane-content" style="margin: 0; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-main);"></pre>
+              <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0;">Deploy Your Optimized File</h5>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Live site data was synthesized into an optimized baseline below.</p>
+              
+              <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+                <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>📥</span> Download robots.txt
+                </button>
+                <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: var(--text-primary, #ffffff); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>📋</span> Copy Code
+                </button>
               </div>
+
+              <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+                💡 <strong>How to publish:</strong> Save this file and upload it directly to your website's main root folder (e.g., <span style="font-family: var(--font-mono); color: #38bdf8;">https://example.com/robots.txt</span>).
+              </div>
+
+              <details style="margin-top: auto;">
+                <summary style="font-size: 0.82rem; color: #38bdf8; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.25rem; user-select: none;">
+                  View generated code & placeholders ▾
+                </summary>
+                <pre id="right-pane-content" style="margin-top: 0.75rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left;"></pre>
+              </details>
               <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem;">To manage this file actively, Upgrade to AI Optimize ↗</a>
             </div>
           </div>
