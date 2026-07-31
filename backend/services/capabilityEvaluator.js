@@ -585,6 +585,26 @@ const CAPABILITY_MATRIX = [
     }
   },
   {
+    id: 'llmsTxtSpecCompliance',
+    section: 4,
+    sectionName: 'Machine Manifest Readiness',
+    name: '/llms.txt Standard Specification Compliance',
+    category: 'Manifests',
+    description: 'Validates Answer.ai markdown format compliance.',
+    impact: 'Standard-compliant markdown formatting ensures parseability by open-source RAG frameworks.',
+    evaluate: (data = {}) => {
+      const exists = data.status?.llmsTxtExists ?? data.sec4?.llmsTxtFound ?? false;
+      return {
+        status: exists ? 'active' : 'warning',
+        score: exists ? 100 : 30,
+        details: exists ? 'H1 Title, H2 Sections, and markdown links compliant' : 'Non-compliant or missing /llms.txt format',
+        deductionReason: exists ? '🟢 No deductions — All protocols clean.' : 'Non-compliant or missing /llms.txt Answer.ai format (-70 pts)',
+        impact: 'Standard-compliant markdown formatting ensures parseability by open-source RAG frameworks.',
+        recommendation: 'Format /llms.txt with standard H1 title, blockquote, and section links.'
+      };
+    }
+  },
+  {
     id: 'jsonLdSchema',
     section: 4,
     sectionName: 'Machine Manifest Readiness',
@@ -740,26 +760,6 @@ const CAPABILITY_MATRIX = [
       impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
       recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
     })
-  },
-  {
-    id: 'llmsTxtSpecCompliance',
-    section: 4,
-    sectionName: 'Machine Manifest Readiness',
-    name: '/llms.txt Standard Specification Compliance',
-    category: 'Manifests',
-    description: 'Validates Answer.ai markdown format compliance.',
-    impact: 'Standard-compliant markdown formatting ensures parseability by open-source RAG frameworks.',
-    evaluate: (data = {}) => {
-      const exists = data.status?.llmsTxtExists ?? data.sec4?.llmsTxtFound ?? false;
-      return {
-        status: exists ? 'active' : 'warning',
-        score: exists ? 100 : 30,
-        details: exists ? 'H1 Title, H2 Sections, and markdown links compliant' : 'Non-compliant or missing /llms.txt format',
-        deductionReason: exists ? '🟢 No deductions — All protocols clean.' : 'Non-compliant or missing /llms.txt Answer.ai format (-70 pts)',
-        impact: 'Standard-compliant markdown formatting ensures parseability by open-source RAG frameworks.',
-        recommendation: 'Format /llms.txt with standard H1 title, blockquote, and section links.'
-      };
-    }
   }
 ];
 

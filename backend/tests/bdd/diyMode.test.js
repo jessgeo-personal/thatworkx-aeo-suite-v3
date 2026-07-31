@@ -483,6 +483,30 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(/AI-first/i.test(content)).toBe(false);
   });
 
+  it('Scenario M: Verify that renderDeveloperMatrixRows cleans raw HTML tag names into inline <code> tags', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    // Verify presence of the code-replacing/escaping logic
+    expect(jsContent).toContain('cleanDescription = cleanDescription.replace(/<([a-zA-Z0-9]+)>/g, \'<code>$1</code>\')');
+    expect(jsContent).toContain('cleanDetails = cleanDetails.replace(/<([a-zA-Z0-9]+)>/g, \'<code>$1</code>\')');
+    
+    // Simulate the regex execution
+    const regex = /<([a-zA-Z0-9]+)>/g;
+    const testDesc = 'Presence of <article>, <section>, <header>, <nav>, <main>.';
+    const testDetails = 'Found 4/5 semantic HTML tags (<main>, <article>, <section>, <header>, <nav>)';
+
+    const cleanDesc = testDesc.replace(regex, '<code>$1</code>');
+    const cleanDet = testDetails.replace(regex, '<code>$1</code>');
+
+    expect(cleanDesc).toBe('Presence of <code>article</code>, <code>section</code>, <code>header</code>, <code>nav</code>, <code>main</code>.');
+    expect(cleanDet).toBe('Found 4/5 semantic HTML tags (<code>main</code>, <code>article</code>, <code>section</code>, <code>header</code>, <code>nav</code>)');
+  });
+
 });
+
 
 

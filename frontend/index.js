@@ -1116,17 +1116,24 @@ function renderDeveloperMatrixRows(capabilities) {
       actionHtml = `<button type="button" class="badge-status status-amber" onclick="showUpgradeModal('PRO_REQUIRED', '${proHook.msg}', '${proHook.tier}')" style="border: none; cursor: pointer; padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700;">${proHook.label}</button>`;
     }
 
+    // Fix unescaped HTML tags rendering bug:
+    // Render tag names cleanly without raw angle brackets inside inline <code> tags
+    let cleanDescription = cap.description || cap.impact || '';
+    let cleanDetails = cap.deductionReason || cap.details || '';
+    cleanDescription = cleanDescription.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
+    cleanDetails = cleanDetails.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
+
     rowsHtml += `
       <tr data-section="${cap.section}">
         <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
         <td>
           <strong>${cap.name || cap.title}</strong> <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_cap_${cap.id}')" style="cursor: pointer; margin-left: 0.2rem;">(?)</span>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${cap.description || cap.impact}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${cleanDescription}</div>
         </td>
         <td><span class="dev-cat-badge">${cap.category}</span></td>
         <td>${statusBadge}</td>
         <td style="font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
-        <td style="font-size: 0.8rem; color: var(--text-main);">${cap.deductionReason || cap.details}</td>
+        <td style="font-size: 0.8rem; color: var(--text-main);">${cleanDetails}</td>
         <td style="text-align: right;">${actionHtml}</td>
       </tr>
     `;

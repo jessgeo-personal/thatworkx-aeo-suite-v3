@@ -477,6 +477,23 @@ export const CAPABILITY_MATRIX = [
     }
   },
   {
+    id: 'llmsTxtSpecCompliance',
+    section: 4,
+    sectionName: 'Are You Setup to be AI-Ready?',
+    name: '/llms.txt Standard Specification Compliance',
+    category: 'Manifests',
+    description: 'Validates Answer.ai markdown format compliance.',
+    evaluate: (data = {}) => {
+      const exists = data.status?.llmsTxtExists ?? data.sec4?.llmsTxtFound ?? false;
+      return {
+        status: exists ? 'pass' : 'warning',
+        score: exists ? 100 : 30,
+        details: exists ? 'H1 Title, H2 Sections, and markdown links compliant' : 'Non-compliant or missing /llms.txt format',
+        recommendation: 'Format /llms.txt with standard H1 title, blockquote, and section links.'
+      };
+    }
+  },
+  {
     id: 'jsonLdSchema',
     section: 4,
     sectionName: 'Are You Setup to be AI-Ready?',
@@ -602,23 +619,6 @@ export const CAPABILITY_MATRIX = [
       details: 'Discovered routes match sitemap index entries',
       recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
     })
-  },
-  {
-    id: 'llmsTxtSpecCompliance',
-    section: 4,
-    sectionName: 'Are You Setup to be AI-Ready?',
-    name: '/llms.txt Standard Specification Compliance',
-    category: 'Manifests',
-    description: 'Validates Answer.ai markdown format compliance.',
-    evaluate: (data = {}) => {
-      const exists = data.status?.llmsTxtExists ?? data.sec4?.llmsTxtFound ?? false;
-      return {
-        status: exists ? 'pass' : 'warning',
-        score: exists ? 100 : 30,
-        details: exists ? 'H1 Title, H2 Sections, and markdown links compliant' : 'Non-compliant or missing /llms.txt format',
-        recommendation: 'Format /llms.txt with standard H1 title, blockquote, and section links.'
-      };
-    }
   }
 ];
 
