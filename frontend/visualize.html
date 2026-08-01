@@ -329,23 +329,23 @@
       </div>
 
       <!-- Section 1 Card: Gateway & Access Detail Card -->
-      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         
-        <!-- a) Title & Subheading -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+        <!-- Section Container Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
           <div>
-            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-              <span>1. Can AI see your website?</span>
-              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span>Section 1: Can AI see your website?</span>
+              <span style="display:none;">1. Can AI see your website?</span>
+              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
             </h4>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
-              Verify search and AI crawler protocols and discovered routes for your web presence.
-            </p>
+            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
           </div>
+          <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Crawlability &amp; Indexing</span>
         </div>
 
         <!-- Protocol Flags -->
-        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-sans), sans-serif;">
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
@@ -370,12 +370,12 @@
         </div>
 
         <!-- Scanned/Discovered webpages Table Block -->
-        <div style="margin-top: 1.5rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <h5 style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0;" id="exec-routes-subheader">
+        <div style="margin-top: 1.5rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-sans), sans-serif;">
+            <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0; font-family: var(--font-sans), sans-serif;" id="exec-routes-subheader">
               Scanned/Discovered webpages (<span id="exec-routes-count">Crawled 0 of 0 pages discovered</span>)
             </h5>
-            <a href="?mode=developer" class="upgrade-pro-btn" style="float: right; margin-bottom: 10px; font-weight: bold; color: var(--primary-accent); text-decoration: underline;">Upgrade to Pro for fixes ↗</a>
+            <a href="?mode=developer" class="upgrade-pro-btn" style="font-weight: bold; color: var(--primary-accent); text-decoration: underline; font-family: var(--font-sans), sans-serif;">Upgrade to Pro for fixes ↗</a>
           </div>
           <div class="table-responsive-wrapper" style="max-height: 340px; overflow-y: auto;">
             <table class="exec-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
@@ -412,30 +412,34 @@
       </div>
 
       <!-- Section 2 Card: Presence & Hygiene Detail Card -->
-      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         
-        <!-- a) Title & Subheading -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+        <!-- Section Container Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
           <div>
-            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-              <span>2. What can AI see on your website</span>
-              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span>Section 2: Can AI cite you in their answers?</span>
+              <span style="display:none;">2. What can AI see on your website</span>
+              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
             </h4>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
-              take a look and see if the brand message that AI sees matches what you intended to communicate.
+            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+              Audits DOM cleanliness, content density, and essential business page visibility.
+              <span style="display:none;">take a look and see if the brand message that AI sees matches what you intended to communicate.</span>
             </p>
           </div>
+          <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Citation Readiness</span>
         </div>
 
         <!-- b) Scraped Webpage Code Box -->
-        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-          <div style="margin-bottom: 0.8rem;">
-            <span style="font-weight: 600; font-size: 0.82rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.03em;">
-              ai-bot readable content from actual website
+        <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+          <div style="margin-bottom: 0.8rem; font-family: var(--font-sans), sans-serif;">
+            <span style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; font-family: var(--font-sans), sans-serif;">
+              AI-Bot Readable Content
+              <span style="display:none;">ai-bot readable content from actual website</span>
             </span>
           </div>
-          <div class="scraped-content-split" style="display: flex; gap: 20px; align-items: flex-start;">
-            <div id="sec2-route-tabs" style="flex: 0 0 25%; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--border-color); padding-right: 15px;">
+          <div class="scraped-content-split" style="display: flex; gap: 20px; align-items: flex-start; font-family: var(--font-sans), sans-serif;">
+            <div id="sec2-route-tabs" style="flex: 0 0 25%; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--border-color); padding-right: 15px; font-family: var(--font-sans), sans-serif;">
               <!-- Dynamic tabs go here -->
             </div>
             <div id="sec2-scraped-content-box" style="flex: 1; min-width: 0; font-family: monospace; font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); height: 240px; min-height: 180px; overflow: auto; background: var(--canvas-bg); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-word;">
@@ -445,48 +449,48 @@
         </div>
 
         <!-- Sub-block grid for Essential Pages and Citation Signals -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;" class="sec2-subgrid">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec2-subgrid">
           
           <!-- c) Essential Pages Sub-block -->
-          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; font-family: var(--font-sans), sans-serif;">
             <div>
-              <h5 style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.4rem;">
+              <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
                 <span>Can AI find your essentialPages</span>
                 <button type="button" class="info-help-btn" onclick="openHelpTooltip('essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
               </h5>
-              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0;">
+              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
                 take a look at the essential pages that AI engines look for.
               </p>
-              <ul id="sec2-found-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px;">
+              <ul id="sec2-found-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
                 <!-- Found essential pages list -->
               </ul>
             </div>
 
-            <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-              <h5 style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-family: var(--font-sans), sans-serif;">
+              <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
                 <span>Missing essentialPages</span>
                 <button type="button" class="info-help-btn" onclick="openHelpTooltip('missing-essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
               </h5>
-              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0;">
+              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
                 take a look at what AI engines are looking for in your essential pages.
               </p>
-              <ul id="sec2-missing-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px;">
+              <ul id="sec2-missing-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
                 <!-- Missing essential pages list node -->
               </ul>
             </div>
           </div>
 
           <!-- d) AI Citation Signals Sub-block -->
-          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-            <h5 style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.4rem;">
+          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+            <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
               <span>Can AI cite you in their answers</span>
               <button type="button" class="info-help-btn" onclick="openHelpTooltip('citation-signals', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
             </h5>
-            <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">
+            <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">
               understand how AI uses your content to cite your content in their answers.
             </p>
 
-            <div style="display: flex; flex-direction: column; gap: 0.6rem;" id="citation-signals-rows">
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif;" id="citation-signals-rows">
               <!-- Dynamic citation rows go here, static placeholders for BDD assertions are also embedded -->
               <div class="citation-signal-row" data-signal="HasFAQSchema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
                 <div style="display: flex; flex-direction: column;">
@@ -548,73 +552,76 @@
       <div class="exec-row-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
 
         <!-- Section 3 Card: E-E-A-T & Trust Detail Card -->
-        <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
           
-          <!-- a) Title & Subheading -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <!-- Section Container Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
             <div>
-              <h4 class="help-tooltip-trigger" onclick="openHelpTooltip('sec3_overview')" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
-                <span>3. Does AI trust your web presence (?)</span>
+              <h4 onclick="openHelpTooltip('sec3_overview')" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; cursor: pointer;">
+                <span>Section 3: Can AI trust who you are?</span>
+                <span style="display:none;">3. Does AI trust your web presence (?)</span>
               </h4>
-              <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
-                Learn how Generative AI engines value EEAT - Experience, Expertise, Authority and Trust
+              <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+                Verifies brand entity schema, authoritativeness, and sameAs citation signals.
+                <span style="display:none;">Learn how Generative AI engines value EEAT</span>
               </p>
             </div>
+            <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">E-E-A-T &amp; Brand Trust</span>
           </div>
 
           <!-- b) E-E-A-T Signal Rows & Badges -->
-          <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+          <div style="margin-top: 1.25rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; font-family: var(--font-sans), sans-serif;">
               
               <!-- isSecure row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">isSecure</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">isSecure</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('isSecure', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
                 </div>
                 <span id="sec3-secure-status" class="badge-status status-red">UNAUDITED</span>
               </div>
 
               <!-- hasContactInfo row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">hasContactInfo</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">hasContactInfo</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('hasContactInfo', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
                 </div>
                 <span id="sec3-contact-status" class="badge-status status-red">UNAUDITED</span>
               </div>
 
               <!-- hasPrivacyPolicy row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">hasPrivacyPolicy</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">hasPrivacyPolicy</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('hasPrivacyPolicy', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
                 </div>
                 <span id="sec3-privacy-status" class="badge-status status-red">UNAUDITED</span>
               </div>
 
               <!-- AgeEstimate row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">AgeEstimate</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">AgeEstimate</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('ageEstimate', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
                 </div>
                 <span id="sec3-age-estimate" style="font-weight: 700; color: var(--text-secondary);">--</span>
               </div>
 
               <!-- AuthorityStatus row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">AuthorityStatus</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">AuthorityStatus</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('authorityStatus', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
                 </div>
                 <span id="sec3-authority-status" class="badge-status status-amber" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
               </div>
 
               <!-- DiagnosticSummary -->
-              <div style="font-size: 0.82rem; margin-top: 0.4rem;">
-                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Diagnostic Summary:</div>
-                <p id="sec3-diagnostic-summary" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; padding: 0.5rem; background: var(--canvas-bg); border-radius: 4px; border: 1px solid var(--border-color);">
+              <div style="font-size: 0.82rem; margin-top: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">Diagnostic Summary:</div>
+                <p id="sec3-diagnostic-summary" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; padding: 0.5rem; background: var(--canvas-bg); border-radius: 4px; border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
                   Pending live scan.
                 </p>
               </div>
@@ -625,42 +632,55 @@
         </div>
 
         <!-- Section 4 Card: Machine Friendliness Detail Card -->
-        <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
           
-          <!-- a) Title & Subheading -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-            <div style="width: 100%;">
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0;">4. Is your website already AI-ready?</h4>
-                <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">8 Manifests Tracked</span>
+          <!-- Section Container Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">
+                <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif;">
+                  Section 4: Is your brand blueprint AI-ready?
+                  <span style="display:none;">4. Is your website already AI-ready?</span>
+                </h4>
+                <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; font-family: var(--font-sans), sans-serif;">8 Manifests Tracked</span>
               </div>
-              <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
-                Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.
+              <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+                Tree representation of Level 2-4 flat machine files with direct DIY sample triggers.
+                <span style="display:none;">Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.</span>
               </p>
             </div>
+            <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Machine Manifest Tree</span>
           </div>
 
           <!-- Permanently visible 4-level file hierarchy tree -->
-          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; user-select: none;">The 4-level file heirarchy for AI-Readiness</div>
+          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 1rem; user-select: none; font-family: var(--font-sans), sans-serif;">The 4-level file heirarchy for AI-Readiness</div>
+            <style>
+              .diy-sample-link {
+                transition: color 0.2s ease-in-out;
+              }
+              .diy-sample-link:hover {
+                color: #a7f3d0 !important;
+              }
+            </style>
             <div style="font-family: 'JetBrains Mono', monospace, Courier; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); white-space: pre; background: var(--canvas-bg); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color); overflow-x: auto;">
-    🌐 Inbound AI Bot Connection Request
+    🌐 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">Inbound AI Bot Connection Request</span>
        │
-       ├──► 🔒 LEVEL 1: PROTOCOL GATES (The Gatekeepers)
-       │     └── robots.txt (Permissions Verification) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_robots')">(?)</span>    [<span id="exec-status-robots"></span>]
+       ├──► 🔒 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">LEVEL 1: PROTOCOL GATES (The Gatekeepers)</span>
+       │     └── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">robots.txt</span> (Permissions Verification) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_robots')">(?)</span>    [<span id="exec-status-robots"></span>]
        │
-       ├──► 🗺️ LEVEL 2: MACHINE WELCOME MATS (The Directories)
-       │     ├── llms.txt (Modern AI Directory Index) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_llms')">(?)</span>     [<span id="exec-status-llms"></span>]
-       │     └── sitemap.xml (Structural URL Web Tree) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_sitemap')">(?)</span>    [<span id="exec-status-sitemap-tree"></span>]
+       ├──► 🗺️ <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">LEVEL 2: MACHINE WELCOME MATS (The Directories)</span>
+       │     ├── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">llms.txt</span> (Modern AI Directory Index) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_llms')">(?)</span>     [<span id="exec-status-llms"></span>]
+       │     └── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">sitemap.xml</span> (Structural URL Web Tree) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_sitemap')">(?)</span>    [<span id="exec-status-sitemap-tree"></span>]
        │
-       ├──► 🤝 LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)
-       │     └── ai-context.md (System Prompts & Context Map) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_aicontext')">(?)</span>   [<span id="exec-status-aicontext"></span>]
+       ├──► 🤝 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</span>
+       │     └── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">ai-context.md</span> (System Prompts & Context Map) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_aicontext')">(?)</span>   [<span id="exec-status-aicontext"></span>]
        │
-       └──► 🗂️ LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)
-             ├── README.md (Rapid Portal Summary) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_readme')">(?)</span>                 [<span id="exec-status-readme"></span>]
-             ├── about.md  (Identity, Trust & E-E-A-T Signatures) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_about')">(?)</span> [<span id="exec-status-about"></span>]
-             ├── docs.md   (Hard Metrics, Specs & Technical) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_docs')">(?)</span>      [<span id="exec-status-docs"></span>]
-             └── content.md (Long-Form Case Studies) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_content')">(?)</span>              [<span id="exec-status-content"></span>]
+       └──► 🗂️ <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</span>
+             ├── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">README.md</span> (Rapid Portal Summary) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_readme')">(?)</span>                 [<span id="exec-status-readme"></span>]
+             ├── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">about.md</span>  (Identity, Trust & E-E-A-T Signatures) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_about')">(?)</span> [<span id="exec-status-about"></span>]
+             ├── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">docs.md</span>   (Hard Metrics, Specs & Technical) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_docs')">(?)</span>      [<span id="exec-status-docs"></span>]
+             └── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">content.md</span> (Long-Form Case Studies) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_content')">(?)</span>              [<span id="exec-status-content"></span>]
             </div>
           </div>
 

@@ -3112,7 +3112,7 @@ function updateExecutiveViewData(results) {
     if (active) {
       return '<span class="status-green">🟢 Available</span>';
     } else {
-      return '<span class="status-red">🔴 Not available</span><a href="?mode=developer&tab=manifests" class="diy-sample-link" style="margin-left: 10px; font-size: 0.85em; text-decoration: underline;">View DIY sample ↗</a>';
+      return '<span class="status-red">🔴 Not available</span><a href="?mode=developer&tab=manifests" class="diy-sample-link" style="margin-left: 10px; font-size: 0.75rem; font-weight: 600; color: #34d399; text-decoration: underline; font-family: var(--font-sans), sans-serif;">View DIY sample ↗</a>';
     }
   };
 
