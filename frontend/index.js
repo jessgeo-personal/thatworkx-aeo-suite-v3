@@ -131,20 +131,20 @@ function buildDevManifestTreeHtml() {
 function buildDevSchemaBuilderHtml() {
   return `
     <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-family: var(--font-sans), sans-serif;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-sans), sans-serif;">
-            <span>Page-Level HTML Schema Builder (JSON-LD)</span>
-            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-sans), sans-serif;">HTML &lt;head&gt; Markup</span>
+          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+            Page-Level HTML Schema Builder (JSON-LD)
           </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
+          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
         </div>
+        <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">HTML &lt;head&gt; Markup</span>
       </div>
 
       <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
         <!-- Left Pane (50% width) -->
         <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
-          <h5 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Schema Builder &amp; Page-Targeting Guidance</h5>
+          <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Schema Builder &amp; Page-Targeting Guidance</h5>
           
           <!-- 3-Step Banner -->
           <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #fef08a; line-height: 1.4; font-family: var(--font-sans), sans-serif;">
@@ -197,7 +197,7 @@ function buildDevSchemaBuilderHtml() {
 
         <!-- Right Pane (50% width) -->
         <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
-          <h5 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Deployment &amp; Real-Time Code Synthesis</h5>
+          <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Deployment &amp; Real-Time Code Synthesis</h5>
           
           <!-- Action Buttons -->
           <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
@@ -224,27 +224,29 @@ function buildDevSchemaBuilderHtml() {
 
 function buildDevMatrixHtml() {
   return `
-    <div class="developer-matrix-card glassmorphic" id="diy-module-1" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>🛠️ AI-Optimized Site Diagnostics</span>
-            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Full Technical Audit</span>
-          </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+    <div class="developer-matrix-card glassmorphic" id="diy-module-1" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <span>🛠️ AI-Optimized Site Diagnostics</span>
+              <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-sans), sans-serif; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600;">Full Technical Audit</span>
+            </h4>
+            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+          </div>
+          <span class="table-count-badge status-amber-badge" style="font-family: var(--font-sans), sans-serif; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px;">32 Checks Evaluated</span>
         </div>
-        <span class="table-count-badge status-amber-badge">32 Checks Evaluated</span>
       </div>
 
-      <div class="matrix-filter-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-        <button type="button" class="matrix-tab-btn control-menu-item active" onclick="filterMatrixSection('all')">All (32)</button>
-        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(1)">Section 1: Gateway (3)</button>
-        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(2)">Section 2: Hygiene (7)</button>
-        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(3)">Section 3: Parsing (10)</button>
-        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(4)">Section 4: Manifests (12)</button>
+      <div class="matrix-filter-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
+        <button type="button" class="matrix-tab-btn control-menu-item active" onclick="filterMatrixSection('all')" style="font-family: var(--font-sans), sans-serif;">All (32)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(1)" style="font-family: var(--font-sans), sans-serif;">Section 1: Gateway (3)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(2)" style="font-family: var(--font-sans), sans-serif;">Section 2: Hygiene (7)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(3)" style="font-family: var(--font-sans), sans-serif;">Section 3: Parsing (10)</button>
+        <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(4)" style="font-family: var(--font-sans), sans-serif;">Section 4: Manifests (12)</button>
       </div>
 
-      <div id="dev-matrix-tbody" class="diy-accordions-container">
+      <div id="dev-matrix-tbody" class="diy-accordions-container" style="font-family: var(--font-sans), sans-serif;">
         <!-- Dynamic Collapsible Accordions will go here -->
       </div>
     </div>
@@ -439,16 +441,16 @@ function buildDevDrawersHtml(domainName = '') {
     const isActive = activeDiyManifestKey === file.key;
     
     let icon = '✕';
-    let iconColor = 'var(--badge-fail, #f43f5e)';
+    let iconColor = '#f43f5e';
     if (fileStatus.state === 'valid') {
       icon = '✓';
-      iconColor = 'var(--badge-pass, #34d399)';
+      iconColor = '#34d399';
     } else if (fileStatus.state === 'needs_fix') {
       icon = '⚠️';
-      iconColor = 'var(--badge-warning, #fbbf24)';
+      iconColor = '#fbbf24';
     }
 
-    return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+    return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--font-sans), sans-serif; transition: all 0.2s ease-in-out;">
       <span style="color: ${iconColor}; font-weight: bold;">${icon}</span>
       <span>${file.name}</span>
     </button>`;
@@ -459,29 +461,29 @@ function buildDevDrawersHtml(domainName = '') {
   }, 0);
 
   return `
-    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>Resolving AI-ready File Issues</span>
-            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">Syntax Highlighted</span>
+          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+            Sitewide Machine Manifest Generators
           </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Deploy root-level flat files to create welcome mats and directory indexes for AI crawlers.</p>
         </div>
+        <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Root Server Manifests</span>
       </div>
 
-      <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+      <div class="drawer-file-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         ${tabsHtml}
       </div>
 
-      <div style="display: flex; gap: 20px; align-items: stretch;">
+      <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
         <!-- Left Pane (50% width) -->
-        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="left-pane-content">
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="left-pane-content">
           <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
 
         <!-- Right Pane (50% width) -->
-        <div style="flex: 1; width: 50%; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;" id="right-pane-container">
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="right-pane-container">
           <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
       </div>
@@ -1742,21 +1744,21 @@ function renderDeveloperMatrixRows(capabilities) {
 
     accordionsHtml += `
       <details class="accordion-item" style="margin-bottom: 1.5rem;">
-        <summary class="accordion-header">
-          <span class="accordion-title" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+        <summary class="accordion-header" style="display: flex; align-items: center; justify-content: space-between; font-family: var(--font-sans), sans-serif;">
+          <span class="accordion-title" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
             <span style="font-size: 1.25rem;">${catInfo.icon}</span>
-            <span>${catInfo.name}</span>
-            <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted, #94a3b8); background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.2rem; border: 1px solid rgba(255,255,255,0.05);">${groupCaps.length} check${groupCaps.length === 1 ? '' : 's'}</span>
+            <span style="font-size: 1.125rem; font-weight: 700; color: #f1f5f9; font-family: var(--font-sans), sans-serif;">${catInfo.name}</span>
+            <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted, #94a3b8); background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.2rem; border: 1px solid rgba(255,255,255,0.05); font-family: var(--font-sans), sans-serif;">${groupCaps.length} check${groupCaps.length === 1 ? '' : 's'}</span>
             
-            <span style="display: inline-flex; align-items: center; gap: 0.4rem; margin-left: 1rem; flex-wrap: wrap;">
-              <span style="background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">✓ ${passCount} Passed</span>
-              <span style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">⚠️ ${warnCount} Warnings</span>
-              <span style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">✕ ${failCount} Failed</span>
+            <span style="display: inline-flex; align-items: center; gap: 0.4rem; margin-left: 1rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
+              <span style="background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif;">✓ ${passCount} Passed</span>
+              <span style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif;">⚠️ ${warnCount} Warnings</span>
+              <span style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif;">✕ ${failCount} Failed</span>
             </span>
           </span>
           <span class="accordion-arrow">▼</span>
         </summary>
-        <div class="accordion-content" style="padding: 1.2rem; overflow-x: auto;">
+        <div class="accordion-content" style="padding: 1.2rem; overflow-x: auto; font-family: var(--font-sans), sans-serif;">
           <table class="exec-table dev-matrix-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
             <thead>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
@@ -2103,7 +2105,7 @@ function switchDiyManifestTab(fileKey) {
         iconColor = '#fbbf24';
       }
 
-      return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+      return `<button type="button" class="drawer-tab-btn control-menu-item ${isActive ? 'active' : ''}" onclick="switchDiyManifestTab('${file.key}')" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--font-sans), sans-serif; transition: all 0.2s ease-in-out;">
         <span style="color: ${iconColor}; font-weight: bold;">${icon}</span>
         <span>${file.name}</span>
       </button>`;
@@ -2117,13 +2119,14 @@ function switchDiyManifestTab(fileKey) {
     
     leftPane.innerHTML = `
       <div style="display: flex; flex-direction: column; height: 100%; text-align: left; font-family: var(--font-sans), sans-serif;">
+        <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">File Context &amp; Diagnostics</h5>
         <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start; font-family: var(--font-sans), sans-serif;">
           <span style="font-size: 0.75rem; background: ${meta.state === 'valid' ? 'rgba(52, 211, 153, 0.1)' : meta.state === 'needs_fix' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; border: 1px solid ${meta.statusColor}; color: ${meta.statusColor}; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem; font-family: var(--font-sans), sans-serif;">
             <span>${meta.statusIcon}</span> ${meta.statusLabel}
           </span>
         </div>
         
-        <h5 style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">${meta.title}</h5>
+        <h6 style="font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">${meta.title}</h6>
         <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 1.25rem 0; font-family: var(--font-sans), sans-serif;">${meta.description}</p>
         
         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">
@@ -2149,10 +2152,11 @@ function switchDiyManifestTab(fileKey) {
     const meta = getManifestMetadata(fileKey, domain, results);
     rightContainer.innerHTML = `
       <div style="display: flex; flex-direction: column; height: 100%; text-align: left; font-family: var(--font-sans), sans-serif;">
+        <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Solution &amp; Action</h5>
         <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start; font-family: var(--font-sans), sans-serif;">
           <span class="badge-status status-green" style="font-size: 0.75rem; background: rgba(52, 211, 153, 0.1); border: 1px solid #34d399; color: #34d399; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; font-family: var(--font-sans), sans-serif;">Baseline Ready</span>
         </div>
-        <h5 style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">Deploy Your Optimized File</h5>
+        <h6 style="font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">Deploy Your Optimized File</h6>
         <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">Live site data was synthesized into an optimized baseline below.</p>
         
         <!-- Primary Action Buttons -->
