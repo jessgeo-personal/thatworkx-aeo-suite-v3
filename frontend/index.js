@@ -547,10 +547,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
     const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
     const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
+    const devModule4Wrap = document.getElementById('dev-module-4-wrapper');
 
     if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
     if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
+    if (devModule4Wrap) {
+      devModule4Wrap.innerHTML = buildDevModule4Html();
+      renderModule4(latestScanResults || window.lastScanResults || {});
+    }
 
     const tabParam = params.get('tab');
     if (modeParam === 'developer' || modeParam === 'diy') {
@@ -1351,6 +1356,7 @@ function updateDeveloperViewData(results) {
   renderDeveloperMatrixRows(currentEvaluatedCapabilities);
   updateSchemaBuilderCode();
   selectCodeDrawer(activeDrawerKey, results);
+  renderModule4(results);
 }
 
 
@@ -4403,6 +4409,257 @@ function switchSec2RouteTab(idx) {
 
 window.openHelpTooltip = openHelpTooltip;
 window.switchSec2RouteTab = switchSec2RouteTab;
+
+// Module 4: Page-Level Crawl & Content Health Inspector functions
+function buildDevModule4Html() {
+  return `
+    <div class="developer-matrix-card glassmorphic" id="diy-module-4" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <span>🔍 Module 4: Page-Level Crawl & Content Health Inspector</span>
+            </h4>
+            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Audit and fix every page on your site to guarantee search engines and AI assistants can index and cite your content.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="dev-module-4-filter-container"></div>
+
+      <div class="table-responsive-wrapper" style="overflow-x: auto;">
+        <table class="exec-table dev-expandable-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+              <th style="padding: 0.6rem; width: 40px;"></th>
+              <th style="padding: 0.6rem;">Page URL</th>
+              <th style="padding: 0.6rem;">Crawl Status</th>
+              <th style="padding: 0.6rem;">Sitemap Status</th>
+              <th style="padding: 0.6rem;">Word Count & Tokens</th>
+              <th style="padding: 0.6rem;">JSON-LD Schema</th>
+              <th style="padding: 0.6rem; text-align: right; width: 180px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="dev-module-4-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function isSchemaMissing(p, results = {}) {
+  const status = results.status || {};
+  if (p.route === '/' || p.route === '') {
+    return !status.jsonLdExists;
+  }
+  if (p.route === '/faq') {
+    const capabilities = currentEvaluatedCapabilities || [];
+    const faqCap = capabilities.find(c => c.id === 'faqSchemaParity');
+    return faqCap ? (faqCap.status !== 'pass' && faqCap.status !== 'active') : true;
+  }
+  return true;
+}
+
+function renderModule4(results, filter = 'all') {
+  const tbody = document.getElementById('dev-module-4-tbody');
+  const filterContainer = document.getElementById('dev-module-4-filter-container');
+  if (!tbody) return;
+
+  const data = results || latestScanResults || window.lastScanResults || {};
+  const pages = (data.pages && data.pages.length) ? data.pages : [
+    { 
+      route: '/', 
+      wordCount: data?.status?.wordCount ?? 0, 
+      hasCanonical: true, 
+      canonicalUrl: `https://${currentScannedDomain || 'example.com'}/`, 
+      headingAudit: { isHierarchyValid: data?.status?.hasProperHierarchy ?? true, h1: 1, h2: 2 } 
+    }
+  ];
+
+  const domain = currentScannedDomain || 'example.com';
+
+  const total = pages.length;
+  let errorCount = 0;
+  let noSchemaCount = 0;
+  let thinContentCount = 0;
+
+  pages.forEach(p => {
+    const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
+    const isSchema = isSchemaMissing(p, data);
+    const isThin = p.wordCount < 250;
+    if (isError || isSchema || isThin) errorCount++;
+    if (isSchema) noSchemaCount++;
+    if (isThin) thinContentCount++;
+  });
+
+  if (filterContainer) {
+    filterContainer.innerHTML = `
+      <div class="matrix-filter-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
+        <button type="button" class="matrix-tab-btn control-menu-item ${filter === 'all' ? 'active' : ''}" onclick="renderModule4(null, 'all')" style="font-family: var(--font-sans), sans-serif;">All Pages (${total})</button>
+        <button type="button" class="matrix-tab-btn control-menu-item ${filter === 'errors' ? 'active' : ''}" onclick="renderModule4(null, 'errors')" style="font-family: var(--font-sans), sans-serif;">⚠️ Warnings & Errors (${errorCount})</button>
+        <button type="button" class="matrix-tab-btn control-menu-item ${filter === 'schema' ? 'active' : ''}" onclick="renderModule4(null, 'schema')" style="font-family: var(--font-sans), sans-serif;">✕ Missing Schema (${noSchemaCount})</button>
+        <button type="button" class="matrix-tab-btn control-menu-item ${filter === 'thin' ? 'active' : ''}" onclick="renderModule4(null, 'thin')" style="font-family: var(--font-sans), sans-serif;">📄 Thin Content (${thinContentCount})</button>
+      </div>
+    `;
+  }
+
+  const filteredPages = pages.filter(p => {
+    if (filter === 'errors') {
+      const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
+      const isSchema = isSchemaMissing(p, data);
+      const isThin = p.wordCount < 250;
+      return isError || isSchema || isThin;
+    }
+    if (filter === 'schema') {
+      return isSchemaMissing(p, data);
+    }
+    if (filter === 'thin') {
+      return p.wordCount < 250;
+    }
+    return true;
+  });
+
+  if (filteredPages.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          No pages match the selected filter.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filteredPages.map((p, idx) => {
+    const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
+    const isSchema = isSchemaMissing(p, data);
+    const isThin = p.wordCount < 250;
+
+    const crawlStatusHtml = (p.wordCount > 0)
+      ? '<span class="badge-status status-green">🟢 200 OK</span>'
+      : '<span class="badge-status status-red">🔴 Crawl Error / Blank Page</span>';
+
+    const sitemapExists = !!data.status?.sitemapExists;
+    const sitemapStatusHtml = sitemapExists
+      ? '<span class="badge-status status-green">🟢 Present</span>'
+      : '<span class="badge-status status-red">🔴 Missing</span>';
+
+    const schemaHtml = !isSchema
+      ? `<span class="badge-status status-green">🟢 ${p.route === '/' ? (data.status?.jsonLdTypes?.join(', ') || 'Organization') : (p.route === '/faq' ? 'FAQPage' : 'Custom Schema')}</span>`
+      : '<span class="badge-status status-red">🔴 Missing</span>';
+
+    let actionHtml = '';
+    if (isSchema) {
+      actionHtml = `<button type="button" class="btn-fix-bridge btn-schema-bridge" onclick="fixMissingSchemaInBuilder('${p.route}')"><span>⚡ Fix Schema</span></button>`;
+    } else {
+      actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', 'tokenLoadAnalysis')"><span>⚡ Audit Page</span></button>`;
+    }
+
+    let fieldStatusBreakdown = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-family: var(--font-sans), sans-serif; text-align: left;">
+        <div><strong>Crawl Status:</strong> ${crawlStatusHtml}</div>
+        <div><strong>Sitemap Status:</strong> ${sitemapStatusHtml}</div>
+        <div><strong>Schema Status:</strong> ${schemaHtml}</div>
+        <div><strong>Canonical URL:</strong> ${p.hasCanonical !== false ? '🟢 Valid' : '🔴 Missing / Non-canonical'}</div>
+        <div><strong>Heading Hierarchy:</strong> ${p.headingAudit?.isHierarchyValid !== false ? '🟢 Valid' : '🔴 Issues Detected'}</div>
+      </div>
+    `;
+
+    let howToFixHtml = '<div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; text-align: left; font-family: var(--font-sans), sans-serif;">';
+    howToFixHtml += '<strong>📋 Actionable How to Fix Instructions:</strong><ul style="margin: 0.5rem 0 0 1.2rem; padding: 0;">';
+
+    if (p.wordCount === 0) {
+      howToFixHtml += `<li><strong>404/403 Crawl Errors:</strong> Redirect this URL to a valid page, or unblock AI user-agents (<code>ChatGPT-User</code>, <code>PerplexityBot</code>) in your firewalls/robots.txt directives.</li>`;
+    }
+    if (!sitemapExists) {
+      howToFixHtml += `<li><strong>Missing Sitemap:</strong> Ensure this page's URL is listed inside your root <code>sitemap.xml</code> manifest so AI crawlers can discover it.</li>`;
+    }
+    if (isThin) {
+      howToFixHtml += `<li><strong>Thin Content (&lt;250 words):</strong> Expand the page content with detailed subject authority paragraphs and subheadings (<code>&lt;h2&gt;</code>) to avoid AI data starvation.</li>`;
+    }
+    if (isSchema) {
+      howToFixHtml += `<li><strong>Missing JSON-LD Schema:</strong> Pre-configure entity JSON-LD markup and embed it in the page's HTML head. <a href="#" onclick="fixMissingSchemaInBuilder('${p.route}'); return false;" style="color: #67e8f9; text-decoration: underline; font-weight: bold;">[ ⚡ Fix in Schema Builder ]</a></li>`;
+    }
+    if (p.headingAudit?.isHierarchyValid === false) {
+      howToFixHtml += `<li><strong>Heading Hierarchy:</strong> Reorder your page headings to ensure a single <code>&lt;h1&gt;</code> is followed sequentially by <code>&lt;h2&gt;</code> and <code>&lt;h3&gt;</code>.</li>`;
+    }
+    if (p.hasCanonical === false) {
+      howToFixHtml += `<li><strong>Missing Canonical Link:</strong> Define a canonical URL link tag in your page head to establish route authority.</li>`;
+    }
+
+    if (!isError && !isSchema && !isThin) {
+      howToFixHtml += `<li>🟢 <strong>No issues found:</strong> This page meets all crawlability, hygiene, structure, and schema standards for AI search engines.</li>`;
+    }
+
+    howToFixHtml += '</ul></div>';
+
+    return `
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <td>
+          <button type="button" class="btn-expand-row" onclick="toggleModule4Row(${idx})">▶</button>
+        </td>
+        <td class="cell-path">
+          <a href="https://${domain}${p.route}" target="_blank" style="color: #67e8f9; text-decoration: none;"><code>${p.route}</code></a>
+        </td>
+        <td>${crawlStatusHtml}</td>
+        <td>${sitemapStatusHtml}</td>
+        <td>${p.wordCount || 0} words (~${Math.round((p.wordCount || 0) * 1.3)} tokens)</td>
+        <td>${schemaHtml}</td>
+        <td style="text-align: right;">${actionHtml}</td>
+      </tr>
+      <tr id="dev-module-4-row-${idx}" style="display: none;">
+        <td colspan="7" style="padding: 1.2rem; background: rgba(0,0,0,0.15); border-left: 3px solid var(--border-color);">
+          <div class="row-expanded-content">
+            ${fieldStatusBreakdown}
+            ${howToFixHtml}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function toggleModule4Row(idx) {
+  const row = document.getElementById(`dev-module-4-row-${idx}`);
+  if (row) {
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+}
+
+function fixMissingSchemaInBuilder(route) {
+  const el = document.getElementById('diy-module-2');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  let entity = 'Organization';
+  const lowerRoute = route.toLowerCase();
+  if (lowerRoute.includes('faq')) {
+    entity = 'FAQPage';
+  } else if (lowerRoute.includes('contact')) {
+    entity = 'LocalBusiness';
+  } else if (lowerRoute.includes('service') || lowerRoute.includes('pricing') || lowerRoute.includes('product')) {
+    entity = 'Service';
+  } else if (lowerRoute === '/' || lowerRoute === '') {
+    entity = 'Organization';
+  }
+
+  const entities = ['Organization', 'LocalBusiness', 'FAQPage', 'WebSite', 'Service'];
+  entities.forEach(ent => {
+    const checkbox = document.getElementById(`schema-entity-${ent}`);
+    if (checkbox) {
+      checkbox.checked = (ent === entity);
+      selectedSchemaEntities[ent] = (ent === entity);
+    }
+  });
+
+  if (typeof updateSchemaBuilderCode === 'function') {
+    updateSchemaBuilderCode();
+  }
+}
+
+window.buildDevModule4Html = buildDevModule4Html;
+window.renderModule4 = renderModule4;
+window.toggleModule4Row = toggleModule4Row;
+window.fixMissingSchemaInBuilder = fixMissingSchemaInBuilder;
 
 
 
