@@ -130,92 +130,92 @@ function buildDevManifestTreeHtml() {
 
 function buildDevSchemaBuilderHtml() {
   return `
-    <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-family: var(--font-sans), sans-serif;">
         <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-sans), sans-serif;">
             <span>Page-Level HTML Schema Builder (JSON-LD)</span>
-            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">HTML &lt;head&gt; Markup</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-sans), sans-serif;">HTML &lt;head&gt; Markup</span>
           </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
         </div>
       </div>
 
-      <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
+      <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
         <!-- Left Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;">
-          <h5 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.75rem 0;">Schema Builder &amp; Page-Targeting Guidance</h5>
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
+          <h5 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Schema Builder &amp; Page-Targeting Guidance</h5>
           
           <!-- 3-Step Banner -->
-          <div style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #fef08a; line-height: 1.4; font-family: var(--font-sans), sans-serif;">
             💡 <strong>How to use:</strong> 1. Toggle entities matching visible content on your target page. 2. Copy script. 3. Paste into page HTML &lt;head&gt;.
           </div>
 
           <!-- Checkboxes with microcopy -->
-          <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
-            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="schema-entity-Organization" ${selectedSchemaEntities.Organization ? 'checked' : ''} onchange="toggleSchemaEntity('Organization')" style="margin-top: 0.25rem; cursor: pointer;" />
+          <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none; font-family: var(--font-sans), sans-serif;">
+              <input type="checkbox" id="schema-entity-Organization" ${selectedSchemaEntities.Organization ? 'checked' : ''} onchange="toggleSchemaEntity('Organization')" style="margin-top: 0.25rem; cursor: pointer; background-color: #0f172a; border: 1px solid #475569; accent-color: #38bdf8;" />
               <div>
-                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">Organization</span>
-                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage. Establishes sitewide brand identity.</div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #e2e8f0; font-family: var(--font-sans), sans-serif;">Organization</span>
+                <div style="font-size: 0.78rem; color: #6ee7b7; margin-top: 0.15rem; font-family: var(--font-sans), sans-serif;">📍 Target Page: Homepage. Establishes sitewide brand identity.</div>
               </div>
             </label>
 
-            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="schema-entity-LocalBusiness" ${selectedSchemaEntities.LocalBusiness ? 'checked' : ''} onchange="toggleSchemaEntity('LocalBusiness')" style="margin-top: 0.25rem; cursor: pointer;" />
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none; font-family: var(--font-sans), sans-serif;">
+              <input type="checkbox" id="schema-entity-LocalBusiness" ${selectedSchemaEntities.LocalBusiness ? 'checked' : ''} onchange="toggleSchemaEntity('LocalBusiness')" style="margin-top: 0.25rem; cursor: pointer; background-color: #0f172a; border: 1px solid #475569; accent-color: #38bdf8;" />
               <div>
-                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">LocalBusiness</span>
-                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage / Contact Page. Address, geo-coordinates, &amp; hours.</div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #e2e8f0; font-family: var(--font-sans), sans-serif;">LocalBusiness</span>
+                <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.15rem; font-family: var(--font-sans), sans-serif;">📍 Target Page: Homepage / Contact Page. Address, geo-coordinates, &amp; hours.</div>
               </div>
             </label>
 
-            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="schema-entity-FAQPage" ${selectedSchemaEntities.FAQPage ? 'checked' : ''} onchange="toggleSchemaEntity('FAQPage')" style="margin-top: 0.25rem; cursor: pointer;" />
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none; font-family: var(--font-sans), sans-serif;">
+              <input type="checkbox" id="schema-entity-FAQPage" ${selectedSchemaEntities.FAQPage ? 'checked' : ''} onchange="toggleSchemaEntity('FAQPage')" style="margin-top: 0.25rem; cursor: pointer; background-color: #0f172a; border: 1px solid #475569; accent-color: #38bdf8;" />
               <div>
-                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">FAQPage</span>
-                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: FAQ / Product Pages. ⚠️ REQUIRED: Question/Answer text MUST be visibly printed on page.</div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #e2e8f0; font-family: var(--font-sans), sans-serif;">FAQPage</span>
+                <div style="font-size: 0.78rem; color: #fcd34d; margin-top: 0.15rem; font-family: var(--font-sans), sans-serif;">📍 Target Page: FAQ / Product Pages. ⚠️ REQUIRED: Question/Answer text MUST be visibly printed on page.</div>
               </div>
             </label>
 
-            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="schema-entity-WebSite" ${selectedSchemaEntities.WebSite ? 'checked' : ''} onchange="toggleSchemaEntity('WebSite')" style="margin-top: 0.25rem; cursor: pointer;" />
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none; font-family: var(--font-sans), sans-serif;">
+              <input type="checkbox" id="schema-entity-WebSite" ${selectedSchemaEntities.WebSite ? 'checked' : ''} onchange="toggleSchemaEntity('WebSite')" style="margin-top: 0.25rem; cursor: pointer; background-color: #0f172a; border: 1px solid #475569; accent-color: #38bdf8;" />
               <div>
-                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">WebSite + Sitelinks SearchBox</span>
-                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage only. Enables sitewide searchbox.</div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #e2e8f0; font-family: var(--font-sans), sans-serif;">WebSite + Sitelinks SearchBox</span>
+                <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.15rem; font-family: var(--font-sans), sans-serif;">📍 Target Page: Homepage only. Enables sitewide searchbox.</div>
               </div>
             </label>
 
-            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="schema-entity-Service" ${selectedSchemaEntities.Service ? 'checked' : ''} onchange="toggleSchemaEntity('Service')" style="margin-top: 0.25rem; cursor: pointer;" />
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none; font-family: var(--font-sans), sans-serif;">
+              <input type="checkbox" id="schema-entity-Service" ${selectedSchemaEntities.Service ? 'checked' : ''} onchange="toggleSchemaEntity('Service')" style="margin-top: 0.25rem; cursor: pointer; background-color: #0f172a; border: 1px solid #475569; accent-color: #38bdf8;" />
               <div>
-                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">Service / Offering</span>
-                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Specific Service / Pricing Pages.</div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #e2e8f0; font-family: var(--font-sans), sans-serif;">Service / Offering</span>
+                <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.15rem; font-family: var(--font-sans), sans-serif;">📍 Target Page: Specific Service / Pricing Pages.</div>
               </div>
             </label>
           </div>
         </div>
 
         <!-- Right Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;">
-          <h5 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.75rem 0;">Deployment &amp; Real-Time Code Synthesis</h5>
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
+          <h5 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Deployment &amp; Real-Time Code Synthesis</h5>
           
           <!-- Action Buttons -->
-          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
-            <button onclick="copySchemaScript()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
+            <button onclick="copySchemaScript()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-family: var(--font-sans), sans-serif;">
               <span>📋</span> Copy HTML &lt;script&gt; Tag
             </button>
-            <button onclick="downloadSchemaJson()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: var(--text-primary, #ffffff); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+            <button onclick="downloadSchemaJson()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
               <span>📥</span> Download schema.json
             </button>
           </div>
 
           <!-- Deployment Helper Banner -->
-          <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+          <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #bae6fd; line-height: 1.4; font-family: var(--font-sans), sans-serif;">
             💡 <strong>How to publish:</strong> Paste directly into the &lt;head&gt; section of your web page's HTML (or via Google Tag Manager / SEO plugin).
           </div>
 
           <!-- Code Box -->
-          <pre id="schema-code-block" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left; margin: 0;"></pre>
+          <pre id="schema-code-block" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono), monospace; font-size: 0.82rem; color: #67e8f9; background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left; margin: 0;"></pre>
         </div>
       </div>
     </div>
@@ -1635,10 +1635,18 @@ function renderDeveloperMatrixRows(capabilities) {
 
     const catInfo = getDiyCategoryInfo(catIndex);
     let rowsHtml = '';
+    
+    let passCount = 0;
+    let warnCount = 0;
+    let failCount = 0;
 
     groupCaps.forEach((cap, idx) => {
       const isPass = cap.status === 'pass' || cap.status === 'active';
       const isBlocked = cap.status === 'blocked' || cap.status === 'critical';
+      if (isPass) passCount++;
+      else if (isBlocked) failCount++;
+      else warnCount++;
+
       const statusBadge = isPass
         ? '<span class="badge-status status-green">🟢 Pass</span>'
         : (isBlocked ? '<span class="badge-status status-red">🔴 Blocked</span>' : '<span class="badge-status status-amber">🟡 Warning</span>');
@@ -1733,12 +1741,18 @@ function renderDeveloperMatrixRows(capabilities) {
     });
 
     accordionsHtml += `
-      <details class="accordion-item" open style="margin-bottom: 1.5rem;">
+      <details class="accordion-item" style="margin-bottom: 1.5rem;">
         <summary class="accordion-header">
-          <span class="accordion-title" style="display: flex; align-items: center; gap: 0.6rem;">
+          <span class="accordion-title" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
             <span style="font-size: 1.25rem;">${catInfo.icon}</span>
             <span>${catInfo.name}</span>
-            <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted, #94a3b8); background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem; border: 1px solid rgba(255,255,255,0.05);">${groupCaps.length} check${groupCaps.length === 1 ? '' : 's'}</span>
+            <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted, #94a3b8); background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.2rem; border: 1px solid rgba(255,255,255,0.05);">${groupCaps.length} check${groupCaps.length === 1 ? '' : 's'}</span>
+            
+            <span style="display: inline-flex; align-items: center; gap: 0.4rem; margin-left: 1rem; flex-wrap: wrap;">
+              <span style="background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">✓ ${passCount} Passed</span>
+              <span style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">⚠️ ${warnCount} Warnings</span>
+              <span style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">✕ ${failCount} Failed</span>
+            </span>
           </span>
           <span class="accordion-arrow">▼</span>
         </summary>
@@ -1764,7 +1778,17 @@ function renderDeveloperMatrixRows(capabilities) {
     `;
   }
 
-  container.innerHTML = accordionsHtml;
+  container.innerHTML = accordionsHtml + `
+    <div class="eeat-upgrade-banner glassmorphic" style="margin-top: 1.5rem; padding: 1.2rem; border-radius: 10px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #cbd5e1; flex-wrap: wrap;">
+        <span>To perform a proper page-level and site-level E-E-A-T review, </span>
+        <a href="#" onclick="showUpgradeModal('AIO_PRO_EEAT', 'Perform a proper page-level and site-level E-E-A-T review', 'AI Optimize'); return false;" style="color: #a78bfa; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+          upgrade to AIOptimize Pro ↗
+        </a>
+        <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_cap_eeat_info')" style="cursor: pointer; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.35rem; border-radius: 4px; color: #cbd5e1; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); margin-left: 0.3rem;">?</span>
+      </div>
+    </div>
+  `;
 }
 
 function filterMatrixSection(section) {
@@ -2092,28 +2116,28 @@ function switchDiyManifestTab(fileKey) {
     const meta = getManifestMetadata(fileKey, domain, results);
     
     leftPane.innerHTML = `
-      <div style="display: flex; flex-direction: column; height: 100%; text-align: left;">
-        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start;">
-          <span style="font-size: 0.75rem; background: ${meta.state === 'valid' ? 'rgba(52, 211, 153, 0.1)' : meta.state === 'needs_fix' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; border: 1px solid ${meta.statusColor}; color: ${meta.statusColor}; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;">
+      <div style="display: flex; flex-direction: column; height: 100%; text-align: left; font-family: var(--font-sans), sans-serif;">
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start; font-family: var(--font-sans), sans-serif;">
+          <span style="font-size: 0.75rem; background: ${meta.state === 'valid' ? 'rgba(52, 211, 153, 0.1)' : meta.state === 'needs_fix' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(244, 63, 94, 0.1)'}; border: 1px solid ${meta.statusColor}; color: ${meta.statusColor}; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem; font-family: var(--font-sans), sans-serif;">
             <span>${meta.statusIcon}</span> ${meta.statusLabel}
           </span>
         </div>
         
-        <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.5rem 0;">${meta.title}</h5>
-        <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); line-height: 1.45; margin: 0 0 1.25rem 0;">${meta.description}</p>
+        <h5 style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">${meta.title}</h5>
+        <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 1.25rem 0; font-family: var(--font-sans), sans-serif;">${meta.description}</p>
         
-        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-          <h6 style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted, #94a3b8); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0;">Live Scan Summary</h6>
-          <ul style="font-size: 0.85rem; color: var(--text-main, #cbd5e1); line-height: 1.6; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.4rem;">
-            <li>Scraped target domain: <span style="font-family: var(--font-mono); color: #38bdf8;">${meta.domain}</span></li>
-            <li>Discovered route count: <span style="font-weight: 600; color: var(--text-primary, #ffffff);">${meta.routeCount} pages</span></li>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">
+          <h6 style="font-size: 0.82rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Live Scan Summary</h6>
+          <ul style="font-size: 0.85rem; color: #e2e8f0; line-height: 1.6; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+            <li>Scraped target domain: <span style="font-family: var(--font-mono), monospace; color: #38bdf8;">${meta.domain}</span></li>
+            <li>Discovered route count: <span style="font-weight: 600; color: #ffffff;">${meta.routeCount} pages</span></li>
             <li>Live status: <span style="color: ${meta.statusColor}; font-weight: 500;">${meta.liveStatusText}</span></li>
           </ul>
         </div>
         
-        <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted, #94a3b8);">
+        <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #94a3b8; font-family: var(--font-sans), sans-serif;">
           <span>⏱️ Est. Setup: <strong>${meta.setupTime}</strong></span>
-          <span style="color: var(--badge-pass, #34d399); font-weight: 500;">Halfway to AI-Ready 🎉</span>
+          <span style="color: #34d399; font-weight: 500; font-family: var(--font-sans), sans-serif;">Halfway to AI-Ready 🎉</span>
         </div>
       </div>
     `;
@@ -2124,37 +2148,37 @@ function switchDiyManifestTab(fileKey) {
   if (rightContainer) {
     const meta = getManifestMetadata(fileKey, domain, results);
     rightContainer.innerHTML = `
-      <div style="display: flex; flex-direction: column; height: 100%; text-align: left;">
-        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start;">
-          <span class="badge-status status-green" style="font-size: 0.75rem; background: rgba(52, 211, 153, 0.1); border: 1px solid var(--badge-pass, #34d399); color: var(--badge-pass, #34d399); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700;">Baseline Ready</span>
+      <div style="display: flex; flex-direction: column; height: 100%; text-align: left; font-family: var(--font-sans), sans-serif;">
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: flex-start; font-family: var(--font-sans), sans-serif;">
+          <span class="badge-status status-green" style="font-size: 0.75rem; background: rgba(52, 211, 153, 0.1); border: 1px solid #34d399; color: #34d399; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; font-family: var(--font-sans), sans-serif;">Baseline Ready</span>
         </div>
-        <h5 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.5rem 0;">Deploy Your Optimized File</h5>
-        <p style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.25rem;">Live site data was synthesized into an optimized baseline below.</p>
+        <h5 style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">Deploy Your Optimized File</h5>
+        <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">Live site data was synthesized into an optimized baseline below.</p>
         
         <!-- Primary Action Buttons -->
-        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
-          <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
+          <button onclick="downloadBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-family: var(--font-sans), sans-serif;">
             <span>📥</span> Download ${meta.filename}
           </button>
-          <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: var(--text-primary, #ffffff); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+          <button onclick="copyBaselineCode()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
             <span>📋</span> Copy Code
           </button>
         </div>
 
         <!-- Deployment Helper Banner -->
-        <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
-          💡 <strong>How to publish:</strong> Upload directly to your website's main root folder (e.g. <span style="font-family: var(--font-mono); color: #38bdf8;">https://${domain}/${meta.filename}</span>).
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #bae6fd; line-height: 1.4; font-family: var(--font-sans), sans-serif;">
+          💡 <strong>How to publish:</strong> Upload directly to your website's main root folder (e.g. <span style="font-family: var(--font-mono), monospace; color: #38bdf8;">https://${domain}/${meta.filename}</span>).
         </div>
 
         <!-- Progressive Disclosure (Hidden Code Viewer) -->
-        <details style="margin-top: auto;">
-          <summary style="font-size: 0.82rem; color: #38bdf8; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.25rem; user-select: none;">
+        <details style="margin-top: auto; font-family: var(--font-sans), sans-serif;">
+          <summary style="font-size: 0.82rem; color: #38bdf8; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.25rem; user-select: none; font-family: var(--font-sans), sans-serif;">
             View generated code & placeholders ▾
           </summary>
-          <pre id="right-pane-content" style="margin-top: 0.75rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left;"></pre>
+          <pre id="right-pane-content" style="margin-top: 0.75rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono), monospace; font-size: 0.82rem; color: #67e8f9; background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left;"></pre>
         </details>
         
-        <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem;">To manage this file actively, Upgrade to AI Optimize ↗</a>
+        <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AI Optimize'); return false;" class="direct-link-btn" style="display: block; text-align: center; margin-top: 15px; padding: 10px 20px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 0.85rem; font-family: var(--font-sans), sans-serif;">To manage this file actively, Upgrade to AI Optimize ↗</a>
       </div>
     `;
     
@@ -4351,6 +4375,11 @@ window.exportRawJsonDiagnostics = exportRawJsonDiagnostics;
 window.exportExecutiveSummaryPdf = exportExecutiveSummaryPdf;
 
 const tooltipExplanationData = {
+  'diy_cap_eeat_info': {
+    title: 'Deep E-E-A-T Auditing',
+    icon: '🛡️',
+    body: 'Deep E-E-A-T auditing verifies author credentials, cross-domain citation networks, brand entity sentiment, and schema graph consistency across all site pages.'
+  },
   'diy_jsonld_guide': {
     title: 'JSON-LD Implementation Guide',
     icon: '💡',
