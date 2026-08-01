@@ -128,9 +128,103 @@ function buildDevManifestTreeHtml() {
   `;
 }
 
+function buildDevSchemaBuilderHtml() {
+  return `
+    <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <span>Page-Level HTML Schema Builder (JSON-LD)</span>
+            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">HTML &lt;head&gt; Markup</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
+        <!-- Left Pane (50% width) -->
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;">
+          <h5 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.75rem 0;">Schema Builder &amp; Page-Targeting Guidance</h5>
+          
+          <!-- 3-Step Banner -->
+          <div style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+            💡 <strong>How to use:</strong> 1. Toggle entities matching visible content on your target page. 2. Copy script. 3. Paste into page HTML &lt;head&gt;.
+          </div>
+
+          <!-- Checkboxes with microcopy -->
+          <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="schema-entity-Organization" ${selectedSchemaEntities.Organization ? 'checked' : ''} onchange="toggleSchemaEntity('Organization')" style="margin-top: 0.25rem; cursor: pointer;" />
+              <div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">Organization</span>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage. Establishes sitewide brand identity.</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="schema-entity-LocalBusiness" ${selectedSchemaEntities.LocalBusiness ? 'checked' : ''} onchange="toggleSchemaEntity('LocalBusiness')" style="margin-top: 0.25rem; cursor: pointer;" />
+              <div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">LocalBusiness</span>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage / Contact Page. Address, geo-coordinates, &amp; hours.</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="schema-entity-FAQPage" ${selectedSchemaEntities.FAQPage ? 'checked' : ''} onchange="toggleSchemaEntity('FAQPage')" style="margin-top: 0.25rem; cursor: pointer;" />
+              <div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">FAQPage</span>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: FAQ / Product Pages. ⚠️ REQUIRED: Question/Answer text MUST be visibly printed on page.</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="schema-entity-WebSite" ${selectedSchemaEntities.WebSite ? 'checked' : ''} onchange="toggleSchemaEntity('WebSite')" style="margin-top: 0.25rem; cursor: pointer;" />
+              <div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">WebSite + Sitelinks SearchBox</span>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Homepage only. Enables sitewide searchbox.</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="schema-entity-Service" ${selectedSchemaEntities.Service ? 'checked' : ''} onchange="toggleSchemaEntity('Service')" style="margin-top: 0.25rem; cursor: pointer;" />
+              <div>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary, #ffffff);">Service / Offering</span>
+                <div style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.15rem;">📍 Target Page: Specific Service / Pricing Pages.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Right Pane (50% width) -->
+        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column;">
+          <h5 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #ffffff); margin: 0 0 0.75rem 0;">Deployment &amp; Real-Time Code Synthesis</h5>
+          
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+            <button onclick="copySchemaScript()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: var(--text-primary, #ffffff); color: var(--surface-bg, #0f172a); border: 1px solid var(--text-primary, #ffffff); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+              <span>📋</span> Copy HTML &lt;script&gt; Tag
+            </button>
+            <button onclick="downloadSchemaJson()" style="border-radius: 999px; padding: 0.5rem 1.25rem; font-size: 0.85rem; background: transparent; color: var(--text-primary, #ffffff); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+              <span>📥</span> Download schema.json
+            </button>
+          </div>
+
+          <!-- Deployment Helper Banner -->
+          <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
+            💡 <strong>How to publish:</strong> Paste directly into the &lt;head&gt; section of your web page's HTML (or via Google Tag Manager / SEO plugin).
+          </div>
+
+          <!-- Code Box -->
+          <pre id="schema-code-block" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; text-align: left; margin: 0;"></pre>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function buildDevMatrixHtml() {
   return `
-    <div class="developer-matrix-card glassmorphic" id="dev-matrix-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+    <div class="developer-matrix-card glassmorphic" id="diy-module-1" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
           <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
@@ -150,23 +244,8 @@ function buildDevMatrixHtml() {
         <button type="button" class="matrix-tab-btn control-menu-item" onclick="filterMatrixSection(4)">Section 4: Manifests (12)</button>
       </div>
 
-      <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto; position: relative;">
-        <table class="exec-table dev-matrix-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-          <thead style="position: sticky; top: 0; z-index: 10; background-color: var(--surface-bg); border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <tr style="color: #94a3b8; text-align: left;">
-              <th style="padding: 0.6rem;">#</th>
-              <th style="padding: 0.6rem;">Capability &amp; Parameter</th>
-              <th style="padding: 0.6rem;">Category</th>
-              <th style="padding: 0.6rem;">Status</th>
-              <th style="padding: 0.6rem;">Score</th>
-              <th style="padding: 0.6rem;">Technical Details &amp; Character Volume</th>
-              <th style="padding: 0.6rem; text-align: right;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="dev-matrix-tbody">
-            <!-- Dynamic 32-capability rows -->
-          </tbody>
-        </table>
+      <div id="dev-matrix-tbody" class="diy-accordions-container">
+        <!-- Dynamic Collapsible Accordions will go here -->
       </div>
     </div>
   `;
@@ -532,11 +611,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Page 2: AI Visualize Dashboard (visualize.html or /visualize)
   if (currentPath.includes('visualize')) {
     const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+    const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
     const devManifestTreeWrap = document.getElementById('dev-manifest-tree-wrapper');
     const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
     const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
     if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
+    if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
     if (devManifestTreeWrap) devManifestTreeWrap.innerHTML = buildDevManifestTreeHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
     if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
@@ -1116,6 +1197,214 @@ function displayScanResults(results) {
 let currentEvaluatedCapabilities = [];
 let currentScannedDomain = 'holiknits.com';
 
+let selectedSchemaEntities = {
+  Organization: true,
+  LocalBusiness: false,
+  FAQPage: false,
+  WebSite: false,
+  Service: false
+};
+
+function toggleSchemaEntity(entityKey) {
+  const checkbox = document.getElementById(`schema-entity-${entityKey}`);
+  if (checkbox) {
+    selectedSchemaEntities[entityKey] = checkbox.checked;
+  }
+  updateSchemaBuilderCode();
+}
+
+function copySchemaScript() {
+  const codeEl = document.getElementById('schema-code-block');
+  if (!codeEl) return;
+  const content = codeEl.innerText;
+  navigator.clipboard.writeText(content).then(() => {
+    alert('Copied HTML <script> Tag to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy schema script: ', err);
+  });
+}
+
+function downloadSchemaJson() {
+  const domain = currentScannedDomain || 'example.com';
+  const results = latestScanResults || window.lastScanResults || {};
+  const json = generateSchemaBuilderJson(domain, results);
+  const content = JSON.stringify(json, null, 2);
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'schema.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function generateSchemaBuilderJson(domainName, results = {}) {
+  const status = results.status || {};
+  const scraper = results.scrapedData || results.capabilityEvaluator || results || {};
+
+  const rawName = domainName || scraper.name || scraper.domain;
+  const nameVal = rawName ? `<Verify Scraped Data: ${rawName}>` : `<Input needed from user: Name>`;
+
+  const rawUrl = results.url || scraper.url || (domainName ? `https://${domainName}` : '');
+  const urlVal = rawUrl ? `<Verify Scraped Data: ${rawUrl}>` : `<Input needed from user: URL>`;
+
+  const rawLogo = scraper.logo || scraper.logoUrl || status.logo || status.logoUrl;
+  const logoVal = rawLogo ? `<Verify Scraped Data: ${rawLogo}>` : `<Input needed from user: Logo>`;
+
+  const rawPhone = results.phoneValue || scraper.phoneValue || scraper.phone || status.phoneValue || status.phone;
+  const hasPhone = rawPhone && rawPhone !== 'None Detected' && rawPhone.trim().length > 0;
+  const phoneVal = hasPhone ? `<Verify Scraped Data: ${rawPhone.trim()}>` : `<Input needed from user: Phone Number>`;
+
+  const rawSocials = scraper.socialLinks || scraper.sameAs || status.socialLinks || status.sameAs;
+  let sameAsVal = [];
+  if (Array.isArray(rawSocials) && rawSocials.length > 0) {
+    sameAsVal = rawSocials.map(link => `<Verify Scraped Data: ${link}>`);
+  } else if (typeof rawSocials === 'string' && rawSocials.trim().length > 0) {
+    sameAsVal = [`<Verify Scraped Data: ${rawSocials.trim()}>`];
+  } else {
+    sameAsVal = [
+      "<Input needed from user: Social Links>",
+      "<Input needed from user: Social Links>"
+    ];
+  }
+
+  const rawAddress = results.scrapedAddress || scraper.scrapedAddress || status.scrapedAddress || results.addressValue || scraper.address || status.address || '';
+  const hasAddress = rawAddress && rawAddress.trim().length > 0 && rawAddress !== 'None Detected';
+  const addressVal = hasAddress ? `<Verify Scraped Data: ${rawAddress.trim()}>` : `<Input needed from user: Physical Address>`;
+
+  const graph = [];
+
+  if (selectedSchemaEntities.Organization) {
+    graph.push({
+      "@type": "Organization",
+      "@id": rawUrl ? `${rawUrl}/#organization` : "<Input needed from user: URL>",
+      "name": nameVal,
+      "url": urlVal,
+      "logo": logoVal,
+      "description": "AI-Optimized Entity Verification Profile",
+      "sameAs": sameAsVal,
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": phoneVal,
+          "contactType": "customer support"
+        }
+      ]
+    });
+  }
+
+  if (selectedSchemaEntities.LocalBusiness) {
+    graph.push({
+      "@type": "LocalBusiness",
+      "@id": rawUrl ? `${rawUrl}/#localbusiness` : "<Input needed from user: URL>",
+      "name": nameVal,
+      "description": "Local Business Entity Profile",
+      "telephone": phoneVal,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": addressVal,
+        "addressLocality": "City",
+        "addressRegion": "State",
+        "postalCode": "Zip",
+        "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "<Verify Scraped Data: Latitude>",
+        "longitude": "<Verify Scraped Data: Longitude>"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "17:00"
+        }
+      ]
+    });
+  }
+
+  if (selectedSchemaEntities.FAQPage) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": rawUrl ? `${rawUrl}/#faq` : "<Input needed from user: URL>",
+      "isPartOf": {
+        "@id": rawUrl ? `${rawUrl}/#organization` : "<Input needed from user: URL>"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "<Verify Scraped Data: FAQ Question 1>",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<Verify Scraped Data: FAQ Answer 1>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "<Verify Scraped Data: FAQ Question 2>",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<Verify Scraped Data: FAQ Answer 2>"
+          }
+        }
+      ]
+    });
+  }
+
+  if (selectedSchemaEntities.WebSite) {
+    graph.push({
+      "@type": "WebSite",
+      "@id": rawUrl ? `${rawUrl}/#website` : "<Input needed from user: URL>",
+      "url": urlVal,
+      "name": nameVal,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": rawUrl ? `${rawUrl}/search?q={search_term_string}` : "<Input needed from user: URL>"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    });
+  }
+
+  if (selectedSchemaEntities.Service) {
+    graph.push({
+      "@type": "Service",
+      "@id": rawUrl ? `${rawUrl}/#service` : "<Input needed from user: URL>",
+      "provider": {
+        "@id": rawUrl ? `${rawUrl}/#organization` : "<Input needed from user: URL>"
+      },
+      "serviceType": "<Verify Scraped Data: Service Type>",
+      "description": "<Verify Scraped Data: Service Description>"
+    });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": graph
+  };
+}
+
+function updateSchemaBuilderCode() {
+  const codeBlock = document.getElementById('schema-code-block');
+  if (!codeBlock) return;
+  const domain = currentScannedDomain || 'example.com';
+  const results = latestScanResults || window.lastScanResults || {};
+  const json = generateSchemaBuilderJson(domain, results);
+  const code = `<script type="application/ld+json">\n${JSON.stringify(json, null, 2)}\n</script>`;
+  codeBlock.innerText = code;
+}
+
+window.toggleSchemaEntity = toggleSchemaEntity;
+window.copySchemaScript = copySchemaScript;
+window.downloadSchemaJson = downloadSchemaJson;
+window.updateSchemaBuilderCode = updateSchemaBuilderCode;
+
 function updateDeveloperViewData(results) {
   if (!results) return;
 
@@ -1131,6 +1420,7 @@ function updateDeveloperViewData(results) {
 
   renderDeveloperManifestTree(results);
   renderDeveloperMatrixRows(currentEvaluatedCapabilities);
+  updateSchemaBuilderCode();
   renderExpandableRoutesTable(results);
   selectCodeDrawer(activeDrawerKey, results);
 }
@@ -1257,107 +1547,224 @@ function getProUpgradeHook(capId = '') {
   return hooks[key] || null;
 }
 
-function renderDeveloperMatrixRows(capabilities) {
-  const tbody = document.getElementById('dev-matrix-tbody');
-  if (!tbody) return;
+const manifestTabMap = {
+  'robotsTxt': 'robots',
+  'robotsTxtTotalBlindness': 'robots',
+  'robotsTxtMapping': 'robots',
+  'sitemapXml': 'sitemap',
+  'sitemapXmlPresence': 'sitemap',
+  'sitemapCoverage': 'sitemap',
+  'llmsTxt': 'llms',
+  'llmsTxtSpecCompliance': 'llms',
+  'aiContextMd': 'aicontext',
+  'readmeMdManifest': 'readme',
+  'aboutMdManifest': 'about',
+  'docsMdManifest': 'docs',
+  'contentMdManifest': 'content'
+};
 
-  const sectionCategoryNames = {
-    1: 'Section 1: Gateway & Access',
-    2: 'Section 2: Presence & Hygiene',
-    3: 'Section 3: Content AI-Optimization',
-    4: 'Section 4: Machine Manifest Readiness'
+const manifestFileNames = {
+  'robots': 'robots.txt',
+  'sitemap': 'sitemap.xml',
+  'llms': 'llms.txt',
+  'aicontext': 'ai-context.md',
+  'readme': 'README.md',
+  'about': 'about.md',
+  'docs': 'docs.md',
+  'content': 'content.md'
+};
+
+function getDiyCategory(capId) {
+  const cat1 = ['cdnFirewallBlocking', 'xRobotsTagHeaders', 'isSecureProtocol', 'robotsTxtTotalBlindness', 'heavyPageIndication', 'lastUpdatedFreshness'];
+  const cat3 = ['essentialPagesIndex', 'contactAndPrivacyPresence', 'faqSchemaParity', 'jsonLdSchema'];
+  const cat4 = ['robotsTxt', 'sitemapXml', 'llmsTxt', 'llmsTxtSpecCompliance', 'aiContextMd', 'readmeMdManifest', 'aboutMdManifest', 'docsMdManifest', 'contentMdManifest', 'robotsTxtMapping'];
+  
+  if (cat1.includes(capId)) return 1;
+  if (cat3.includes(capId)) return 3;
+  if (cat4.includes(capId)) return 4;
+  return 2; // Default Category 2: Semantic HTML & Structural Hygiene
+}
+
+function getDiyCategoryInfo(catIndex) {
+  const infos = {
+    1: { name: 'Server & Hosting Health', icon: '🖥️' },
+    2: { name: 'Semantic HTML & Structural Hygiene', icon: '🏷️' },
+    3: { name: 'E-E-A-T & Trust Signals', icon: '🤝' },
+    4: { name: 'Machine Manifest Presence & Compliance', icon: '🤖' }
+  };
+  return infos[catIndex] || { name: 'Other', icon: '🔍' };
+}
+
+function scrollToModule(moduleId, tabKey = null) {
+  let targetId = moduleId;
+  if (moduleId === 'diy-module-3') {
+    targetId = 'dev-drawers-wrapper';
+  }
+  const el = document.getElementById(targetId);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  if (tabKey) {
+    switchDiyManifestTab(tabKey);
+  }
+}
+
+window.scrollToModule = scrollToModule;
+
+function renderDeveloperMatrixRows(capabilities) {
+  const container = document.getElementById('dev-matrix-tbody');
+  if (!container) return;
+
+  const categories = {
+    1: [],
+    2: [],
+    3: [],
+    4: []
   };
 
-  let rowsHtml = '';
-  let currentSection = null;
-  const isAllView = capabilities.length > 15;
-
-  capabilities.forEach((cap, idx) => {
-    if (isAllView && cap.section !== currentSection) {
-      currentSection = cap.section;
-      const catTitle = sectionCategoryNames[currentSection] || `Section ${currentSection}`;
-      rowsHtml += `
-        <tr class="category-divider" style="background: rgba(255,255,255,0.06); color: var(--burnt-copper); font-weight: 700;">
-          <td colspan="7" style="padding: 0.6rem 0.8rem; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-            <strong>${catTitle}</strong>
-          </td>
-        </tr>
-      `;
-    }
-
-    const isPass = cap.status === 'pass' || cap.status === 'active';
-    const isBlocked = cap.status === 'blocked' || cap.status === 'critical';
-    const statusBadge = isPass
-      ? '<span class="badge-status status-green">🟢 Pass</span>'
-      : (isBlocked ? '<span class="badge-status status-red">🔴 Blocked</span>' : '<span class="badge-status status-amber">🟡 Warning</span>');
-
-    const proHook = getProUpgradeHook(cap.id);
-    let actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')"><span>⚡ Fix in AIOptimize</span></button>`;
-    
-    if (proHook && !isPass) {
-      actionHtml = `<button type="button" class="badge-status status-amber" onclick="showUpgradeModal('PRO_REQUIRED', '${proHook.msg}', '${proHook.tier}')" style="border: none; cursor: pointer; padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700;">${proHook.label}</button>`;
-    }
-
-    // Fix unescaped HTML tags rendering bug:
-    // Render tag names cleanly without raw angle brackets inside inline <code> tags
-    let cleanDescription = cap.description || cap.impact || '';
-    let cleanDetails = cap.deductionReason || cap.details || '';
-    cleanDescription = cleanDescription.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
-    cleanDetails = cleanDetails.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
-
-    rowsHtml += `
-      <tr data-section="${cap.section}">
-        <td style="font-family: var(--font-mono); color: var(--text-muted);">${idx + 1}</td>
-        <td>
-          <strong>${cap.name || cap.title}</strong> <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_cap_${cap.id}')" style="cursor: pointer; margin-left: 0.2rem;">(?)</span>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${cleanDescription}</div>
-        </td>
-        <td><span class="dev-cat-badge">${cap.category}</span></td>
-        <td>${statusBadge}</td>
-        <td style="font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
-        <td style="font-size: 0.8rem; color: var(--text-main);">${cleanDetails}</td>
-        <td style="text-align: right;">${actionHtml}</td>
-      </tr>
-    `;
-
-    // Task 1.2: Check if capability is X-Robots-Tag and render conditionally styled accordion
-    const isXRobots = cap.id === 'xRobotsTag' || cap.id === 'xRobotsTagHeaders' || (cap.id && cap.id.toLowerCase().includes('xrobots'));
-    if (isXRobots) {
-      const isXRobotsPass = isPass || cap.score === 100 || cap.status === 'pass' || (cap.deductions === 0);
-      let summaryText = '';
-      let bodyContent = '';
-      if (isXRobotsPass) {
-        summaryText = `<summary style="color: var(--badge-pass, #10b981); cursor: pointer; font-weight: 600;">Status: Valid AI-Optimized Configuration</summary>`;
-        bodyContent = `<div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-pass-bg); border-radius: 4px; margin-top: 5px;'><strong>✅ Your server headers are correctly configured and are not blocking AI.</strong></div>`;
-      } else {
-        summaryText = `<summary style="color: var(--badge-fail, #ef4444); cursor: pointer; font-weight: 600;">How to Fix: AI-Block Detected</summary>`;
-        bodyContent = `
-          <div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-fail-bg); border-radius: 4px; margin-top: 5px;'>
-            <strong>Using a Text Editor (via FTP or cPanel File Manager):</strong><br>
-            <span style='font-size: 0.9em; display: block; margin-bottom: 10px;'>The X-Robots-Tag is a hidden server header, not a standalone file. To fix this without using a command-line terminal, open your website's root folder using a file manager or FTP, open the server configuration file in a text editor, and modify or remove the blocking rules.</span>
-            <strong>Apache (Edit your .htaccess file):</strong><br>
-            <code style='color: var(--primary-accent);'>Header unset X-Robots-Tag</code><br><br>
-            <strong>Nginx (Edit your nginx.conf file):</strong><br>
-            <code style='color: var(--primary-accent);'>fastcgi_hide_header X-Robots-Tag;</code><br>
-            <code style='color: var(--primary-accent);'>proxy_hide_header X-Robots-Tag;</code>
-          </div>
-        `;
-      }
-
-      rowsHtml += `
-        <tr>
-          <td colspan="100%">
-            <details>
-              ${summaryText}
-              ${bodyContent}
-            </details>
-          </td>
-        </tr>
-      `;
-    }
+  capabilities.forEach(cap => {
+    const catIndex = getDiyCategory(cap.id);
+    categories[catIndex].push(cap);
   });
 
-  tbody.innerHTML = rowsHtml;
+  let accordionsHtml = '';
+
+  for (let catIndex = 1; catIndex <= 4; catIndex++) {
+    const groupCaps = categories[catIndex];
+    if (groupCaps.length === 0) continue;
+
+    const catInfo = getDiyCategoryInfo(catIndex);
+    let rowsHtml = '';
+
+    groupCaps.forEach((cap, idx) => {
+      const isPass = cap.status === 'pass' || cap.status === 'active';
+      const isBlocked = cap.status === 'blocked' || cap.status === 'critical';
+      const statusBadge = isPass
+        ? '<span class="badge-status status-green">🟢 Pass</span>'
+        : (isBlocked ? '<span class="badge-status status-red">🔴 Blocked</span>' : '<span class="badge-status status-amber">🟡 Warning</span>');
+
+      const proHook = getProUpgradeHook(cap.id);
+      let actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('', '${cap.id}')"><span>⚡ Fix in AIOptimize</span></button>`;
+      
+      if (proHook && !isPass) {
+        actionHtml = `<button type="button" class="badge-status status-amber" onclick="showUpgradeModal('PRO_REQUIRED', '${proHook.msg}', '${proHook.tier}')" style="border: none; cursor: pointer; padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700;">${proHook.label}</button>`;
+      } else if (!isPass) {
+        const isSchemaCheck = cap.id === 'jsonLdSchema' || cap.id === 'faqSchemaParity' || cap.id.toLowerCase().includes('schema') || cap.id.toLowerCase().includes('jsonld');
+        const manifestTab = manifestTabMap[cap.id];
+        
+        if (isSchemaCheck) {
+          actionHtml = `<button type="button" class="btn-fix-bridge btn-schema-bridge" onclick="scrollToModule('diy-module-2')"><span>⚡ Fix in Schema Builder</span></button>`;
+        } else if (manifestTab) {
+          const fname = manifestFileNames[manifestTab] || 'file';
+          actionHtml = `<button type="button" class="btn-fix-bridge btn-manifest-bridge" onclick="scrollToModule('diy-module-3', '${manifestTab}')"><span>⚡ Generate ${fname}</span></button>`;
+        }
+      }
+
+      // Fix unescaped HTML tags rendering bug:
+      // Render tag names cleanly without raw angle brackets inside inline <code> tags
+      let cleanDescription = cap.description || cap.impact || '';
+      let cleanDetails = cap.deductionReason || cap.details || '';
+      cleanDescription = cleanDescription.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
+      cleanDetails = cleanDetails.replace(/<([a-zA-Z0-9]+)>/g, '<code>$1</code>');
+
+      // Robust escaping helper to prevent any other raw unescaped angle brackets (like <link rel="canonical">)
+      const escapeRawAngleBrackets = (str) => {
+        let temp = str.replace(/<code>/g, '___CODE_OPEN___').replace(/<\/code>/g, '___CODE_CLOSE___');
+        temp = temp.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        temp = temp.replace(/___CODE_OPEN___/g, '<code>').replace(/___CODE_CLOSE___/g, '</code>');
+        return temp;
+      };
+      
+      cleanDescription = escapeRawAngleBrackets(cleanDescription);
+      cleanDetails = escapeRawAngleBrackets(cleanDetails);
+
+      const overallIndex = CAPABILITY_MATRIX.findIndex(c => c.id === cap.id) + 1;
+
+      rowsHtml += `
+        <tr data-section="${cap.section}">
+          <td style="font-family: var(--font-mono); color: var(--text-muted); padding: 0.6rem;">${overallIndex}</td>
+          <td style="padding: 0.6rem;">
+            <strong>${cap.name || cap.title}</strong> <span class="help-tooltip-trigger" onclick="openHelpTooltip('diy_cap_${cap.id}')" style="cursor: pointer; margin-left: 0.2rem;">(?)</span>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${cleanDescription}</div>
+          </td>
+          <td style="padding: 0.6rem;"><span class="dev-cat-badge">${cap.category}</span></td>
+          <td style="padding: 0.6rem;">${statusBadge}</td>
+          <td style="padding: 0.6rem; font-family: var(--font-mono); font-weight: 700;">${cap.score}/100</td>
+          <td style="padding: 0.6rem; font-size: 0.8rem; color: var(--text-main);">${cleanDetails}</td>
+          <td style="padding: 0.6rem; text-align: right;">${actionHtml}</td>
+        </tr>
+      `;
+
+      // Accordion for X-Robots-Tag if blocked
+      const isXRobots = cap.id === 'xRobotsTag' || cap.id === 'xRobotsTagHeaders' || (cap.id && cap.id.toLowerCase().includes('xrobots'));
+      if (isXRobots) {
+        const isXRobotsPass = isPass || cap.score === 100 || cap.status === 'pass' || (cap.deductions === 0);
+        let summaryText = '';
+        let bodyContent = '';
+        if (isXRobotsPass) {
+          summaryText = `<summary style="color: var(--badge-pass, #10b981); cursor: pointer; font-weight: 600;">Status: Valid AI-Optimized Configuration</summary>`;
+          bodyContent = `<div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-pass-bg); border-radius: 4px; margin-top: 5px;'><strong>✅ Your server headers are correctly configured and are not blocking AI.</strong></div>`;
+        } else {
+          summaryText = `<summary style="color: var(--badge-fail, #ef4444); cursor: pointer; font-weight: 600;">How to Fix: AI-Block Detected</summary>`;
+          bodyContent = `
+            <div style='padding: 10px; background: var(--surface-bg); border-left: 4px solid var(--badge-fail-bg); border-radius: 4px; margin-top: 5px;'>
+              <strong>Using a Text Editor (via FTP or cPanel File Manager):</strong><br>
+              <span style='font-size: 0.9em; display: block; margin-bottom: 10px;'>The X-Robots-Tag is a hidden server header, not a standalone file. To fix this without using a command-line terminal, open your website's root folder using a file manager or FTP, open the server configuration file in a text editor, and modify or remove the blocking rules.</span>
+              <strong>Apache (Edit your .htaccess file):</strong><br>
+              <code style='color: var(--primary-accent);'>Header unset X-Robots-Tag</code><br><br>
+              <strong>Nginx (Edit your nginx.conf file):</strong><br>
+              <code style='color: var(--primary-accent);'>fastcgi_hide_header X-Robots-Tag;</code><br>
+              <code style='color: var(--primary-accent);'>proxy_hide_header X-Robots-Tag;</code>
+            </div>
+          `;
+        }
+
+        rowsHtml += `
+          <tr>
+            <td colspan="100%">
+              <details style="margin: 0.5rem 0;">
+                ${summaryText}
+                ${bodyContent}
+              </details>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    accordionsHtml += `
+      <details class="accordion-item" open style="margin-bottom: 1.5rem;">
+        <summary class="accordion-header">
+          <span class="accordion-title" style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="font-size: 1.25rem;">${catInfo.icon}</span>
+            <span>${catInfo.name}</span>
+            <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted, #94a3b8); background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem; border: 1px solid rgba(255,255,255,0.05);">${groupCaps.length} check${groupCaps.length === 1 ? '' : 's'}</span>
+          </span>
+          <span class="accordion-arrow">▼</span>
+        </summary>
+        <div class="accordion-content" style="padding: 1.2rem; overflow-x: auto;">
+          <table class="exec-table dev-matrix-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
+                <th style="padding: 0.6rem; width: 40px;">#</th>
+                <th style="padding: 0.6rem; width: 250px;">Capability &amp; Parameter</th>
+                <th style="padding: 0.6rem; width: 100px;">Category</th>
+                <th style="padding: 0.6rem; width: 100px;">Status</th>
+                <th style="padding: 0.6rem; width: 80px;">Score</th>
+                <th style="padding: 0.6rem;">Technical Details &amp; Character Volume</th>
+                <th style="padding: 0.6rem; text-align: right; width: 180px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    `;
+  }
+
+  container.innerHTML = accordionsHtml;
 }
 
 function filterMatrixSection(section) {
@@ -1736,7 +2143,7 @@ function switchDiyManifestTab(fileKey) {
 
         <!-- Deployment Helper Banner -->
         <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.4;">
-          💡 <strong>How to publish:</strong> Save this file and upload it directly to your website's main root folder (e.g., <span style="font-family: var(--font-mono); color: #38bdf8;">https://${domain}/${meta.filename}</span>).
+          💡 <strong>How to publish:</strong> Upload directly to your website's main root folder (e.g. <span style="font-family: var(--font-mono); color: #38bdf8;">https://${domain}/${meta.filename}</span>).
         </div>
 
         <!-- Progressive Disclosure (Hidden Code Viewer) -->
