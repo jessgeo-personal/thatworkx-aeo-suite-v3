@@ -92,41 +92,6 @@ let cooldownTimeRemaining = 0;
 let cooldownInterval = null;
 
 // Developer Mode HTML Template Builders
-function buildDevManifestTreeHtml() {
-  return `
-    <div class="table-card glassmorphic mb-6" id="dev-manifest-tree-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>🤖 AI-Ready File (Machine Manifest) Diagnostics</span>
-            <span class="badge-status" id="dev-manifest-count-badge" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">8 Manifests Tracked</span>
-          </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Inspect robots.txt directives, bot permissions, and Level 1–4 machine welcome mats.</p>
-        </div>
-      </div>
-
-      <div class="table-responsive-wrapper" style="overflow-x: auto;">
-        <table class="exec-table dev-manifest-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-          <thead>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8;">
-              <th style="padding: 0.6rem;">Machine File</th>
-              <th style="padding: 0.6rem;">Status</th>
-              <th style="padding: 0.6rem;">In Robots.txt</th>
-              <th style="padding: 0.6rem;">ChatGPT</th>
-              <th style="padding: 0.6rem;">Gemini-bot</th>
-              <th style="padding: 0.6rem;">Perplexity-bot</th>
-              <th style="padding: 0.6rem;">Words / Chars</th>
-              <th style="padding: 0.6rem; text-align: right;">Inspection</th>
-            </tr>
-          </thead>
-          <tbody id="dev-manifest-tbody">
-            <!-- Dynamic Level 1-4 Manifest Rows -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
 
 function buildDevSchemaBuilderHtml() {
   return `
@@ -540,40 +505,7 @@ async function handleRequest(request) {
   `;
 }
 
-function buildDevRoutesHtml() {
-  return `
-    <div class="expandable-routes-card glassmorphic" id="dev-expandable-routes-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div>
-          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>📂 Scanned Routes Directory (Expandable DOM Metrics)</span>
-            <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted);">[▶] Click to Expand</span>
-          </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Expand individual route rows to inspect raw DOM heading arrays, token counts, and canonical link tags.</p>
-        </div>
-        <span class="table-count-badge" id="dev-routes-count">4 Routes Tracked</span>
-      </div>
 
-      <div class="table-responsive-wrapper">
-        <table class="exec-table dev-expandable-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-          <thead>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
-              <th style="width: 40px; padding: 0.6rem;"></th>
-              <th style="padding: 0.6rem;">Route Path</th>
-              <th style="padding: 0.6rem;">Word Count</th>
-              <th style="padding: 0.6rem;">Token Count</th>
-              <th style="padding: 0.6rem;">Canonical Tag</th>
-              <th style="padding: 0.6rem;">Heading Hierarchy</th>
-            </tr>
-          </thead>
-          <tbody id="dev-expandable-routes-tbody">
-            <!-- Rendered by JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
 
 // 4-Page Architecture Router Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -614,15 +546,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (currentPath.includes('visualize')) {
     const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
     const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
-    const devManifestTreeWrap = document.getElementById('dev-manifest-tree-wrapper');
     const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
-    const devRoutesWrap = document.getElementById('dev-routes-wrapper');
 
     if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
     if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
-    if (devManifestTreeWrap) devManifestTreeWrap.innerHTML = buildDevManifestTreeHtml();
     if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
-    if (devRoutesWrap) devRoutesWrap.innerHTML = buildDevRoutesHtml();
 
     const tabParam = params.get('tab');
     if (modeParam === 'developer' || modeParam === 'diy') {
@@ -1420,112 +1348,12 @@ function updateDeveloperViewData(results) {
   const evalResults = evaluateAllCapabilities(results);
   currentEvaluatedCapabilities = evalResults.capabilities || results.capabilityMatrix || [];
 
-  renderDeveloperManifestTree(results);
   renderDeveloperMatrixRows(currentEvaluatedCapabilities);
   updateSchemaBuilderCode();
-  renderExpandableRoutesTable(results);
   selectCodeDrawer(activeDrawerKey, results);
 }
 
-function renderDeveloperManifestTree(results = {}) {
-  const tbody = document.getElementById('dev-manifest-tbody');
-  const countBadge = document.getElementById('dev-manifest-count-badge');
-  if (!tbody) return;
 
-  const status = results.status || {};
-  const botPerms = status.botPermissions || {};
-
-  const gptAllowed = botPerms.gptBot !== false;
-  const geminiAllowed = botPerms.googleExtended !== false;
-  const perplexityAllowed = botPerms.perplexityBot !== false;
-
-  const getBotPill = (allowed) => allowed
-    ? `<span class="badge-status status-green" style="font-size: 0.72rem;">🟢 Allowed</span>`
-    : `<span class="badge-status status-red" style="font-size: 0.72rem;">🔴 Blocked</span>`;
-
-  const domainUrl = `https://${currentScannedDomain}`;
-
-  const manifests = [
-    {
-      path: '/robots.txt',
-      fileRoute: '/robots.txt',
-      exists: !!status.robotsTxtExists,
-      inRobots: 'N/A',
-      wordInfo: status.robotsTxtExists ? '780 chars' : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> /llms.txt',
-      fileRoute: '/llms.txt',
-      exists: !!status.llmsTxtExists,
-      inRobots: status.robotsTxtExists ? 'Yes' : 'No',
-      wordInfo: status.llmsTxtExists ? (status.llmsTxtContent ? `${status.llmsTxtContent.split(/\s+/).filter(Boolean).length} words` : '350 words') : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> /sitemap.xml',
-      fileRoute: '/sitemap.xml',
-      exists: !!status.sitemapExists,
-      inRobots: status.sitemapExists ? 'Yes' : 'No',
-      wordInfo: status.sitemapExists ? '1.4 KB' : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> /ai-context.md',
-      fileRoute: '/ai-context.md',
-      exists: !!status.aiContextExists,
-      inRobots: status.aiContextExists ? 'Yes' : 'No',
-      wordInfo: status.aiContextExists ? (status.aiContextContent ? `${status.aiContextContent.split(/\s+/).filter(Boolean).length} words` : '520 words') : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> README.md',
-      fileRoute: '/README.md',
-      exists: !!status.readmeFound,
-      inRobots: 'No',
-      wordInfo: status.readmeFound ? '290 words' : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> about.md',
-      fileRoute: '/about.md',
-      exists: !!status.aboutTxtExists,
-      inRobots: status.aboutTxtExists ? 'Yes' : 'No',
-      wordInfo: status.aboutTxtExists ? (status.aboutTxtContent ? `${status.aboutTxtContent.split(/\s+/).filter(Boolean).length} words` : '410 words') : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> docs.md',
-      fileRoute: '/docs.md',
-      exists: !!status.docsTxtExists,
-      inRobots: status.docsTxtExists ? 'Yes' : 'No',
-      wordInfo: status.docsTxtExists ? (status.docsTxtContent ? `${status.docsTxtContent.split(/\s+/).filter(Boolean).length} words` : '680 words') : '0 words (404 Missing)'
-    },
-    {
-      path: '|--> content.md',
-      fileRoute: '/content.md',
-      exists: !!status.contentTxtExists,
-      inRobots: status.contentTxtExists ? 'Yes' : 'No',
-      wordInfo: status.contentTxtExists ? (status.contentTxtContent ? `${status.contentTxtContent.split(/\s+/).filter(Boolean).length} words` : '950 words') : '0 words (404 Missing)'
-    }
-  ];
-
-  const activeCount = manifests.filter(m => m.exists).length;
-  if (countBadge) countBadge.innerText = `${activeCount} / 8 Manifests Active`;
-
-  tbody.innerHTML = manifests.map(m => `
-    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-      <td style="padding: 0.6rem;"><code style="color: #4ade80;">${m.path}</code></td>
-      <td style="padding: 0.6rem;">
-        <span class="badge-status ${m.exists ? 'status-green' : 'status-red'}" style="font-size: 0.75rem;">
-          ${m.exists ? '🟢 Active' : '🔴 Not Active'}
-        </span>
-      </td>
-      <td style="padding: 0.6rem; color: #cbd5e1;">${m.inRobots}</td>
-      <td style="padding: 0.6rem;">${getBotPill(gptAllowed)}</td>
-      <td style="padding: 0.6rem;">${getBotPill(geminiAllowed)}</td>
-      <td style="padding: 0.6rem;">${getBotPill(perplexityAllowed)}</td>
-      <td style="padding: 0.6rem; color: #94a3b8; font-size: 0.8rem;">${m.wordInfo}</td>
-      <td style="padding: 0.6rem; text-align: right;">
-        <a href="${domainUrl}${m.fileRoute}" target="_blank" rel="noopener noreferrer" class="drawer-btn" style="text-decoration: none; display: inline-block; padding: 0.2rem 0.5rem; font-size: 0.78rem;">View ↗</a>
-      </td>
-    </tr>
-  `).join('');
-}
 
 function getProUpgradeHook(capId = '') {
   if (!capId) return null;
@@ -1579,7 +1407,7 @@ const manifestFileNames = {
 function getDiyCategory(capId) {
   const cat1 = ['cdnFirewallBlocking', 'xRobotsTagHeaders', 'isSecureProtocol', 'robotsTxtTotalBlindness', 'heavyPageIndication', 'lastUpdatedFreshness'];
   const cat3 = ['essentialPagesIndex', 'contactAndPrivacyPresence', 'faqSchemaParity', 'jsonLdSchema'];
-  const cat4 = ['robotsTxt', 'sitemapXml', 'llmsTxt', 'llmsTxtSpecCompliance', 'aiContextMd', 'readmeMdManifest', 'aboutMdManifest', 'docsMdManifest', 'contentMdManifest', 'robotsTxtMapping'];
+  const cat4 = ['robotsTxt', 'sitemapXml', 'llmsTxt', 'llmsTxtSpecCompliance', 'aiContextMd', 'readmeMdManifest', 'aboutMdManifest', 'docsMdManifest', 'contentMdManifest', 'robotsTxtMapping', 'sitemapCoverage'];
   
   if (cat1.includes(capId)) return 1;
   if (cat3.includes(capId)) return 3;
@@ -2344,60 +2172,7 @@ function copyEdgeScript() {
   }
 }
 
-function renderExpandableRoutesTable(results) {
-  const tbody = document.getElementById('dev-expandable-routes-tbody');
-  const countEl = document.getElementById('dev-routes-count');
-  if (!tbody) return;
 
-  const pages = (results && results.pages && results.pages.length) ? results.pages : [
-    { 
-      route: '/', 
-      wordCount: results?.status?.wordCount ?? 0, 
-      hasCanonical: true, 
-      canonicalUrl: `https://${currentScannedDomain}/`, 
-      headingAudit: { isHierarchyValid: results?.status?.hasProperHierarchy ?? true, h1: 1, h2: 2 } 
-    }
-  ];
-
-  if (countEl) countEl.innerText = `${pages.length} Route${pages.length === 1 ? '' : 's'} Tracked`;
-
-  tbody.innerHTML = pages.map((p, idx) => `
-    <tr>
-      <td>
-        <button type="button" class="btn-expand-row" onclick="toggleRouteExpandRow(${idx})">▶</button>
-      </td>
-      <td class="cell-path"><code>${p.route}</code></td>
-      <td>${p.wordCount || 0} words</td>
-      <td>~${Math.round((p.wordCount || 0) * 1.3)} tokens</td>
-      <td>${p.hasCanonical !== false ? '🟢 Valid' : '🔴 Missing'}</td>
-      <td>${p.headingAudit?.isHierarchyValid !== false ? '🟢 1 H1 (Sequential)' : '🔴 Hierarchy Issue'}</td>
-      <td style="text-align: right;">
-        <button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', 'tokenLoadAnalysis')">
-          <span>⚡ Audit Page</span>
-        </button>
-      </td>
-    </tr>
-    <tr id="dev-expand-row-${idx}" style="display: none;">
-      <td colspan="7">
-        <div class="row-expanded-content">
-          <strong>Raw DOM Metrics &amp; Heading Array for <code>${p.route}</code>:</strong>
-          <ul style="margin: 0.5rem 0 0 1.2rem; padding: 0;">
-            <li>Canonical URL: <code>${p.canonicalUrl || `https://${currentScannedDomain}${p.route}`}</code></li>
-            <li>Headings Count: H1: ${p.headingAudit?.h1 ?? 1} | H2: ${p.headingAudit?.h2 ?? 0}</li>
-            <li>RAG Context Window Status: ${(p.wordCount || 0) > 2500 ? '🟡 High Token Volume (Truncation Risk)' : '🟢 Ideal Vector Window'}</li>
-          </ul>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function toggleRouteExpandRow(idx) {
-  const row = document.getElementById(`dev-expand-row-${idx}`);
-  if (row) {
-    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
-  }
-}
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 // Execute Dashboard Scan for visualize.html
