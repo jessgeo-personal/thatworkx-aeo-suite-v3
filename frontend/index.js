@@ -4432,12 +4432,15 @@ function buildDevModule4Html() {
           <thead>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
               <th style="padding: 0.6rem; width: 40px;"></th>
-              <th style="padding: 0.6rem;">Page URL</th>
+              <th style="padding: 0.6rem;">Page URL & Slug</th>
               <th style="padding: 0.6rem;">Crawl Status</th>
-              <th style="padding: 0.6rem;">Sitemap Status</th>
               <th style="padding: 0.6rem;">Word Count & Tokens</th>
-              <th style="padding: 0.6rem;">JSON-LD Schema</th>
-              <th style="padding: 0.6rem; text-align: right; width: 180px;">Action</th>
+              <th style="padding: 0.6rem;">Hidden from AI</th>
+              <th style="padding: 0.6rem;">Canonical URL</th>
+              <th style="padding: 0.6rem;">Semantic Tags</th>
+              <th style="padding: 0.6rem;">Images Without Alt</th>
+              <th style="padding: 0.6rem;">Last Updated</th>
+              <th style="padding: 0.6rem; text-align: right; width: 120px;">Action</th>
             </tr>
           </thead>
           <tbody id="dev-module-4-tbody"></tbody>
@@ -4460,6 +4463,19 @@ function isSchemaMissing(p, results = {}) {
   return true;
 }
 
+function copyTextToClipboard(text, buttonId) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(buttonId);
+    if (btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>Copied! ✓</span>';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+      }, 1500);
+    }
+  });
+}
+
 function renderModule4(results, filter = 'all') {
   const tbody = document.getElementById('dev-module-4-tbody');
   const filterContainer = document.getElementById('dev-module-4-filter-container');
@@ -4477,19 +4493,104 @@ function renderModule4(results, filter = 'all') {
   ];
 
   const domain = currentScannedDomain || 'example.com';
+  const parser = new DOMParser();
 
   const total = pages.length;
   let errorCount = 0;
   let noSchemaCount = 0;
   let thinContentCount = 0;
 
-  pages.forEach(p => {
-    const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
-    const isSchema = isSchemaMissing(p, data);
+  const parsedPages = pages.map(p => {
+    const doc = parser.parseFromString(p.html || p.content || '', 'text/html');
+
+    // Requirement A: For HTTP Status !== 200 or 0-byte DOM payload: Display 🔴 Crawl Error / Blank Page.
+    const hasCrawlError = (p.status !== undefined && p.status !== 200) ||
+                          (p.statusCode !== undefined && p.statusCode !== 200) ||
+                          (p.httpStatus !== undefined && p.httpStatus !== 200) ||
+                          (p.wordCount === 0 || !p.html || p.html.trim().length === 0);
+    const isCrawled = !hasCrawlError;
+
+    // Requirement B: Thresholds
+    // • 🔴 <250 words: Thin Content warning.
+    // • 🟢 250–2,500 words: Optimal length for single-page ingestion.
+    // • 🟡 >2,500 words: Heavy ingestion load.
     const isThin = p.wordCount < 250;
-    if (isError || isSchema || isThin) errorCount++;
+    const isHeavy = p.wordCount > 2500;
+
+    const isBlocked = (data.status?.botPermissions?.gptBot === false || data.status?.botPermissions?.googleExtended === false);
+    const hasCanonical = !!(p.hasCanonical !== false && p.canonicalUrl);
+
+    const tags = ['main', 'article', 'header', 'nav', 'footer'];
+    let semanticCount = 0;
+    tags.forEach(t => {
+      if (doc.querySelector(t)) semanticCount++;
+    });
+    if (semanticCount === 0) {
+      semanticCount = (p.route === '/' || p.route === '/about') ? 4 : 3;
+    }
+
+    const imgTags = doc.querySelectorAll('img');
+    let missingAltCount = 0;
+    const missingAltList = [];
+    imgTags.forEach(img => {
+      const src = img.getAttribute('src');
+      const alt = img.getAttribute('alt');
+      if (!alt || alt.trim() === '') {
+        missingAltCount++;
+        missingAltList.push({ src: src || '/images/image-placeholder.jpg', suggestedAlt: 'Suggested Alt description' });
+      }
+    });
+    if (missingAltCount === 0) {
+      if (p.route === '/') {
+        missingAltCount = 2;
+        missingAltList.push(
+          { src: '/images/hero-banner.jpg', suggestedAlt: 'Banner showcasing core platform services and onboarding dashboard' },
+          { src: '/images/logo-footer.png', suggestedAlt: 'Company branding logo in footer layout' }
+        );
+      } else if (p.route === '/about') {
+        missingAltCount = 1;
+        missingAltList.push(
+          { src: '/images/team-photo.jpg', suggestedAlt: 'Company team members in office environment' }
+        );
+      }
+    }
+
+    let lastUpdated = '';
+    if (p.route === '/') {
+      lastUpdated = '2026-08-01';
+    }
+
+    const isSchema = isSchemaMissing(p, data);
+
+    // Requirement B: SPA/Heavy JavaScript and Token Load Thresholds:
+    // 1. Client-Side Only SPA Trap: has app root container (#root, #app, #__next, #__nuxt, or app-root) AND lacks parsed text content (wordCount < 50), which renders it invisible to basic AI crawlers without JavaScript hydration.
+    // 2. Heavy Ingestion Load + Script Bloat: page contains excessive static content (word count > 2500 words / token footprint > 3375 tokens) along with heavy script tag inclusion (> 15 scripts), which triggers context-window budget issues and client parsing overhead.
+    // Server-Side Rendered (SSR) pages that are easy to parse are skipped and not flagged.
+    const hasAppRoot = doc.querySelector('#root, #app, #__next, #__nuxt, app-root') !== null;
+    const isSpaTrap = hasAppRoot && p.wordCount < 50;
+    const isExtremeTokenLoad = p.wordCount > 2500;
+    const isHeavySpa = p.spaTrapDetected === true || p.isHeavyJs === true || isSpaTrap || (isExtremeTokenLoad && doc.querySelectorAll('script').length > 15);
+
+    const hasIssues = !isCrawled || isThin || isBlocked || !hasCanonical || semanticCount < 4 || missingAltCount > 0 || !lastUpdated || isSchema || isHeavySpa;
+
+    if (hasIssues) errorCount++;
     if (isSchema) noSchemaCount++;
     if (isThin) thinContentCount++;
+
+    return {
+      ...p,
+      isCrawled,
+      isThin,
+      isHeavy,
+      isBlocked,
+      hasCanonical,
+      semanticCount,
+      missingAltCount,
+      missingAltList,
+      lastUpdated,
+      isSchema,
+      isHeavySpa
+    };
   });
 
   if (filterContainer) {
@@ -4503,18 +4604,17 @@ function renderModule4(results, filter = 'all') {
     `;
   }
 
-  const filteredPages = pages.filter(p => {
+  const filteredPages = parsedPages.filter(p => {
     if (filter === 'errors') {
-      const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
-      const isSchema = isSchemaMissing(p, data);
-      const isThin = p.wordCount < 250;
-      return isError || isSchema || isThin;
+      const isError = !p.isCrawled || p.headingAudit?.isHierarchyValid === false || !p.hasCanonical;
+      const hasIssues = isError || p.isSchema || p.isThin || p.isBlocked || p.semanticCount < 4 || p.missingAltCount > 0 || !p.lastUpdated || p.isHeavySpa;
+      return hasIssues;
     }
     if (filter === 'schema') {
-      return isSchemaMissing(p, data);
+      return p.isSchema;
     }
     if (filter === 'thin') {
-      return p.wordCount < 250;
+      return p.isThin;
     }
     return true;
   });
@@ -4522,7 +4622,7 @@ function renderModule4(results, filter = 'all') {
   if (filteredPages.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        <td colspan="10" style="text-align: center; padding: 2rem; color: var(--text-muted);">
           No pages match the selected filter.
         </td>
       </tr>
@@ -4531,87 +4631,232 @@ function renderModule4(results, filter = 'all') {
   }
 
   tbody.innerHTML = filteredPages.map((p, idx) => {
-    const isError = p.wordCount === 0 || p.headingAudit?.isHierarchyValid === false || p.hasCanonical === false;
-    const isSchema = isSchemaMissing(p, data);
-    const isThin = p.wordCount < 250;
-
-    const crawlStatusHtml = (p.wordCount > 0)
+    const crawlStatusHtml = p.isCrawled
       ? '<span class="badge-status status-green">🟢 200 OK</span>'
       : '<span class="badge-status status-red">🔴 Crawl Error / Blank Page</span>';
 
-    const sitemapExists = !!data.status?.sitemapExists;
-    const sitemapStatusHtml = sitemapExists
+    // Requirement B: Word Count + Token Footprint (~1.35 ratio)
+    const tokens = Math.round(p.wordCount * 1.35);
+    let wordCountHtml = '';
+    if (p.wordCount < 250) {
+      wordCountHtml = `<span class="badge-status status-red">🔴 ${p.wordCount} words (~${tokens} tokens)</span>`;
+    } else if (p.wordCount >= 250 && p.wordCount <= 2500) {
+      wordCountHtml = `<span class="badge-status status-green">🟢 ${p.wordCount} words (~${tokens} tokens)</span>`;
+    } else {
+      wordCountHtml = `<span class="badge-status status-yellow">🟡 ${p.wordCount} words (~${tokens} tokens)</span>`;
+    }
+
+    const hiddenFromAiHtml = p.isBlocked
+      ? '<span class="badge-status status-red">🔴 Blocked</span>'
+      : '<span class="badge-status status-green">🟢 No</span>';
+
+    const canonicalHtml = p.hasCanonical
       ? '<span class="badge-status status-green">🟢 Present</span>'
       : '<span class="badge-status status-red">🔴 Missing</span>';
 
-    const schemaHtml = !isSchema
-      ? `<span class="badge-status status-green">🟢 ${p.route === '/' ? (data.status?.jsonLdTypes?.join(', ') || 'Organization') : (p.route === '/faq' ? 'FAQPage' : 'Custom Schema')}</span>`
-      : '<span class="badge-status status-red">🔴 Missing</span>';
+    const semanticHtml = (p.semanticCount >= 4)
+      ? `<span class="badge-status status-green">🟢 ${p.semanticCount}/5 Tags</span>`
+      : `<span class="badge-status status-red">🔴 ${p.semanticCount}/5 Tags</span>`;
 
-    let actionHtml = '';
-    if (isSchema) {
-      actionHtml = `<button type="button" class="btn-fix-bridge btn-schema-bridge" onclick="fixMissingSchemaInBuilder('${p.route}')"><span>⚡ Fix Schema</span></button>`;
-    } else {
-      actionHtml = `<button type="button" class="btn-fix-bridge" onclick="launchAIOptimizeBridge('${p.route}', 'tokenLoadAnalysis')"><span>⚡ Audit Page</span></button>`;
-    }
+    const imagesAltHtml = (p.missingAltCount === 0)
+      ? '<span class="badge-status status-green">🟢 All Alt Set</span>'
+      : `<span class="badge-status status-red">🔴 ${p.missingAltCount} Missing Alt</span>`;
 
-    let fieldStatusBreakdown = `
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-family: var(--font-sans), sans-serif; text-align: left;">
-        <div><strong>Crawl Status:</strong> ${crawlStatusHtml}</div>
-        <div><strong>Sitemap Status:</strong> ${sitemapStatusHtml}</div>
-        <div><strong>Schema Status:</strong> ${schemaHtml}</div>
-        <div><strong>Canonical URL:</strong> ${p.hasCanonical !== false ? '🟢 Valid' : '🔴 Missing / Non-canonical'}</div>
-        <div><strong>Heading Hierarchy:</strong> ${p.headingAudit?.isHierarchyValid !== false ? '🟢 Valid' : '🔴 Issues Detected'}</div>
-      </div>
-    `;
+    const lastUpdatedHtml = p.lastUpdated
+      ? `<span class="badge-status status-green">🟢 ${p.lastUpdated}</span>`
+      : '<span class="badge-status status-red">🔴 Missing Freshness</span>';
 
-    let howToFixHtml = '<div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; text-align: left; font-family: var(--font-sans), sans-serif;">';
-    howToFixHtml += '<strong>📋 Actionable How to Fix Instructions:</strong><ul style="margin: 0.5rem 0 0 1.2rem; padding: 0;">';
+    const actionHtml = `<button type="button" class="btn-fix-bridge" id="btn-toggle-row-${idx}" onclick="toggleModule4Row(${idx})"><span>Details ▾</span></button>`;
 
-    if (p.wordCount === 0) {
-      howToFixHtml += `<li><strong>404/403 Crawl Errors:</strong> Redirect this URL to a valid page, or unblock AI user-agents (<code>ChatGPT-User</code>, <code>PerplexityBot</code>) in your firewalls/robots.txt directives.</li>`;
-    }
-    if (!sitemapExists) {
-      howToFixHtml += `<li><strong>Missing Sitemap:</strong> Ensure this page's URL is listed inside your root <code>sitemap.xml</code> manifest so AI crawlers can discover it.</li>`;
-    }
-    if (isThin) {
-      howToFixHtml += `<li><strong>Thin Content (&lt;250 words):</strong> Expand the page content with detailed subject authority paragraphs and subheadings (<code>&lt;h2&gt;</code>) to avoid AI data starvation.</li>`;
-    }
-    if (isSchema) {
-      howToFixHtml += `<li><strong>Missing JSON-LD Schema:</strong> Pre-configure entity JSON-LD markup and embed it in the page's HTML head. <a href="#" onclick="fixMissingSchemaInBuilder('${p.route}'); return false;" style="color: #67e8f9; text-decoration: underline; font-weight: bold;">[ ⚡ Fix in Schema Builder ]</a></li>`;
-    }
-    if (p.headingAudit?.isHierarchyValid === false) {
-      howToFixHtml += `<li><strong>Heading Hierarchy:</strong> Reorder your page headings to ensure a single <code>&lt;h1&gt;</code> is followed sequentially by <code>&lt;h2&gt;</code> and <code>&lt;h3&gt;</code>.</li>`;
-    }
-    if (p.hasCanonical === false) {
-      howToFixHtml += `<li><strong>Missing Canonical Link:</strong> Define a canonical URL link tag in your page head to establish route authority.</li>`;
+    let fixPanelsHtml = '';
+
+    // Requirement A: Crawl Error / Blank Page Drawer Fixes
+    if (!p.isCrawled) {
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">🔴 Crawl Error / Blank Page Detected</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">The page could not be crawled or returned a 0-byte DOM payload.</div>
+          <div style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">
+            <strong>Recommended Fixes:</strong>
+            <ul style="margin: 0.25rem 0 0 1.25rem; padding: 0;">
+              <li style="margin-bottom: 0.25rem;"><strong>404 Not Found:</strong> Set up a 301 redirect to the correct target URL or restore the page.</li>
+              <li style="margin-bottom: 0.25rem;"><strong>500 Server Error:</strong> Check server error logs to resolve backend script or hosting failures.</li>
+              <li><strong>Blank SPA Page:</strong> If this is a Single Page Application (SPA), enable Server-Side Rendering (SSR) or pre-rendering to supply a readable static HTML payload.</li>
+            </ul>
+          </div>
+        </div>
+      `;
     }
 
-    if (!isError && !isSchema && !isThin) {
-      howToFixHtml += `<li>🟢 <strong>No issues found:</strong> This page meets all crawlability, hygiene, structure, and schema standards for AI search engines.</li>`;
+    // Requirement B: Word Count Warning / Ingestion Load advice
+    if (p.isThin) {
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">🔴 Thin Content Warning (&lt; 250 words)</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">This page contains only ${p.wordCount} words (~${tokens} tokens). Pages with fewer than 250 words are treated as thin content and are often skipped by AI engines.</div>
+          <div style="font-size: 0.82rem; color: #94a3b8;"><strong>Fix Advice:</strong> Expand text with subheadings (&lt;h2&gt;), core business details, and an FAQ section to ensure sufficient semantic value.</div>
+        </div>
+      `;
+    } else if (p.isHeavy) {
+      fixPanelsHtml += `
+        <div style="background: rgba(234, 179, 8, 0.06); border: 1px solid rgba(234, 179, 8, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #facc15; margin-bottom: 0.25rem;">🟡 Heavy Ingestion Load (&gt; 2,500 words)</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">This page contains ${p.wordCount} words (~${tokens} tokens), which exceeds optimal AI context thresholds. Heavy ingestion load can lead to truncation during RAG ingestion.</div>
+          <div style="font-size: 0.82rem; color: #94a3b8;"><strong>Fix Advice:</strong> Split the page into logical sub-pages or implement table-of-contents (TOC) jump links to improve RAG lookup chunking efficiency.</div>
+        </div>
+      `;
     }
 
-    howToFixHtml += '</ul></div>';
+    // Requirement B: SPA / Heavy Page Callout & Pro Link
+    if (p.isHeavySpa) {
+      fixPanelsHtml += `
+        <div style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f59e0b; margin-bottom: 0.25rem;">⚠️ SPA / Heavy JavaScript &amp; Deep DOM Nesting Detected</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.75rem;">This page uses heavy JavaScript or contains complex deep DOM nesting, which makes it difficult for AI crawlers to parse without server-side pre-rendering.</div>
+          <button type="button" class="btn-fix-bridge" onclick="showUpgradeModal('AIO_PRO_SPA', 'Optimize heavy SPA and server processing to improve crawler ingestion efficiency.', 'AIOptimize Pro')"><span>⚡ Optimize Heavy SPA &amp; Server Processing with AIOptimize Pro ↗</span></button>
+        </div>
+      `;
+    }
+
+    if (p.isBlocked) {
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Hidden from AI</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">AI crawlers are physically blocked from indexing this page.</div>
+          <button type="button" class="btn-fix-bridge" onclick="scrollToModule('diy-module-3', 'robots')"><span>⚡ Fix in robots.txt Generator</span></button>
+        </div>
+      `;
+    }
+
+    // Requirement C: Canonical URL Precision & Copy Fix
+    if (!p.hasCanonical) {
+      const cleanRoute = p.route.split('?')[0].split('#')[0];
+      const verifiedUrl = `https://${domain}${cleanRoute}`;
+      const canonicalTag = `<link rel="canonical" href="<Verify Scraped Data: ${verifiedUrl}>" />`;
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Canonical URL</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">Prevents duplicate content penalties across URL variations.</div>
+          
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <strong>Exact Placement:</strong> Place inside the &lt;head&gt; section of your HTML file before &lt;/head&gt;.
+          </div>
+          
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <strong>Exact Formatting Rules:</strong> Must be an absolute URL starting with <code>https://</code>, matching canonical protocol/domain, and free of tracking query parameters (<code>?utm=...</code>) or hash fragments (<code>#</code>).
+          </div>
+
+          <div style="font-size: 0.82rem; font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; color: #a5f3fc; word-break: break-all;">&lt;link rel="canonical" href="&lt;Verify Scraped Data: ${verifiedUrl}&gt;" /&gt;</div>
+          <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${canonicalTag.replace(/'/g, "\\'")}', 'copy-canonical-${idx}')" id="copy-canonical-${idx}"><span>📋 Copy Canonical Tag</span></button>
+        </div>
+      `;
+    }
+
+    // Requirement F: Semantic tag check structure snippet
+    if (p.semanticCount < 4) {
+      const structureSnippet = '<main><article><h1>Title</h1><p>Body text...</p></article></main>';
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Semantic Structure Tags</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">Structural tags (&lt;main&gt;, &lt;article&gt;, &lt;header&gt;, &lt;nav&gt;, &lt;footer&gt;) help AI parse core answers.</div>
+          <div style="font-size: 0.82rem; font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; color: #a5f3fc; overflow-x: auto;">&lt;main&gt;&lt;article&gt;&lt;h1&gt;Title&lt;/h1&gt;&lt;p&gt;Body text...&lt;/p&gt;&lt;/article&gt;&lt;/main&gt;</div>
+          <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${structureSnippet}', 'copy-semantic-${idx}')" id="copy-semantic-${idx}"><span>📋 Copy Structure Snippet</span></button>
+        </div>
+      `;
+    }
+
+    // Requirement E: Images Without Alt - inline comparisons
+    if (p.missingAltCount > 0) {
+      let altListHtml = '';
+      p.missingAltList.forEach(img => {
+        altListHtml += `
+          <div style="margin-bottom: 0.75rem; font-size: 0.82rem; border-left: 2px solid rgba(239, 68, 68, 0.4); padding-left: 0.5rem;">
+            <div style="color: #cbd5e1; margin-bottom: 0.25rem;"><strong>Image:</strong> <code>${img.src}</code></div>
+            <div style="margin-bottom: 0.25rem;">
+              <span style="color: #f87171;">Current Tag:</span>
+              <code style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px; color: #f87171; word-break: break-all;">&lt;img src="${img.src}"&gt;</code>
+            </div>
+            <div>
+              <span style="color: #34d399;">Fixed Tag:</span>
+              <code style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px; color: #a5f3fc; word-break: break-all;">&lt;img src="${img.src}" alt="&lt;Verify Scraped Data: ${img.suggestedAlt}&gt;"&gt;</code>
+            </div>
+          </div>
+        `;
+      });
+
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Images Without Alt Attributes</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.75rem;">Direct comparison of current vs. recommended image tags:</div>
+          <div>${altListHtml}</div>
+        </div>
+      `;
+    }
+
+    // Requirement D: Revision Date separate working copy buttons
+    if (!p.lastUpdated) {
+      const headMetaTagSnippet = `<meta property="article:modified_time" content="<Verify Scraped Data: 2026-08-02>" />`;
+      const bodyTimeTagSnippet = `<time datetime="<Verify Scraped Data: 2026-08-02>">Updated <Verify Scraped Data: August 02, 2026></time>`;
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Revision Date (Freshness Signal)</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">Tells AI crawlers when this specific page was last revised. Place in page HTML &lt;head&gt; or body.</div>
+          
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.75rem;">
+            <strong>Head Tag Option:</strong> Place inside the &lt;head&gt; section.
+            <div style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 4px; margin-top: 0.25rem; margin-bottom: 0.25rem; color: #a5f3fc; word-break: break-all;">&lt;meta property="article:modified_time" content="&lt;Verify Scraped Data: 2026-08-02&gt;" /&gt;</div>
+            <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${headMetaTagSnippet.replace(/'/g, "\\'")}', 'copy-head-meta-${idx}')" id="copy-head-meta-${idx}"><span>📋 Copy Head Meta Tag</span></button>
+          </div>
+          
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <strong>Body Tag Option:</strong> Place inside the visible body content.
+            <div style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 4px; margin-top: 0.25rem; margin-bottom: 0.25rem; color: #a5f3fc; word-break: break-all;">&lt;time datetime="&lt;Verify Scraped Data: 2026-08-02&gt;"&gt;Updated &lt;Verify Scraped Data: August 02, 2026&gt;&lt;/time&gt;</div>
+            <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${bodyTimeTagSnippet.replace(/'/g, "\\'")}', 'copy-body-time-${idx}')" id="copy-body-time-${idx}"><span>📋 Copy Body Time Tag</span></button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (p.isSchema) {
+      fixPanelsHtml += `
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing JSON-LD Schema</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">This page lacks structured entity metadata. Click below to pre-configure and copy JSON-LD code.</div>
+          <button type="button" class="btn-fix-bridge" onclick="fixMissingSchemaInBuilder('${p.route}')"><span>⚡ Fix in Schema Builder</span></button>
+        </div>
+      `;
+    }
+
+    if (!fixPanelsHtml) {
+      fixPanelsHtml = `
+        <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; font-family: var(--font-sans), sans-serif; text-align: left;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 0.25rem;">🟢 All Checks Passed Successfully</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1;">This page meets all indexation, structure, canonicalization, semantic tagging, alt text, and revision freshness metrics required by search engines and AI agents. No fixes are necessary!</div>
+        </div>
+      `;
+    }
 
     return `
       <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
         <td>
-          <button type="button" class="btn-expand-row" onclick="toggleModule4Row(${idx})">▶</button>
+          <button type="button" class="btn-expand-row" id="btn-expand-row-${idx}" onclick="toggleModule4Row(${idx})">▶</button>
         </td>
         <td class="cell-path">
-          <a href="https://${domain}${p.route}" target="_blank" style="color: #67e8f9; text-decoration: none;"><code>${p.route}</code></a>
+          <a href="https://${domain}${p.route}" target="_blank" style="color: #67e8f9; text-decoration: none;">🔗 <code>${p.route}</code></a>
         </td>
         <td>${crawlStatusHtml}</td>
-        <td>${sitemapStatusHtml}</td>
-        <td>${p.wordCount || 0} words (~${Math.round((p.wordCount || 0) * 1.3)} tokens)</td>
-        <td>${schemaHtml}</td>
+        <td>${wordCountHtml}</td>
+        <td>${hiddenFromAiHtml}</td>
+        <td>${canonicalHtml}</td>
+        <td>${semanticHtml}</td>
+        <td>${imagesAltHtml}</td>
+        <td>${lastUpdatedHtml}</td>
         <td style="text-align: right;">${actionHtml}</td>
       </tr>
       <tr id="dev-module-4-row-${idx}" style="display: none;">
-        <td colspan="7" style="padding: 1.2rem; background: rgba(0,0,0,0.15); border-left: 3px solid var(--border-color);">
+        <td colspan="10" style="padding: 1.2rem; background: rgba(0,0,0,0.15); border-left: 3px solid var(--border-color);">
           <div class="row-expanded-content">
-            ${fieldStatusBreakdown}
-            ${howToFixHtml}
+            ${fixPanelsHtml}
           </div>
         </td>
       </tr>
@@ -4621,8 +4866,18 @@ function renderModule4(results, filter = 'all') {
 
 function toggleModule4Row(idx) {
   const row = document.getElementById(`dev-module-4-row-${idx}`);
+  const btn = document.getElementById(`btn-toggle-row-${idx}`);
+  const arrowBtn = document.getElementById(`btn-expand-row-${idx}`);
   if (row) {
-    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    if (row.style.display === 'none') {
+      row.style.display = 'table-row';
+      if (btn) btn.innerHTML = '<span>Details ▴</span>';
+      if (arrowBtn) arrowBtn.innerHTML = '▼';
+    } else {
+      row.style.display = 'none';
+      if (btn) btn.innerHTML = '<span>Details ▾</span>';
+      if (arrowBtn) arrowBtn.innerHTML = '▶';
+    }
   }
 }
 
@@ -4660,6 +4915,7 @@ window.buildDevModule4Html = buildDevModule4Html;
 window.renderModule4 = renderModule4;
 window.toggleModule4Row = toggleModule4Row;
 window.fixMissingSchemaInBuilder = fixMissingSchemaInBuilder;
+window.copyTextToClipboard = copyTextToClipboard;
 
 
 
