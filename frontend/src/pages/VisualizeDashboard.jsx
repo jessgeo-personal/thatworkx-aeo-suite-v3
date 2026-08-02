@@ -95,7 +95,7 @@ export function renderMachineCodeDrawers(domainName = 'thatworkx.com') {
             <span>💻 Machine File Code Inspection Drawers</span>
             <span class="badge-status status-green" style="font-size: 0.72rem;">Syntax Highlighted</span>
           </h4>
-          <p>Inspect, copy, and download root directory machine welcome mats and blueprint manifests.</p>
+          <p>Review, copy, and download standard control files (like robots.txt and llms.txt) to make your website AI-Ready and direct AI crawlers.</p>
         </div>
       </div>
 

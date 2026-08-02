@@ -193,7 +193,7 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     const $ = cheerio.load(visHtml);
 
     const sectionTitle = $('#dev-drawers-section h4 span').first().text().trim();
-    expect(sectionTitle).toBe('Resolving AI-ready File Issues');
+    expect(sectionTitle).toBe('🛠️ Module 3: AI Search Visibility & Crawler Configurator');
 
     const leftPane = $('#left-pane-content');
     const rightPane = $('#right-pane-content');

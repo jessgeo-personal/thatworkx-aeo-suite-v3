@@ -99,7 +99,7 @@ function buildDevSchemaBuilderHtml() {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
-            Page-Level HTML Schema Builder (JSON-LD)
+            🛠️ Module 2: Page-Level HTML Schema Builder (JSON-LD)
           </h4>
           <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
         </div>
@@ -194,7 +194,7 @@ function buildDevMatrixHtml() {
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-              <span>🛠️ AI-Optimized Site Diagnostics</span>
+              <span>🛠️ Module 1: AI-Optimized Site Diagnostics</span>
               <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-sans), sans-serif; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600;">Full Technical Audit</span>
             </h4>
             <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
@@ -430,9 +430,9 @@ function buildDevDrawersHtml(domainName = '') {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
-            Sitewide Machine Manifest Generators
+            🛠️ Module 3: AI Search Visibility &amp; Crawler Configurator
           </h4>
-          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Deploy root-level flat files to create welcome mats and directory indexes for AI crawlers.</p>
+          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Review and deploy standard control files (like robots.txt and llms.txt) to make your website AI-Ready, direct AI crawlers, and control how bots index your content.</p>
         </div>
         <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Root Server Manifests</span>
       </div>
@@ -451,6 +451,16 @@ function buildDevDrawersHtml(domainName = '') {
         <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="right-pane-container">
           <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
+      </div>
+
+      <!-- Upgrade Callout Box -->
+      <div style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 12px; background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <span style="font-size: 0.95rem; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">
+          To manage AI-Ready Machine readable files, upgrade to <strong style="color: #fbbf24;">AIOptimize Pro</strong>
+        </span>
+        <a href="#" onclick="showUpgradeModal('AIO_PRO_FILE_MANAGER', 'Actively manage and deploy AI-Ready files', 'AIOptimize Pro'); return false;" style="background: var(--burnt-copper); color: #ffffff; padding: 0.55rem 1.35rem; border-radius: 8px; font-weight: 700; font-family: var(--font-sans), sans-serif; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+          Upgrade to AIOptimize Pro ↗
+        </a>
       </div>
     </div>
   `;
@@ -4520,14 +4530,25 @@ function renderModule4(results, filter = 'all') {
     const isBlocked = (data.status?.botPermissions?.gptBot === false || data.status?.botPermissions?.googleExtended === false);
     const hasCanonical = !!(p.hasCanonical !== false && p.canonicalUrl);
 
-    const tags = ['main', 'article', 'header', 'nav', 'footer'];
-    let semanticCount = 0;
-    tags.forEach(t => {
-      if (doc.querySelector(t)) semanticCount++;
+    const requiredTags = ['main', 'header', 'footer'];
+    const missingRequired = [];
+    requiredTags.forEach(t => {
+      if (!doc.querySelector(t)) missingRequired.push(t);
     });
-    if (semanticCount === 0) {
-      semanticCount = (p.route === '/' || p.route === '/about') ? 4 : 3;
-    }
+    const hasAllRequired = missingRequired.length === 0;
+
+    const optionalTags = ['article', 'nav', 'section', 'aside'];
+    const presentOptional = [];
+    const missingOptional = [];
+    optionalTags.forEach(t => {
+      if (doc.querySelector(t)) {
+        presentOptional.push(t);
+      } else {
+        missingOptional.push(t);
+      }
+    });
+
+    const semanticCount = hasAllRequired ? 4 : 2; // backward-compatibility
 
     const imgTags = doc.querySelectorAll('img');
     let missingAltCount = 0;
@@ -4571,7 +4592,7 @@ function renderModule4(results, filter = 'all') {
     const isExtremeTokenLoad = p.wordCount > 2500;
     const isHeavySpa = p.spaTrapDetected === true || p.isHeavyJs === true || isSpaTrap || (isExtremeTokenLoad && doc.querySelectorAll('script').length > 15);
 
-    const hasIssues = !isCrawled || isThin || isBlocked || !hasCanonical || semanticCount < 4 || missingAltCount > 0 || !lastUpdated || isSchema || isHeavySpa;
+    const hasIssues = !isCrawled || isThin || isBlocked || !hasCanonical || !hasAllRequired || missingAltCount > 0 || !lastUpdated || isSchema || isHeavySpa;
 
     if (hasIssues) errorCount++;
     if (isSchema) noSchemaCount++;
@@ -4585,6 +4606,10 @@ function renderModule4(results, filter = 'all') {
       isBlocked,
       hasCanonical,
       semanticCount,
+      hasAllRequired,
+      missingRequired,
+      presentOptional,
+      missingOptional,
       missingAltCount,
       missingAltList,
       lastUpdated,
@@ -4607,7 +4632,7 @@ function renderModule4(results, filter = 'all') {
   const filteredPages = parsedPages.filter(p => {
     if (filter === 'errors') {
       const isError = !p.isCrawled || p.headingAudit?.isHierarchyValid === false || !p.hasCanonical;
-      const hasIssues = isError || p.isSchema || p.isThin || p.isBlocked || p.semanticCount < 4 || p.missingAltCount > 0 || !p.lastUpdated || p.isHeavySpa;
+      const hasIssues = isError || p.isSchema || p.isThin || p.isBlocked || !p.hasAllRequired || p.missingAltCount > 0 || !p.lastUpdated || p.isHeavySpa;
       return hasIssues;
     }
     if (filter === 'schema') {
@@ -4654,9 +4679,9 @@ function renderModule4(results, filter = 'all') {
       ? '<span class="badge-status status-green">🟢 Present</span>'
       : '<span class="badge-status status-red">🔴 Missing</span>';
 
-    const semanticHtml = (p.semanticCount >= 4)
-      ? `<span class="badge-status status-green">🟢 ${p.semanticCount}/5 Tags</span>`
-      : `<span class="badge-status status-red">🔴 ${p.semanticCount}/5 Tags</span>`;
+    const semanticHtml = p.hasAllRequired
+      ? '<span class="badge-status status-green">🟢 Pass (Required Present)</span>'
+      : `<span class="badge-status status-red" title="Missing required tags: ${p.missingRequired.join(', ')}">🔴 Fail (Missing Required)</span>`;
 
     const imagesAltHtml = (p.missingAltCount === 0)
       ? '<span class="badge-status status-green">🟢 All Alt Set</span>'
@@ -4733,6 +4758,7 @@ function renderModule4(results, filter = 'all') {
       const cleanRoute = p.route.split('?')[0].split('#')[0];
       const verifiedUrl = `https://${domain}${cleanRoute}`;
       const canonicalTag = `<link rel="canonical" href="<Verify Scraped Data: ${verifiedUrl}>" />`;
+      const escapedCanonical = canonicalTag.replace(/"/g, '&quot;');
       fixPanelsHtml += `
         <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
           <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Canonical URL</div>
@@ -4747,20 +4773,41 @@ function renderModule4(results, filter = 'all') {
           </div>
 
           <div style="font-size: 0.82rem; font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; color: #a5f3fc; word-break: break-all;">&lt;link rel="canonical" href="&lt;Verify Scraped Data: ${verifiedUrl}&gt;" /&gt;</div>
-          <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${canonicalTag.replace(/'/g, "\\'")}', 'copy-canonical-${idx}')" id="copy-canonical-${idx}"><span>📋 Copy Canonical Tag</span></button>
+          <button type="button" class="btn-fix-bridge" data-copy-text="${escapedCanonical}" onclick="copyTextToClipboard(this.getAttribute('data-copy-text'), 'copy-canonical-${idx}')" id="copy-canonical-${idx}"><span>📋 Copy Canonical Tag</span></button>
         </div>
       `;
     }
 
     // Requirement F: Semantic tag check structure snippet
-    if (p.semanticCount < 4) {
+    if (!p.hasAllRequired) {
       const structureSnippet = '<main><article><h1>Title</h1><p>Body text...</p></article></main>';
+      const escapedStructure = structureSnippet.replace(/"/g, '&quot;');
       fixPanelsHtml += `
         <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
-          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Semantic Structure Tags</div>
-          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">Structural tags (&lt;main&gt;, &lt;article&gt;, &lt;header&gt;, &lt;nav&gt;, &lt;footer&gt;) help AI parse core answers.</div>
+          <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Required Semantic HTML5 Tags</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            To help search engines and AI crawlers map your page hierarchy, the following required semantic tags are missing:
+            <strong style="color: #f87171;">${p.missingRequired.map(t => `&lt;${t}&gt;`).join(', ')}</strong>.
+          </div>
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <strong>Absolutely Required (Essential for all pages):</strong> <code>&lt;main&gt;</code>, <code>&lt;header&gt;</code>, and <code>&lt;footer&gt;</code>.
+          </div>
+          <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <strong>Optional Structural Tags (Optional Enhancements):</strong> <code>&lt;article&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;section&gt;</code>, and <code>&lt;aside&gt;</code>.
+          </div>
           <div style="font-size: 0.82rem; font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; color: #a5f3fc; overflow-x: auto;">&lt;main&gt;&lt;article&gt;&lt;h1&gt;Title&lt;/h1&gt;&lt;p&gt;Body text...&lt;/p&gt;&lt;/article&gt;&lt;/main&gt;</div>
-          <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${structureSnippet}', 'copy-semantic-${idx}')" id="copy-semantic-${idx}"><span>📋 Copy Structure Snippet</span></button>
+          <button type="button" class="btn-fix-bridge" data-copy-text="${escapedStructure}" onclick="copyTextToClipboard(this.getAttribute('data-copy-text'), 'copy-semantic-${idx}')" id="copy-semantic-${idx}"><span>📋 Copy Structure Snippet</span></button>
+        </div>
+      `;
+    } else {
+      fixPanelsHtml += `
+        <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 0.25rem;">🟢 Semantic HTML5 Structure Valid</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">All required structural tags (<code>&lt;main&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code>) are present on this page.</div>
+          <div style="font-size: 0.82rem; color: #94a3b8;">
+            <strong>Optional Tags found:</strong> ${p.presentOptional.length > 0 ? p.presentOptional.map(t => `<code>&lt;${t}&gt;</code>`).join(', ') : 'None'}.<br>
+            <strong>Optional Tags missing:</strong> ${p.missingOptional.length > 0 ? p.missingOptional.map(t => `<code>&lt;${t}&gt;</code>`).join(', ') : 'None'}.
+          </div>
         </div>
       `;
     }
@@ -4787,7 +4834,13 @@ function renderModule4(results, filter = 'all') {
       fixPanelsHtml += `
         <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
           <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Images Without Alt Attributes</div>
-          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.75rem;">Direct comparison of current vs. recommended image tags:</div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.75rem; line-height: 1.55;">
+            <strong>Why Alt Text Matters for AI Indexation &amp; SEO:</strong><br>
+            AI answer engines and search crawlers are text-based or multimodal systems. They read <code>alt</code> attributes to understand what visual information is depicted in an image.
+            <br><br>
+            <strong>Recommended Fix:</strong> Update your HTML source files to replace the existing image tags with the fixed versions shown below. The suggested alt text provides a descriptive summary matching the visual context of your page.
+          </div>
+          <div style="font-weight: 600; color: #cbd5e1; font-size: 0.82rem; margin-bottom: 0.5rem;">Direct comparison of current vs. recommended image tags:</div>
           <div>${altListHtml}</div>
         </div>
       `;
@@ -4797,6 +4850,8 @@ function renderModule4(results, filter = 'all') {
     if (!p.lastUpdated) {
       const headMetaTagSnippet = `<meta property="article:modified_time" content="<Verify Scraped Data: 2026-08-02>" />`;
       const bodyTimeTagSnippet = `<time datetime="<Verify Scraped Data: 2026-08-02>">Updated <Verify Scraped Data: August 02, 2026></time>`;
+      const escapedHead = headMetaTagSnippet.replace(/"/g, '&quot;');
+      const escapedBody = bodyTimeTagSnippet.replace(/"/g, '&quot;');
       fixPanelsHtml += `
         <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; text-align: left; font-family: var(--font-sans), sans-serif;">
           <div style="font-weight: 700; color: #f87171; margin-bottom: 0.25rem;">⚠️ Missing Revision Date (Freshness Signal)</div>
@@ -4805,13 +4860,13 @@ function renderModule4(results, filter = 'all') {
           <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.75rem;">
             <strong>Head Tag Option:</strong> Place inside the &lt;head&gt; section.
             <div style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 4px; margin-top: 0.25rem; margin-bottom: 0.25rem; color: #a5f3fc; word-break: break-all;">&lt;meta property="article:modified_time" content="&lt;Verify Scraped Data: 2026-08-02&gt;" /&gt;</div>
-            <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${headMetaTagSnippet.replace(/'/g, "\\'")}', 'copy-head-meta-${idx}')" id="copy-head-meta-${idx}"><span>📋 Copy Head Meta Tag</span></button>
+            <button type="button" class="btn-fix-bridge" data-copy-text="${escapedHead}" onclick="copyTextToClipboard(this.getAttribute('data-copy-text'), 'copy-head-meta-${idx}')" id="copy-head-meta-${idx}"><span>📋 Copy Head Meta Tag</span></button>
           </div>
           
           <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
             <strong>Body Tag Option:</strong> Place inside the visible body content.
             <div style="font-family: var(--font-mono); background: #040508; border: 1px solid rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 4px; margin-top: 0.25rem; margin-bottom: 0.25rem; color: #a5f3fc; word-break: break-all;">&lt;time datetime="&lt;Verify Scraped Data: 2026-08-02&gt;"&gt;Updated &lt;Verify Scraped Data: August 02, 2026&gt;&lt;/time&gt;</div>
-            <button type="button" class="btn-fix-bridge" onclick="copyTextToClipboard('${bodyTimeTagSnippet.replace(/'/g, "\\'")}', 'copy-body-time-${idx}')" id="copy-body-time-${idx}"><span>📋 Copy Body Time Tag</span></button>
+            <button type="button" class="btn-fix-bridge" data-copy-text="${escapedBody}" onclick="copyTextToClipboard(this.getAttribute('data-copy-text'), 'copy-body-time-${idx}')" id="copy-body-time-${idx}"><span>📋 Copy Body Time Tag</span></button>
           </div>
         </div>
       `;
