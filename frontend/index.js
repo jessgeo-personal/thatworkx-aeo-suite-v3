@@ -430,7 +430,7 @@ function buildDevDrawersHtml(domainName = '') {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
-            🛠️ Module 3: AI Search Visibility &amp; Crawler Configurator
+            🛠️ Module 3: AI Machine-readable File Configurator
           </h4>
           <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Review and deploy standard control files (like robots.txt and llms.txt) to make your website AI-Ready, direct AI crawlers, and control how bots index your content.</p>
         </div>
