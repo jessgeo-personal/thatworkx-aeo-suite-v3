@@ -142,4 +142,27 @@ describe('Services & Controllers Unit Regression Suite', () => {
     });
   });
 
+  describe('BetaSignup Model Unit Tests', () => {
+    const BetaSignup = require('../models/BetaSignup');
+
+    it('Should create BetaSignup instance with valid attributes', () => {
+      const signup = new BetaSignup({
+        email: 'TEST@THATWORKX.COM ',
+        sourceTool: 'visualize'
+      });
+      expect(signup.email).toBe('test@thatworkx.com');
+      expect(signup.sourceTool).toBe('visualize');
+      expect(signup.createdAt).toBeInstanceOf(Date);
+    });
+
+    it('Should fail validation if sourceTool is invalid', () => {
+      const signup = new BetaSignup({
+        email: 'test@thatworkx.com',
+        sourceTool: 'invalid-tool'
+      });
+      const err = signup.validateSync();
+      expect(err.errors.sourceTool).toBeDefined();
+    });
+  });
+
 });

@@ -21,12 +21,27 @@ const { registerUser, loginUser, getCurrentUser, verifyOtp } = require('./contro
 const User = require('./models/User');
 const ScanLog = require('./models/ScanLog');
 const DomainProfile = require('./models/DomainProfile');
+const BetaSignup = require('./models/BetaSignup');
 const url = require('url');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+const allowedOrigins = [
+  'https://thatworkx.com',
+  'https://www.thatworkx.com',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB Connection with native bare-metal fallback
@@ -165,6 +180,47 @@ app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
 app.post('/api/auth/verify-otp', verifyOtp);
 app.get('/api/auth/me', getCurrentUser);
+
+// Beta Signup Route
+app.post('/api/beta-signup', async (req, res) => {
+  try {
+    const { email, sourceTool } = req.body;
+
+    if (!email || !sourceTool) {
+      return res.status(400).json({ error: 'Email and sourceTool are required fields.' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    const validTools = ['visualize', 'optimize', 'socialize'];
+    if (!validTools.includes(sourceTool)) {
+      return res.status(400).json({ error: 'Invalid sourceTool. Must be one of: visualize, optimize, socialize' });
+    }
+
+    const betaSignup = new BetaSignup({
+      email: trimmedEmail,
+      sourceTool
+    });
+
+    if (mongoose.connection.readyState === 1) {
+      await betaSignup.save();
+    } else {
+      console.warn('MongoDB offline. Bypassing BetaSignup database write.');
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Beta registration successful'
+    });
+  } catch (error) {
+    console.error('Beta Signup Route Error:', error);
+    return res.status(500).json({ error: 'Failed to process beta registration' });
+  }
+});
 
 // Endpoint to build Level 3 Context Maps and Remediation Scripts
 app.post('/api/generator/build', async (req, res) => {
