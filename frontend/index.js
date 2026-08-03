@@ -4117,7 +4117,6 @@ function toggleTheme() {
 function switchDeckCard(cardId) {
   const PANEL_META = {
     aeo:       { file: 'ai-context.json',      tag: 'AEO_VS_SEO_MATRIX',           tagColor: '#9F1239' },
-    hierarchy: { file: 'llms.txt',             tag: 'DIRECTORY_HANDSHAKE',          tagColor: '#B45309' },
     eeat:      { file: 'schema-eeat.json',     tag: 'EEAT_CITATION_AUDITING',       tagColor: '#059669' },
     api:       { file: 'deploy-pipeline.sh',   tag: 'WORKFLOWS_AND_APIS',           tagColor: '#9A3412' },
     policy:    { file: 'rate-limits.json',     tag: 'FAIR_USE_POLICY',              tagColor: '#7C3AED' },

@@ -87,44 +87,6 @@ AEO optimizes digital assets so AI systems can cite them directly.
           </div>
         </div>
 
-        {/* Item 2: Ecosystem Gateways (Col span 1, Row span 2) */}
-        <div className="md:row-span-2 p-6 rounded-2xl border border-slate-800/80 bg-slate-950/40 backdrop-blur-md hover:border-slate-700/60 hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-all duration-300 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-amber-400 mb-3">
-              <Layers className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Ecosystem Gateways</span>
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Machine-First Folder Directories</h3>
-            <p className="text-xs sm:text-sm text-slate-400 mb-4">
-              AI engines scan your root domain for specific verification files. Ensure your servers serve these 3 core manifests.
-            </p>
-          </div>
-
-          <div className="space-y-3 mt-4 text-left">
-            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60 flex gap-2.5 items-start">
-              <span className="text-base">🔒</span>
-              <div>
-                <h4 className="text-xs font-bold text-white">/robots.txt</h4>
-                <p className="text-[10px] text-slate-500">Global gatekeeper that allows GPTBot, PerplexityBot, and ClaudeBot to crawl.</p>
-              </div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60 flex gap-2.5 items-start">
-              <span className="text-base">🗺️</span>
-              <div>
-                <h4 className="text-xs font-bold text-white">/llms.txt</h4>
-                <p className="text-[10px] text-slate-500">Directory standard that maps site architecture paths and references external social proof.</p>
-              </div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60 flex gap-2.5 items-start">
-              <span className="text-base">🤝</span>
-              <div>
-                <h4 className="text-xs font-bold text-white">/ai-context.md</h4>
-                <p className="text-[10px] text-slate-500">Corporate verification manifest that holds brand mission, EEAT anchors, and system prompt injections.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Item 3: Live Sample Report (Col span 2) */}
         <div className="md:col-span-2 p-6 rounded-2xl border border-slate-800/80 bg-slate-950/40 backdrop-blur-md hover:border-slate-700/60 hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-all duration-300 flex flex-col justify-between">
           <div>
