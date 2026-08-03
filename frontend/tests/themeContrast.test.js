@@ -50,20 +50,17 @@ describe('Theme Contrast & Infrastructure Preservation Suite', () => {
     expect(indexCssContent).toContain('body.light-theme .adaptive-card .check-pill');
     expect(indexCssContent).toContain('color: #0f172a !important;');
 
-    // 2) Dark-locked container isolation & text reversion (Module 2 & Module 3)
-    expect(indexCssContent).toContain('body.light-theme .dark-card-locked *');
-    expect(indexCssContent).toContain('body.light-theme #dev-module2-card *');
-    expect(indexCssContent).toContain('body.light-theme #dev-module3-card *');
-    expect(indexCssContent).toContain('color: revert;');
+    // 2) Dark-locked container isolation (Module 2 & Module 3 inner split panes)
     expect(indexCssContent).toContain('background-color: #020617 !important;');
     expect(indexCssContent).toContain('color: #f8fafc !important;');
     expect(indexCssContent).toContain('color: #ffffff !important;');
     expect(indexCssContent).toContain('color: #cbd5e1 !important;');
 
-    // 3) DOM class tagging in index.js for Module 1, Module 2, Module 3, and Executive Sections
+    // 3) DOM class tagging in index.js: outer adaptive-card wrappers & inner dark-card-locked split panes
     expect(indexJsContent).toContain('class="developer-matrix-card glassmorphic adaptive-card"');
-    expect(indexJsContent).toContain('class="schema-builder-card glassmorphic dark-card-locked"');
-    expect(indexJsContent).toContain('class="machine-code-drawers-card glassmorphic dark-card-locked"');
+    expect(indexJsContent).toContain('class="schema-builder-card glassmorphic adaptive-card"');
+    expect(indexJsContent).toContain('class="machine-code-drawers-card glassmorphic adaptive-card"');
+    expect(indexJsContent).toContain('class="dark-card-locked"');
     expect(indexJsContent).toContain('class="explainer-card glassmorphic adaptive-card"');
   });
 });

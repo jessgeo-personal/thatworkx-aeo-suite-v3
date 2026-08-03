@@ -142,7 +142,7 @@ let cooldownInterval = null;
 
 function buildDevSchemaBuilderHtml() {
   return `
-    <div class="schema-builder-card glassmorphic dark-card-locked" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+    <div class="schema-builder-card glassmorphic adaptive-card" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
@@ -473,7 +473,7 @@ function buildDevDrawersHtml(domainName = '') {
   }, 0);
 
   return `
-    <div class="machine-code-drawers-card glassmorphic dark-card-locked" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+    <div class="machine-code-drawers-card glassmorphic adaptive-card" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">

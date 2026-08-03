@@ -4927,26 +4927,46 @@ body.light-theme :not(.dark-card-locked) .text-slate-500 {
 }
 
 /* RE-ENFORCE DARK-LOCKED CONTAINER ISOLATION */
-body.light-theme .dark-card-locked,
-body.light-theme .dark-card-locked *,
-body.light-theme #dev-module2-card *,
-body.light-theme #dev-module3-card * {
-  /* Ensure child elements inside dark boxes NEVER get light-mode dark text */
-  color: revert; 
-}
 .dark-card-locked,
 body.light-theme .dark-card-locked {
   background-color: #020617 !important;
   color: #f8fafc !important;
   border-color: #1e293b !important;
 }
-.dark-card-locked h1, .dark-card-locked h2, .dark-card-locked h3, .dark-card-locked h4, .dark-card-locked h5, .dark-card-locked .card-title,
-body.light-theme .dark-card-locked h1, body.light-theme .dark-card-locked h2, body.light-theme .dark-card-locked h3, body.light-theme .dark-card-locked h4, body.light-theme .dark-card-locked h5, body.light-theme .dark-card-locked .card-title {
+
+body.light-theme .dark-card-locked h1, 
+body.light-theme .dark-card-locked h2, 
+body.light-theme .dark-card-locked h3, 
+body.light-theme .dark-card-locked h4, 
+body.light-theme .dark-card-locked h5, 
+body.light-theme .dark-card-locked .card-title,
+.dark-card-locked h1, 
+.dark-card-locked h2, 
+.dark-card-locked h3, 
+.dark-card-locked h4, 
+.dark-card-locked h5, 
+.dark-card-locked .card-title {
   color: #ffffff !important;
 }
-.dark-card-locked p, .dark-card-locked span, .dark-card-locked label, .dark-card-locked .badge,
-body.light-theme .dark-card-locked p, body.light-theme .dark-card-locked span, body.light-theme .dark-card-locked label, body.light-theme .dark-card-locked .badge {
+
+body.light-theme .dark-card-locked p, 
+body.light-theme .dark-card-locked span, 
+body.light-theme .dark-card-locked label, 
+body.light-theme .dark-card-locked div,
+body.light-theme .dark-card-locked li,
+.dark-card-locked p, 
+.dark-card-locked span, 
+.dark-card-locked label, 
+.dark-card-locked div,
+.dark-card-locked li {
   color: #cbd5e1 !important;
+}
+
+body.light-theme .dark-card-locked strong,
+body.light-theme .dark-card-locked b,
+.dark-card-locked strong,
+.dark-card-locked b {
+  color: #ffffff !important;
 }
 
 /* Section Title Light Mode Contrast Rules */
