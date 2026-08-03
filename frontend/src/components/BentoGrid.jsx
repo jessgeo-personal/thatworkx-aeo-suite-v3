@@ -41,31 +41,48 @@ axios.post('https://aeo.thatworkx.com/api/scan', {
               <HelpCircle className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">What is AEO?</span>
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Answer Engine Optimization vs SEO</h3>
-            <p className="text-xs sm:text-sm text-slate-400 mb-4">
-              Traditional SEO focuses on keyword stuffing for human rank. AEO structures clean data layouts that RAG systems, LLMs, and agentic crawlers can index and cite.
+            <h3 className="text-lg font-bold text-white mb-2">What is Answer Engine Optimization (AEO)?</h3>
+            <p className="text-xs sm:text-sm text-slate-400 mb-4 text-left">
+              Make your standard human-facing pages instantly readable for AI engines—without heavy markup bloat, high token costs, or hidden core facts.
             </p>
-          </div>
-          
-          {/* Comparison Split Widget */}
-          <div className="grid grid-cols-2 gap-3 mt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800/50">
-            <div className="p-2 border-r border-slate-800/60 text-left">
-              <div className="text-xs font-bold text-slate-400 mb-1.5 uppercase">Traditional SEO</div>
-              <ul className="text-[11px] text-slate-500 space-y-1">
-                <li>• Hreflang & sitemaps for Google</li>
-                <li>• Long-form visual HTML blogs</li>
-                <li>• Heavy third-party scripts</li>
-                <li>• Domain Authority backlink sweeps</li>
-              </ul>
+
+            <div className="space-y-3 text-left mb-4">
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60">
+                <h4 className="text-xs font-bold text-white">Token-Efficient DOM & Layout</h4>
+                <p className="text-[11px] text-slate-400 mt-1">Standard website markup is streamlined so search agents and LLM crawlers parse content without burning through excessive token budgets or visual wrapper bloat.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60">
+                <h4 className="text-xs font-bold text-white">Direct Entity & Content Visibility</h4>
+                <p className="text-[11px] text-slate-400 mt-1">Essential pages, services, pricing, and business details are immediately accessible and clearly surfaced using clean semantic markup and unambiguous structured schema.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/60">
+                <h4 className="text-xs font-bold text-white">RAG-Ready Information Density</h4>
+                <p className="text-[11px] text-slate-400 mt-1">Content is formatted into logical, high-density text chunks with precise Q&A headers for instant Retrieval-Augmented Generation (RAG) extraction by AI answer engines.</p>
+              </div>
             </div>
-            <div className="p-2 text-left">
-              <div className="text-xs font-bold text-cyan-400 mb-1.5 uppercase">Modern AEO / GEO</div>
-              <ul className="text-[11px] text-slate-300 space-y-1">
-                <li>✔ Flat markdown directory routes</li>
-                <li>✔ Non-hydrated crawl accessibility</li>
-                <li>✔ Attributable JSON-LD entity structures</li>
-                <li>✔ High readability, no boilerplate noise</li>
-              </ul>
+          </div>
+
+          {/* Code Box Placed Below Text (Stacked Layout matching Tab 2 container styling) */}
+          <div className="text-left mt-2">
+            <div className="p-3 bg-slate-950/90 border border-slate-800/80 rounded-xl font-mono">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80 text-[10px]">
+                <span className="font-bold text-slate-300">DOM-to-Token Streamline</span>
+                <span className="px-1.5 py-0.5 rounded bg-cyan-950/50 border border-cyan-800/40 text-cyan-400 font-bold">HTML ➔ MD</span>
+              </div>
+              <pre className="text-[10px] sm:text-[11px] text-slate-400 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+{`<!-- Raw Bloated HTML -->
+<div class="site-wrapper flex-col padding-24">
+  <h1 class="text-4xl text-gray-900">What is Answer Engine Optimization?</h1>
+  <p class="leading-relaxed">AEO optimizes digital assets so AI systems can cite them directly.</p>
+</div>
+
+<!-- Clean Markdown Token Stream -->
+# What is Answer Engine Optimization?
+
+AEO optimizes digital assets so AI systems can cite them directly.
+
+--- [RAG Chunk Boundary | Entity: AEO Definition] ---`}
+              </pre>
             </div>
           </div>
         </div>

@@ -282,30 +282,29 @@
 
               <!-- Panel 1: AEO -->
               <div class="deck-panel deck-panel--active" id="deck-panel-aeo" role="tabpanel" aria-labelledby="deck-nav-aeo">
-                <p class="deck-panel-desc">While SEO targets algorithmic blue url indexing, AEO optimizes sites to serve <strong>flat, structured text summaries</strong> matching semantic intent.</p>
-                <table class="deck-compare-table">
-                  <thead>
-                    <tr><th>Vector</th><th>SEO</th><th>AEO</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td><strong>Queries</strong></td><td>Keywords</td><td>RAG Context</td></tr>
-                    <tr><td><strong>Focus</strong></td><td>Sitemaps</td><td>Flat Markdown</td></tr>
-                    <tr><td><strong>Links</strong></td><td>Backlinks</td><td>Author EEAT</td></tr>
-                  </tbody>
-                </table>
+                <p class="deck-panel-desc">Make your standard human-facing pages instantly readable for AI engines—without heavy markup bloat, high token costs, or hidden core facts.</p>
+                <ul class="deck-prose-list">
+                  <li><strong>Token-Efficient DOM &amp; Layout</strong> — Standard website markup is streamlined so search agents and LLM crawlers parse content without burning through excessive token budgets or visual wrapper bloat.</li>
+                  <li><strong>Direct Entity &amp; Content Visibility</strong> — Essential pages, services, pricing, and business details are immediately accessible and clearly surfaced using clean semantic markup and unambiguous structured schema.</li>
+                  <li><strong>RAG-Ready Information Density</strong> — Content is formatted into logical, high-density text chunks with precise Q&amp;A headers for instant Retrieval-Augmented Generation (RAG) extraction by AI answer engines.</li>
+                </ul>
                 <div class="deck-code-block">
                   <div class="deck-code-header">
-                    <span>ai-context.json</span>
-                    <span class="deck-code-lang">JSON</span>
+                    <span>DOM-to-Token Streamline</span>
+                    <span class="deck-code-lang">HTML ➔ MD</span>
                   </div>
-                  <pre class="deck-code-pre"><code class="deck-code">{
-  "context": "https://aeo.thatworkx.com/schemas/context.json",
-  "organization": {
-    "name": "Thatworkx",
-    "naics": "541511",
-    "description": "Enterprise AI search visibility and directory protocols"
-  }
-}</code></pre>
+                  <pre class="deck-code-pre"><code class="deck-code">&lt;!-- Raw Bloated HTML --&gt;
+&lt;div class="site-wrapper flex-col padding-24"&gt;
+  &lt;h1 class="text-4xl text-gray-900"&gt;What is Answer Engine Optimization?&lt;/h1&gt;
+  &lt;p class="leading-relaxed"&gt;AEO optimizes digital assets so AI systems can cite them directly.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- Clean Markdown Token Stream --&gt;
+# What is Answer Engine Optimization?
+
+AEO optimizes digital assets so AI systems can cite them directly.
+
+--- [RAG Chunk Boundary | Entity: AEO Definition] ---</code></pre>
                 </div>
               </div>
 
