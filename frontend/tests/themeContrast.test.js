@@ -41,4 +41,29 @@ describe('Theme Contrast & Infrastructure Preservation Suite', () => {
     expect(/AI-first/i.test(indexCssContent)).toBe(false);
     expect(/AI-first/i.test(visualizeHtmlContent)).toBe(false);
   });
+
+  it('5. Asserts Light Mode contrast rules and strict Dark-Card isolation', () => {
+    // 1) Light Mode text color overrides scoped to adaptive containers and metrics
+    expect(indexCssContent).toContain('body.light-theme :not(.dark-card-locked) [data-metric="isSecure"]');
+    expect(indexCssContent).toContain('body.light-theme :not(.dark-card-locked) [data-metric="Inbound AI Bot Connection Request"]');
+    expect(indexCssContent).toContain('body.light-theme .adaptive-card .metric-badge');
+    expect(indexCssContent).toContain('body.light-theme .adaptive-card .check-pill');
+    expect(indexCssContent).toContain('color: #0f172a !important;');
+
+    // 2) Dark-locked container isolation & text reversion (Module 2 & Module 3)
+    expect(indexCssContent).toContain('body.light-theme .dark-card-locked *');
+    expect(indexCssContent).toContain('body.light-theme #dev-module2-card *');
+    expect(indexCssContent).toContain('body.light-theme #dev-module3-card *');
+    expect(indexCssContent).toContain('color: revert;');
+    expect(indexCssContent).toContain('background-color: #020617 !important;');
+    expect(indexCssContent).toContain('color: #f8fafc !important;');
+    expect(indexCssContent).toContain('color: #ffffff !important;');
+    expect(indexCssContent).toContain('color: #cbd5e1 !important;');
+
+    // 3) DOM class tagging in index.js for Module 1, Module 2, Module 3, and Executive Sections
+    expect(indexJsContent).toContain('class="developer-matrix-card glassmorphic adaptive-card"');
+    expect(indexJsContent).toContain('class="schema-builder-card glassmorphic dark-card-locked"');
+    expect(indexJsContent).toContain('class="machine-code-drawers-card glassmorphic dark-card-locked"');
+    expect(indexJsContent).toContain('class="explainer-card glassmorphic adaptive-card"');
+  });
 });

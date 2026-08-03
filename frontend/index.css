@@ -4901,31 +4901,51 @@ body.light-theme .table-count-badge {
 .text-slate-900 { color: #0f172a !important; }
 
 /* Light Theme Contrast Overrides */
-body.light-theme .text-slate-100,
-body.light-theme .text-slate-200,
-body.light-theme .text-slate-300 {
+body.light-theme :not(.dark-card-locked) [data-metric="isSecure"],
+body.light-theme :not(.dark-card-locked) [data-metric="Inbound AI Bot Connection Request"],
+body.light-theme .adaptive-card .metric-badge,
+body.light-theme .adaptive-card .check-pill {
+  color: #0f172a !important;
+  font-weight: 600;
+}
+
+body.light-theme .adaptive-card .text-slate-100,
+body.light-theme .adaptive-card .text-slate-200,
+body.light-theme .adaptive-card .text-slate-300,
+body.light-theme :not(.dark-card-locked) .text-slate-100,
+body.light-theme :not(.dark-card-locked) .text-slate-200,
+body.light-theme :not(.dark-card-locked) .text-slate-300 {
   color: #1e293b !important;
 }
-body.light-theme .text-slate-400 {
+body.light-theme .adaptive-card .text-slate-400,
+body.light-theme :not(.dark-card-locked) .text-slate-400 {
   color: #334155 !important;
 }
-body.light-theme .text-slate-500 {
+body.light-theme .adaptive-card .text-slate-500,
+body.light-theme :not(.dark-card-locked) .text-slate-500 {
   color: #475569 !important;
 }
 
-/* Explicit Dark-Card Contrast Locking Utility */
+/* RE-ENFORCE DARK-LOCKED CONTAINER ISOLATION */
+body.light-theme .dark-card-locked,
+body.light-theme .dark-card-locked *,
+body.light-theme #dev-module2-card *,
+body.light-theme #dev-module3-card * {
+  /* Ensure child elements inside dark boxes NEVER get light-mode dark text */
+  color: revert; 
+}
 .dark-card-locked,
 body.light-theme .dark-card-locked {
   background-color: #020617 !important;
   color: #f8fafc !important;
   border-color: #1e293b !important;
 }
-.dark-card-locked h1, .dark-card-locked h2, .dark-card-locked h3, .dark-card-locked h4, .dark-card-locked h5,
-body.light-theme .dark-card-locked h1, body.light-theme .dark-card-locked h2, body.light-theme .dark-card-locked h3, body.light-theme .dark-card-locked h4, body.light-theme .dark-card-locked h5 {
+.dark-card-locked h1, .dark-card-locked h2, .dark-card-locked h3, .dark-card-locked h4, .dark-card-locked h5, .dark-card-locked .card-title,
+body.light-theme .dark-card-locked h1, body.light-theme .dark-card-locked h2, body.light-theme .dark-card-locked h3, body.light-theme .dark-card-locked h4, body.light-theme .dark-card-locked h5, body.light-theme .dark-card-locked .card-title {
   color: #ffffff !important;
 }
-.dark-card-locked p, .dark-card-locked span, .dark-card-locked label,
-body.light-theme .dark-card-locked p, body.light-theme .dark-card-locked span, body.light-theme .dark-card-locked label {
+.dark-card-locked p, .dark-card-locked span, .dark-card-locked label, .dark-card-locked .badge,
+body.light-theme .dark-card-locked p, body.light-theme .dark-card-locked span, body.light-theme .dark-card-locked label, body.light-theme .dark-card-locked .badge {
   color: #cbd5e1 !important;
 }
 

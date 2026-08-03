@@ -329,7 +329,7 @@
       </div>
 
       <!-- Section 1 Card: Gateway & Access Detail Card -->
-      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         
         <!-- Section Container Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
@@ -412,7 +412,7 @@
       </div>
 
       <!-- Section 2 Card: Presence & Hygiene Detail Card -->
-      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         
         <!-- Section Container Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
@@ -552,7 +552,7 @@
       <div class="exec-row-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
 
         <!-- Section 3 Card: E-E-A-T & Trust Detail Card -->
-        <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+        <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
           
           <!-- Section Container Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
@@ -574,7 +574,7 @@
             <div style="display: flex; flex-direction: column; gap: 0.8rem; font-family: var(--font-sans), sans-serif;">
               
               <!-- isSecure row -->
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;" data-metric="isSecure">
                 <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
                   <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">isSecure</span>
                   <button type="button" class="info-help-btn" onclick="openHelpTooltip('isSecure', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
@@ -632,7 +632,7 @@
         </div>
 
         <!-- Section 4 Card: Machine Friendliness Detail Card -->
-        <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+        <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
           
           <!-- Section Container Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
@@ -664,7 +664,7 @@
               }
             </style>
             <div style="font-family: 'JetBrains Mono', monospace, Courier; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); white-space: pre; background: var(--canvas-bg); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color); overflow-x: auto;">
-    🌐 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">Inbound AI Bot Connection Request</span>
+    🌐 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;" data-metric="Inbound AI Bot Connection Request">Inbound AI Bot Connection Request</span>
        │
        ├──► 🔒 <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">LEVEL 1: PROTOCOL GATES (The Gatekeepers)</span>
        │     └── <span style="font-size: 0.92rem; font-weight: 700; color: #cbd5e1;">robots.txt</span> (Permissions Verification) <span class="help-tooltip-trigger" onclick="openHelpTooltip('manifest_robots')">(?)</span>    [<span id="exec-status-robots"></span>]

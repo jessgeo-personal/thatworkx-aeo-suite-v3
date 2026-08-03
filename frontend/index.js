@@ -142,7 +142,7 @@ let cooldownInterval = null;
 
 function buildDevSchemaBuilderHtml() {
   return `
-    <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+    <div class="schema-builder-card glassmorphic dark-card-locked" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
@@ -236,7 +236,7 @@ function buildDevSchemaBuilderHtml() {
 
 function buildDevMatrixHtml() {
   return `
-    <div class="developer-matrix-card glassmorphic" id="diy-module-1" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+    <div class="developer-matrix-card glassmorphic adaptive-card" id="diy-module-1" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
           <div>
@@ -473,7 +473,7 @@ function buildDevDrawersHtml(domainName = '') {
   }, 0);
 
   return `
-    <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+    <div class="machine-code-drawers-card glassmorphic dark-card-locked" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
           <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
@@ -2569,7 +2569,7 @@ function updateExecutiveViewData(results) {
   if (devSummaryGrid) {
     devSummaryGrid.innerHTML = `
       <!-- Section 1 Card: Gateway & Access -->
-      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid #f59e0b; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+      <div id="exec-section1-card" class="explainer-card glassmorphic adaptive-card" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid #f59e0b; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -2591,7 +2591,7 @@ function updateExecutiveViewData(results) {
       </div>
 
       <!-- Section 2 Card: Presence & Hygiene -->
-      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(14, 165, 233, 0.25); border-left: 4px solid #0ea5e9; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+      <div id="exec-section2-card" class="explainer-card glassmorphic adaptive-card" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(14, 165, 233, 0.25); border-left: 4px solid #0ea5e9; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -2604,7 +2604,7 @@ function updateExecutiveViewData(results) {
             <strong style="color: #38bdf8; font-weight: 800;">AI-Optimized</strong> web structure &amp; hydration hygiene:
           </p>
           <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
-            <li style="display: flex; align-items: center;">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
+            <li style="display: flex; align-items: center;" data-metric="isSecure">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isSpaPass)}SPA Hydration Trap &amp; Density Ratio</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isRagPass)}RAG Offset: /llms.txt &amp; /ai-context.md</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isEntityPass)}Essential Entity Nodes Discovered</li>
@@ -2613,7 +2613,7 @@ function updateExecutiveViewData(results) {
       </div>
 
       <!-- Section 3 Card: Content AI-Optimization -->
-      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(139, 92, 246, 0.25); border-left: 4px solid #8b5cf6; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+      <div id="exec-section3-card" class="explainer-card glassmorphic adaptive-card" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(139, 92, 246, 0.25); border-left: 4px solid #8b5cf6; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -2635,7 +2635,7 @@ function updateExecutiveViewData(results) {
       </div>
 
       <!-- Section 4 Card: Machine Manifest Readiness -->
-      <div class="explainer-card glassmorphic" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.25); border-left: 4px solid #10b981; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+      <div id="exec-section4-card" class="explainer-card glassmorphic adaptive-card" style="padding: 1.2rem; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.25); border-left: 4px solid #10b981; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
