@@ -753,7 +753,7 @@ body.light-theme .logo-placeholder {
   height: 100vh;
   background: rgba(2, 6, 23, 0.85);
   backdrop-filter: blur(8px);
-  z-index: 200;
+  z-index: 10000;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -4772,6 +4772,185 @@ body.light-theme .audit-overlay-backdrop {
   }
 }
 
+
+/* ═════════════════════════════════════════════════════════
+   LIGHT-MODE: AI VISUALIZE DASHBOARD OVERRIDES
+   Ensures all text/UI elements are readable in light mode
+   ═════════════════════════════════════════════════════════ */
+
+/* Hero card: soften the dark background for light mode */
+body.light-theme .visualize-hero-card {
+  background-color: #f8f9fa !important;
+  background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.08) 0%, rgba(245, 158, 11, 0.04) 35%, rgba(139, 92, 246, 0.04) 70%, transparent 100%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Badge capsules in hero */
+body.light-theme .onboarding-badge-capsule {
+  background: rgba(241, 243, 244, 0.9) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+}
+
+/* View mode pill container */
+body.light-theme .view-mode-pill-container {
+  background: rgba(241, 243, 244, 0.95) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Score dial card */
+body.light-theme .score-dial-card {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Section cards (exec) */
+body.light-theme #exec-section1-card,
+body.light-theme #exec-section2-card,
+body.light-theme #exec-section3-card,
+body.light-theme #exec-section4-card {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* DIY explainer cards: override hardcoded dark backgrounds */
+body.light-theme .explainer-card.glassmorphic {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Theme toggle button text in light mode */
+body.light-theme .theme-toggle-btn {
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Export / drawer buttons in light mode */
+body.light-theme .drawer-btn {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Pill badges */
+body.light-theme .pill-badge {
+  background: rgba(241, 243, 244, 0.9) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Machine manifest tree container */
+body.light-theme .machine-file-tree-block {
+  background: var(--surface-nested-bg) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Badge status pills on section headers */
+body.light-theme .badge-status {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Info help buttons in light mode */
+body.light-theme .info-help-btn {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Help modal light-mode overrides */
+body.light-theme #help-modal .modal-card {
+  background: #ffffff !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Scan input area */
+body.light-theme #target-url {
+  background: var(--surface-nested-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Table count badges */
+body.light-theme .table-count-badge {
+  background: var(--surface-nested-bg) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Typography & Theme-Aware Contrast Utility Classes */
+.font-sans {
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif) !important;
+}
+.font-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+}
+
+.text-white { color: #ffffff !important; }
+.text-slate-100 { color: #f1f5f9 !important; }
+.text-slate-200 { color: #e2e8f0 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-slate-700 { color: #334155 !important; }
+.text-slate-800 { color: #1e293b !important; }
+.text-slate-900 { color: #0f172a !important; }
+
+/* Light Theme Contrast Overrides */
+body.light-theme .text-slate-100,
+body.light-theme .text-slate-200,
+body.light-theme .text-slate-300 {
+  color: #1e293b !important;
+}
+body.light-theme .text-slate-400 {
+  color: #334155 !important;
+}
+body.light-theme .text-slate-500 {
+  color: #475569 !important;
+}
+
+/* Explicit Dark-Card Contrast Locking Utility */
+.dark-card-locked,
+body.light-theme .dark-card-locked {
+  background-color: #020617 !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+.dark-card-locked h1, .dark-card-locked h2, .dark-card-locked h3, .dark-card-locked h4, .dark-card-locked h5,
+body.light-theme .dark-card-locked h1, body.light-theme .dark-card-locked h2, body.light-theme .dark-card-locked h3, body.light-theme .dark-card-locked h4, body.light-theme .dark-card-locked h5 {
+  color: #ffffff !important;
+}
+.dark-card-locked p, .dark-card-locked span, .dark-card-locked label,
+body.light-theme .dark-card-locked p, body.light-theme .dark-card-locked span, body.light-theme .dark-card-locked label {
+  color: #cbd5e1 !important;
+}
+
+/* Section Title Light Mode Contrast Rules */
+body.light-theme #exec-section1-card h4,
+body.light-theme #exec-section2-card h4,
+body.light-theme #exec-section3-card h4,
+body.light-theme #exec-section4-card h4,
+body.light-theme #diy-module-1 h4,
+body.light-theme #diy-module-2 h4,
+body.light-theme #dev-drawers-section h4,
+body.light-theme #dev-module-4-wrapper h4 {
+  color: var(--text-primary, #0f172a) !important;
+}
+
+body.light-theme #exec-section1-card p,
+body.light-theme #exec-section2-card p,
+body.light-theme #exec-section3-card p,
+body.light-theme #exec-section4-card p,
+body.light-theme #diy-module-1 p,
+body.light-theme #diy-module-2 p,
+body.light-theme #dev-drawers-section p,
+body.light-theme #dev-module-4-wrapper p {
+  color: var(--text-secondary, #475569) !important;
+}
 
 
 

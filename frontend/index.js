@@ -10,6 +10,15 @@ try {
   console.warn('Early theme initialization issue:', e);
 }
 
+// Global API Base URL Resolution with fallback & window binding
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE !== undefined)
+  ? window.API_BASE
+  : ((typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) ? 'http://localhost:5000' : '');
+
+if (typeof window !== 'undefined') {
+  window.API_BASE = API_BASE;
+}
+
 // Current Client State
 let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
@@ -20,9 +29,47 @@ let latestScanResults = null;
 let activeDiyManifestKey = 'robots';
 
 // Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
-const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) 
-  ? 'http://localhost:5000' 
-  : '';
+// Section Help Data Map (Global & Window scoped to prevent TDZ errors)
+const sectionHelpData = {
+  0: {
+    title: 'AI Visibility Health Index (0-100 Score Formula)',
+    icon: '📊',
+    body: `<p style="margin-bottom: 0.75rem;">The <strong>AI Visibility Health Index</strong> measures your domain's total readiness for AI search engines (Google Gemini, Microsoft Copilot, ChatGPT, Perplexity). Baseline score starts at <strong>100 Points</strong> and deducts weight across the 4 Health Pillars:</p>
+    <div style="background: rgba(15,23,42,0.8); padding: 0.65rem 0.85rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.76rem; color: #38bdf8; margin-bottom: 0.85rem; border: 1px solid rgba(56, 189, 248, 0.2);">
+      Overall Score = 100 - (Pillar 1 + Pillar 2 + Pillar 3 + Pillar 4 Deductions)
+    </div>
+    <ul style="margin-left: 1.2rem; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; text-align: left;">
+      <li><strong style="color: #38bdf8;">Pillar 1: Gateway & Access (25% Weight):</strong> -10 pts per blocked AI crawler (Google-Extended, GPTBot, PerplexityBot, ClaudeBot); -5 pts if sitemap.xml is missing.</li>
+      <li><strong style="color: #4ade80;">Pillar 2: AI-Ready Machine Data (25% Weight):</strong> -10 pts if /llms.txt is 404; -10 pts if /ai-context.md is 404; -5 pts per missing narrative manifest (/about.md, /docs.md, /content.md).</li>
+      <li><strong style="color: #facc15;">Pillar 3: Parsing & Readability (25% Weight):</strong> -15 pts for SPA JS hydration traps; -10 pts for broken H1/H2 heading hierarchy; -5 pts for word count &lt;500 or &gt;2500 (truncation risk).</li>
+      <li><strong style="color: #f43f5e;">Pillar 4: Knowledge Graph Integrity (25% Weight):</strong> -15 pts if JSON-LD schema is missing; -10 pts if self-referential canonical tag is missing.</li>
+    </ul>
+    <p style="margin-top: 0.85rem; font-size: 0.78rem; color: #f87171; text-align: left;">⚠️ <em>Blanket Block Override:</em> A blanket "Disallow: /" in robots.txt immediately caps score at 20/100 (Total AI Blindness).</p>`
+  },
+  1: {
+    title: 'Section 1: Gateway & Access (Corridor Audit)',
+    icon: '🛡️',
+    body: `<p>Verifies whether AI search bots (GPTBot, PerplexityBot, ClaudeBot, Google-Extended) have unhindered network access to your root domain.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">Optimized Handshake:</strong> All major AI crawler User-Agents are explicitly allowed in /robots.txt.</li><li><strong style="color: #facc15;">Partial Block:</strong> Certain bots are permitted while others are restricted.</li><li><strong style="color: #f87171;">Total AI Blindness:</strong> A blanket "Disallow: /" rule is preventing AI models from indexing your site.</li></ul>`
+  },
+  2: {
+    title: 'Section 2: Presence & Hygiene',
+    icon: '🧹',
+    body: `<p>Checks structural technical hygiene needed for automated crawlers to discover and validate your canonical routes.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong>Sitemap XML:</strong> Valid route index tree accessible at /sitemap.xml.</li><li><strong>Canonical Tag:</strong> Explicit self-referential canonical tags to prevent duplicate content dilution.</li><li><strong>SSL Security:</strong> HTTPS protocol verification.</li><li><strong>SPA Hydration Trap:</strong> Detects whether page content relies solely on client-side JS rendering without SSR HTML fallback.</li></ul>`
+  },
+  3: {
+    title: 'Section 3: Parsing & Readability',
+    icon: '📖',
+    body: `<p>Measures how cleanly an LLM's RAG chunking algorithm can process the text density of your rendered DOM.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">High Content Density:</strong> >50% ratio of factual body text relative to DOM HTML markup node noise.</li><li><strong>Linear Heading Hierarchy:</strong> Single H1 with sequential H2/H3 nesting for precise question matching.</li><li><strong style="color: #facc15;">Truncation Risk:</strong> Pages >2,500 words risk "loss in the middle" or truncation during scraper fetch windows.</li></ul>`
+  },
+  4: {
+    title: 'Section 4: Machine Manifests',
+    icon: '🤖',
+    body: `<p>Verifies deployment of machine welcome mats and structured AI blueprint files.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">/llms.txt:</strong> Answer.ai standard machine welcome directory.</li><li><strong style="color: #4ade80;">/ai-context.md:</strong> System prompt context map outlining brand specs.</li><li><strong>/about.md & /docs.md:</strong> Flattened Markdown files for E-E-A-T and technical entity verification.</li></ul>`
+  }
+};
+if (typeof window !== 'undefined') {
+  window.sectionHelpData = sectionHelpData;
+}
 
 // AIVisualize Dual-View Switcher Handler (Executive vs Developer / DIY Mode)
 function setVisualizeViewMode(mode) {
@@ -98,17 +145,17 @@ function buildDevSchemaBuilderHtml() {
     <div class="schema-builder-card glassmorphic" id="diy-module-2" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
-          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
             🛠️ Module 2: Page-Level HTML Schema Builder (JSON-LD)
           </h4>
-          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
+          <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Generate page-specific JSON-LD schemas in real-time to establish corporate profiles and FAQ parity.</p>
         </div>
         <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">HTML &lt;head&gt; Markup</span>
       </div>
 
       <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
         <!-- Left Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
+        <div class="dark-card-locked" style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
           <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Schema Builder &amp; Page-Targeting Guidance</h5>
           
           <!-- 3-Step Banner -->
@@ -161,7 +208,7 @@ function buildDevSchemaBuilderHtml() {
         </div>
 
         <!-- Right Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
+        <div class="dark-card-locked" style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;">
           <h5 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">Deployment &amp; Real-Time Code Synthesis</h5>
           
           <!-- Action Buttons -->
@@ -193,11 +240,11 @@ function buildDevMatrixHtml() {
       <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
               <span>🛠️ Module 1: AI-Optimized Site Diagnostics</span>
               <span class="badge-status" style="font-size: 0.72rem; background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-sans), sans-serif; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600;">Full Technical Audit</span>
             </h4>
-            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
+            <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Complete technical breakdown of all 32 AEO access, hygiene, parsing, and machine handshake parameters.</p>
           </div>
           <span class="table-count-badge status-amber-badge" style="font-family: var(--font-sans), sans-serif; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px;">32 Checks Evaluated</span>
         </div>
@@ -429,10 +476,10 @@ function buildDevDrawersHtml(domainName = '') {
     <div class="machine-code-drawers-card glassmorphic" id="dev-drawers-section" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
         <div>
-          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+          <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
             🛠️ Module 3: AI Machine-readable File Configurator
           </h4>
-          <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Review and deploy standard control files (like robots.txt and llms.txt) to make your website AI-Ready, direct AI crawlers, and control how bots index your content.</p>
+          <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Review and deploy standard control files (like robots.txt and llms.txt) to make your website AI-Ready, direct AI crawlers, and control how bots index your content.</p>
         </div>
         <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Root Server Manifests</span>
       </div>
@@ -443,12 +490,12 @@ function buildDevDrawersHtml(domainName = '') {
 
       <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; font-family: var(--font-sans), sans-serif;">
         <!-- Left Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="left-pane-content">
+        <div class="dark-card-locked" style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="left-pane-content">
           <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
 
         <!-- Right Pane (50% width) -->
-        <div style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="right-pane-container">
+        <div class="dark-card-locked" style="flex: 1; min-width: 300px; background: #090a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; font-family: var(--font-sans), sans-serif;" id="right-pane-container">
           <!-- Populated dynamically by switchDiyManifestTab -->
         </div>
       </div>
@@ -554,52 +601,124 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Page 2: AI Visualize Dashboard (visualize.html or /visualize)
   if (currentPath.includes('visualize')) {
-    const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
-    const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
-    const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
-    const devModule4Wrap = document.getElementById('dev-module-4-wrapper');
+    try {
+      const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+      const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
+      const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
+      const devModule4Wrap = document.getElementById('dev-module-4-wrapper');
 
-    if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
-    if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
-    if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
-    if (devModule4Wrap) {
-      devModule4Wrap.innerHTML = buildDevModule4Html();
-      renderModule4(latestScanResults || window.lastScanResults || {});
+      if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
+      if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
+      if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
+      if (devModule4Wrap) {
+        devModule4Wrap.innerHTML = buildDevModule4Html();
+        renderModule4(latestScanResults || window.lastScanResults || {});
+      }
+
+      const tabParam = params.get('tab');
+      if (modeParam === 'developer' || modeParam === 'diy') {
+        setVisualizeViewMode('developer');
+      } else {
+        setVisualizeViewMode('executive');
+      }
+
+      if (tabParam) {
+        if (tabParam === 'gateway' || tabParam === '1') filterMatrixSection(1);
+        else if (tabParam === 'hygiene' || tabParam === '2') filterMatrixSection(2);
+        else if (tabParam === 'content' || tabParam === '3') filterMatrixSection(3);
+        else if (tabParam === 'manifests' || tabParam === '4') filterMatrixSection(4);
+        else filterMatrixSection('all');
+      }
+
+      if (targetUrlParam) {
+        const mainInput = document.getElementById('target-url');
+        if (mainInput) mainInput.value = targetUrlParam;
+        executeDashboardScan(null);
+      } else {
+        // Default initial scan load for demo
+        executeDashboardScan(null);
+      }
+    } catch (vizInitErr) {
+      console.warn('[Visualize] Non-critical init error:', vizInitErr);
     }
 
-    const tabParam = params.get('tab');
-    if (modeParam === 'developer' || modeParam === 'diy') {
-      setVisualizeViewMode('developer');
-    } else {
-      setVisualizeViewMode('executive');
-    }
-
-    if (tabParam) {
-      if (tabParam === 'gateway' || tabParam === '1') filterMatrixSection(1);
-      else if (tabParam === 'hygiene' || tabParam === '2') filterMatrixSection(2);
-      else if (tabParam === 'content' || tabParam === '3') filterMatrixSection(3);
-      else if (tabParam === 'manifests' || tabParam === '4') filterMatrixSection(4);
-      else filterMatrixSection('all');
-    }
-
-    if (targetUrlParam) {
-      const mainInput = document.getElementById('target-url');
-      if (mainInput) mainInput.value = targetUrlParam;
-      executeDashboardScan(null);
-    } else {
-      // Default initial scan load for demo
-      executeDashboardScan(null);
-    }
-
-    // Attach ? help button listeners via event delegation (reliable, no inline onclick needed)
+    // Attach ? help button and infotip listeners via global event delegation
     document.addEventListener('click', function(e) {
-      const btn = e.target.closest('.info-help-btn[data-section]');
-      if (btn) {
+      console.log('[AEO-Infotip-Debug] Click Intercepted on:', e.target);
+      const btn = e.target.closest('.info-help-btn, .info-tip, .infotip-btn, .help-tooltip-trigger, [data-tooltip], [data-section], [data-modal], [data-action]');
+      
+      if (!btn) {
+        console.log('[AEO-Infotip-Debug] Clicked element did NOT match any known Infotip/Help trigger selectors.');
+        return;
+      }
+
+      console.log('[AEO-Infotip-Debug] Matched Trigger Element:', btn);
+      console.log('[AEO-Infotip-Debug] Extracted Datasets:', {
+        section: btn.dataset.section,
+        tooltip: btn.dataset.tooltip,
+        modal: btn.dataset.modal,
+        action: btn.dataset.action,
+        title: btn.getAttribute('title')
+      });
+
+      const trigger = btn;
+
+      // 1. Handle section help triggers (data-section="1", etc.)
+      if (trigger.dataset.section !== undefined && trigger.dataset.section !== '') {
+        const secNum = parseInt(trigger.dataset.section, 10);
+        if (!isNaN(secNum)) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[HelpModal] Section trigger clicked, section:', secNum);
+          openSectionHelpModal(secNum, e);
+          return;
+        }
+      }
+
+      // 2. Handle tooltip key triggers (data-tooltip="key" or data-help="key")
+      const tooltipKey = trigger.dataset.tooltip || trigger.dataset.help;
+      if (tooltipKey) {
         e.preventDefault();
         e.stopPropagation();
-        const secNum = parseInt(btn.dataset.section, 10);
-        console.log('[HelpModal] ? button clicked, section:', secNum);
-        openSectionHelpModal(secNum, null);
+        console.log('[HelpModal] Tooltip trigger clicked, key:', tooltipKey);
+        openHelpTooltip(tooltipKey, e);
+        return;
+      }
+
+      // 3. Handle modal target triggers (data-modal="key" or data-action="open-modal")
+      const modalKey = trigger.dataset.modal || trigger.dataset.target || trigger.dataset.action;
+      if (modalKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (modalKey === 'auth' || modalKey === 'auth-modal') {
+          openAuthModal();
+        } else if (modalKey === 'alert' || modalKey === 'alert-modal' || modalKey === 'upgrade') {
+          showUpgradeModal('PRO_REQUIRED', 'Upgrade required to unlock feature.', 'AIOptimize Pro');
+        } else if (modalKey === 'help' || modalKey === 'help-modal') {
+          openSectionHelpModal(1, e);
+        } else {
+          openHelpTooltip(modalKey, e);
+        }
+        return;
+      }
+
+      // 4. Fallback for title attribute on infotip buttons
+      const titleAttr = trigger.getAttribute('title');
+      if (titleAttr) {
+        e.preventDefault();
+        e.stopPropagation();
+        const titleEl = document.getElementById('help-modal-title');
+        const iconEl = document.getElementById('help-modal-icon');
+        const bodyEl = document.getElementById('help-modal-body');
+        const modalEl = document.getElementById('help-modal') || document.getElementById('help-info-modal');
+
+        if (titleEl) titleEl.innerText = titleAttr;
+        if (iconEl) iconEl.innerText = '💡';
+        if (bodyEl) bodyEl.innerHTML = `<p>${titleAttr}</p>`;
+        if (modalEl) {
+          modalEl.classList.remove('help-modal-hidden');
+          modalEl.style.display = 'flex';
+        }
       }
     });
   }
@@ -2980,26 +3099,31 @@ function toggleAccordion(accId) {
   }
 }
 
-// Show/Hide upgrade limit alerts modal
 function showUpgradeModal(code, message, targetTier) {
+  console.log('[AEO-Infotip-Debug] Dispatched showUpgradeModal with arguments:', { code, message, targetTier });
   const modalTitle = document.getElementById('modal-title');
   if (modalTitle) modalTitle.innerText = (code || 'Limit Exceeded').replace(/_/g, ' ');
 
   const modalMsg = document.getElementById('modal-message');
   if (modalMsg) modalMsg.innerText = message || 'Daily scan allocation limit reached.';
 
-  const modal = document.getElementById('alert-modal');
-  if (modal) modal.style.display = 'flex';
-  
+  const modalEl = document.getElementById('alert-modal');
+  if (!modalEl) {
+    console.error('[AEO-Infotip-Debug] CRITICAL ERROR: Target modal element ID NOT FOUND in live DOM!');
+    alert(`[${code}] ${message}`);
+    return;
+  }
+
+  console.log('[AEO-Infotip-Debug] Found Modal Element in DOM:', modalEl, 'Classes Before:', modalEl.className, 'Display Before:', modalEl.style.display);
+
+  modalEl.style.display = 'flex';
+
   const tierSelector = document.getElementById('user-tier-selector');
   if (tierSelector && targetTier) {
     tierSelector.value = targetTier;
   }
 
-  // Fallback alert if modal container is absent in DOM
-  if (!modal) {
-    alert(`[${code}] ${message}`);
-  }
+  console.log('[AEO-Infotip-Debug] Modal State After Mutation:', 'Classes After:', modalEl.className, 'Display After:', modalEl.style.display);
 }
 
 function closeAlertModal() {
@@ -3011,6 +3135,10 @@ function triggerUpgrade() {
   updateUserTier();
   alert('Upgraded plan configuration updated. Limits have been expanded.');
 }
+
+window.showUpgradeModal = showUpgradeModal;
+window.closeAlertModal = closeAlertModal;
+window.triggerUpgrade = triggerUpgrade;
 
 // --- Dynamic Optimization Generator sandboxes ---
 
@@ -3652,21 +3780,38 @@ async function auditSinglePage(event, route, buttonEl) {
 }
 
 function showHelpModal(type) {
-  const modal = document.getElementById('help-info-modal');
-  const data = helpContent[type];
-  if (modal && data) {
-    document.getElementById('help-modal-icon').innerText = data.icon;
-    document.getElementById('help-modal-title').innerText = data.title;
-    document.getElementById('help-modal-body').innerHTML = data.body;
-    modal.style.display = 'flex';
+  console.log('[AEO-Infotip-Debug] Dispatched showHelpModal with arguments:', { type });
+  const modalEl = document.getElementById('help-modal') || document.getElementById('help-info-modal');
+  const data = (typeof helpContent !== 'undefined' && helpContent[type]) || (typeof tooltipExplanationData !== 'undefined' && tooltipExplanationData[type]);
+
+  if (!modalEl) {
+    console.error('[AEO-Infotip-Debug] CRITICAL ERROR: Target modal element ID NOT FOUND in live DOM!');
+    return;
   }
+
+  console.log('[AEO-Infotip-Debug] Found Modal Element in DOM:', modalEl, 'Classes Before:', modalEl.className, 'Display Before:', modalEl.style.display);
+
+  if (data) {
+    const iconEl = document.getElementById('help-modal-icon');
+    const titleEl = document.getElementById('help-modal-title');
+    const bodyEl = document.getElementById('help-modal-body');
+    if (iconEl) iconEl.innerText = data.icon;
+    if (titleEl) titleEl.innerText = data.title;
+    if (bodyEl) bodyEl.innerHTML = data.body;
+  }
+
+  modalEl.classList.remove('help-modal-hidden');
+  modalEl.style.display = 'flex';
+
+  console.log('[AEO-Infotip-Debug] Modal State After Mutation:', 'Classes After:', modalEl.className, 'Display After:', modalEl.style.display);
 }
 
 function closeHelpModal() {
-  const modal = document.getElementById('help-info-modal');
-  if (modal) {
+  const modals = [document.getElementById('help-modal'), document.getElementById('help-info-modal')].filter(Boolean);
+  modals.forEach(modal => {
+    modal.classList.add('help-modal-hidden');
     modal.style.display = 'none';
-  }
+  });
 }
 
 window.showHelpModal = showHelpModal;
@@ -4067,54 +4212,31 @@ function switchPipelineStep(stepIndex) {
   }
 }
 window.switchPipelineStep = switchPipelineStep;
+
+function toggleRouteExpandRow(rowId) {
+  const targetId = typeof rowId === 'string' && rowId.startsWith('route-') ? rowId : `route-${rowId}`;
+  const row = document.getElementById(targetId) || document.getElementById(rowId);
+  if (row) {
+    row.classList.toggle('hidden');
+    if (row.classList.contains('hidden')) {
+      row.style.display = 'none';
+    } else {
+      row.style.display = 'table-row';
+    }
+  }
+}
+window.toggleRouteExpandRow = toggleRouteExpandRow;
+
 window.filterMatrixSection = filterMatrixSection;
 window.selectCodeDrawer = selectCodeDrawer;
 window.copyDrawerCode = copyDrawerCode;
 window.downloadDrawerFile = downloadDrawerFile;
 window.selectEdgeTab = selectEdgeTab;
 window.copyEdgeScript = copyEdgeScript;
-window.toggleRouteExpandRow = toggleRouteExpandRow;
 window.updateOptimizeTargetDomain = updateOptimizeTargetDomain;
 
-const sectionHelpData = {
-  0: {
-    title: 'AI Visibility Health Index (0-100 Score Formula)',
-    icon: '📊',
-    body: `<p style="margin-bottom: 0.75rem;">The <strong>AI Visibility Health Index</strong> measures your domain's total readiness for AI search engines (Google Gemini, Microsoft Copilot, ChatGPT, Perplexity). Baseline score starts at <strong>100 Points</strong> and deducts weight across the 4 Health Pillars:</p>
-    <div style="background: rgba(15,23,42,0.8); padding: 0.65rem 0.85rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.76rem; color: #38bdf8; margin-bottom: 0.85rem; border: 1px solid rgba(56, 189, 248, 0.2);">
-      Overall Score = 100 - (Pillar 1 + Pillar 2 + Pillar 3 + Pillar 4 Deductions)
-    </div>
-    <ul style="margin-left: 1.2rem; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; text-align: left;">
-      <li><strong style="color: #38bdf8;">Pillar 1: Gateway & Access (25% Weight):</strong> -10 pts per blocked AI crawler (Google-Extended, GPTBot, PerplexityBot, ClaudeBot); -5 pts if sitemap.xml is missing.</li>
-      <li><strong style="color: #4ade80;">Pillar 2: AI-Ready Machine Data (25% Weight):</strong> -10 pts if /llms.txt is 404; -10 pts if /ai-context.md is 404; -5 pts per missing narrative manifest (/about.md, /docs.md, /content.md).</li>
-      <li><strong style="color: #facc15;">Pillar 3: Parsing & Readability (25% Weight):</strong> -15 pts for SPA JS hydration traps; -10 pts for broken H1/H2 heading hierarchy; -5 pts for word count &lt;500 or &gt;2500 (truncation risk).</li>
-      <li><strong style="color: #f43f5e;">Pillar 4: Knowledge Graph Integrity (25% Weight):</strong> -15 pts if JSON-LD schema is missing; -10 pts if self-referential canonical tag is missing.</li>
-    </ul>
-    <p style="margin-top: 0.85rem; font-size: 0.78rem; color: #f87171; text-align: left;">⚠️ <em>Blanket Block Override:</em> A blanket "Disallow: /" in robots.txt immediately caps score at 20/100 (Total AI Blindness).</p>`
-  },
-  1: {
-    title: 'Section 1: Gateway & Access (Corridor Audit)',
-    icon: '🛡️',
-    body: `<p>Verifies whether AI search bots (GPTBot, PerplexityBot, ClaudeBot, Google-Extended) have unhindered network access to your root domain.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">Optimized Handshake:</strong> All major AI crawler User-Agents are explicitly allowed in /robots.txt.</li><li><strong style="color: #facc15;">Partial Block:</strong> Certain bots are permitted while others are restricted.</li><li><strong style="color: #f87171;">Total AI Blindness:</strong> A blanket "Disallow: /" rule is preventing AI models from indexing your site.</li></ul>`
-  },
-  2: {
-    title: 'Section 2: Presence & Hygiene',
-    icon: '🧹',
-    body: `<p>Checks structural technical hygiene needed for automated crawlers to discover and validate your canonical routes.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong>Sitemap XML:</strong> Valid route index tree accessible at /sitemap.xml.</li><li><strong>Canonical Tag:</strong> Explicit self-referential canonical tags to prevent duplicate content dilution.</li><li><strong>SSL Security:</strong> HTTPS protocol verification.</li><li><strong>SPA Hydration Trap:</strong> Detects whether page content relies solely on client-side JS rendering without SSR HTML fallback.</li></ul>`
-  },
-  3: {
-    title: 'Section 3: Parsing & Readability',
-    icon: '📖',
-    body: `<p>Measures how cleanly an LLM's RAG chunking algorithm can process the text density of your rendered DOM.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">High Content Density:</strong> >50% ratio of factual body text relative to DOM HTML markup node noise.</li><li><strong>Linear Heading Hierarchy:</strong> Single H1 with sequential H2/H3 nesting for precise question matching.</li><li><strong style="color: #facc15;">Truncation Risk:</strong> Pages >2,500 words risk "loss in the middle" or truncation during scraper fetch windows.</li></ul>`
-  },
-  4: {
-    title: 'Section 4: Machine Manifests',
-    icon: '🤖',
-    body: `<p>Verifies deployment of machine welcome mats and structured AI blueprint files.</p><ul style="margin-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;"><li><strong style="color: #4ade80;">/llms.txt:</strong> Answer.ai standard machine welcome directory.</li><li><strong style="color: #4ade80;">/ai-context.md:</strong> System prompt context map outlining brand specs.</li><li><strong>/about.md & /docs.md:</strong> Flattened Markdown files for E-E-A-T and technical entity verification.</li></ul>`
-  }
-};
-
 function openSectionHelpModal(secNum, evt) {
+  console.log('[AEO-Infotip-Debug] Dispatched openSectionHelpModal with arguments:', { secNum, evt });
   if (evt) {
     if (typeof evt.preventDefault === 'function') evt.preventDefault();
     if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
@@ -4124,14 +4246,23 @@ function openSectionHelpModal(secNum, evt) {
   const titleEl = document.getElementById('help-modal-title');
   const iconEl = document.getElementById('help-modal-icon');
   const bodyEl = document.getElementById('help-modal-body');
-  const modalEl = document.getElementById('help-modal');
+  const modalEl = document.getElementById('help-modal') || document.getElementById('help-info-modal');
+
+  if (!modalEl) {
+    console.error('[AEO-Infotip-Debug] CRITICAL ERROR: Target modal element ID NOT FOUND in live DOM!');
+    return;
+  }
+
+  console.log('[AEO-Infotip-Debug] Found Modal Element in DOM:', modalEl, 'Classes Before:', modalEl.className, 'Display Before:', modalEl.style.display);
 
   if (titleEl) titleEl.innerText = data.title;
   if (iconEl) iconEl.innerText = data.icon;
   if (bodyEl) bodyEl.innerHTML = data.body;
-  if (modalEl) {
-    modalEl.classList.remove('help-modal-hidden');
-  }
+
+  modalEl.classList.remove('help-modal-hidden');
+  modalEl.style.display = 'flex';
+
+  console.log('[AEO-Infotip-Debug] Modal State After Mutation:', 'Classes After:', modalEl.className, 'Display After:', modalEl.style.display);
 }
 
 function closeHelpModal() {
@@ -4358,6 +4489,7 @@ const tooltipExplanationData = {
 };
 
 function openHelpTooltip(key, evt) {
+  console.log('[AEO-Infotip-Debug] Dispatched openHelpTooltip with arguments:', { key, evt });
   if (evt) {
     if (typeof evt.preventDefault === 'function') evt.preventDefault();
     if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
@@ -4386,14 +4518,23 @@ function openHelpTooltip(key, evt) {
   const titleEl = document.getElementById('help-modal-title');
   const iconEl = document.getElementById('help-modal-icon');
   const bodyEl = document.getElementById('help-modal-body');
-  const modalEl = document.getElementById('help-modal');
+  const modalEl = document.getElementById('help-modal') || document.getElementById('help-info-modal');
+
+  if (!modalEl) {
+    console.error('[AEO-Infotip-Debug] CRITICAL ERROR: Target modal element ID NOT FOUND in live DOM!');
+    return;
+  }
+
+  console.log('[AEO-Infotip-Debug] Found Modal Element in DOM:', modalEl, 'Classes Before:', modalEl.className, 'Display Before:', modalEl.style.display);
 
   if (titleEl) titleEl.innerText = data.title;
   if (iconEl) iconEl.innerText = data.icon;
   if (bodyEl) bodyEl.innerHTML = data.body;
-  if (modalEl) {
-    modalEl.classList.remove('help-modal-hidden');
-  }
+
+  modalEl.classList.remove('help-modal-hidden');
+  modalEl.style.display = 'flex';
+
+  console.log('[AEO-Infotip-Debug] Modal State After Mutation:', 'Classes After:', modalEl.className, 'Display After:', modalEl.style.display);
 }
 
 function switchSec2RouteTab(idx) {
@@ -4427,10 +4568,10 @@ function buildDevModule4Html() {
       <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
               <span>🔍 Module 4: Page-Level Crawl & Content Health Inspector</span>
             </h4>
-            <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Audit and fix every page on your site to guarantee search engines and AI assistants can index and cite your content.</p>
+            <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Audit and fix every page on your site to guarantee search engines and AI assistants can index and cite your content.</p>
           </div>
         </div>
       </div>

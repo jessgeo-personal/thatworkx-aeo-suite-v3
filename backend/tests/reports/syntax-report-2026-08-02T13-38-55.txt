@@ -1,0 +1,13 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-08-02T13:38:55.862Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: All files passed.

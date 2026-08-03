@@ -1,0 +1,104 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-08-02T13:35:11.602Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 10  Malformed entity: bare '&' at col 119 — use &amp; in HTML contexts
+  [ERR   2]  Line 10  Malformed entity: bare '&' at col 154 — use &amp; in HTML contexts
+  [ERR   3]  Line 64  Malformed entity: bare '&' at col 23 — use &amp; in HTML contexts
+  [ERR   4]  Line 158  Malformed entity: bare '&' at col 44 — use &amp; in HTML contexts
+  [ERR   5]  Line 185  Malformed entity: bare '&' at col 52 — use &amp; in HTML contexts
+  [ERR   6]  Line 186  Malformed entity: bare '&' at col 51 — use &amp; in HTML contexts
+  [ERR   7]  Line 187  Malformed entity: bare '&' at col 51 — use &amp; in HTML contexts
+  [ERR   8]  Line 234  Malformed entity: bare '&' at col 34 — use &amp; in HTML contexts
+  [ERR   9]  Line 246  Malformed entity: bare '&' at col 42 — use &amp; in HTML contexts
+  [ERR  10]  Line 258  Malformed entity: bare '&' at col 40 — use &amp; in HTML contexts
+  [ERR  11]  Line 399  Malformed entity: bare '&' at col 41 — use &amp; in HTML contexts
+  [ERR  12]  Line 616  Malformed entity: bare '&' at col 33 — use &amp; in HTML contexts
+  [ERR  13]  Line 697  Malformed entity: bare '&' at col 34 — use &amp; in HTML contexts
+  [ERR  14]  Line 719  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR  15]  Line 732  Malformed entity: bare '&' at col 22 — use &amp; in HTML contexts
+  [ERR  16]  Line 746  Malformed entity: bare '&' at col 23 — use &amp; in HTML contexts
+  16 error(s).
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 10  Malformed entity: bare '&' at col 119 — use &amp; in HTML contexts
+  [ERR   2]  Line 10  Malformed entity: bare '&' at col 154 — use &amp; in HTML contexts
+  [ERR   3]  Line 50  Hierarchy violation: <main> (line 50) not closed before </body> (line 1118)
+  [ERR   4]  Line 55  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR   5]  Line 101  Malformed entity: bare '&' at col 40 — use &amp; in HTML contexts
+  [ERR   6]  Line 144  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR   7]  Line 147  Malformed entity: bare '&' at col 36 — use &amp; in HTML contexts
+  [ERR   8]  Line 263  Malformed entity: bare '&' at col 151 — use &amp; in HTML contexts
+  [ERR   9]  Line 281  Malformed entity: bare '&' at col 152 — use &amp; in HTML contexts
+  [ERR  10]  Line 331  Malformed entity: bare '&' at col 36 — use &amp; in HTML contexts
+  [ERR  11]  Line 414  Malformed entity: bare '&' at col 37 — use &amp; in HTML contexts
+  [ERR  12]  Line 554  Malformed entity: bare '&' at col 38 — use &amp; in HTML contexts
+  [ERR  13]  Line 572  Malformed entity: bare '&' at col 39 — use &amp; in HTML contexts
+  [ERR  14]  Line 677  Malformed entity: bare '&' at col 123 — use &amp; in HTML contexts
+  [ERR  15]  Line 681  Malformed entity: bare '&' at col 120 — use &amp; in HTML contexts
+  [ERR  16]  Line 682  Malformed entity: bare '&' at col 124 — use &amp; in HTML contexts
+  [ERR  17]  Line 706  Malformed entity: bare '&' at col 26 — use &amp; in HTML contexts
+  [ERR  18]  Line 709  Malformed entity: bare '&' at col 38 — use &amp; in HTML contexts
+  [ERR  19]  Line 747  Malformed entity: bare '&' at col 38 — use &amp; in HTML contexts
+  [ERR  20]  Line 769  Malformed entity: bare '&' at col 39 — use &amp; in HTML contexts
+  [ERR  21]  Line 940  Malformed entity: bare '&' at col 39 — use &amp; in HTML contexts
+  [ERR  22]  Line 950  Malformed entity: bare '&' at col 39 — use &amp; in HTML contexts
+  [ERR  23]  Line 995  Malformed entity: bare '&' at col 34 — use &amp; in HTML contexts
+  [ERR  24]  Line 1017  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR  25]  Line 1030  Malformed entity: bare '&' at col 22 — use &amp; in HTML contexts
+  25 error(s).
+
+FILE: frontend\optimize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 10  Malformed entity: bare '&' at col 119 — use &amp; in HTML contexts
+  [ERR   2]  Line 10  Malformed entity: bare '&' at col 154 — use &amp; in HTML contexts
+  [ERR   3]  Line 50  Hierarchy violation: <main> (line 50) not closed before </body> (line 326)
+  [ERR   4]  Line 104  Hierarchy violation: <div> (line 104) not closed before </body> (line 326)
+  [ERR   5]  Line 251  Malformed entity: bare '&' at col 34 — use &amp; in HTML contexts
+  [ERR   6]  Line 273  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR   7]  Line 286  Malformed entity: bare '&' at col 22 — use &amp; in HTML contexts
+  7 error(s).
+
+FILE: frontend\socialize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 6  Malformed entity: bare '&' at col 33 — use &amp; in HTML contexts
+  [ERR   2]  Line 10  Malformed entity: bare '&' at col 119 — use &amp; in HTML contexts
+  [ERR   3]  Line 10  Malformed entity: bare '&' at col 154 — use &amp; in HTML contexts
+  [ERR   4]  Line 50  Hierarchy violation: <main> (line 50) not closed before </body> (line 249)
+  [ERR   5]  Line 147  Malformed entity: bare '&' at col 16 — use &amp; in HTML contexts
+  [ERR   6]  Line 174  Malformed entity: bare '&' at col 34 — use &amp; in HTML contexts
+  [ERR   7]  Line 196  Malformed entity: bare '&' at col 30 — use &amp; in HTML contexts
+  [ERR   8]  Line 209  Malformed entity: bare '&' at col 22 — use &amp; in HTML contexts
+  8 error(s).
+
+FILE: frontend\index.js
+------------------------------------------------------------------------
+  [ERR   1]  Line 521  Unclosed '(' opened at line 521 col 26 — never closed
+  [ERR   2]  Line 521  Unclosed '{' opened at line 521 col 36 — never closed
+  [ERR   3]  Line 608  Unclosed '{' opened at line 608 col 37 — never closed
+  [ERR   4]  Line 613  Mismatched: '(' opened line 610 col 49 expected ')' but found '}' at line 613
+  [ERR   5]  Line 623  Mismatched: '(' opened line 622 col 64 expected ')' but found '}' at line 623
+  [ERR   6]  Line 643  Mismatched: '(' opened line 631 col 49 expected ')' but found '}' at line 643
+  [ERR   7]  Line 650  Mismatched: '{' opened line 609 col 25 expected '}' but found ')' at line 650
+  [ERR   8]  Line 764  Mismatched: '(' opened line 762 col 6 expected ')' but found '}' at line 764
+  [ERR   9]  Line 1353  Unclosed '{' opened at line 1353 col 43 — never closed
+  [ERR  10]  Line 1360  Mismatched: '(' opened line 1359 col 42 expected ')' but found '}' at line 1360
+  [ERR  11]  Line 2072  Unclosed '{' opened at line 2072 col 31 — never closed
+  [ERR  12]  Line 2086  Mismatched: '(' opened line 2081 col 37 expected ')' but found '}' at line 2086
+  [ERR  13]  Line 2195  Unclosed '{' opened at line 2195 col 44 — never closed
+  [ERR  14]  Line 2214  Mismatched: '(' opened line 2212 col 6 expected ')' but found '}' at line 2214
+  [ERR  15]  Line 2245  Mismatched: '(' opened line 2241 col 47 expected ')' but found '}' at line 2245
+  [ERR  16]  Line 2345  Unclosed '{' opened at line 2345 col 43 — never closed
+  [ERR  17]  Line 2943  Mismatched: '(' opened line 2351 col 34 expected ')' but found '}' at line 2943
+  [ERR  18]  Line 3746  Unclosed '{' opened at line 3746 col 41 — never closed
+  [ERR  19]  Line 3767  Mismatched: '(' opened line 3749 col 26 expected ')' but found '}' at line 3767
+  [ERR  20]  Line 3785  Mismatched: '(' opened line 3785 col 61 expected ')' but found ']' at line 3785
+  [ERR  21]  Line 3785  Mismatched: '{' opened line 3784 col 25 expected '}' but found ')' at line 3785
+  [ERR  22]  Line 3951  Mismatched: '(' opened line 3772 col 50 expected ')' but found '}' at line 3951
+  [ERR  23]  Line 3953  Mismatched: '{' opened line 3769 col 39 expected '}' but found ')' at line 3953
+  23 error(s).
+
+========================================================================
+RESULT: 79 error(s) - review above.
