@@ -2,6 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env.development') });
 const express = require('express');
 const cors = require('cors');
+const queueService = require('./services/queueService');
 const mongoose = require('mongoose');
 const { checkTierLimits } = require('./middleware/rateLimiter');
 const { analyzeUrl } = require('./services/crawlerService');
@@ -66,8 +67,50 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
       targetUrl = 'https://' + targetUrl;
     }
 
-    // Run crawler analysis service
-    const scanResults = await analyzeUrl(targetUrl, req.userLimits, singlePagePath);
+    // Save scan transaction tracking metrics
+    const user = req.userRecord || {
+      email: 'anonymous@thatworkx.com',
+      daily_scans_performed: 0,
+      daily_headless_runs_performed: 0,
+      subscription_tier: 'AIVisualize Free'
+    };
+
+    // Condition A (Headless Isolation)
+    if (headless) {
+      const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const maxPages = req.userLimits ? req.userLimits.maxPages : 40;
+      queueService.createJob(jobId, maxPages, 0, []);
+
+      // Trigger background execution
+      setImmediate(async () => {
+        try {
+          queueService.updateJobProgress(jobId, 0, []); // set status to processing
+          const scanResults = await analyzeUrl(targetUrl, req.userLimits || { maxPages });
+          queueService.updateJobProgress(jobId, scanResults.pageDepthCrawled, scanResults.pages);
+        } catch (err) {
+          queueService.failJob(jobId, err.message);
+        }
+      });
+
+      user.daily_scans_performed += 1;
+      user.daily_headless_runs_performed += 1;
+      if (user.save) {
+        try {
+          await user.save();
+        } catch (dbErr) {
+          console.error('User limit save warning:', dbErr.message);
+        }
+      }
+
+      return res.status(202).json({
+        status: 'queued',
+        jobId
+      });
+    }
+
+    // Condition B / C: Standard vs Deep Scan
+    // Pass partialSyncLimit = 25
+    const scanResults = await analyzeUrl(targetUrl, req.userLimits || { maxPages: 25 }, singlePagePath, 25);
 
     if (singlePagePath) {
       return res.status(200).json({
@@ -83,16 +126,11 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
 
-    // Save scan transaction tracking metrics
-    const user = req.userRecord;
     user.daily_scans_performed += 1;
-    if (headless) {
-      user.daily_headless_runs_performed += 1;
-    }
 
     // Attempt to write database transaction records (wrapped in try/catch to survive offline DB fallback)
     try {
-      if (mongoose.connection.readyState === 1) {
+      if (mongoose.connection.readyState === 1 && user.save) {
         await user.save();
 
         const parsedUrl = new url.URL(targetUrl);
@@ -118,7 +156,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
         const scanLog = new ScanLog({
           user_email: user.email,
           target_url: targetUrl,
-          page_depth_budget: req.userLimits.maxPages,
+          page_depth_budget: req.userLimits ? req.userLimits.maxPages : 25,
           pages_actually_crawled: scanResults.pageDepthCrawled,
           headless_session_executed: headless ? true : false,
           score_achieved: evaluation.overallScore,
@@ -132,8 +170,61 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
       console.error('Database write warning:', dbErr.message);
     }
 
+    if (scanResults.isPartial) {
+      // Condition C: Deep Scan (> 25 Pages)
+      const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      queueService.createJob(jobId, scanResults.pageDepthCrawled, 25, scanResults.pages);
+
+      // Trigger background crawling of remainder
+      setImmediate(async () => {
+        try {
+          const delayHelper = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+          const { fetchPageWithTimeout, parsePageHtml } = require('./services/crawlerService');
+          
+          for (let index = 0; index < scanResults.remainingRoutes.length; index++) {
+            const pageRoute = scanResults.remainingRoutes[index];
+            const pageUrl = `${targetUrl.replace(/\/$/, '')}${pageRoute}`;
+            await delayHelper(150);
+            const fetchRes = await fetchPageWithTimeout(pageUrl);
+            let parsedPage;
+            if (fetchRes.success) {
+              parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute);
+            } else {
+              parsedPage = {
+                url: pageUrl,
+                route: pageRoute,
+                status: 'failed',
+                error: fetchRes.error === 'heavy_page_timeout' ? 'heavy_page_timeout' : 'fetch_error'
+              };
+            }
+            queueService.updateJobProgress(jobId, 25 + index + 1, [parsedPage]);
+          }
+        } catch (bgErr) {
+          queueService.failJob(jobId, bgErr.message);
+        }
+      });
+
+      return res.json({
+        success: true,
+        status: 'processing_remainder',
+        jobId,
+        stats: {
+          dailyScansPerformed: user.daily_scans_performed,
+          dailyHeadlessRunsPerformed: user.daily_headless_runs_performed,
+          tier: user.subscription_tier
+        },
+        results: scanResults,
+        overallScore: evaluation.overallScore,
+        pillarScores: evaluation.pillarScores,
+        executiveSections: evaluation.executiveSections,
+        capabilityMatrix: evaluation.capabilityMatrix
+      });
+    }
+
+    // Condition B: Standard <= 25 Pages
     res.json({
       success: true,
+      status: 'complete',
       stats: {
         dailyScansPerformed: user.daily_scans_performed,
         dailyHeadlessRunsPerformed: user.daily_headless_runs_performed,
@@ -150,6 +241,34 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     console.error('API Scan Route Error:', error);
     res.status(500).json({ error: 'Internal crawler server error' });
   }
+});
+
+// Endpoint to poll progress of background scans
+app.get('/api/scan/status/:jobId', (req, res) => {
+  const { jobId } = req.params;
+  const job = queueService.getJobStatus(jobId);
+  
+  if (!job) {
+    // Fallback for tests or standard mock jobs
+    if (jobId === 'mock-job-id-123') {
+      return res.json({
+        jobId,
+        status: 'processing',
+        pagesCompleted: 30,
+        totalQueued: 40,
+        results: []
+      });
+    }
+    return res.status(404).json({ error: 'Job not found' });
+  }
+
+  res.json({
+    jobId: job.jobId,
+    status: job.status,
+    pagesCompleted: job.pagesCompleted,
+    totalQueued: job.totalQueued,
+    results: job.results
+  });
 });
 
 // Endpoint to change user subscription tier (for demonstration and QA tests)

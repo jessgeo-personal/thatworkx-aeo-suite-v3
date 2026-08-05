@@ -4,6 +4,26 @@ const url = require('url');
 const { parseHtmlMetrics } = require('./parserService');
 const { evaluateCapabilities } = require('./capabilityEvaluator');
 
+const fetchPageWithTimeout = async (pageUrl) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  try {
+    const pageRes = await axios.get(pageUrl, {
+      signal: controller.signal,
+      timeout: 3500
+    });
+    clearTimeout(timeoutId);
+    return { success: true, data: pageRes.data };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    const isTimeout = error.name === 'AbortError' || error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'));
+    return {
+      success: false,
+      error: isTimeout ? 'heavy_page_timeout' : error.message
+    };
+  }
+};
+
 const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   if (!htmlContent) {
     return {
@@ -75,7 +95,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   };
 };
 
-const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
+const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialSyncLimit = null) => {
   if (singlePagePath) {
     const pageUrl = `${targetUrl.replace(/\/$/, '')}${singlePagePath}`;
     let htmlContent = '';
@@ -350,27 +370,39 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
     result.totalPagesFound = uniquePaths.length;
     result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
 
+    const syncLimit = (partialSyncLimit && result.pageDepthCrawled > partialSyncLimit) ? partialSyncLimit : result.pageDepthCrawled;
+
+    if (partialSyncLimit && result.pageDepthCrawled > partialSyncLimit) {
+      result.isPartial = true;
+      result.remainingRoutes = uniquePaths.slice(partialSyncLimit);
+    }
+
     const delayHelper = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    for (let i = 0; i < result.pageDepthCrawled; i++) {
+    for (let i = 0; i < syncLimit; i++) {
       const pageRoute = uniquePaths[i];
       const pageUrl = `${targetUrl.replace(/\/$/, '')}${pageRoute}`;
       
       let pageHtml = '';
       if (i === 0) {
         pageHtml = htmlContent;
+        const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
+        result.pages.push(parsedPage);
       } else {
         await delayHelper(150);
-        try {
-          const pageRes = await axios.get(pageUrl, { timeout: 4000 });
-          pageHtml = pageRes.data;
-        } catch (e) {
-          // Leave pageHtml empty; parsedPage will gracefully return blank markers
+        const fetchRes = await fetchPageWithTimeout(pageUrl);
+        if (fetchRes.success) {
+          const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute);
+          result.pages.push(parsedPage);
+        } else {
+          result.pages.push({
+            url: pageUrl,
+            route: pageRoute,
+            status: 'failed',
+            error: fetchRes.error === 'heavy_page_timeout' ? 'heavy_page_timeout' : 'fetch_error'
+          });
         }
       }
-
-      const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
-      result.pages.push(parsedPage);
     }
 
     // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores via capabilityEvaluator
@@ -405,4 +437,4 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null) => {
   return result;
 };
 
-module.exports = { analyzeUrl };
+module.exports = { analyzeUrl, parsePageHtml, fetchPageWithTimeout };
