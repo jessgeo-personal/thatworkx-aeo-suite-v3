@@ -5,11 +5,13 @@ import path from 'path';
 describe('Theme Contrast & Infrastructure Preservation Suite', () => {
   const indexJsPath = path.resolve(__dirname, '../index.js');
   const indexCssPath = path.resolve(__dirname, '../index.css');
+  const indexHtmlPath = path.resolve(__dirname, '../index.html');
   const visualizeHtmlPath = path.resolve(__dirname, '../visualize.html');
+  const optimizeHtmlPath = path.resolve(__dirname, '../optimize.html');
+  const socializeHtmlPath = path.resolve(__dirname, '../socialize.html');
 
   const indexJsContent = fs.readFileSync(indexJsPath, 'utf8');
   const indexCssContent = fs.readFileSync(indexCssPath, 'utf8');
-  const visualizeHtmlContent = fs.readFileSync(visualizeHtmlPath, 'utf8');
 
   it('1. Asserts [AEO-Infotip-Debug] console logging and API_BASE definitions remain strictly intact in index.js', () => {
     expect(indexJsContent).toContain('[AEO-Infotip-Debug]');
@@ -21,46 +23,47 @@ describe('Theme Contrast & Infrastructure Preservation Suite', () => {
     expect(indexJsContent).toContain('window.API_BASE = API_BASE;');
   });
 
-  it('2. Asserts frontend/index.css contains .dark-card-locked and body.light-theme section title overrides', () => {
+  it('2. Asserts frontend/index.css contains .dark-card-locked, default dark variables, and zero light-theme selectors', () => {
     expect(indexCssContent).toContain('.dark-card-locked');
-    expect(indexCssContent).toContain('body.light-theme .dark-card-locked');
-    expect(indexCssContent).toContain('body.light-theme');
-    expect(indexCssContent).toContain('color: var(--text-primary, #0f172a) !important;');
+    expect(indexCssContent).not.toContain('body.light-theme');
+    expect(indexCssContent).not.toContain('light-theme');
+
+    // Confirm :root dark variables remain the default layout theme
+    expect(indexCssContent).toContain('--canvas-bg: #202124');
+    expect(indexCssContent).toContain('--surface-bg: #1f1f1f');
+    expect(indexCssContent).toContain('--burnt-copper: #b7410e');
   });
 
-  it('3. Asserts Section 1 title uses theme-aware text-primary styling and does not use hardcoded #ffffff', () => {
-    expect(visualizeHtmlContent).toContain('Section 1: Can AI see your website?');
-    const sec1HeaderMatch = visualizeHtmlContent.match(/<h4[^>]*>\s*<span>Section 1: Can AI see your website\?<\/span>/i);
-    expect(sec1HeaderMatch).toBeTruthy();
-    expect(sec1HeaderMatch[0]).toContain('color: var(--text-primary)');
-    expect(sec1HeaderMatch[0]).not.toContain('color: #ffffff');
-  });
-
-  it('4. Asserts zero occurrences of legacy phrase "AI-first"', () => {
+  it('3. Asserts zero occurrences of legacy phrase "AI-first"', () => {
     expect(/AI-first/i.test(indexJsContent)).toBe(false);
     expect(/AI-first/i.test(indexCssContent)).toBe(false);
-    expect(/AI-first/i.test(visualizeHtmlContent)).toBe(false);
+    expect(/AI-first/i.test(fs.readFileSync(visualizeHtmlPath, 'utf8'))).toBe(false);
   });
 
-  it('5. Asserts Light Mode contrast rules and strict Dark-Card isolation', () => {
-    // 1) Light Mode text color overrides scoped to adaptive containers and metrics
-    expect(indexCssContent).toContain('body.light-theme :not(.dark-card-locked) [data-metric="isSecure"]');
-    expect(indexCssContent).toContain('body.light-theme :not(.dark-card-locked) [data-metric="Inbound AI Bot Connection Request"]');
-    expect(indexCssContent).toContain('body.light-theme .adaptive-card .metric-badge');
-    expect(indexCssContent).toContain('body.light-theme .adaptive-card .check-pill');
-    expect(indexCssContent).toContain('color: #0f172a !important;');
-
-    // 2) Dark-locked container isolation (Module 2 & Module 3 inner split panes)
+  it('4. Asserts strict Dark-Card isolation values remain intact in index.css', () => {
     expect(indexCssContent).toContain('background-color: #020617 !important;');
     expect(indexCssContent).toContain('color: #f8fafc !important;');
     expect(indexCssContent).toContain('color: #ffffff !important;');
     expect(indexCssContent).toContain('color: #cbd5e1 !important;');
 
-    // 3) DOM class tagging in index.js: outer adaptive-card wrappers & inner dark-card-locked split panes
+    // DOM class tagging in index.js: outer adaptive-card wrappers & inner dark-card-locked split panes
     expect(indexJsContent).toContain('class="developer-matrix-card glassmorphic adaptive-card"');
     expect(indexJsContent).toContain('class="schema-builder-card glassmorphic adaptive-card"');
     expect(indexJsContent).toContain('class="machine-code-drawers-card glassmorphic adaptive-card"');
     expect(indexJsContent).toContain('class="dark-card-locked"');
     expect(indexJsContent).toContain('class="explainer-card glassmorphic adaptive-card"');
+  });
+
+  it('5. Asserts the theme toggle button is removed from all 4 HTML files and no structural elements are modified', () => {
+    const htmlFiles = [indexHtmlPath, visualizeHtmlPath, optimizeHtmlPath, socializeHtmlPath];
+    for (const filePath of htmlFiles) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      // Verify no remaining theme toggle buttons are inside the layout
+      expect(content).not.toContain('id="theme-toggle-btn"');
+      expect(content).not.toContain('class="theme-toggle-btn"');
+
+      // Verify page structures still have main sections and structures
+      expect(content).toContain('<header class="app-header">');
+    }
   });
 });
