@@ -1,0 +1,28 @@
+<header class="app-header">
+  <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
+    <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
+    <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
+    <div class="logo-placeholder" data-logo="AEO Suite" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AEO Suite</div>
+  </div>
+  
+  <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
+    <a href="visualize.html" class="nav-logo-btn" data-nav="visualize" data-logo="AIVisualize">AI Visualize</a>
+    <a href="optimize.html" class="nav-logo-btn" data-nav="optimize" data-logo="AIOptimize">AIOptimize</a>
+    <a href="socialize.html" class="nav-logo-btn" data-nav="socialize" data-logo="AISocialize">AISocialize</a>
+  </nav>
+
+  <div class="header-actions flex items-center gap-3">
+    <div class="tier-badge-container">
+      <span class="tier-label">Plan:</span>
+      <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+        <option value="AIVisualize Free">AIVisualize Free</option>
+        <option value="AIVisualize Pro">AIVisualize Pro</option>
+        <option value="AIVisualize ENT">AIVisualize ENT</option>
+        <option value="AIOptimize Free">AIOptimize Free</option>
+        <option value="AIOptimize Pro">AIOptimize Pro</option>
+        <option value="AIOptimize ENT">AIOptimize ENT</option>
+      </select>
+    </div>
+    <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+  </div>
+</header>
