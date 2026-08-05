@@ -2473,22 +2473,32 @@ function updateExecutiveViewData(results) {
   ].filter(Boolean);
   domainDisplayEls.forEach(el => { el.innerText = rawUrl || domainName; });
 
+  const lastScannedVal = results.scanMetrics?.lastScanned || results.lastScanned || new Date().toLocaleString();
   const timestampEls = [
     document.getElementById('scan-timestamp-badge'),
-    document.getElementById('dev-scan-timestamp-badge')
+    document.getElementById('dev-scan-timestamp-badge'),
+    document.getElementById('display-scanned-time')
   ].filter(Boolean);
   timestampEls.forEach(el => {
-    const lastScannedVal = results.scanMetrics?.lastScanned || results.lastScanned || new Date().toLocaleString();
-    el.innerText = `Last Scanned: ${lastScannedVal}`;
+    if (el.id === 'display-scanned-time') {
+      el.innerText = lastScannedVal;
+    } else {
+      el.innerText = `Last Scanned: ${lastScannedVal}`;
+    }
   });
 
+  const scanTimeSeconds = results.scanMetrics?.scanTimeSeconds ?? results.scanTimeSeconds ?? 1.8;
   const durationEls = [
     document.getElementById('scan-duration-badge'),
-    document.getElementById('dev-scan-duration-badge')
+    document.getElementById('dev-scan-duration-badge'),
+    document.getElementById('display-scan-duration')
   ].filter(Boolean);
   durationEls.forEach(el => {
-    const scanTimeSeconds = results.scanMetrics?.scanTimeSeconds ?? results.scanTimeSeconds ?? 1.8;
-    el.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
+    if (el.id === 'display-scan-duration') {
+      el.innerText = `${scanTimeSeconds} seconds`;
+    } else {
+      el.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
+    }
   });
 
   // Section scores & pills from results.executiveSections
@@ -4107,6 +4117,41 @@ function switchDeckCard(cardId) {
   if (labelEl) labelEl.textContent = meta.file || '';
   if (tagEl)   { tagEl.textContent = meta.tag || ''; tagEl.style.color = meta.tagColor || '#9F1239'; }
 }
+function openNewScanModal() {
+  const modal = document.getElementById('new-scan-modal');
+  const modalInput = document.getElementById('modal-target-url');
+  const mainInput = document.getElementById('target-url');
+  const scannedDomain = document.getElementById('display-scanned-domain')?.textContent;
+  
+  if (modalInput) {
+    modalInput.value = (scannedDomain && scannedDomain !== '--') ? scannedDomain : (mainInput?.value || '');
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeNewScanModal() {
+  const modal = document.getElementById('new-scan-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function handleNewScanModalSubmit(event) {
+  if (event && event.preventDefault) event.preventDefault();
+  const modalInput = document.getElementById('modal-target-url');
+  const mainInput = document.getElementById('target-url');
+  if (mainInput && modalInput) {
+    mainInput.value = modalInput.value;
+  }
+  closeNewScanModal();
+  executeDashboardScan(event);
+}
+
+window.openNewScanModal = openNewScanModal;
+window.closeNewScanModal = closeNewScanModal;
+window.handleNewScanModalSubmit = handleNewScanModalSubmit;
 
 window.openUrlModal = openUrlModal;
 window.closeUrlModal = closeUrlModal;

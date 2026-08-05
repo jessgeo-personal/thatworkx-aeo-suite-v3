@@ -28,13 +28,13 @@ pages.forEach(({ file, navKey }) => {
 
   // Replace commented markers
   content = content.replace(
-    /[\s\S]*?/,
-    `\n${customizedHeader}\n`
+    /<!-- HEADER_START -->[\s\S]*?<!-- HEADER_END -->/,
+    `<!-- HEADER_START -->\n${customizedHeader}\n<!-- HEADER_END -->`
   );
 
   content = content.replace(
-    /[\s\S]*?/,
-    `\n${footerPartial}\n`
+    /<!-- FOOTER_START -->[\s\S]*?<!-- FOOTER_END -->/,
+    `<!-- FOOTER_START -->\n${footerPartial}\n<!-- FOOTER_END -->`
   );
 
   fs.writeFileSync(filePath, content, 'utf8');

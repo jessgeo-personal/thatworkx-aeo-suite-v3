@@ -13,35 +13,36 @@
 <body class="page-visualize">
 
   <!-- Top Navigation Header -->
-  <header class="app-header">
-    <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
-      <img id="site-logo" src="src/images/ai-thatworkx-logo-dark.png" alt="AI@thatworkx" onclick="window.location.href='index.html'" style="height: 36px; width: auto; object-fit: contain; display: block; cursor: pointer; transition: opacity 0.3s ease;" title="Go back to Homepage">
-      <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
-      <div class="logo-placeholder" data-logo="AIVisualize" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AI Visualize</div>
-    </div>
-    
-    <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
-      <a href="visualize.html" class="nav-logo-btn active" data-logo="AIVisualize">AI Visualize</a>
-      <a href="optimize.html" class="nav-logo-btn" data-logo="AIOptimize">AIOptimize</a>
-      <a href="socialize.html" class="nav-logo-btn" data-logo="AISocialize">AISocialize</a>
-    </nav>
+  <!-- HEADER_START -->
+<header class="app-header">
+  <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
+    <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
+    <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
+    <div class="logo-placeholder" data-logo="AEO Suite" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AEO Suite</div>
+  </div>
+  
+  <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
+    <a href="visualize.html" class="nav-logo-btn" data-nav="visualize" class="nav-logo-btn active" style="border-color: var(--burnt-copper); background: rgba(183, 65, 14, 0.2);" data-logo="AIVisualize">AI Visualize</a>
+    <a href="optimize.html" class="nav-logo-btn" data-nav="optimize" data-logo="AIOptimize">AIOptimize</a>
+    <a href="socialize.html" class="nav-logo-btn" data-nav="socialize" data-logo="AISocialize">AISocialize</a>
+  </nav>
 
-
-    <div class="header-actions flex items-center gap-3">
-      <div class="tier-badge-container">
-        <span class="tier-label">Plan:</span>
-        <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
-          <option value="AIVisualize Free">AIVisualize Free</option>
-          <option value="AIVisualize Pro">AIVisualize Pro</option>
-          <option value="AIVisualize ENT">AIVisualize ENT</option>
-          <option value="AIOptimize Free">AIOptimize Free</option>
-          <option value="AIOptimize Pro">AIOptimize Pro</option>
-          <option value="AIOptimize ENT">AIOptimize ENT</option>
-        </select>
-      </div>
-      <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+  <div class="header-actions flex items-center gap-3">
+    <div class="tier-badge-container">
+      <span class="tier-label">Plan:</span>
+      <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
+        <option value="AIVisualize Free">AIVisualize Free</option>
+        <option value="AIVisualize Pro">AIVisualize Pro</option>
+        <option value="AIVisualize ENT">AIVisualize ENT</option>
+        <option value="AIOptimize Free">AIOptimize Free</option>
+        <option value="AIOptimize Pro">AIOptimize Pro</option>
+        <option value="AIOptimize ENT">AIOptimize ENT</option>
+      </select>
     </div>
-  </header>
+    <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+  </div>
+</header>
+<!-- HEADER_END -->
 
   <!-- Main Visualize Workspace -->
   <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
@@ -82,29 +83,34 @@
         </p>
       </div>
 
-      <!-- Main Audit Input Form -->
-      <div class="visualize-search-bar-card" style="margin-bottom: 1.25rem;">
-        <form id="scan-form" onsubmit="executeDashboardScan(event)" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-          <div class="input-wrapper" style="position: relative; flex: 1; min-width: 280px;">
-            <span class="input-icon" style="position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); font-size: 1.15rem;">🌐</span>
-            <input type="text" id="target-url" placeholder="Enter target domain (e.g. example.com)..." required style="width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(15, 23, 42, 0.8); color: #f8fafc; font-size: 0.95rem; font-weight: 500; transition: all 0.2s ease;">
-          </div>
-          <button type="submit" class="submit-btn glowing-btn bg-cyan" id="scan-submit-btn" style="padding: 0.8rem 1.75rem; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 0.95rem; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);">
-            <span>Run Audit 🔄</span>
-          </button>
-        </form>
+      <!-- Minimized Scan Input Container -->
+      <div id="scan-input-container" class="visualize-search-bar-card" style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+        <input type="hidden" id="target-url" value="">
+        <button type="button" class="submit-btn glowing-btn bg-cyan" id="new-scan-btn" onclick="openNewScanModal()" style="padding: 0.6rem 1.4rem; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 0.9rem; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);">
+          <span>🔍 New Scan</span>
+        </button>
       </div>
 
       <!-- Active Target Domain Header & Action Buttons -->
-      <div id="active-domain-header-bar" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; color: #94a3b8; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1.1rem; background: rgba(15, 23, 42, 0.65); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06);">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="color: #cbd5e1; font-weight: 500;">Scanned page:</span>
-          <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">--</strong>
+      <div id="active-domain-header-bar" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; color: #94a3b8; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1.1rem; background: rgba(15, 23, 42, 0.65); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #cbd5e1; font-weight: 500;">Scanned URL:</span>
+            <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">--</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #cbd5e1; font-weight: 500;">Last Scanned:</span>
+            <span id="display-scanned-time" style="color: #cbd5e1; font-weight: 500;">--</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #cbd5e1; font-weight: 500;">Duration:</span>
+            <span id="display-scan-duration" style="color: #38bdf8; font-weight: 600;">--</span>
+          </div>
         </div>
         
         <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-          <button type="button" class="drawer-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">📄 Export Raw JSON</button>
-          <button type="button" class="drawer-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">🖨️ Export PDF Summary</button>
+          <button type="button" class="drawer-btn" id="export-json-btn" onclick="exportRawJsonDiagnostics()" title="Download raw JSON diagnostics payload" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">📄 Export Raw JSON</button>
+          <button type="button" class="drawer-btn" id="export-pdf-btn" onclick="exportExecutiveSummaryPdf()" title="Print or save PDF summary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">🖨️ Export PDF Summary</button>
         </div>
       </div>
 
@@ -973,74 +979,40 @@
   </main>
 
   <!-- Mega Footer Section -->
-  <footer class="app-footer mega-footer" id="mega-footer" style="padding: 3rem 0 2rem; margin-top: 4rem;">
-    <div class="mega-footer-inner max-w-6xl mx-auto px-6" style="max-width: 1200px; margin: 0 auto;">
-      
-      <!-- 4-Column Directory Grid -->
-      <div class="footer-directory-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-b border-slate-200 dark:border-white/10 mb-8" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
-        
-        <!-- Column 1: Product Suite -->
-        <div class="footer-col">
-          <h4 class="font-mono text-xs font-bold uppercase tracking-widest text-slate-200 mb-3.5" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; color: #cbd5e1; margin-bottom: 0.85rem; font-weight: 700;">Product Suite</h4>
-          <ul class="space-y-2 text-xs text-slate-400" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem; color: #94a3b8;">
-            <li><a href="index.html" class="hover:text-rose-400 transition-colors" style="color: #94a3b8; text-decoration: none;">🏠 Home Platform</a></li>
-            <li><a href="visualize.html" class="hover:text-cyan-400 transition-colors" style="color: #94a3b8; text-decoration: none;">👁️ AI Visualize</a></li>
-            <li><a href="optimize.html" class="hover:text-amber-400 transition-colors" style="color: #94a3b8; text-decoration: none;">🩺 AI Optimize</a></li>
-            <li><a href="socialize.html" class="hover:text-violet-400 transition-colors" style="color: #94a3b8; text-decoration: none;">📣 AISocialize</a></li>
-          </ul>
-        </div>
-
-        <!-- Column 2: Ecosystem & Standards -->
-        <div class="footer-col">
-          <h4 class="font-mono text-xs font-bold uppercase tracking-widest text-slate-200 mb-3.5" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; color: #cbd5e1; margin-bottom: 0.85rem; font-weight: 700;">Ecosystem &amp; Standards</h4>
-          <ul class="space-y-2 text-xs text-slate-400" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem; color: #94a3b8;">
-            <li><a href="optimize.html?tool=llmstxt" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">/llms.txt Specification</a></li>
-            <li><a href="optimize.html?tool=aicontext" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">/ai-context.md Manifest</a></li>
-            <li><a href="optimize.html?tool=about" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">/about.md E-E-A-T Signature</a></li>
-            <li><a href="optimize.html?tool=docs" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">/docs.md Technical Blueprints</a></li>
-          </ul>
-        </div>
-
-        <!-- Column 3: Edge Integrations -->
-        <div class="footer-col">
-          <h4 class="font-mono text-xs font-bold uppercase tracking-widest text-slate-200 mb-3.5" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; color: #cbd5e1; margin-bottom: 0.85rem; font-weight: 700;">Edge Integrations</h4>
-          <ul class="space-y-2 text-xs text-slate-400" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem; color: #94a3b8;">
-            <li><a href="optimize.html?tool=cloudflare" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Cloudflare Worker Proxy</a></li>
-            <li><a href="optimize.html?tool=shopify" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Shopify Domain Redirect Hook</a></li>
-            <li><a href="optimize.html?tool=htaccess" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Apache .htaccess Directives</a></li>
-            <li><a href="#" onclick="triggerSemrushRedirect()" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Semrush AI Visibility ↗</a></li>
-          </ul>
-        </div>
-
-        <!-- Column 4: Legal & Governance -->
-        <div class="footer-col">
-          <h4 class="font-mono text-xs font-bold uppercase tracking-widest text-slate-200 mb-3.5" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; color: #cbd5e1; margin-bottom: 0.85rem; font-weight: 700;">Legal &amp; Governance</h4>
-          <ul class="space-y-2 text-xs text-slate-400" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem; color: #94a3b8;">
-            <li><a href="#" onclick="showHelpModal('privacy')" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Privacy Policy</a></li>
-            <li><a href="#" onclick="showHelpModal('terms')" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Terms of Service</a></li>
-            <li><a href="#" onclick="showHelpModal('fairuse')" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">Fair Use Policy</a></li>
-            <li><a href="#" onclick="showHelpModal('about')" class="hover:text-slate-200 transition-colors" style="color: #94a3b8; text-decoration: none;">About Thatworkx Solutions</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <!-- Copyright & Brand Line -->
-      <div class="footer-brand-bar flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-mono text-slate-500" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; font-size: 0.85rem; color: #64748b;">
-        <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
-          <strong style="color: #f8fafc;">aeo.thatworkx.com</strong>
-          <span>•</span>
-          <span>The AEO &amp; GEO Infrastructure Platform</span>
-        </div>
-        <div>
-          © 2026 Thatworkx Solutions. All rights reserved.
-        </div>
-      </div>
-
+  <!-- FOOTER_START -->
+<footer class="mega-footer">
+  <div class="footer-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+    <div>
+      <p style="margin: 0;">&copy; 2026 Thatworkx AEO Suite. All rights reserved.</p>
     </div>
-  </footer>
+    <div style="display: flex; gap: 1.5rem;">
+      <a href="index.html" style="color: var(--text-secondary); text-decoration: none;">Home</a>
+      <a href="visualize.html" style="color: var(--text-secondary); text-decoration: none;">AIVisualize</a>
+      <a href="optimize.html" style="color: var(--text-secondary); text-decoration: none;">AIOptimize</a>
+      <a href="socialize.html" style="color: var(--text-secondary); text-decoration: none;">AISocialize</a>
+    </div>
+  </div>
+</footer>
+<!-- FOOTER_END -->
 
   <!-- Modals Container -->
+  <!-- New Scan Modal -->
+  <div id="new-scan-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 480px; margin: 0 auto; padding: 1.75rem;">
+      <span class="modal-close" id="modal-close-btn" onclick="closeNewScanModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🔍</div>
+      <h3 style="text-align: center; color: #fff; margin-bottom: 1rem;">Launch Live AEO Audit Scan</h3>
+      
+      <form id="new-scan-form" onsubmit="handleNewScanModalSubmit(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Target Domain/URL:</label>
+          <input type="text" id="modal-target-url" required placeholder="example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        </div>
+        <button type="submit" id="modal-submit-scan-btn" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; border: none; cursor: pointer;">Start Audit Scan 🔄</button>
+      </form>
+    </div>
+  </div>
+
   <div id="auth-modal" class="modal-backdrop" style="display: none;">
 
     <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto;">
