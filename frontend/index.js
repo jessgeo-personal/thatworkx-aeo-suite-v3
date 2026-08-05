@@ -4100,11 +4100,23 @@ axios.post('https://aeo.thatworkx.com/api/scan', {
   }
 }
 
+function _applyLogoForTheme(isLight) {
+  const logo = document.getElementById('site-logo');
+  if (!logo) return;
+  logo.style.opacity = '0';
+  setTimeout(() => {
+    logo.src = isLight
+      ? 'src/images/ai-thatworkx-logo-white.png'
+      : 'src/images/ai-thatworkx-logo-dark.png';
+    logo.style.opacity = '1';
+  }, 150);
+}
+
 function toggleTheme() {
   const body = document.body;
   const isLight = body.classList.toggle('light-theme');
   const themeToggleIcon = document.getElementById('theme-toggle-icon');
-  
+
   if (isLight) {
     if (themeToggleIcon) themeToggleIcon.innerText = '☀️';
     localStorage.setItem('aeo-theme', 'light');
@@ -4112,7 +4124,24 @@ function toggleTheme() {
     if (themeToggleIcon) themeToggleIcon.innerText = '🌙';
     localStorage.setItem('aeo-theme', 'dark');
   }
+  _applyLogoForTheme(isLight);
 }
+
+// Restore theme & logo on page load
+(function initTheme() {
+  const saved = localStorage.getItem('aeo-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-theme');
+    const icon = document.getElementById('theme-toggle-icon');
+    if (icon) icon.innerText = '☀️';
+    // Logo swap after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => _applyLogoForTheme(true));
+    } else {
+      _applyLogoForTheme(true);
+    }
+  }
+})();
 
 function switchDeckCard(cardId) {
   const PANEL_META = {
