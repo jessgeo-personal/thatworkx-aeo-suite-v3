@@ -2436,6 +2436,7 @@ function formatRagTextWithTruncation(rawText, pageRoute) {
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 function updateExecutiveViewData(results) {
+  console.log("=== updateExecutiveViewData called ===");
   if (!results) return;
 
   // Extract clean domain name from target input or results
@@ -2739,7 +2740,7 @@ function updateExecutiveViewData(results) {
   const secureStatusEl = document.getElementById('sec3-secure-status');
   if (secureStatusEl) {
     const isSecure = typeof eeat.isSecure === 'boolean' ? eeat.isSecure : (results.executiveSections?.section3?.isSecure ?? true);
-    secureStatusEl.innerText = isSecure ? '🟢 Passed' : '🔴 Action Needed';
+    secureStatusEl.textContent = isSecure ? '🟢 Passed' : '🔴 Action Needed';
     secureStatusEl.className = `badge-status ${isSecure ? 'status-green' : 'status-red'}`;
     secureStatusEl.style.setProperty('background', isSecure ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
     secureStatusEl.style.setProperty('color', isSecure ? '#34d399' : '#f43f5e', 'important');
@@ -2748,16 +2749,25 @@ function updateExecutiveViewData(results) {
   const contactStatusEl = document.getElementById('sec3-contact-status');
   if (contactStatusEl) {
     const hasContact = typeof eeat.hasContactInfo === 'boolean' ? eeat.hasContactInfo : (results.executiveSections?.section3?.hasContactInfo ?? true);
-    contactStatusEl.innerText = hasContact ? '🟢 Passed' : '🔴 Action Needed';
+    contactStatusEl.textContent = hasContact ? '🟢 Passed' : '🔴 Action Needed';
     contactStatusEl.className = `badge-status ${hasContact ? 'status-green' : 'status-red'}`;
     contactStatusEl.style.setProperty('background', hasContact ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
     contactStatusEl.style.setProperty('color', hasContact ? '#34d399' : '#f43f5e', 'important');
   }
 
+  const orgSchemaStatusEl = document.getElementById('sec3-org-schema-status');
+  if (orgSchemaStatusEl) {
+    const hasOrgSchema = results.status?.jsonLdTypes?.includes('Organization') || results.status?.jsonLdExists || false;
+    orgSchemaStatusEl.textContent = hasOrgSchema ? '🟢 Passed' : '🔴 Action Needed';
+    orgSchemaStatusEl.className = `badge-status ${hasOrgSchema ? 'status-green' : 'status-red'}`;
+    orgSchemaStatusEl.style.setProperty('background', hasOrgSchema ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
+    orgSchemaStatusEl.style.setProperty('color', hasOrgSchema ? '#34d399' : '#f43f5e', 'important');
+  }
+
   const privacyStatusEl = document.getElementById('sec3-privacy-status');
   if (privacyStatusEl) {
     const hasPrivacy = typeof eeat.hasPrivacyPolicy === 'boolean' ? eeat.hasPrivacyPolicy : (results.executiveSections?.section3?.hasPrivacyPolicy ?? true);
-    privacyStatusEl.innerText = hasPrivacy ? '🟢 Passed' : '🔴 Action Needed';
+    privacyStatusEl.textContent = hasPrivacy ? '🟢 Passed' : '🔴 Action Needed';
     privacyStatusEl.className = `badge-status ${hasPrivacy ? 'status-green' : 'status-red'}`;
     privacyStatusEl.style.setProperty('background', hasPrivacy ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)', 'important');
     privacyStatusEl.style.setProperty('color', hasPrivacy ? '#34d399' : '#f43f5e', 'important');
@@ -5374,6 +5384,7 @@ window.copyTextToClipboard = copyTextToClipboard;
 window.viewPageMarkdown = viewPageMarkdown;
 window.closeMarkdownPreviewModal = closeMarkdownPreviewModal;
 window.copyMarkdownFromModal = copyMarkdownFromModal;
+window.updateExecutiveViewData = updateExecutiveViewData;
 
 
 
