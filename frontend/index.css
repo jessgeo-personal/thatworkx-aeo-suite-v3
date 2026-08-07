@@ -4648,3 +4648,16 @@ body {
   border-color: var(--burnt-copper-active) !important;
   transform: translateY(0) !important;
 }
+
+.exec-row-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 767px) {
+  .exec-row-split {
+    grid-template-columns: 1fr;
+  }
+}
