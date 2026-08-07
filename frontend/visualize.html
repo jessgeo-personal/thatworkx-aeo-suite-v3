@@ -1005,6 +1005,34 @@
 <!-- FOOTER_END -->
 
   <!-- Modals Container -->
+  <!-- Markdown Preview Modal -->
+  <div id="markdown-preview-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-cyan">
+      <span class="modal-close" id="markdown-modal-close-btn" onclick="closeMarkdownPreviewModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">📄</div>
+      <h3 style="text-align: center; color: #fff; margin-bottom: 1rem;">Page Markdown & Status Inspector</h3>
+      
+      <div style="text-align: left; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.5rem;">
+          Route: <code id="markdown-modal-url" style="color: #67e8f9; font-family: var(--font-mono); font-size: 0.9rem;">--</code>
+        </div>
+        
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span id="markdown-modal-canonical" class="badge-status status-red">Canonical: Checking...</span>
+          <span id="markdown-modal-schema" class="badge-status status-red">JSON-LD Schema: Checking...</span>
+        </div>
+        
+        <!-- Missing Schema Warning Alert -->
+        <div id="markdown-modal-schema-alert" style="display: none;">
+          <span>⚠️ <strong>Missing JSON-LD Schema:</strong> This page does not have any structured JSON-LD entity markup. We recommend injecting standard organizational or FAQ schema tags to ensure AI entities can cite this page's content correctly.</span>
+        </div>
+      </div>
+
+      <div style="text-align: left; margin-bottom: 0.5rem; font-weight: 700; color: #cbd5e1; font-size: 0.9rem;">Raw Page Markdown Ingested:</div>
+      <pre id="markdown-modal-body"></pre>
+    </div>
+  </div>
+
   <!-- New Scan Modal -->
   <div id="new-scan-modal" class="modal-backdrop" style="display: none;">
     <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 480px; margin: 0 auto; padding: 1.75rem;">

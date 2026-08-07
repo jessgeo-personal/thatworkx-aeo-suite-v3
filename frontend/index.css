@@ -4542,3 +4542,44 @@ body {
 .dark-card-locked b {
   color: #ffffff !important;
 }
+
+/* Page-Level Inspector Markdown Preview Modal styles */
+#markdown-preview-modal .modal-card {
+  max-width: 800px;
+  width: 90%;
+  padding: 2rem;
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 40px rgba(6, 182, 212, 0.25);
+  border-radius: 12px;
+}
+
+#markdown-modal-body {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: #040508;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  padding: 1rem;
+  border-radius: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  text-align: left;
+}
+
+#markdown-modal-schema-alert {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

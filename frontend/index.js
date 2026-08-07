@@ -4741,6 +4741,23 @@ function renderModule4(results, filter = 'all') {
     if (isSchema) noSchemaCount++;
     if (isThin) thinContentCount++;
 
+    const schemas = [];
+    doc.querySelectorAll('script[type="application/ld+json"]').forEach(script => {
+      try {
+        const parsed = JSON.parse(script.textContent);
+        if (Array.isArray(parsed)) {
+          schemas.push(...parsed);
+        } else {
+          schemas.push(parsed);
+        }
+      } catch (e) {
+        // ignore
+      }
+    });
+
+    const matchedPreview = (data.scrapedContentPreview || []).find(item => item.route === p.route);
+    const bodyMarkdown = p.markdown || p.rawText || matchedPreview?.content || p.content || '';
+
     return {
       ...p,
       isCrawled,
@@ -4757,7 +4774,9 @@ function renderModule4(results, filter = 'all') {
       missingAltList,
       lastUpdated,
       isSchema,
-      isHeavySpa
+      isHeavySpa,
+      schema: schemas,
+      markdown: bodyMarkdown
     };
   });
 
@@ -4798,6 +4817,8 @@ function renderModule4(results, filter = 'all') {
     return;
   }
 
+  window.module4FilteredPages = filteredPages;
+
   tbody.innerHTML = filteredPages.map((p, idx) => {
     const crawlStatusHtml = p.isCrawled
       ? '<span class="badge-status status-green">🟢 200 OK</span>'
@@ -4834,7 +4855,12 @@ function renderModule4(results, filter = 'all') {
       ? `<span class="badge-status status-green">🟢 ${p.lastUpdated}</span>`
       : '<span class="badge-status status-red">🔴 Missing Freshness</span>';
 
-    const actionHtml = `<button type="button" class="btn-fix-bridge" id="btn-toggle-row-${idx}" onclick="toggleModule4Row(${idx})"><span>Details ▾</span></button>`;
+    const actionHtml = `
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+        <button type="button" class="view-markdown-btn" id="btn-view-markdown-${idx}" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border-color); background: var(--surface-bg); color: var(--text-primary); transition: all 0.2s;" onclick="viewPageMarkdown(${idx})"><span>View Markdown</span></button>
+        <button type="button" class="btn-fix-bridge" id="btn-toggle-row-${idx}" onclick="toggleModule4Row(${idx})"><span>Details ▾</span></button>
+      </div>
+    `;
 
     let fixPanelsHtml = '';
 
@@ -5109,11 +5135,82 @@ function fixMissingSchemaInBuilder(route) {
   }
 }
 
+function viewPageMarkdown(idx) {
+  const item = window.module4FilteredPages && window.module4FilteredPages[idx];
+  if (!item) return;
+
+  const route = item.route || '/';
+  const canonicalUrl = item.canonicalUrl || '';
+  const schemaArray = item.schema || [];
+  const bodyMarkdown = item.markdown || 'No markdown body parsed for this page.';
+
+  const modalUrl = document.getElementById('markdown-modal-url');
+  const modalCanonical = document.getElementById('markdown-modal-canonical');
+  const modalSchema = document.getElementById('markdown-modal-schema');
+  const modalSchemaAlert = document.getElementById('markdown-modal-schema-alert');
+  const modalBody = document.getElementById('markdown-modal-body');
+
+  if (modalUrl) modalUrl.textContent = route;
+  
+  if (modalCanonical) {
+    if (item.hasCanonical && canonicalUrl) {
+      modalCanonical.className = 'badge-status status-green';
+      modalCanonical.textContent = `🟢 Canonical: ${canonicalUrl}`;
+    } else {
+      modalCanonical.className = 'badge-status status-red';
+      modalCanonical.textContent = '🔴 Canonical: Missing';
+    }
+  }
+
+  if (modalSchema) {
+    if (schemaArray.length > 0) {
+      modalSchema.className = 'badge-status status-green';
+      modalSchema.textContent = `🟢 JSON-LD Schema: Present (${schemaArray.length})`;
+    } else {
+      modalSchema.className = 'badge-status status-red';
+      modalSchema.textContent = '🔴 JSON-LD Schema: Missing';
+    }
+  }
+
+  if (modalSchemaAlert) {
+    if (schemaArray.length === 0) {
+      modalSchemaAlert.style.display = 'block';
+    } else {
+      modalSchemaAlert.style.display = 'none';
+    }
+  }
+
+  if (modalBody) {
+    modalBody.textContent = bodyMarkdown;
+  }
+
+  const modal = document.getElementById('markdown-preview-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeMarkdownPreviewModal() {
+  const modal = document.getElementById('markdown-preview-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const closeBtn = document.getElementById('markdown-modal-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMarkdownPreviewModal);
+  }
+});
+
 window.buildDevModule4Html = buildDevModule4Html;
 window.renderModule4 = renderModule4;
 window.toggleModule4Row = toggleModule4Row;
 window.fixMissingSchemaInBuilder = fixMissingSchemaInBuilder;
 window.copyTextToClipboard = copyTextToClipboard;
+window.viewPageMarkdown = viewPageMarkdown;
+window.closeMarkdownPreviewModal = closeMarkdownPreviewModal;
 
 
 
