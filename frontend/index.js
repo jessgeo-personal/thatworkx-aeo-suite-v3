@@ -5135,6 +5135,119 @@ function fixMissingSchemaInBuilder(route) {
   }
 }
 
+function convertHtmlToMarkdown(htmlString) {
+  if (!htmlString) return '';
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, 'text/html');
+  const body = doc.body;
+
+  // Strip scripts, styles, SVGs, navs, footers, headers, etc.
+  body.querySelectorAll('script, style, svg, nav, footer, iframe, header').forEach(el => el.remove());
+
+  function parseNode(node) {
+    if (node.nodeType === 3) { // Text node
+      return node.textContent;
+    }
+    if (node.nodeType !== 1) { // Not an element node
+      return '';
+    }
+
+    const tagName = node.tagName.toLowerCase();
+    
+    // Process children recursively
+    let childrenContent = '';
+    node.childNodes.forEach(child => {
+      childrenContent += parseNode(child);
+    });
+
+    switch (tagName) {
+      case 'h1': return `\n\n# ${childrenContent.trim()}\n\n`;
+      case 'h2': return `\n\n## ${childrenContent.trim()}\n\n`;
+      case 'h3': return `\n\n### ${childrenContent.trim()}\n\n`;
+      case 'h4': return `\n\n#### ${childrenContent.trim()}\n\n`;
+      case 'h5': return `\n\n##### ${childrenContent.trim()}\n\n`;
+      case 'h6': return `\n\n###### ${childrenContent.trim()}\n\n`;
+
+      case 'strong':
+      case 'b':
+        return `**${childrenContent}**`;
+      
+      case 'em':
+      case 'i':
+        return `*${childrenContent}*`;
+
+      case 'hr':
+        return `\n\n---\n\n`;
+      case 'section':
+      case 'article':
+        return `\n\n---\n\n${childrenContent}\n\n---\n\n`;
+
+      case 'a': {
+        const href = node.getAttribute('href') || '';
+        return `[${childrenContent}](${href})`;
+      }
+
+      case 'ul':
+        return `\n${childrenContent}\n`;
+      case 'ol': {
+        let index = 1;
+        let listContent = '';
+        node.childNodes.forEach(child => {
+          if (child.nodeType === 1 && child.tagName.toLowerCase() === 'li') {
+            listContent += `${index}. ${parseNode(child).replace(/^\s*-\s+/, '')}\n`;
+            index++;
+          } else {
+            listContent += parseNode(child);
+          }
+        });
+        return `\n${listContent}\n`;
+      }
+      case 'li':
+        return `- ${childrenContent.trim()}\n`;
+
+      case 'table': {
+        let tableMarkdown = '\n\n';
+        const rows = Array.from(node.querySelectorAll('tr')).filter(r => r.closest('table') === node);
+        let headerProcessed = false;
+
+        rows.forEach(row => {
+          const cells = Array.from(row.querySelectorAll('th, td')).filter(c => c.closest('tr') === row);
+          const cellTexts = cells.map(cell => {
+            let cellContent = '';
+            cell.childNodes.forEach(c => { cellContent += parseNode(c); });
+            return cellContent.trim().replace(/\|/g, '\\|');
+          });
+
+          tableMarkdown += `| ${cellTexts.join(' | ')} |\n`;
+
+          if (!headerProcessed && cells.length > 0) {
+            const delimiters = cells.map(() => '---');
+            tableMarkdown += `| ${delimiters.join(' | ')} |\n`;
+            headerProcessed = true;
+          }
+        });
+        tableMarkdown += '\n';
+        return tableMarkdown;
+      }
+
+      case 'p':
+      case 'div':
+        return `\n\n${childrenContent}\n\n`;
+
+      case 'br':
+        return '\n';
+
+      default:
+        return childrenContent;
+    }
+  }
+
+  return parseNode(body)
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function viewPageMarkdown(idx) {
   const item = window.module4FilteredPages && window.module4FilteredPages[idx];
   if (!item) return;
@@ -5142,7 +5255,8 @@ function viewPageMarkdown(idx) {
   const route = item.route || '/';
   const canonicalUrl = item.canonicalUrl || '';
   const schemaArray = item.schema || [];
-  const bodyMarkdown = item.markdown || 'No markdown body parsed for this page.';
+  const htmlPayload = item.html || item.content || '';
+  const bodyMarkdown = convertHtmlToMarkdown(htmlPayload) || item.markdown || 'No markdown body parsed for this page.';
 
   const modalUrl = document.getElementById('markdown-modal-url');
   const modalCanonical = document.getElementById('markdown-modal-canonical');

@@ -86,7 +86,7 @@ describe('Page-Level Inspector Modal BDD Suite', () => {
           status: 200,
           hasCanonical: true,
           canonicalUrl: 'https://example.com/about',
-          html: '<html><head><link rel="canonical" href="https://example.com/about" /><script type="application/ld+json">{"@context": "https://schema.org", "@type": "AboutPage"}</script></head><body><main><h1>About Us</h1><header></header><footer></footer></main></body></html>',
+          html: '<html><head><link rel="canonical" href="https://example.com/about" /><script type="application/ld+json">{"@context": "https://schema.org", "@type": "AboutPage"}</script></head><body><main><h1>About Us</h1><p>This is a team page.</p><header></header><footer></footer></main></body></html>',
           markdown: '# About Us\nThis is a team page.'
         }
       ]
@@ -120,7 +120,7 @@ describe('Page-Level Inspector Modal BDD Suite', () => {
     expect(modalUrl.textContent).toBe('/about');
     expect(modalCanonical.textContent).toContain('Canonical: https://example.com/about');
     expect(modalSchema.textContent).toContain('JSON-LD Schema: Present (1)');
-    expect(modalBody.textContent).toBe('# About Us\nThis is a team page.');
+    expect(modalBody.textContent).toBe('# About Us\n\nThis is a team page.');
     expect(modalSchemaAlert.style.display).toBe('none');
   });
 
@@ -191,5 +191,33 @@ describe('Page-Level Inspector Modal BDD Suite', () => {
 
     // Modal should be hidden (style.display should be 'none')
     expect(modal.style.display).toBe('none');
+  });
+
+  it('Scenario 5: Assert true HTML-to-Markdown conversion maps headings, links, and bold elements correctly', () => {
+    const mockResults = {
+      url: 'https://example.com',
+      pages: [
+        {
+          route: '/custom-elements',
+          wordCount: 150,
+          status: 200,
+          html: '<html><body><main><h2>Title</h2><p>This is a <a href="/test">Link</a> and some <strong>Answer</strong> text.</p></main></body></html>'
+        }
+      ]
+    };
+
+    if (typeof window.renderModule4 === 'function') {
+      window.renderModule4(mockResults);
+    }
+
+    const viewMarkdownBtn = document.querySelector('.view-markdown-btn');
+    viewMarkdownBtn.click();
+
+    const modalBody = document.getElementById('markdown-modal-body');
+    const content = modalBody.textContent;
+
+    expect(content).toContain('## Title');
+    expect(content).toContain('[Link](/test)');
+    expect(content).toContain('**Answer**');
   });
 });
