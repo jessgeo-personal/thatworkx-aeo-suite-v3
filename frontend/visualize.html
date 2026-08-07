@@ -143,6 +143,7 @@
          EXECUTIVE MODE CONTAINER (#exec-mode-container)
     ════════════════════════════════════════════════════════ -->
     <div id="exec-mode-container" class="view-mode-section">
+      <div id="executive-view-container">
       
       <!-- Executive Welcome & Business Explainer Banner -->
       <div id="exec-welcome-banner" class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 2rem 2.25rem; border-radius: 20px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 20%, rgba(6, 182, 212, 0.12) 0%, rgba(245, 158, 11, 0.05) 40%, rgba(139, 92, 246, 0.06) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.06) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); margin-bottom: 1.5rem;">
@@ -415,7 +416,8 @@
       </div>
 
       <!-- Section 2 Card: Presence & Hygiene Detail Card -->
-      <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+      <div id="citation-readiness-card">
+        <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
         
         <!-- Section Container Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
@@ -549,7 +551,14 @@
           </div>
 
         </div>
+      </div>
+      </div>
 
+      <!-- Page-Level Inspector Container -->
+      <div id="page-level-inspector-container">
+        <div id="module-4-table">
+          <div id="dev-module-4-wrapper"></div>
+        </div>
       </div>
 
       <div class="exec-row-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -696,7 +705,8 @@
 
       </div>
 
-    </div>
+      </div> <!-- closing #executive-view-container -->
+    </div> <!-- closing #exec-mode-container -->
 
     <!-- ═══════════════════════════════════════════════════════
          DEVELOPER / DIY MODE CONTAINER (#dev-mode-container)
@@ -950,8 +960,7 @@
         </div>
       </div>
 
-      <!-- Module 4: Page-Level Crawl & Content Health Inspector -->
-      <div id="dev-module-4-wrapper"></div>
+
 
       <!-- Provider Workaround Callout Banner -->
       <div id="dev-provider-callout" class="onboarding-card glassmorphic border-glow-amber mb-6" style="padding: 2rem 2.5rem; border-radius: 16px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(245, 158, 11, 0.35); border-left: 5px solid #f59e0b; margin-top: 2rem; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); font-family: var(--font-sans), sans-serif; text-align: left; position: relative; overflow: hidden;">
