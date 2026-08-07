@@ -4773,3 +4773,156 @@ body {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+/* AIOptimize Action Banner Redesign Styles */
+.action-banner-urgent {
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  background: var(--surface-bg);
+  border: 2px solid var(--burnt-copper);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(183, 65, 14, 0.25);
+  box-sizing: border-box;
+  font-family: var(--font-sans), sans-serif;
+  text-align: left;
+}
+
+.action-banner-urgent .action-banner-header {
+  margin-bottom: 1.5rem;
+}
+
+.action-banner-urgent .urgency-pill {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(220, 38, 38, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.action-banner-urgent h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
+}
+
+.action-banner-urgent .urgency-subtext {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.action-banner-urgent .action-banner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.action-banner-urgent .comparison-card {
+  background: var(--surface-nested-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-banner-urgent .comparison-card.way-hard {
+  border-left: 4px solid #ef4444;
+}
+
+.action-banner-urgent .comparison-card.way-easy {
+  border-left: 4px solid var(--burnt-copper);
+}
+
+.action-banner-urgent .card-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.action-banner-urgent .way-hard .card-tag {
+  color: #ef4444;
+}
+
+.action-banner-urgent .way-easy .card-tag {
+  color: #38bdf8;
+}
+
+.action-banner-urgent .comparison-card h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.action-banner-urgent .comparison-card p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.action-banner-urgent .comparison-card code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.action-banner-urgent .action-banner-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.action-banner-urgent .btn-urgent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 20px var(--burnt-copper-glow) !important;
+}
+
+.action-banner-urgent .btn-urgent:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(183, 65, 14, 0.45) !important;
+}
+
+.action-banner-urgent .btn-urgent:active {
+  background: var(--burnt-copper-active) !important;
+  border-color: var(--burnt-copper-active) !important;
+  transform: translateY(0);
+}
+
+.action-banner-urgent .pricing-flexibility-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
