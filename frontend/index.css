@@ -4656,8 +4656,120 @@ body {
   margin-bottom: 1.5rem;
 }
 
+@media (min-width: 768px) {
+  .exec-row-split {
+    grid-template-columns: 1fr 2fr;
+    align-items: stretch;
+  }
+}
+
 @media (max-width: 767px) {
   .exec-row-split {
     grid-template-columns: 1fr;
   }
+}
+
+#exec-section-4 .diy-sample-link {
+  display: none !important;
+}
+
+.section4-upsell-card {
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  font-family: var(--font-sans), sans-serif;
+  text-align: left;
+}
+
+.section4-upsell-card .upsell-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section4-upsell-card .upsell-header h4 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.section4-upsell-card .badge-icon {
+  font-size: 1.25rem;
+}
+
+.section4-upsell-card .upsell-problem {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+.section4-upsell-card .upsell-solution-box {
+  background: var(--surface-nested-bg);
+  border-left: 4px solid var(--burnt-copper);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.section4-upsell-card .upsell-value {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.section4-upsell-card .upsell-value code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.section4-upsell-card .upsell-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section4-upsell-card #sec4-upgrade-btn {
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px var(--burnt-copper-glow);
+}
+
+.section4-upsell-card #sec4-upgrade-btn:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(183, 65, 14, 0.4);
+}
+
+.section4-upsell-card #sec4-upgrade-btn:active {
+  background: var(--burnt-copper-active) !important;
+  border-color: var(--burnt-copper-active) !important;
+  transform: translateY(0);
+}
+
+.section4-upsell-card .upsell-pricing-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
