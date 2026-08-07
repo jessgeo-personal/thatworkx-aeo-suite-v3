@@ -141,10 +141,10 @@ describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
       expect(pillars.length).toBe(4);
     });
 
-    it('should render Executive Scanned Routes Table and AI-Ready Machine Files Table', () => {
+    it('should render AI-Ready Machine Files Table', () => {
       const execRoutesCount = $vis('#exec-routes-count');
       const execMachineFilesCount = $vis('#exec-machine-files-count');
-      expect(execRoutesCount.length).toBe(1);
+      expect(execRoutesCount.length).toBe(0);
       expect(execMachineFilesCount.length).toBe(1);
     });
   });

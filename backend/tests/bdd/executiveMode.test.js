@@ -319,29 +319,9 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     const sitemapTooltip = sec1Card.find('span.help-tooltip-trigger[onclick*="openHelpTooltip(\'exec_sitemap\')"]');
     expect(sitemapTooltip.length).toBe(1);
 
-    // Verify table block exists inside section 1 card
+    // Verify table block is removed inside section 1 card
     const table = sec1Card.find('table.exec-table');
-    expect(table.length).toBe(1);
-
-    // Verify table headers exist in DOM
-    const headers = [];
-    table.find('th').each((i, el) => {
-      // Strip out the help tooltip (?) triggers to check core header names
-      headers.push($(el).text().trim().replace(/\s*\(\?\)\s*$/, '').trim());
-    });
-    expect(headers).toContain('Route Path');
-    expect(headers).not.toContain('Words');
-    expect(headers.some(h => h.startsWith('Token load'))).toBe(true);
-    expect(headers.some(h => h.startsWith('Hidden from AI'))).toBe(true);
-    expect(headers.some(h => h.startsWith('InSitemap'))).toBe(true);
-    expect(headers.some(h => h.startsWith('IsEssentialPage'))).toBe(true);
-    expect(headers.some(h => h.startsWith('Canonical tag'))).toBe(true);
-    expect(headers.some(h => h.startsWith('Heading hierarchy'))).toBe(true);
-    expect(headers.some(h => h.startsWith('isMobileFriendly'))).toBe(true);
-    expect(headers.some(h => h.startsWith('hasSemanticTags'))).toBe(true);
-    expect(headers.some(h => h.startsWith('Images without Alt'))).toBe(true);
-    expect(headers.some(h => h.startsWith('Last Updated'))).toBe(true);
-    expect(headers).not.toContain('Action');
+    expect(table.length).toBe(0);
 
     // 2. Check capabilityEvaluator discoveredRoutes calculation & validation
     const mockScan = {
