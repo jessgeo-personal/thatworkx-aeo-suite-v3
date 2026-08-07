@@ -4583,3 +4583,40 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
+
+.modal-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-copy-btn:hover {
+  background: var(--burnt-copper);
+  color: #FFFFFF;
+  border-color: var(--burnt-copper);
+  box-shadow: 0 4px 12px var(--burnt-copper-glow);
+}
+
+.modal-copy-btn.copied-active {
+  background: #10B981 !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35) !important;
+}
+
+.markdown-code-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 8px;
+}

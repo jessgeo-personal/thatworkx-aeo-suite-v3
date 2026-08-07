@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
@@ -219,5 +219,60 @@ describe('Page-Level Inspector Modal BDD Suite', () => {
     expect(content).toContain('## Title');
     expect(content).toContain('[Link](/test)');
     expect(content).toContain('**Answer**');
+  });
+
+  it('Scenario 6: Assert #markdown-modal-copy-btn exists and updates text to "✓ Copied!" on click', async () => {
+    // Mock navigator.clipboard.writeText
+    const writeTextMock = vi.fn().mockImplementation(() => Promise.resolve());
+    Object.defineProperty(window.navigator, 'clipboard', {
+      value: {
+        writeText: writeTextMock
+      },
+      writable: true,
+      configurable: true
+    });
+
+    // Simulate scan results payload
+    const mockResults = {
+      url: 'https://example.com',
+      pages: [
+        {
+          route: '/',
+          wordCount: 100,
+          status: 200,
+          html: '<html><body><main><p>Sample Content</p></main></body></html>'
+        }
+      ]
+    };
+
+    if (typeof window.renderModule4 === 'function') {
+      window.renderModule4(mockResults);
+    }
+
+    const viewMarkdownBtn = document.querySelector('.view-markdown-btn');
+    viewMarkdownBtn.click();
+
+    const modal = document.getElementById('markdown-preview-modal');
+    expect(modal).not.toBeNull();
+
+    const codeHeader = modal.querySelector('.markdown-code-header');
+    expect(codeHeader).not.toBeNull();
+
+    const copyBtn = codeHeader.querySelector('#markdown-modal-copy-btn');
+    expect(copyBtn).not.toBeNull();
+    expect(copyBtn.textContent).toBe('Copy Markdown');
+
+    // Click the copy button
+    copyBtn.click();
+
+    // Wait for async clipboard promise to resolve
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Verify mock clipboard execution
+    expect(writeTextMock).toHaveBeenCalledWith('Sample Content');
+
+    // Verify status feedback text updates to "✓ Copied!"
+    expect(copyBtn.textContent).toBe('✓ Copied!');
+    expect(copyBtn.classList.contains('copied-active')).toBe(true);
   });
 });

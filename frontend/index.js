@@ -5311,10 +5311,58 @@ function closeMarkdownPreviewModal() {
   }
 }
 
+function copyMarkdownFromModal() {
+  const modalBody = document.getElementById('markdown-modal-body');
+  const btn = document.getElementById('markdown-modal-copy-btn');
+  if (!modalBody || !btn) return;
+
+  const text = modalBody.textContent || '';
+  
+  const onSuccess = () => {
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied-active');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('copied-active');
+    }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(err => {
+      console.warn('Clipboard write failed, using fallback:', err);
+      fallbackCopyText(text, onSuccess);
+    });
+  } else {
+    fallbackCopyText(text, onSuccess);
+  }
+}
+
+function fallbackCopyText(text, callback) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    if (callback) callback();
+  } catch (err) {
+    console.error('Fallback copy failed:', err);
+  }
+  document.body.removeChild(textarea);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('markdown-modal-close-btn');
   if (closeBtn) {
     closeBtn.addEventListener('click', closeMarkdownPreviewModal);
+  }
+  const copyBtn = document.getElementById('markdown-modal-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', copyMarkdownFromModal);
   }
 });
 
@@ -5325,6 +5373,7 @@ window.fixMissingSchemaInBuilder = fixMissingSchemaInBuilder;
 window.copyTextToClipboard = copyTextToClipboard;
 window.viewPageMarkdown = viewPageMarkdown;
 window.closeMarkdownPreviewModal = closeMarkdownPreviewModal;
+window.copyMarkdownFromModal = copyMarkdownFromModal;
 
 
 
