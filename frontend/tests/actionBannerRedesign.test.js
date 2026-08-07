@@ -84,18 +84,25 @@ describe('Action Banner Redesign BDD Suite', () => {
     // Assert urgency pill
     const urgencyPill = actionBanner.querySelector('.urgency-pill');
     expect(urgencyPill).not.toBeNull();
-    expect(urgencyPill.textContent).toContain('AEO CRITICAL RISK');
+    expect(urgencyPill.textContent).toContain('BUSINESS VISIBILITY ALERT');
 
     // Assert comparison cards
     const wayHard = actionBanner.querySelector('.comparison-card.way-hard');
     const wayEasy = actionBanner.querySelector('.comparison-card.way-easy');
     expect(wayHard).not.toBeNull();
     expect(wayEasy).not.toBeNull();
+    expect(wayHard.querySelector('h4').textContent).toContain('Rebuilding Your Entire Website');
+    expect(wayEasy.querySelector('h4').textContent).toContain('1-Click AI Machine Blueprints');
 
     // Assert CTA button
     const ctaBtn = actionBanner.querySelector('#banner-activate-btn');
     expect(ctaBtn).not.toBeNull();
     expect(ctaBtn.className).toContain('btn-urgent');
-    expect(ctaBtn.textContent).toContain('Activate AIOptimize Pro');
+    expect(ctaBtn.textContent.trim()).toBe('🚀 Make My Website AI-Ready with AIOptimize Pro');
+
+    // Assert headline
+    const headline = actionBanner.querySelector('h2');
+    expect(headline).not.toBeNull();
+    expect(headline.textContent).toBe('Your Website Was Built for Human Eyes—Not AI Search Engines');
   });
 });
