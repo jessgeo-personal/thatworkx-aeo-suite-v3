@@ -71,7 +71,7 @@ describe('Section 3 & 4 Split Grid Layout BDD Suite', () => {
     const splitContainer = document.querySelector('.exec-row-split');
     expect(splitContainer).not.toBeNull();
 
-    const upsellBanner = document.getElementById('aioptimize-upsell-banner');
+    const upsellBanner = document.getElementById('aioptimize-action-banner');
     expect(upsellBanner).not.toBeNull();
 
     // Verify ordering

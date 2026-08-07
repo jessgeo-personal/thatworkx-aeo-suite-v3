@@ -211,16 +211,12 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     const subheading = $('#exec-section2-card p');
     expect(subheading.text()).toContain('take a look and see if the brand message that AI sees matches');
 
-    // 2. Scraped Webpage Code Box
+    // 2. Scraped Webpage Code Box (Removed)
     const sectionHtml = $('#exec-section2-card').html();
-    expect(sectionHtml).toContain('ai-bot readable content from actual website');
+    expect(sectionHtml).not.toContain('ai-bot readable content from actual website');
     
     const contentBox = $('#sec2-scraped-content-box');
-    expect(contentBox.length).toBe(1);
-    const styleAttr = contentBox.attr('style') || '';
-    expect(styleAttr).toContain('white-space: pre-wrap');
-    expect(styleAttr).toContain('word-break: break-word');
-    expect(styleAttr).toContain('font-family: monospace');
+    expect(contentBox.length).toBe(0);
 
     // 3. Essential Pages Sub-block
     const foundList = $('#sec2-found-essential-pages');
@@ -426,16 +422,16 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(card.length).toBe(1);
 
     const cardTitle = card.find('h4');
-    expect(cardTitle.text().trim()).toContain('4. Is your website already AI-ready?');
+    expect(cardTitle.text().trim()).toContain('Section 4: Is your brand blueprint AI-ready?');
 
     const subheading = card.find('p');
-    expect(subheading.text().trim()).toContain('Getting your website AI-ready means setting up your web presence with AI-readable files that AI-bots can easily access, process and understand.');
+    expect(subheading.text().trim()).toContain('Want to offer AI your content in a form thats easy for it to ingest, utilize and cite? Maintain these machine manifest files.');
 
     // 2. Tree container and title presence (accordion details/summary removed)
     const details = card.find('details');
     expect(details.length).toBe(0);
 
-    const treeContainer = card.find('div:contains("The 4-level file heirarchy for AI-Readiness")');
+    const treeContainer = card.find('div:contains("The 4-level file hierarchy for AI-Readiness")');
     expect(treeContainer.length).toBeGreaterThan(0);
 
     // 3. Spans for the tree
@@ -459,7 +455,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
 
     const card = $('#exec-section4-card');
     
-    // Check that each of the 8 file names has a corresponding trigger span
+    // Check that each of the 8 file names has a corresponding trigger button/span
     const expectedMappings = {
       'manifest_robots': 'robots.txt',
       'manifest_llms': 'llms.txt',
@@ -472,9 +468,9 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     };
 
     for (const [key, fileName] of Object.entries(expectedMappings)) {
-      const span = card.find(`span.help-tooltip-trigger[onclick*="openHelpTooltip('${key}')"]`);
-      expect(span.length).toBe(1);
-      expect(span.text()).toBe('(?)');
+      const button = card.find(`button.info-help-btn[onclick*="${key}"]`);
+      expect(button.length).toBe(1);
+      expect(button.text()).toBe('(?)');
     }
   });
 
