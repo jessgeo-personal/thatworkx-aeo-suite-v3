@@ -4624,3 +4624,27 @@ body {
 #exec-section-3 {
   margin-bottom: 1.5rem;
 }
+
+.border-glow-burnt {
+  border-color: var(--burnt-copper) !important;
+  box-shadow: 0 0 30px var(--burnt-copper-glow) !important;
+}
+
+.aioptimize-cta-btn {
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.aioptimize-cta-btn:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(183, 65, 14, 0.4) !important;
+}
+
+.aioptimize-cta-btn:active {
+  background: var(--burnt-copper-active) !important;
+  border-color: var(--burnt-copper-active) !important;
+  transform: translateY(0) !important;
+}
