@@ -174,6 +174,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     ]);
 
     let robotsContent = '';
+    let sitemapContent = '';
     if (robotsSettled.status === 'fulfilled' && robotsSettled.value.data) {
       robotsContent = robotsSettled.value.data;
       result.status.robotsTxtExists = true;
@@ -201,6 +202,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     }
     if (sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data) {
       result.status.sitemapExists = true;
+      sitemapContent = typeof sitemapSettled.value.data === 'string' ? sitemapSettled.value.data : JSON.stringify(sitemapSettled.value.data);
     }
 
     // 2. Parse Robots.txt for blanket disallow vs targeted AI bot rules
@@ -334,6 +336,27 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       // Fallback
     }
 
+    if (sitemapContent) {
+      const locRegex = /<loc>\s*(https?:\/\/[^<\s]+)\s*<\/loc>/gi;
+      let match;
+      const cleanHost = (h) => (h || '').replace(/^www\./i, '').toLowerCase();
+      while ((match = locRegex.exec(sitemapContent)) !== null) {
+        try {
+          const resolvedUrl = new url.URL(match[1]);
+          if (cleanHost(resolvedUrl.hostname) === cleanHost(targetHost)) {
+            let cleanPath = resolvedUrl.pathname;
+            if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+            if (cleanPath.length > 1 && cleanPath.endsWith('/')) cleanPath = cleanPath.slice(0, -1);
+            if (!/\.(png|jpg|jpeg|gif|svg|pdf|css|js|woff|woff2|xml)$/i.test(cleanPath)) {
+              discoveredLinks.add(cleanPath);
+            }
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
+    }
+
     $('a[href]').each((_, el) => {
       try {
         let href = $(el).attr('href');
@@ -368,7 +391,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
 
     const uniquePaths = Array.from(discoveredLinks);
     result.totalPagesFound = uniquePaths.length;
-    result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits.maxPages);
+    result.pageDepthCrawled = Math.min(result.totalPagesFound, userLimits?.maxPages ?? 500);
 
     const syncLimit = (partialSyncLimit && result.pageDepthCrawled > partialSyncLimit) ? partialSyncLimit : result.pageDepthCrawled;
 
@@ -389,7 +412,9 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
         result.pages.push(parsedPage);
       } else {
-        await delayHelper(150);
+        if (process.env.NODE_ENV !== 'test') {
+          await delayHelper(150);
+        }
         const fetchRes = await fetchPageWithTimeout(pageUrl);
         if (fetchRes.success) {
           const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute);

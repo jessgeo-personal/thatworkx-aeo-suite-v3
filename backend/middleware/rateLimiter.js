@@ -3,17 +3,17 @@ const User = require('../models/User');
 const TIER_LIMITS = {
   'AIVisualize Free': {
     maxScans: parseInt(process.env.AIV_FREE_MAX_SCANS || (process.env.NODE_ENV === 'test' ? '5' : '100'), 10),
-    maxPages: parseInt(process.env.AIV_FREE_MAX_PAGES || '5', 10),
+    maxPages: 500,
     maxHeadless: 0
   },
   'AIVisualize Pro': {
     maxScans: parseInt(process.env.AIV_PRO_MAX_SCANS || '50', 10),
-    maxPages: parseInt(process.env.AIV_PRO_MAX_PAGES || '40', 10),
+    maxPages: 500,
     maxHeadless: 0
   },
   'AIVisualize ENT': {
     maxScans: parseInt(process.env.AIV_PRO_MAX_SCANS || '50', 10),
-    maxPages: parseInt(process.env.AIV_ENT_MAX_PAGES || '100', 10),
+    maxPages: 500,
     maxHeadless: 0
   },
   'AIOptimize Free': {
@@ -23,12 +23,12 @@ const TIER_LIMITS = {
   },
   'AIOptimize Pro': {
     maxScans: parseInt(process.env.AIV_PRO_MAX_SCANS || '50', 10),
-    maxPages: parseInt(process.env.AIV_PRO_MAX_PAGES || '40', 10),
+    maxPages: 500,
     maxHeadless: parseInt(process.env.AIO_PRO_MAX_HEADLESS || '3', 10)
   },
   'AIOptimize ENT': {
     maxScans: parseInt(process.env.AIV_PRO_MAX_SCANS || '50', 10),
-    maxPages: parseInt(process.env.AIV_ENT_MAX_PAGES || '100', 10),
+    maxPages: 500,
     maxHeadless: parseInt(process.env.AIO_ENT_MAX_HEADLESS || '10', 10)
   }
 };
