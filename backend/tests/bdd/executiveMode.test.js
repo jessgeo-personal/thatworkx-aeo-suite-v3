@@ -578,4 +578,54 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(jsContent).toContain('getStatusIndicator(');
   });
 
+  it('Scenario P: Executive Mode Section 3 Pillar Card contains an accordion with 4 protocol check labels and updates on live scan', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    // a) & b) & c) Verify visualize.html structure
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const pillar3Card = $('#pillar-sec3-title').closest('.pillar-card');
+    expect(pillar3Card.length).toBe(1);
+
+    const accordion = pillar3Card.find('#pillar-sec3-accordion');
+    expect(accordion.length).toBe(1);
+    expect(accordion.is('details')).toBe(true);
+
+    const summary = accordion.find('summary');
+    expect(summary.length).toBe(1);
+    expect(summary.text().trim()).toContain('AI-Optimized page-level readability & trust');
+
+    const checklist = accordion.find('#pillar-sec3-checklist');
+    expect(checklist.length).toBe(1);
+    expect(checklist.is('ul')).toBe(true);
+
+    const items = checklist.find('li');
+    expect(items.length).toBe(4);
+
+    const expectedLabels = [
+      'Title & Meta Desc Sweet Spots',
+      'Token Load Status & Flesch Score',
+      'Ans/Ques Parity Ratio',
+      'Page-Level E-E-A-T Diagnostics'
+    ];
+    expectedLabels.forEach((label, idx) => {
+      expect($(items[idx]).text().trim()).toContain(label);
+    });
+
+    // d) Verify index.js updates the pass/fail indicators on scan
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    expect(jsContent).toContain('pillar-sec3-checklist');
+    expect(jsContent).toContain('isSeoPass');
+    expect(jsContent).toContain('isTokenPass');
+    expect(jsContent).toContain('isParityPass');
+    expect(jsContent).toContain('isEeatPass');
+    expect(jsContent).toContain('getStatusIndicator(');
+  });
+
 });

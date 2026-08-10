@@ -2886,6 +2886,17 @@ function updateExecutiveViewData(results) {
     `;
   }
   renderPillarCard(3, 'section3', pillars?.p3);
+
+  // Update Section 3 accordion checklist pass/fail indicators dynamically:
+  const checklistSec3El = document.getElementById('pillar-sec3-checklist');
+  if (checklistSec3El) {
+    checklistSec3El.innerHTML = `
+      <li id="chk-sec3-seo" style="display: flex; align-items: center;">${getStatusIndicator(isSeoPass)}Title &amp; Meta Desc Sweet Spots</li>
+      <li id="chk-sec3-token" style="display: flex; align-items: center;">${getStatusIndicator(isTokenPass)}Token Load Status &amp; Flesch Score</li>
+      <li id="chk-sec3-parity" style="display: flex; align-items: center;">${getStatusIndicator(isParityPass)}Ans/Ques Parity Ratio</li>
+      <li id="chk-sec3-eeat" style="display: flex; align-items: center;">${getStatusIndicator(isEeatPass)}Page-Level E-E-A-T Diagnostics</li>
+    `;
+  }
   renderPillarCard(4, 'section4', pillars?.p4);
 
   // Bind live Section 1 gateway payload data to X-Robots-Tag and robots.txt status elements
