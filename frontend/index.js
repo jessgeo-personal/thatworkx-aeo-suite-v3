@@ -2874,6 +2874,17 @@ function updateExecutiveViewData(results) {
     `;
   }
   renderPillarCard(2, 'section2', pillars?.p2);
+
+  // Update Section 2 accordion checklist pass/fail indicators dynamically:
+  const checklistSec2El = document.getElementById('pillar-sec2-checklist');
+  if (checklistSec2El) {
+    checklistSec2El.innerHTML = `
+      <li id="chk-sec2-issecure" style="display: flex; align-items: center;">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
+      <li id="chk-sec2-spatrap" style="display: flex; align-items: center;">${getStatusIndicator(isSpaPass)}SPA Hydration Trap &amp; Density Ratio</li>
+      <li id="chk-sec2-ragoffset" style="display: flex; align-items: center;">${getStatusIndicator(isRagPass)}RAG Offset: /llms.txt &amp; /ai-context.md</li>
+      <li id="chk-sec2-entitynodes" style="display: flex; align-items: center;">${getStatusIndicator(isEntityPass)}Essential Entity Nodes Discovered</li>
+    `;
+  }
   renderPillarCard(3, 'section3', pillars?.p3);
   renderPillarCard(4, 'section4', pillars?.p4);
 
