@@ -809,4 +809,53 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(scanPages).not.toBeNull();
   });
 
+  it('Scenario P: Verify Executive Mode badge reordering, enlarged primary buttons, and export buttons nested in metadata bubble bar', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    // 1. Check DOM order: #exec-welcome-banner appears BEFORE the control hero card ("AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE")
+    const htmlText = $('body').html();
+    const idxWelcomeBanner = htmlText.indexOf('id="exec-welcome-banner"');
+    const idxControlHero = htmlText.indexOf('AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE');
+
+    expect(idxWelcomeBanner).toBeGreaterThan(-1);
+    expect(idxControlHero).toBeGreaterThan(-1);
+    expect(idxWelcomeBanner).toBeLessThan(idxControlHero);
+
+    // 2. Check export buttons are outside .visualize-meta-bubble
+    const metaBubble = $('.visualize-meta-bubble');
+    expect(metaBubble.length).toBe(1);
+
+    const btnExportJsonInBubble = metaBubble.find('#btn-export-json');
+    expect(btnExportJsonInBubble.length).toBe(0);
+
+    const btnExportPdfInBubble = metaBubble.find('#btn-export-pdf');
+    expect(btnExportPdfInBubble.length).toBe(0);
+
+    // 3. Check they are contained in a right-aligned wrapper
+    const exportWrapper = $('.export-btn-container');
+    expect(exportWrapper.length).toBe(1);
+
+    const btnExportJson = exportWrapper.find('#btn-export-json');
+    expect(btnExportJson.length).toBe(1);
+
+    const btnExportPdf = exportWrapper.find('#btn-export-pdf');
+    expect(btnExportPdf.length).toBe(1);
+
+    // 4. Primary buttons must remain large
+    const btnNewScan = $('#btn-new-scan');
+    expect(btnNewScan.length).toBe(1);
+    expect(btnNewScan.hasClass('btn-large')).toBe(true);
+
+    const btnRefresh = $('#btn-refresh-analysis');
+    expect(btnRefresh.length).toBe(1);
+    expect(btnRefresh.hasClass('btn-large')).toBe(true);
+  });
+
 });
+

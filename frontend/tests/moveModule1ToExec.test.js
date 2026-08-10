@@ -59,8 +59,8 @@ describe('BDD Move Module 1 to Executive Mode Test Suite', () => {
   });
 
   it('Scenario 2: #dev-matrix-wrapper is placed directly beneath the top dial / pillars grid', () => {
-    const execModeContainer = document.getElementById('exec-mode-container');
-    const children = Array.from(execModeContainer.firstElementChild.children); // children of #executive-view-container
+    const execViewContainer = document.getElementById('executive-view-container');
+    const children = Array.from(execViewContainer.children); // children of #executive-view-container
 
     const gridIdx = children.findIndex(el => 
       el.tagName === 'DIV' && 

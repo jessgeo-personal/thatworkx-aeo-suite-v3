@@ -4958,3 +4958,66 @@ body {
   color: var(--text-secondary);
   font-weight: 500;
 }
+
+/* Custom styling for the enlarged buttons */
+.btn-large {
+  padding: 0.85rem 1.75rem !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 15px var(--burnt-copper-glow);
+}
+
+.btn-large:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  box-shadow: 0 6px 20px var(--burnt-copper-glow);
+}
+
+.btn-large:active {
+  background: var(--burnt-copper-active) !important;
+  border-color: var(--burnt-copper-active) !important;
+}
+
+/* Right-aligned container for export buttons positioned directly below metadata bubble capsule */
+.export-btn-container,
+.export-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Styled export action buttons inside the right-aligned container */
+.export-btn-container .action-btn,
+.export-actions-row .action-btn {
+  padding: 0.55rem 1.1rem !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem !important;
+  background: var(--surface-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 9999px !important;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.export-btn-container .action-btn:hover,
+.export-actions-row .action-btn:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  color: #ffffff !important;
+}

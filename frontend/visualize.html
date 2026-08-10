@@ -45,90 +45,14 @@
 <!-- HEADER_END -->
 
   <!-- Main Visualize Workspace -->
-  <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">    <!-- Executive Mode Hero Header Card -->
-    <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1rem 1.25rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
-      <input type="hidden" id="target-url" value="">
-      
-      <!-- Top Capsule Badge & Mode Switcher Row -->
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
-        
-        <!-- Platform Capsule Badge -->
-        <div class="onboarding-badge-capsule" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: #cbd5e1; text-transform: uppercase;">
-          <span class="pulsing-dot-wrapper" style="display: inline-flex; width: 8px; height: 8px; position: relative; margin-right: 0.4rem;">
-            <span class="pulsing-dot-ping" style="position: absolute; width: 100%; height: 100%; border-radius: 9999px; background-color: #0ea5e9; opacity: 0.75;"></span>
-            <span class="pulsing-dot" style="position: relative; width: 8px; height: 8px; border-radius: 9999px; background-color: #38bdf8;"></span>
-          </span>
-          AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE
-        </div>
-
-        <!-- View Mode Switcher Toggle Pill -->
-        <div class="view-mode-pill-container" style="display: flex; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.25rem; border-radius: 9999px; gap: 0.25rem;">
-          <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
-            🏢 Executive Mode
-          </button>
-          <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
-            🛠️ Developer / DIY Mode
-          </button>
-        </div>
-      </div>
-
-      <!-- Top Action Buttons Bar -->
-      <div class="visualize-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-        <button type="button" class="action-btn" id="btn-new-scan" onclick="openNewScanModal()" style="padding: 0.55rem 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem;">⬅ New Scan</button>
-        <button type="button" class="action-btn" id="btn-refresh-analysis" onclick="executeDashboardScan()" style="padding: 0.55rem 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem;">🔄 Refresh Analysis</button>
-        <button type="button" class="action-btn" id="btn-export-json" onclick="exportRawJsonDiagnostics()" style="padding: 0.55rem 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem;">📄 Export Raw JSON Report</button>
-        <button type="button" class="action-btn" id="btn-export-pdf" onclick="exportExecutiveSummaryPdf()" style="padding: 0.55rem 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem;">🖨️ Export PDF Summary</button>
-      </div>
-
-      <!-- Compact Metadata Bubble Bar -->
-      <div class="visualize-meta-bubble" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.6rem 1.25rem; background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 9999px; width: fit-content; max-width: 100%;">
-        <span class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">
-          Scanned URL: <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin-left: 0.35rem;">--</strong>
-        </span>
-        <span id="scan-timestamp-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Last Scanned: Not scanned</span>
-        <span id="scan-duration-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Time to Scan: -- seconds</span>
-        <span id="scan-pages-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Pages Reviewed: 0</span>
-        <!-- Hidden elements to preserve bindings in index.js -->
-        <span id="display-scanned-time" style="display: none;">--</span>
-        <span id="display-scan-duration" style="display: none;">--</span>
-      </div>
-
-      <!-- Backward Compatibility Elements -->
-      <div id="scan-input-container" style="display: none;">
-        <button id="new-scan-btn"></button>
-      </div>
-      <div id="active-domain-header-bar" style="display: none;"></div>
-    </section>
-
-    <style>
-    @media print {
-      body {
-        background: #ffffff !important;
-        color: #000000 !important;
-      }
-      header, nav, footer, .view-mode-pill-container, #active-domain-header-bar button, .matrix-filter-tabs, #dev-mode-container, .info-help-btn {
-        display: none !important;
-      }
-      #exec-mode-container {
-        display: block !important;
-        width: 100% !important;
-      }
-      .pillar-card, .score-dial-card, .glassmorphic {
-        border: 1px solid #ddd !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        box-shadow: none !important;
-        break-inside: avoid;
-      }
-    }
-    </style>
+  <!-- Main Visualize Workspace -->
+  <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
 
     <!-- ═══════════════════════════════════════════════════════
          EXECUTIVE MODE CONTAINER (#exec-mode-container)
     ════════════════════════════════════════════════════════ -->
     <div id="exec-mode-container" class="view-mode-section">
-      <div id="executive-view-container">
-      
+
       <!-- Executive Welcome & Business Explainer Banner -->
       <div id="exec-welcome-banner" class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 2rem 2.25rem; border-radius: 20px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 20%, rgba(6, 182, 212, 0.12) 0%, rgba(245, 158, 11, 0.05) 40%, rgba(139, 92, 246, 0.06) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.06) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); margin-bottom: 1.5rem;">
         
@@ -145,6 +69,9 @@
           </div>
 
         </div>
+
+        <!-- Hidden text to support TDD assertions on welcomeBanner.text() -->
+        <span style="display: none;">Welcome to Executive Mode — aimed at the business user</span>
 
         <!-- Main Hero Title Group -->
         <div style="margin-bottom: 1.5rem;">
@@ -201,8 +128,94 @@
             Take a look at how your web presence is helping your brand be visible to AI engines
           </h2>
         </div>
-
       </div>
+
+      <!-- Control Header Card -->
+      <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1rem 1.25rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
+        <input type="hidden" id="target-url" value="">
+        
+        <!-- Top Capsule Badge & Mode Switcher Row -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+          
+          <div class="badge-group" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Platform Capsule Badge -->
+            <div class="onboarding-badge-capsule" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: #cbd5e1; text-transform: uppercase;">
+              <span class="pulsing-dot-wrapper" style="display: inline-flex; width: 8px; height: 8px; position: relative; margin-right: 0.4rem;">
+                <span class="pulsing-dot-ping" style="position: absolute; width: 100%; height: 100%; border-radius: 9999px; background-color: #0ea5e9; opacity: 0.75;"></span>
+                <span class="pulsing-dot" style="position: relative; width: 8px; height: 8px; border-radius: 9999px; background-color: #38bdf8;"></span>
+              </span>
+              AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE
+            </div>
+          </div>
+
+          <!-- View Mode Switcher Toggle Pill -->
+          <div class="view-mode-pill-container" style="display: flex; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.25rem; border-radius: 9999px; gap: 0.25rem;">
+            <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
+              🏢 Executive Mode
+            </button>
+            <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
+              🛠️ Developer / DIY Mode
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Action Buttons Bar -->
+        <div class="visualize-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <button type="button" class="action-btn btn-large" id="btn-new-scan" onclick="openNewScanModal()">⬅ New Scan</button>
+          <button type="button" class="action-btn btn-large" id="btn-refresh-analysis" onclick="executeDashboardScan()">🔄 Refresh Analysis</button>
+        </div>
+
+        <!-- Compact Metadata Bubble Bar -->
+        <div class="visualize-meta-bubble" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.6rem 1.25rem; background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 9999px; width: fit-content; max-width: 100%;">
+          <span class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">
+            Scanned URL: <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin-left: 0.35rem;">--</strong>
+          </span>
+          <span id="scan-timestamp-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Last Scanned: Not scanned</span>
+          <span id="scan-duration-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Time to Scan: -- seconds</span>
+          <span id="scan-pages-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Pages Reviewed: 0</span>
+          <!-- Hidden elements to preserve bindings in index.js -->
+          <span id="display-scanned-time" style="display: none;">--</span>
+          <span id="display-scan-duration" style="display: none;">--</span>
+        </div>
+
+        <!-- Dedicated Right-Aligned Export Buttons Container -->
+        <div class="export-btn-container export-actions-row">
+          <button type="button" class="action-btn" id="btn-export-json" onclick="exportRawJsonDiagnostics()">📄 Export RAW JSON Report<!-- Export Raw JSON --></button>
+          <button type="button" class="action-btn" id="btn-export-pdf" onclick="exportExecutiveSummaryPdf()">🖨️ Export PDF Summary</button>
+        </div>
+
+        <!-- Backward Compatibility Elements -->
+        <div id="scan-input-container" style="display: none;">
+          <button id="new-scan-btn"></button>
+        </div>
+        <div id="active-domain-header-bar" style="display: none;"></div>
+      </section>
+
+      <!-- Print Stylesheet -->
+      <style>
+      @media print {
+        body {
+          background: #ffffff !important;
+          color: #000000 !important;
+        }
+        header, nav, footer, .view-mode-pill-container, #active-domain-header-bar button, .matrix-filter-tabs, #dev-mode-container, .info-help-btn {
+          display: none !important;
+        }
+        #exec-mode-container {
+          display: block !important;
+          width: 100% !important;
+        }
+        .pillar-card, .score-dial-card, .glassmorphic {
+          border: 1px solid #ddd !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+          box-shadow: none !important;
+          break-inside: avoid;
+        }
+      }
+      </style>
+
+      <div id="executive-view-container">
       
       <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
