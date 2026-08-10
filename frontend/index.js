@@ -709,6 +709,15 @@ document.addEventListener('DOMContentLoaded', () => {
       devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
     }
 
+    // Initialize Module 3 drawers wrapper
+    const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
+    if (devDrawersWrap) {
+      devDrawersWrap.innerHTML = buildDevDrawersHtml();
+      if (typeof switchDiyManifestTab === 'function') {
+        switchDiyManifestTab('robots');
+      }
+    }
+
     const devEdgeWrap = document.getElementById('dev-edge-wrapper');
     if (devEdgeWrap) {
       devEdgeWrap.innerHTML = buildDevEdgeHtml();
@@ -728,12 +737,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (typeof updateSchemaBuilderCode === 'function') {
           updateSchemaBuilderCode();
         }
+        if (typeof switchDiyManifestTab === 'function') {
+          switchDiyManifestTab(window.activeDiyManifestKey || 'robots');
+        }
       });
       domainInput.addEventListener('change', () => {
         if (typeof updateOptimizeTargetDomain === 'function') {
           updateOptimizeTargetDomain();
         } else if (typeof updateSchemaBuilderCode === 'function') {
           updateSchemaBuilderCode();
+        }
+        if (typeof switchDiyManifestTab === 'function') {
+          switchDiyManifestTab(window.activeDiyManifestKey || 'robots');
         }
       });
     }
