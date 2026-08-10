@@ -2862,6 +2862,17 @@ function updateExecutiveViewData(results) {
   };
 
   renderPillarCard(1, 'section1', pillars?.p1);
+
+  // Update Section 1 accordion checklist pass/fail indicators dynamically:
+  const checklistEl = document.getElementById('pillar-sec1-checklist');
+  if (checklistEl) {
+    checklistEl.innerHTML = `
+      <li id="chk-sec1-cdn" style="display: flex; align-items: center;">${getStatusIndicator(isCdnPass)}CDN / Edge Firewall Blocks</li>
+      <li id="chk-sec1-xrobots" style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}X-Robots-Tag Headers</li>
+      <li id="chk-sec1-useragents" style="display: flex; align-items: center;">${getStatusIndicator(isUseragentsPass)}robots.txt useragents Disallow</li>
+      <li id="chk-sec1-aibots" style="display: flex; align-items: center;">${getStatusIndicator(isAiBotsPass)}robots.txt ai-bots Disallow</li>
+    `;
+  }
   renderPillarCard(2, 'section2', pillars?.p2);
   renderPillarCard(3, 'section3', pillars?.p3);
   renderPillarCard(4, 'section4', pillars?.p4);

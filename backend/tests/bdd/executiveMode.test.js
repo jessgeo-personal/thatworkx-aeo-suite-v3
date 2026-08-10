@@ -478,4 +478,54 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(/AI-first/i.test(jsContent)).toBe(false);
   });
 
+  it('Scenario N: Executive Mode Section 1 Pillar Card contains an accordion with 4 protocol check labels and updates on live scan', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    // a) & b) & c) Verify visualize.html structure
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const pillar1Card = $('#pillar-sec1-title').closest('.pillar-card');
+    expect(pillar1Card.length).toBe(1);
+
+    const accordion = pillar1Card.find('#pillar-sec1-accordion');
+    expect(accordion.length).toBe(1);
+    expect(accordion.is('details')).toBe(true);
+
+    const summary = accordion.find('summary');
+    expect(summary.length).toBe(1);
+    expect(summary.text().trim()).toContain('AI-Optimized human-centric protocol gate checks');
+
+    const checklist = accordion.find('#pillar-sec1-checklist');
+    expect(checklist.length).toBe(1);
+    expect(checklist.is('ul')).toBe(true);
+
+    const items = checklist.find('li');
+    expect(items.length).toBe(4);
+
+    const expectedLabels = [
+      'CDN / Edge Firewall Blocks',
+      'X-Robots-Tag Headers',
+      'robots.txt useragents Disallow',
+      'robots.txt ai-bots Disallow'
+    ];
+    expectedLabels.forEach((label, idx) => {
+      expect($(items[idx]).text().trim()).toContain(label);
+    });
+
+    // d) Verify index.js updates the pass/fail indicators on scan
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    expect(jsContent).toContain('pillar-sec1-checklist');
+    expect(jsContent).toContain('isCdnPass');
+    expect(jsContent).toContain('isXRobotsPass');
+    expect(jsContent).toContain('isUseragentsPass');
+    expect(jsContent).toContain('isAiBotsPass');
+    expect(jsContent).toContain('getStatusIndicator(');
+  });
+
 });
