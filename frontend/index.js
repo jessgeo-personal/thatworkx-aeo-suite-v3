@@ -2899,6 +2899,23 @@ function updateExecutiveViewData(results) {
   }
   renderPillarCard(4, 'section4', pillars?.p4);
 
+  // Calculate live status for the 4 Pillar 4 checks:
+  const isL1Pass = results.status?.robotsTxtExists === true;
+  const isL2Pass = results.status?.llmsTxtExists === true && results.status?.sitemapExists !== false;
+  const isL3Pass = results.status?.aiContextExists === true;
+  const isL4Pass = results.status?.readmeTxtExists === true || results.status?.aboutTxtExists === true;
+
+  // Update Section 4 accordion checklist pass/fail indicators dynamically:
+  const checklistSec4El = document.getElementById('pillar-sec4-checklist');
+  if (checklistSec4El) {
+    checklistSec4El.innerHTML = `
+      <li id="chk-sec4-l1" style="display: flex; align-items: center;">${getStatusIndicator(isL1Pass)}Level 1 Gate: robots.txt</li>
+      <li id="chk-sec4-l2" style="display: flex; align-items: center;">${getStatusIndicator(isL2Pass)}Level 2 Welcome Mats: /llms.txt &amp; sitemap.xml</li>
+      <li id="chk-sec4-l3" style="display: flex; align-items: center;">${getStatusIndicator(isL3Pass)}Level 3 Blueprint: /ai-context.md</li>
+      <li id="chk-sec4-l4" style="display: flex; align-items: center;">${getStatusIndicator(isL4Pass)}Level 4 Workspaces: /README.md, about, docs, content</li>
+    `;
+  }
+
   // Bind live Section 1 gateway payload data to X-Robots-Tag and robots.txt status elements
   const xRobotsEl = document.getElementById('exec-x-robots-status');
   const robotsTxtEl = document.getElementById('exec-robots-txt-status');

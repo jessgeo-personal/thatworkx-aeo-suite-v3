@@ -628,4 +628,54 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(jsContent).toContain('getStatusIndicator(');
   });
 
+  it('Scenario Q: Executive Mode Section 4 Pillar Card contains an accordion with 4 protocol check labels and updates on live scan', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    // a) & b) & c) Verify visualize.html structure
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const pillar4Card = $('#pillar-sec4-title').closest('.pillar-card');
+    expect(pillar4Card.length).toBe(1);
+
+    const accordion = pillar4Card.find('#pillar-sec4-accordion');
+    expect(accordion.length).toBe(1);
+    expect(accordion.is('details')).toBe(true);
+
+    const summary = accordion.find('summary');
+    expect(summary.length).toBe(1);
+    expect(summary.text().trim()).toContain('AI-Ready Level 1–4 manifest hierarchy');
+
+    const checklist = accordion.find('#pillar-sec4-checklist');
+    expect(checklist.length).toBe(1);
+    expect(checklist.is('ul')).toBe(true);
+
+    const items = checklist.find('li');
+    expect(items.length).toBe(4);
+
+    const expectedLabels = [
+      'Level 1 Gate: robots.txt',
+      'Level 2 Welcome Mats: /llms.txt & sitemap.xml',
+      'Level 3 Blueprint: /ai-context.md',
+      'Level 4 Workspaces: /README.md, about, docs, content'
+    ];
+    expectedLabels.forEach((label, idx) => {
+      expect($(items[idx]).text().trim()).toContain(label);
+    });
+
+    // d) Verify index.js updates the pass/fail indicators on scan
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    expect(jsContent).toContain('pillar-sec4-checklist');
+    expect(jsContent).toContain('isL1Pass');
+    expect(jsContent).toContain('isL2Pass');
+    expect(jsContent).toContain('isL3Pass');
+    expect(jsContent).toContain('isL4Pass');
+    expect(jsContent).toContain('getStatusIndicator(');
+  });
+
 });
