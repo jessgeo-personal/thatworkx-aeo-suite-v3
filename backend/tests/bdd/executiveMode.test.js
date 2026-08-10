@@ -764,4 +764,49 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(execPagesBadge.textContent).toBe('Pages Reviewed: 8');
   });
 
+  it('Scenario O: Verify sleek Visualize header redesign with 4 action buttons, removed legacy hero copy, and 4 metadata pills', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const { JSDOM } = require('jsdom');
+
+    const htmlPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+    const dom = new JSDOM(htmlContent);
+    const { document } = dom.window;
+
+    // 1. Verify legacy headline & description copy is removed
+    const bodyText = document.body.textContent;
+    expect(bodyText).not.toContain('Measure AI Visibility & Auditable Readiness');
+    expect(bodyText).not.toContain('Discover how search engines and LLM web scrapers perceive');
+
+    // 2. Verify existence of the 4 Top Action Buttons
+    const btnNewScan = document.getElementById('btn-new-scan');
+    expect(btnNewScan).not.toBeNull();
+    expect(btnNewScan.textContent).toContain('New Scan');
+
+    const btnRefresh = document.getElementById('btn-refresh-analysis');
+    expect(btnRefresh).not.toBeNull();
+    expect(btnRefresh.textContent).toContain('Refresh Analysis');
+
+    const btnExportJson = document.getElementById('btn-export-json');
+    expect(btnExportJson).not.toBeNull();
+
+    const btnExportPdf = document.getElementById('btn-export-pdf');
+    expect(btnExportPdf).not.toBeNull();
+
+    // 3. Verify presence of the 4 metadata badges inside the capsule bar
+    const displayDomain = document.getElementById('display-scanned-domain');
+    expect(displayDomain).not.toBeNull();
+
+    const scanTimestamp = document.getElementById('scan-timestamp-badge');
+    expect(scanTimestamp).not.toBeNull();
+
+    const scanDuration = document.getElementById('scan-duration-badge');
+    expect(scanDuration).not.toBeNull();
+
+    const scanPages = document.getElementById('scan-pages-badge');
+    expect(scanPages).not.toBeNull();
+  });
+
 });
