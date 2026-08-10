@@ -1235,6 +1235,10 @@ function displayScanResults(results) {
 let currentEvaluatedCapabilities = [];
 let currentScannedDomain = 'holiknits.com';
 
+// Module 4 pagination / viewport state
+let isModule4Expanded = false;
+let currentModule4Filter = 'all';
+
 let selectedSchemaEntities = {
   Organization: true,
   LocalBusiness: false,
@@ -1451,6 +1455,10 @@ function updateDeveloperViewData(results) {
   if (rawUrl) {
     currentScannedDomain = rawUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
   }
+
+  const pageCount = Array.isArray(results?.pages) ? results.pages.length : (results?.scannedPages?.length ?? 0);
+  const devPagesBadge = document.getElementById('dev-scan-pages-badge');
+  if (devPagesBadge) devPagesBadge.textContent = `Pages Reviewed: ${pageCount}`;
 
   // Compute full 32 capability evaluations via capabilityEvaluator engine
   const evalResults = evaluateAllCapabilities(results);
@@ -2501,6 +2509,12 @@ function updateExecutiveViewData(results) {
       el.innerText = `Time to Scan: ${scanTimeSeconds} seconds`;
     }
   });
+
+  const pageCount = Array.isArray(results?.pages) ? results.pages.length : (results?.scannedPages?.length ?? 0);
+  const execPagesBadge = document.getElementById('scan-pages-badge');
+  if (execPagesBadge) execPagesBadge.textContent = `Pages Reviewed: ${pageCount}`;
+  const devPagesBadge = document.getElementById('dev-scan-pages-badge');
+  if (devPagesBadge) devPagesBadge.textContent = `Pages Reviewed: ${pageCount}`;
 
   // Section scores & pills from results.executiveSections
   const sec1 = results.executiveSections?.section1;
@@ -4632,6 +4646,7 @@ function buildDevModule4Html() {
           <div>
             <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
               <span>🔍 Module 4: Page-Level Crawl & Content Health Inspector</span>
+              <span id="dev-module-4-pages-count" class="pill-badge" style="display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Total Pages Reviewed: 0</span>
             </h4>
             <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Audit and fix every page on your site to guarantee search engines and AI assistants can index and cite your content.</p>
           </div>
@@ -4659,6 +4674,7 @@ function buildDevModule4Html() {
           <tbody id="dev-module-4-tbody"></tbody>
         </table>
       </div>
+      <div id="dev-module-4-expand-container"></div>
     </div>
   `;
 }
@@ -4690,6 +4706,16 @@ function copyTextToClipboard(text, buttonId) {
 }
 
 function renderModule4(results, filter = 'all') {
+  // Reset expansion state if the filter changes or a new results object is provided
+  if (filter !== currentModule4Filter) {
+    isModule4Expanded = false;
+    currentModule4Filter = filter;
+  }
+  if (results) {
+    isModule4Expanded = false;
+    latestScanResults = results;
+  }
+
   const tbody = document.getElementById('dev-module-4-tbody');
   const filterContainer = document.getElementById('dev-module-4-filter-container');
   if (!tbody) return;
@@ -4709,6 +4735,10 @@ function renderModule4(results, filter = 'all') {
   const parser = new DOMParser();
 
   const total = pages.length;
+  const pagesCountEl = document.getElementById('dev-module-4-pages-count');
+  if (pagesCountEl) {
+    pagesCountEl.textContent = `Total Pages Reviewed: ${total}`;
+  }
   let errorCount = 0;
   let noSchemaCount = 0;
   let thinContentCount = 0;
@@ -4879,7 +4909,25 @@ function renderModule4(results, filter = 'all') {
 
   window.module4FilteredPages = filteredPages;
 
-  tbody.innerHTML = filteredPages.map((p, idx) => {
+  const expandContainer = document.getElementById('dev-module-4-expand-container');
+  let displayedPages = filteredPages;
+
+  if (filteredPages.length > 5 && !isModule4Expanded) {
+    displayedPages = filteredPages.slice(0, 5);
+    if (expandContainer) {
+      expandContainer.innerHTML = `
+        <div style="margin-top: 1.25rem; display: flex; justify-content: center;">
+          <button id="btn-mod4-load-more" onclick="expandModule4Pages()" class="btn-fix-bridge" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 0.6rem 1.2rem; font-size: 0.85rem; font-weight: 600; width: 100%; justify-content: center; transition: all 0.2s; cursor: pointer;">Load rest of the pages (${filteredPages.length - 5} remaining)</button>
+        </div>
+      `;
+    }
+  } else {
+    if (expandContainer) {
+      expandContainer.innerHTML = '';
+    }
+  }
+
+  tbody.innerHTML = displayedPages.map((p, idx) => {
     const crawlStatusHtml = p.isCrawled
       ? '<span class="badge-status status-green">🟢 200 OK</span>'
       : '<span class="badge-status status-red">🔴 Crawl Error / Blank Page</span>';
@@ -5435,6 +5483,12 @@ window.viewPageMarkdown = viewPageMarkdown;
 window.closeMarkdownPreviewModal = closeMarkdownPreviewModal;
 window.copyMarkdownFromModal = copyMarkdownFromModal;
 window.updateExecutiveViewData = updateExecutiveViewData;
+
+function expandModule4Pages() {
+  isModule4Expanded = true;
+  renderModule4(null, currentModule4Filter);
+}
+window.expandModule4Pages = expandModule4Pages;
 
 
 

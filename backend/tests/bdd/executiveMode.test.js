@@ -707,4 +707,61 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     });
   });
 
+  it('Scenario S: Top scan metric bars contain #scan-pages-badge displaying "Pages Reviewed: X" on update', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const { JSDOM } = require('jsdom');
+
+    const htmlPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    const dom = new JSDOM(htmlContent, {
+      runScripts: 'dangerously',
+      resources: 'usable',
+      url: 'http://localhost/visualize.html'
+    });
+    const { window } = dom;
+    const { document } = window;
+
+    // Define standard globals needed by index.js
+    window.API_BASE = 'http://localhost:5000';
+    
+    // Evaluate index.js
+    try {
+      window.eval(jsContent);
+    } catch (err) {
+      // ignore
+    }
+
+    // Dispatch DOMContentLoaded
+    const domLoadedEvent = new window.Event('DOMContentLoaded', {
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(domLoadedEvent);
+
+    // Mock scan results with 8 pages
+    const mockResults = {
+      url: 'https://example.com',
+      pages: Array.from({ length: 8 }, (_, i) => ({
+        route: `/page-${i + 1}`,
+        wordCount: 300,
+        status: 200
+      }))
+    };
+
+    // Verify updateExecutiveViewData exists
+    expect(typeof window.updateExecutiveViewData).toBe('function');
+
+    // Run updateExecutiveViewData
+    window.updateExecutiveViewData(mockResults);
+
+    // Assert executive scan metric bar badge is present
+    const execPagesBadge = document.getElementById('scan-pages-badge');
+    expect(execPagesBadge).not.toBeNull();
+    expect(execPagesBadge.textContent).toBe('Pages Reviewed: 8');
+  });
+
 });

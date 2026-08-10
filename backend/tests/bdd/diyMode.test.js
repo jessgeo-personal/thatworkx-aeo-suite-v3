@@ -506,6 +506,100 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(cleanDet).toBe('Found 4/5 semantic HTML tags (<code>main</code>, <code>article</code>, <code>section</code>, <code>header</code>, <code>nav</code>)');
   });
 
+  it('Scenario N: Module 4 displays max 5 page rows initially when >5 pages exist, showing "Load rest of the pages" button, and expands on action', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const { JSDOM } = require('jsdom');
+
+    const htmlPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
+    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+
+    const dom = new JSDOM(htmlContent, {
+      runScripts: 'dangerously',
+      resources: 'usable',
+      url: 'http://localhost/visualize.html'
+    });
+    const { window } = dom;
+    const { document } = window;
+
+    // Define standard globals needed by index.js
+    window.API_BASE = 'http://localhost:5000';
+    const { evaluateAllCapabilities, CAPABILITY_MATRIX } = require('../../services/capabilityEvaluator');
+    window.evaluateAllCapabilities = evaluateAllCapabilities;
+    window.CAPABILITY_MATRIX = CAPABILITY_MATRIX;
+    
+    // Evaluate index.js inside the window context
+    try {
+      window.eval(jsContent);
+    } catch (err) {
+      // Ignore evaluation warnings
+    }
+
+    // Dispatch DOMContentLoaded
+    const domLoadedEvent = new window.Event('DOMContentLoaded', {
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(domLoadedEvent);
+
+    // Mock scan results with 8 pages
+    const mockResults = {
+      url: 'https://example.com',
+      pages: Array.from({ length: 8 }, (_, i) => ({
+        route: `/page-${i + 1}`,
+        wordCount: 300,
+        status: 200,
+        html: `<html><head><link rel="canonical" href="https://example.com/page-${i + 1}" /></head><body><main><h1>Page ${i + 1}</h1><header></header><footer></footer></main></body></html>`
+      }))
+    };
+
+    // Verify renderModule4 is available
+    expect(typeof window.renderModule4).toBe('function');
+    expect(typeof window.updateDeveloperViewData).toBe('function');
+
+    // Run renderModule4 and updateDeveloperViewData with 8 pages
+    window.updateDeveloperViewData(mockResults);
+    window.renderModule4(mockResults);
+
+    // a) Top scan metric bar contains #dev-scan-pages-badge displaying Pages Reviewed: 8
+    const devPagesBadge = document.getElementById('dev-scan-pages-badge');
+    expect(devPagesBadge).not.toBeNull();
+    expect(devPagesBadge.textContent).toBe('Pages Reviewed: 8');
+
+    // b) Module 4 contains a prominent #dev-module-4-pages-count element showing Total Pages Reviewed: 8
+    const module4PagesCount = document.getElementById('dev-module-4-pages-count');
+    expect(module4PagesCount).not.toBeNull();
+    expect(module4PagesCount.textContent).toBe('Total Pages Reviewed: 8');
+
+    // c) When Module 4 receives >5 scanned pages (e.g., 8 pages), #dev-module-4-tbody initially renders exactly 5 <tr> rows.
+    const tbody = document.getElementById('dev-module-4-tbody');
+    expect(tbody).not.toBeNull();
+    
+    const allRows = tbody.querySelectorAll('tr');
+    const mainRows = Array.from(allRows).filter(r => !r.id.startsWith('dev-module-4-row-'));
+    expect(mainRows.length).toBe(5);
+
+    // d) Button #btn-mod4-load-more is present in the DOM with exact text containing "Load rest of the pages (3 remaining)"
+    const loadMoreBtn = document.getElementById('btn-mod4-load-more');
+    expect(loadMoreBtn).not.toBeNull();
+    expect(loadMoreBtn.textContent).toContain('Load rest of the pages (3 remaining)');
+
+    // e) Clicking or executing expandModule4Pages() updates #dev-module-4-tbody to display all 8 rows.
+    expect(typeof window.expandModule4Pages).toBe('function');
+    window.expandModule4Pages();
+
+    // Re-select rows after expand
+    const allRowsExpanded = tbody.querySelectorAll('tr');
+    const mainRowsExpanded = Array.from(allRowsExpanded).filter(r => !r.id.startsWith('dev-module-4-row-'));
+    expect(mainRowsExpanded.length).toBe(8);
+
+    // Button should now be hidden or omitted
+    const loadMoreBtnAfter = document.getElementById('btn-mod4-load-more');
+    expect(loadMoreBtnAfter).toBeNull();
+  });
+
 });
 
 
