@@ -678,4 +678,33 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(jsContent).toContain('getStatusIndicator(');
   });
 
+  it('Scenario R: Executive Mode Pillars 1-4 title size is 1.05rem and accordions have open attribute and indentation styling', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const cheerio = require('cheerio');
+
+    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const visHtml = fs.readFileSync(visPath, 'utf8');
+    const $ = cheerio.load(visHtml);
+
+    const targetSections = [1, 2, 3, 4];
+    targetSections.forEach(sec => {
+      const title = $(`#pillar-sec${sec}-title`);
+      expect(title.length).toBe(1);
+      const titleStyle = title.attr('style') || '';
+      expect(titleStyle).toContain('font-size: 1.05rem');
+      expect(titleStyle).toContain('font-weight: 800');
+
+      const accordion = $(`#pillar-sec${sec}-accordion`);
+      expect(accordion.length).toBe(1);
+      expect(accordion.attr('open')).toBeDefined();
+      
+      const accordionStyle = accordion.attr('style') || '';
+      expect(accordionStyle).toContain('margin-top: 0.85rem');
+      expect(accordionStyle).toContain('margin-left: 0.75rem');
+      expect(accordionStyle).toContain('padding-left: 0.5rem');
+      expect(accordionStyle).toContain('border-left: 2px solid rgba(255,255,255,0.08)');
+    });
+  });
+
 });
