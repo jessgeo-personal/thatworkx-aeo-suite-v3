@@ -81,10 +81,10 @@
 
     <!-- Sub-Tool Navigation Tabs (Track 1) -->
     <div id="optimize-track1-subtabs" class="optimize-tabs mb-6" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      <button type="button" class="control-menu-item active" id="menu-robots" onclick="switchOptimizeTool('robots')">Robots.txt Editor</button>
+      <button type="button" class="control-menu-item" id="menu-robots" onclick="switchOptimizeTool('robots')">Robots.txt Editor</button>
       <button type="button" class="control-menu-item" id="menu-cloudflare" onclick="switchOptimizeTool('cloudflare')">Cloudflare Edge Worker</button>
       <button type="button" class="control-menu-item" id="menu-shopify" onclick="switchOptimizeTool('shopify')">Shopify Liquid Hook</button>
-      <button type="button" class="control-menu-item" id="menu-jsonld" onclick="switchOptimizeTool('jsonld')">JSON-LD Entity Schema</button>
+      <button type="button" class="control-menu-item active" id="menu-jsonld" onclick="switchOptimizeTool('jsonld')">JSON-LD Entity Schema</button>
       <button type="button" class="control-menu-item" id="menu-htaccess" onclick="switchOptimizeTool('htaccess')">Apache .htaccess</button>
     </div>
 
@@ -102,7 +102,7 @@
     <div class="workspace-card glassmorphic" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color);">
       
       <!-- Dynamic Tool View Panels -->
-      <div id="opt-tool-robots" class="optimize-tool-view active">
+      <div id="opt-tool-robots" class="optimize-tool-view" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h4 style="color: var(--text-primary); font-size: 1rem;">Robots.txt Protocol Gate Fixer</h4>
           <button type="button" class="drawer-btn" onclick="copyCodeFromPre('robots-output')">📋 Copy Robots.txt</button>
@@ -142,12 +142,9 @@ Sitemap: https://thatworkx.com/sitemap.xml</code></pre>
         <pre><code id="shopify-output" class="language-html"><!-- Shopify theme.liquid AI Meta Injection --></code></pre>
       </div>
 
-      <div id="opt-tool-jsonld" class="optimize-tool-view" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h4 style="color: #fff; font-size: 1rem;">Organization &amp; Entity JSON-LD Schema</h4>
-          <button type="button" class="drawer-btn" onclick="copyCodeFromPre('jsonld-output')">📋 Copy Schema</button>
-        </div>
-        <pre><code id="jsonld-output" class="language-json">/* Organization JSON-LD Schema */</code></pre>
+      <div id="opt-tool-jsonld" class="optimize-tool-view" style="display: block;">
+        <!-- Module 2: Page-Level HTML Schema Builder (JSON-LD) -->
+        <div id="dev-schema-builder-wrapper"></div>
       </div>
 
       <div id="opt-tool-htaccess" class="optimize-tool-view" style="display: none;">

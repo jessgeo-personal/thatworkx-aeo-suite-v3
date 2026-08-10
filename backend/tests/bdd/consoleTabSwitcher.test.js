@@ -5,20 +5,25 @@ const cheerio = require('cheerio');
 describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
   let htmlContent;
   let visualizeHtmlContent;
+  let optimizeHtmlContent;
   let heroSectionContent;
   let $;
   let $vis;
+  let $opt;
 
   beforeAll(() => {
     const indexPath = path.resolve(__dirname, '../../../frontend/index.html');
     const visPath   = path.resolve(__dirname, '../../../frontend/visualize.html');
+    const optPath   = path.resolve(__dirname, '../../../frontend/optimize.html');
     const heroPath  = path.resolve(__dirname, '../../../frontend/src/components/HeroSection.jsx');
 
     htmlContent          = fs.readFileSync(indexPath, 'utf8');
     visualizeHtmlContent = fs.readFileSync(visPath, 'utf8');
+    optimizeHtmlContent  = fs.readFileSync(optPath, 'utf8');
     heroSectionContent   = fs.readFileSync(heroPath, 'utf8');
     $                    = cheerio.load(htmlContent);
     $vis                 = cheerio.load(visualizeHtmlContent);
+    $opt                 = cheerio.load(optimizeHtmlContent);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -105,20 +110,20 @@ describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  describe('Scenario 9.5: AIVisualize Dual View Mode Switcher Pill (Milestone 1)', () => {
-    it('should render Executive Mode and Developer/DIY Mode switcher buttons on visualize.html', () => {
-      const execBtn = $vis('#pill-exec-mode');
-      const devBtn  = $vis('#pill-dev-mode');
+  describe('Scenario 9.5: AIOptimize Track Switcher Pill (Milestone 1)', () => {
+    it('should render Track 1 and Track 2 switcher buttons on optimize.html', () => {
+      const track1Btn = $opt('#btn-track1');
+      const track2Btn = $opt('#btn-track2');
 
-      expect(execBtn.length).toBe(1);
-      expect(devBtn.length).toBe(1);
-      expect(execBtn.text()).toContain('Executive Mode');
-      expect(devBtn.text()).toContain('Developer / DIY Mode');
+      expect(track1Btn.length).toBe(1);
+      expect(track2Btn.length).toBe(1);
+      expect(track1Btn.text()).toContain('Track 1: AI-Optimized Page Fixes');
+      expect(track2Btn.text()).toContain('Track 2: AI-Ready File Generators');
     });
 
-    it('should set Executive Mode as the default active state', () => {
-      const execBtn = $vis('#pill-exec-mode');
-      expect(execBtn.hasClass('active')).toBe(true);
+    it('should set Track 1 as the default active state', () => {
+      const track1Btn = $opt('#btn-track1');
+      expect(track1Btn.hasClass('active')).toBe(true);
     });
   });
 
@@ -149,10 +154,12 @@ describe('Landing Page Console Tab Switcher (BDD Feature 9)', () => {
     });
   });
 
-  describe('Scenario 9.7: AIVisualize Developer / DIY Mode UI (Milestone 4)', () => {
-    it('should render Developer mode containers on visualize.html', () => {
-      const devContainer = $vis('#dev-mode-container');
-      expect(devContainer.length).toBe(1);
+  describe('Scenario 9.7: AIOptimize Developer / DIY Mode UI (Milestone 4)', () => {
+    it('should render Developer mode containers on optimize.html', () => {
+      const devSchemaWrapper = $opt('#dev-schema-builder-wrapper');
+      const devEdgeWrapper = $opt('#dev-edge-wrapper');
+      expect(devSchemaWrapper.length).toBe(1);
+      expect(devEdgeWrapper.length).toBe(1);
     });
   });
 });

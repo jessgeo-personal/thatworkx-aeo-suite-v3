@@ -10,11 +10,11 @@ if (typeof window !== 'undefined') {
 // Current Client State
 let activeProduct = 'visualize';
 let activeOptimizeTool = 'robots';
-let activeVisualizeViewMode = 'executive'; // Default active state: Executive Mode
 let currentEmail = 'user@thatworkx.com'; // Default user session email
 let activeScanController = null;
 let latestScanResults = null;
 let activeDiyManifestKey = 'robots';
+let activeVisualizeViewMode = 'executive';
 
 // Base API URL Resolver (routes cleanly to port 5000 when accessing via file:// or non-5000 ports)
 // Section Help Data Map (Global & Window scoped to prevent TDZ errors)
@@ -59,20 +59,19 @@ if (typeof window !== 'undefined') {
   window.sectionHelpData = sectionHelpData;
 }
 
-// AIVisualize Dual-View Switcher Handler (Executive vs Developer / DIY Mode)
+
+
 function setVisualizeViewMode(mode) {
   activeVisualizeViewMode = mode;
-  
   const execContainer = document.getElementById('exec-mode-container');
   const devContainer = document.getElementById('dev-mode-container');
-  const pillExec = document.getElementById('pill-exec-mode') || document.getElementById('btn-mode-executive');
-  const pillDev = document.getElementById('pill-dev-mode') || document.getElementById('btn-mode-developer');
-
+  const pillExec = document.getElementById('pill-exec-mode');
+  const pillDev = document.getElementById('pill-dev-mode');
   const welcomeBanner = document.getElementById('exec-welcome-banner');
   const executiveViewContainer = document.getElementById('executive-view-container');
 
   if (mode === 'developer' || mode === 'diy') {
-    if (execContainer) execContainer.style.display = 'block'; // Keep wrapper block for the shared Control Header Card
+    if (execContainer) execContainer.style.display = 'block';
     if (welcomeBanner) welcomeBanner.style.display = 'none';
     if (executiveViewContainer) executiveViewContainer.style.display = 'none';
     if (devContainer) devContainer.style.display = 'block';
@@ -87,24 +86,13 @@ function setVisualizeViewMode(mode) {
     if (pillDev) pillDev.classList.remove('active');
   }
 
-  // Toggle visibility of executive-only badges in top row
-  const execBadges = document.querySelectorAll('.exec-only-badge');
-  execBadges.forEach(badge => {
-    badge.style.setProperty('display', (mode === 'developer' || mode === 'diy') ? 'none' : 'inline-flex', 'important');
-  });
-
-  const panel = document.getElementById('panel-visualize');
-  if (panel) {
-    panel.setAttribute('data-visualize-mode', mode);
-  }
-
-  // Update URL parameters without reloading
   if (typeof window !== 'undefined' && window.history) {
     const params = new URLSearchParams(window.location.search || '');
     params.set('mode', mode);
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
   }
 }
+window.setVisualizeViewMode = setVisualizeViewMode;
 
 // Executive Mode Action: Export PDF Summary
 function exportExecutiveSummaryPdf() {
@@ -590,24 +578,21 @@ document.addEventListener('DOMContentLoaded', () => {
   if (currentPath.includes('visualize')) {
     try {
       const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
-      const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
-      const devDrawersWrap = document.getElementById('dev-drawers-wrapper');
       const devModule4Wrap = document.getElementById('dev-module-4-wrapper');
 
       if (devMatrixWrap) devMatrixWrap.innerHTML = buildDevMatrixHtml();
-      if (devSchemaBuilderWrap) devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
-      if (devDrawersWrap) devDrawersWrap.innerHTML = buildDevDrawersHtml(targetUrlParam || '');
       if (devModule4Wrap) {
         devModule4Wrap.innerHTML = buildDevModule4Html();
         renderModule4(latestScanResults || window.lastScanResults || {});
       }
 
-      const tabParam = params.get('tab');
       if (modeParam === 'developer' || modeParam === 'diy') {
         setVisualizeViewMode('developer');
       } else {
         setVisualizeViewMode('executive');
       }
+
+      const tabParam = params.get('tab');
 
       if (tabParam) {
         if (tabParam === 'gateway' || tabParam === '1') filterMatrixSection(1);
@@ -719,6 +704,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     switchOptimizeTrack(1);
 
+    const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
+    if (devSchemaBuilderWrap) {
+      devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
+    }
+
     const devEdgeWrap = document.getElementById('dev-edge-wrapper');
     if (devEdgeWrap) {
       devEdgeWrap.innerHTML = buildDevEdgeHtml();
@@ -728,6 +718,28 @@ document.addEventListener('DOMContentLoaded', () => {
         currentScannedDomain = domainInput.value.trim().replace(/^https?:\/\//i, '').split('/')[0];
       }
       selectEdgeTab('cloudflare');
+    }
+
+    const domainInput = document.getElementById('optimize-target-domain');
+    if (domainInput) {
+      domainInput.addEventListener('input', () => {
+        if (typeof updateOptimizeTargetDomain === 'function') {
+          updateOptimizeTargetDomain();
+        } else if (typeof updateSchemaBuilderCode === 'function') {
+          updateSchemaBuilderCode();
+        }
+      });
+      domainInput.addEventListener('change', () => {
+        if (typeof updateOptimizeTargetDomain === 'function') {
+          updateOptimizeTargetDomain();
+        } else if (typeof updateSchemaBuilderCode === 'function') {
+          updateSchemaBuilderCode();
+        }
+      });
+    }
+
+    if (devSchemaBuilderWrap) {
+      updateSchemaBuilderCode();
     }
   }
 
@@ -1452,13 +1464,21 @@ function updateSchemaBuilderCode() {
   const results = latestScanResults || window.lastScanResults || {};
   const json = generateSchemaBuilderJson(domain, results);
   const code = `<script type="application/ld+json">\n${JSON.stringify(json, null, 2)}\n</script>`;
-  codeBlock.innerText = code;
+  codeBlock.textContent = code;
 }
 
 window.toggleSchemaEntity = toggleSchemaEntity;
 window.copySchemaScript = copySchemaScript;
 window.downloadSchemaJson = downloadSchemaJson;
 window.updateSchemaBuilderCode = updateSchemaBuilderCode;
+
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'currentScannedDomain', {
+    get() { return currentScannedDomain; },
+    set(val) { currentScannedDomain = val; },
+    configurable: true
+  });
+}
 
 function updateDeveloperViewData(results) {
   if (!results) return;
@@ -2406,7 +2426,6 @@ function cancelActiveAudit() {
   }
 }
 
-window.setVisualizeViewMode = setVisualizeViewMode;
 window.executeDashboardScan = executeDashboardScan;
 window.showAuditOverlay = showAuditOverlay;
 window.hideAuditOverlay = hideAuditOverlay;
@@ -3989,6 +4008,10 @@ function updateOptimizeTargetDomain() {
   if (!domain) return;
   
   currentScannedDomain = domain;
+  
+  if (typeof updateSchemaBuilderCode === 'function') {
+    updateSchemaBuilderCode();
+  }
   
   // Refresh the currently selected tool if it's Track 2
   if (typeof activeOptimizeTool !== 'undefined' && ['llmstxt', 'aicontext', 'about', 'docs', 'content', 'sitemap'].includes(activeOptimizeTool)) {

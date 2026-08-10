@@ -101,62 +101,46 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(sampleLinkHtml).toContain('View ↗');
   });
 
-  it('Scenario E: DIY Mode Hero banner in visualize.html renders headline, audience badge, scan metrics, and 4-section summary cards', () => {
+  it('Scenario E: AIOptimize Workspace in optimize.html renders headline, console buttons, and track tools', () => {
     const fs = require('fs');
     const path = require('path');
     const cheerio = require('cheerio');
 
-    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
-    const visHtml = fs.readFileSync(visPath, 'utf8');
-    const $ = cheerio.load(visHtml);
+    const optPath = path.resolve(__dirname, '../../../frontend/optimize.html');
+    const optHtml = fs.readFileSync(optPath, 'utf8');
+    const $ = cheerio.load(optHtml);
 
-    // 1. DIY Hero Banner presence
-    const devBanner = $('#dev-hero-banner');
-    expect(devBanner.length).toBe(1);
+    // 1. Optimize Header Card presence
+    const headerCard = $('.optimize-header-card');
+    expect(headerCard.length).toBe(1);
 
-    const bannerText = devBanner.text();
-    const summaryGridText = $('#dev-summary-grid').text();
-    const combinedText = bannerText + ' ' + summaryGridText;
+    const headerText = headerCard.text();
+    expect(headerText).toContain('Remediation Sandbox');
+    expect(headerText).toContain('Prescriptive Code Generators');
 
-    // 2. Audience Badge & Headline
-    expect(bannerText).toContain('DIY Mode — Aimed at the technically inclined business user / DIY user');
-    expect(bannerText).toContain('How to Improve Your');
-    expect(bannerText).toContain('AI-Visibility');
+    // 2. Track Selector Tabs
+    const track1Btn = $('#btn-track1');
+    const track2Btn = $('#btn-track2');
+    expect(track1Btn.length).toBe(1);
+    expect(track2Btn.length).toBe(1);
+    expect(track1Btn.text()).toContain('Track 1: AI-Optimized Page Fixes');
+    expect(track2Btn.text()).toContain('Track 2: AI-Ready File Generators');
 
-    // 3. Scan Metrics Bar Badges
-    const devDurationBadge = $('#dev-scan-duration-badge');
-    expect(devDurationBadge.length).toBe(1);
-    expect(devDurationBadge.text()).toContain('Time to Scan:');
+    // 3. Sub-Tool Navigation Tabs
+    const robotsTab = $('#menu-robots');
+    const jsonldTab = $('#menu-jsonld');
+    expect(robotsTab.length).toBe(1);
+    expect(jsonldTab.length).toBe(1);
 
-    const devTimestampBadge = $('#dev-scan-timestamp-badge');
-    expect(devTimestampBadge.length).toBe(1);
-    expect(devTimestampBadge.text()).toContain('Last Scanned:');
-
-    // 4. 4-Section Summary Grid Cards
-    expect(combinedText).toContain('Gateway & Access');
-    expect(combinedText).toContain('Presence & Hygiene');
-    expect(combinedText).toContain('Content AI-Optimization');
-    expect(combinedText).toContain('Machine Manifest Readiness');
-
-    // 5. Governance vocabulary rules
+    // 4. Governance vocabulary rules
+    const combinedText = optHtml;
     expect(combinedText).toContain('AI-Optimized');
     expect(combinedText).toContain('AI-Ready');
     expect(/AI-first/i.test(combinedText)).toBe(false);
 
-    // 6. Provider Workaround Callout Banner & Upgrade Modal
-    const providerCallout = $('#dev-provider-callout');
-    expect(providerCallout.length).toBe(1);
-    expect(providerCallout.text()).toContain("Can't manage your own AI-ready files because your provider manages it for you?");
-    
-    const calloutLink = providerCallout.find('a');
-    expect(calloutLink.length).toBe(1);
-    expect(calloutLink.text()).toContain('Upgrade to AIOptimize Pro');
-    expect(calloutLink.attr('onclick')).toContain("showUpgradeModal('AIO_PRO_REQUIRED', 'Enable provider workarounds to manage your AI-Ready files yourself', 'AIOptimize Pro')");
-
-    const alertModal = $('#alert-modal');
-    expect(alertModal.length).toBe(1);
-    expect(alertModal.find('#modal-title').length).toBe(1);
-    expect(alertModal.find('#modal-message').length).toBe(1);
+    // 5. Auth Modal exists on page
+    const authModal = $('#auth-modal');
+    expect(authModal.length).toBe(1);
   });
 
   it('Scenario F: Verify index.js appends the conditionally-styled always-visible accordion for X-Robots-Tag capability', () => {
@@ -182,39 +166,39 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
     expect(bannedRegex.test(jsContent)).toBe(false);
   });
 
-  it('Scenario G: Verify side-by-side Resolving AI-ready File Issues component is structured correctly in visualize.html and index.js', () => {
+  it('Scenario G: Verify side-by-side Resolving AI-ready File Issues component is structured correctly in optimize.html and index.js', () => {
     const fs = require('fs');
     const path = require('path');
     const cheerio = require('cheerio');
 
-    // 1. Verify visualize.html structure
-    const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
-    const visHtml = fs.readFileSync(visPath, 'utf8');
-    const $ = cheerio.load(visHtml);
+    // 1. Verify optimize.html structure
+    const optPath = path.resolve(__dirname, '../../../frontend/optimize.html');
+    const optHtml = fs.readFileSync(optPath, 'utf8');
+    const $ = cheerio.load(optHtml);
 
-    const sectionTitle = $('#dev-drawers-section h4 span').first().text().trim();
-    expect(sectionTitle).toBe('🛠️ Module 3: AI Machine-readable File Configurator');
+    // Track buttons existence
+    expect($('#btn-track1').length).toBe(1);
+    expect($('#btn-track2').length).toBe(1);
 
-    const leftPane = $('#left-pane-content');
-    const rightPane = $('#right-pane-content');
-    expect(leftPane.length).toBe(1);
-    expect(rightPane.length).toBe(1);
+    // Sub-tools tab controls existence
+    expect($('#menu-robots').length).toBe(1);
+    expect($('#menu-llmstxt').length).toBe(1);
+
+    // Dynamic slots
+    expect($('#dev-schema-builder-wrapper').length).toBe(1);
+    expect($('#dev-edge-wrapper').length).toBe(1);
 
     // 2. Verify index.js script logic
     const jsPath = path.resolve(__dirname, '../../../frontend/index.js');
     const jsContent = fs.readFileSync(jsPath, 'utf8');
 
-    expect(jsContent).toContain('switchDiyManifestTab');
-    expect(jsContent).toContain('latestScanResults');
-    expect(jsContent).toContain('copyLeftPaneCode');
-    expect(jsContent).toContain('copyRightPaneCode');
-    expect(jsContent).toContain('downloadRightPaneFile');
-    expect(jsContent).toContain('JSON-LD Schema');
-    expect(jsContent).toContain('robots.txt');
-    expect(jsContent).toContain('llms.txt');
+    expect(jsContent).toContain('buildDevSchemaBuilderHtml');
+    expect(jsContent).toContain('buildDevEdgeHtml');
+    expect(jsContent).toContain('switchOptimizeTrack');
+    expect(jsContent).toContain('switchOptimizeTool');
 
     // 3. Ensure no banned vocabulary is present
-    const combined = visHtml + ' ' + jsContent;
+    const combined = optHtml + ' ' + jsContent;
     expect(/AI-first/i.test(combined)).toBe(false);
   });
 
@@ -575,9 +559,9 @@ describe('DIY (Developer) Mode Engine & Upgrade Hook Integration (BDD Phase 3)',
       window.updateExecutiveViewData(scanResult);
 
       // Verify metric badges show 36 pages
-      const devPagesBadge = document.getElementById('dev-scan-pages-badge');
-      expect(devPagesBadge).not.toBeNull();
-      expect(devPagesBadge.textContent).toBe('Pages Reviewed: 36');
+      const execPagesBadge = document.getElementById('scan-pages-badge');
+      expect(execPagesBadge).not.toBeNull();
+      expect(execPagesBadge.textContent).toBe('Pages Reviewed: 36');
 
       const module4PagesCount = document.getElementById('dev-module-4-pages-count');
       expect(module4PagesCount).not.toBeNull();
