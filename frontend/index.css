@@ -5088,6 +5088,17 @@ body {
   padding: 0.4rem 0.8rem;
   border-radius: 9999px;
   transition: all 0.2s ease;
+  position: relative;
+}
+
+.dock-link:not(:last-child)::after {
+  content: "|";
+  position: absolute;
+  right: -0.45rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
 }
 
 .dock-link:hover {

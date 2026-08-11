@@ -59,7 +59,6 @@ describe('Phase 2 - UI & Content Refactoring on AIVisualize BDD Test Suite', () 
     expect(dock).not.toBeNull();
 
     const text = dock.textContent;
-    expect(text).toContain('Brand AI Score');
     expect(text).toContain('1. AI Access');
     expect(text).toContain('2. Page Content');
     expect(text).toContain('3. Brand Trust');

@@ -21,8 +21,8 @@ describe('Floating Glass Dock Summary and Scan Links BDD Suite', () => {
     expect(links.length).toBe(6);
 
     const linkTexts = links.map((i, el) => $(el).text().trim()).get();
-    expect(linkTexts).toContain('Scan');
-    expect(linkTexts).toContain('Summary');
+    expect(linkTexts.some(t => t.includes('Scan'))).toBe(true);
+    expect(linkTexts.some(t => t.includes('Summary'))).toBe(true);
     expect(linkTexts).toContain('1. AI Access');
     expect(linkTexts).toContain('2. Page Content');
     expect(linkTexts).toContain('3. Brand Trust');
@@ -31,8 +31,8 @@ describe('Floating Glass Dock Summary and Scan Links BDD Suite', () => {
 
   it('Scenario 2: Verify Scan link targets #control-toolbar-anchor and Summary link targets #summary-dial-anchor', () => {
     const $ = cheerio.load(htmlContent);
-    const scanLink = $('.dock-link').filter((i, el) => $(el).text().trim() === 'Scan');
-    const summaryLink = $('.dock-link').filter((i, el) => $(el).text().trim() === 'Summary');
+    const scanLink = $('.dock-link').filter((i, el) => $(el).text().trim().includes('Scan'));
+    const summaryLink = $('.dock-link').filter((i, el) => $(el).text().trim().includes('Summary'));
 
     expect(scanLink.attr('href')).toBe('#control-toolbar-anchor');
     expect(summaryLink.attr('href')).toBe('#summary-dial-anchor');

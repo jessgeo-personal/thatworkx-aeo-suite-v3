@@ -2598,9 +2598,6 @@ function updateExecutiveViewData(results) {
   const scoreValEl = document.getElementById('exec-overall-score') || document.getElementById('exec-score-val');
   if (scoreValEl) scoreValEl.innerText = score;
 
-  const dockScoreValEl = document.getElementById('dock-score-value');
-  if (dockScoreValEl) dockScoreValEl.innerText = score;
-
   const dialArc = document.getElementById('score-dial-arc') || document.querySelector('.score-dial-progress');
   if (dialArc) {
     const dashOffset = 264 - (264 * score) / 100;
