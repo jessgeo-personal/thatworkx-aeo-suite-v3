@@ -210,10 +210,10 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(card.length).toBe(1);
     
     const cardTitle = $('#exec-section2-card h4');
-    expect(cardTitle.text()).toContain('2. What can AI see on your website');
+    expect(cardTitle.text()).toContain('Section 2 (AI-Optimized): Can AI cite you in their answers?');
     
     const subheading = $('#exec-section2-card p');
-    expect(subheading.text()).toContain('take a look and see if the brand message that AI sees matches');
+    expect(subheading.text()).toContain('Audits DOM cleanliness, content density, and essential business page visibility.');
 
     // 2. Scraped Webpage Code Box (Removed)
     const sectionHtml = $('#exec-section2-card').html();
@@ -303,7 +303,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
 
     // Verify Section 1 Header and protocol elements exist
     const header = sec1Card.find('h4');
-    expect(header.text()).toContain('1. Can AI see your website?');
+    expect(header.text()).toContain('Section 1 (AI-Optimized): Can AI see your website?');
 
     const xRobotsRow = sec1Card.find('span:contains("Is your server blocking AI?")');
     expect(xRobotsRow.length).toBeGreaterThan(0);
@@ -370,11 +370,11 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(card.length).toBe(1);
 
     const cardTitle = $('#exec-section3-card h4');
-    expect(cardTitle.text()).toContain('3. Does AI trust your web presence (?)');
+    expect(cardTitle.text()).toContain('Section 3 (AI-Optimized): Can AI trust who you are?');
     expect(cardTitle.attr('onclick')).toContain("openHelpTooltip('sec3_overview')");
 
     const subheading = $('#exec-section3-card p');
-    expect(subheading.text()).toContain('Learn how Generative AI engines value EEAT');
+    expect(subheading.text()).toContain('Verifies brand entity schema, authoritativeness, and sameAs citation signals.');
 
     // 2. Badges and signal rows checks
     expect($('#sec3-secure-status').length).toBe(1);

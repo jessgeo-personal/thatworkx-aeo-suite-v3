@@ -4625,6 +4625,21 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.border-glow-cyan {
+  border-color: #0ea5e9 !important;
+  box-shadow: 0 0 25px rgba(14, 165, 233, 0.25) !important;
+}
+
+.border-glow-emerald {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25) !important;
+}
+
+.border-glow-amber {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.3) !important;
+}
+
 .border-glow-burnt {
   border-color: var(--burnt-copper) !important;
   box-shadow: 0 0 30px var(--burnt-copper-glow) !important;
