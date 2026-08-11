@@ -46,25 +46,19 @@ describe('Section 3 Polish BDD Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: Section 3 container exists nested within the split container directly following page-level-inspector-container', () => {
+  it('Scenario 1: Section 3 container exists directly following page-level-inspector-container', () => {
     const inspectorContainer = document.getElementById('page-level-inspector-container');
     expect(inspectorContainer).not.toBeNull();
 
-    const section3Container = document.getElementById('exec-section-3');
+    const section3Container = document.getElementById('section-3-card');
     expect(section3Container).not.toBeNull();
 
-    const splitContainer = document.querySelector('.exec-row-split');
-    expect(splitContainer).not.toBeNull();
-
-    // Verify Section 3 resides inside the split container
-    expect(splitContainer.contains(section3Container)).toBe(true);
-
-    // Verify the split container is a sibling directly following page-level inspector
-    expect(inspectorContainer.nextElementSibling).toBe(splitContainer);
+    // Verify Section 3 resides directly after page-level inspector
+    expect(inspectorContainer.nextElementSibling).toBe(section3Container);
   });
 
   it('Scenario 2: Section 3 contains the required E-E-A-T trust diagnostic badges', () => {
-    const section3 = document.getElementById('exec-section-3');
+    const section3 = document.getElementById('section-3-card');
     expect(section3).not.toBeNull();
 
     // Assert presence of Contact details badge

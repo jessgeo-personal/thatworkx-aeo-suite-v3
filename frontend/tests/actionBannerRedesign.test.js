@@ -47,8 +47,8 @@ describe('Action Banner Redesign BDD Suite', () => {
   });
 
   it('Scenario 1: Section 3 and Section 4 contain zero internal upsell cards', () => {
-    const section3 = document.getElementById('exec-section-3');
-    const section4 = document.getElementById('exec-section-4');
+    const section3 = document.getElementById('section-3-card');
+    const section4 = document.getElementById('section-4-card');
 
     expect(section3).not.toBeNull();
     expect(section4).not.toBeNull();
@@ -63,18 +63,18 @@ describe('Action Banner Redesign BDD Suite', () => {
     expect(section4.querySelector('#aioptimize-action-banner')).toBeNull();
   });
 
-  it('Scenario 2: Full-width action banner exists directly after .exec-row-split', () => {
+  it('Scenario 2: Full-width action banner exists directly after #section-4-card', () => {
     const execContainer = document.getElementById('executive-view-container');
     expect(execContainer).not.toBeNull();
 
-    const rowSplit = execContainer.querySelector('.exec-row-split');
-    expect(rowSplit).not.toBeNull();
+    const sec4 = document.getElementById('section-4-card');
+    expect(sec4).not.toBeNull();
 
     const actionBanner = document.getElementById('aioptimize-action-banner');
     expect(actionBanner).not.toBeNull();
 
-    // Verify action banner is positioned immediately after the row split
-    expect(rowSplit.nextElementSibling).toBe(actionBanner);
+    // Verify action banner is positioned immediately after Section 4
+    expect(sec4.nextElementSibling).toBe(actionBanner);
   });
 
   it('Scenario 3: Action banner contains urgency pill, both comparison cards, and CTA button', () => {

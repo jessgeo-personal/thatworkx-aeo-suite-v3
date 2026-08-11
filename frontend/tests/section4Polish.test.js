@@ -47,10 +47,10 @@ describe('Section 4 Polish BDD Suite', () => {
   });
 
   it('Scenario 1: Section 4 container exists directly following Section 3', () => {
-    const section3 = document.getElementById('exec-section-3');
+    const section3 = document.getElementById('section-3-card');
     expect(section3).not.toBeNull();
 
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     expect(section4).not.toBeNull();
 
     // Verify Section 4 is a sibling directly following Section 3
@@ -58,7 +58,7 @@ describe('Section 4 Polish BDD Suite', () => {
   });
 
   it('Scenario 2: Section 4 contains the required machine manifest diagnostic indicators', () => {
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     expect(section4).not.toBeNull();
 
     // Assert presence of robots.txt indicator element
@@ -79,7 +79,7 @@ describe('Section 4 Polish BDD Suite', () => {
   });
 
   it('Scenario 3: Metric rows align diagnostic badges cleanly to the right', () => {
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     expect(section4).not.toBeNull();
 
     const robotsEl = section4.querySelector('#exec-status-robots');

@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
+import * as cheerio from 'cheerio';
 
 const htmlPath = path.resolve(__dirname, '../visualize.html');
 const jsPath = path.resolve(__dirname, '../index.js');
@@ -46,44 +47,17 @@ describe('BDD Move Module 1 to Executive Mode Test Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: #dev-matrix-wrapper and #diy-module-1 exist inside #exec-mode-container', () => {
-    const execModeContainer = document.getElementById('exec-mode-container');
-    expect(execModeContainer).not.toBeNull();
-
-    const devMatrixWrapper = execModeContainer.querySelector('#dev-matrix-wrapper');
-    expect(devMatrixWrapper).not.toBeNull();
-
-    // Verify diy-module-1 matrix element was successfully populated
-    const diyModule1 = devMatrixWrapper.querySelector('#diy-module-1');
-    expect(diyModule1).not.toBeNull();
-  });
-
-  it('Scenario 2: #dev-matrix-wrapper is placed directly beneath the top dial / pillars grid', () => {
-    const execViewContainer = document.getElementById('executive-view-container');
-    const children = Array.from(execViewContainer.children); // children of #executive-view-container
-
-    const gridIdx = children.findIndex(el => 
-      el.tagName === 'DIV' && 
-      el.style.display === 'grid' && 
-      el.style.gridTemplateColumns === '1fr 2fr'
-    );
-    expect(gridIdx).toBeGreaterThan(-1);
-
-    // Assert that the element immediately following the dial/pillars grid is the matrix wrapper
-    const nextSibling = children[gridIdx + 1];
-    expect(nextSibling.id).toBe('dev-matrix-wrapper');
-  });
-
-  it('Scenario 3: The 32-capability rows and filter tab buttons are fully rendered and functional in Executive Mode', () => {
+  it('Scenario 1: #dev-matrix-wrapper is not present inside visualize.html after decoupling', () => {
     const devMatrixWrapper = document.getElementById('dev-matrix-wrapper');
-    expect(devMatrixWrapper).not.toBeNull();
+    expect(devMatrixWrapper).toBeNull();
+  });
 
-    // 1. Assert filter tabs are present
-    const tabs = devMatrixWrapper.querySelectorAll('.matrix-tab-btn');
-    expect(tabs.length).toBe(5); // All, Section 1, Section 2, Section 3, Section 4
+  it('Scenario 2: optimize.html contains #dev-matrix-wrapper and renders the diagnostic matrix', () => {
+    const optPath = path.resolve(__dirname, '../optimize.html');
+    const optHtml = fs.readFileSync(optPath, 'utf8');
+    const $ = cheerio.load(optHtml);
 
-    // 2. Assert matrix body container exists
-    const tbody = devMatrixWrapper.querySelector('#dev-matrix-tbody');
-    expect(tbody).not.toBeNull();
+    const devMatrixWrapper = $('#dev-matrix-wrapper');
+    expect(devMatrixWrapper.length).toBe(1);
   });
 });

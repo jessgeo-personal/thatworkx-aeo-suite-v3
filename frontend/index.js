@@ -101,8 +101,27 @@ function exportExecutiveSummaryPdf() {
 
 // Export Engine: Raw JSON Diagnostics Download
 function exportRawJsonDiagnostics() {
-  const payload = window.lastScanResults || currentEvaluatedCapabilities || {};
-  const domain = currentScannedDomain || 'site';
+  const lastScan = window.lastScanResults || {};
+  const capabilities = window.currentEvaluatedCapabilities || [];
+  
+  // Developer-facing technical keys for handoff
+  const hasFAQSchema = lastScan.status?.jsonLdExists || lastScan.sec3?.hasFaqSchema || false;
+  const xRobotsTag = lastScan.status?.xRobotsIndexable || false;
+  const canonicalMatch = lastScan.status?.hasCanonical || false;
+
+  const payload = {
+    ...lastScan,
+    diagnosticSummary: {
+      domain: window.currentScannedDomain || 'site',
+      timestamp: new Date().toISOString(),
+      hasFAQSchema,
+      xRobotsTag,
+      canonicalMatch,
+      capabilities
+    }
+  };
+
+  const domain = window.currentScannedDomain || 'site';
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `aeo-diagnostics-${domain}-${timestamp}.json`;
 
@@ -610,6 +629,42 @@ document.addEventListener('DOMContentLoaded', () => {
         // Default initial scan load for demo
         executeDashboardScan(null);
       }
+
+      // Set up IntersectionObserver for Alternative B Floating Glass Dock active link toggling
+      const dockLinks = document.querySelectorAll('.dock-link');
+      const cards = [
+        document.getElementById('section-1-card'),
+        document.getElementById('section-2-card'),
+        document.getElementById('section-3-card'),
+        document.getElementById('section-4-card')
+      ].filter(Boolean);
+
+      if (cards.length > 0 && typeof IntersectionObserver !== 'undefined') {
+        const observerOptions = {
+          root: null,
+          rootMargin: '-20% 0px -60% 0px',
+          threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const cardId = entry.target.id;
+              const sectionNum = cardId.replace('section-', '').replace('-card', '');
+              
+              dockLinks.forEach((link) => {
+                if (link.getAttribute('data-section') === sectionNum || link.getAttribute('href') === `#${cardId}`) {
+                  link.classList.add('active');
+                } else {
+                  link.classList.remove('active');
+                }
+              });
+            }
+          });
+        }, observerOptions);
+
+        cards.forEach((card) => observer.observe(card));
+      }
     } catch (vizInitErr) {
       console.warn('[Visualize] Non-critical init error:', vizInitErr);
     }
@@ -707,6 +762,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
     if (devSchemaBuilderWrap) {
       devSchemaBuilderWrap.innerHTML = buildDevSchemaBuilderHtml();
+    }
+
+    // Initialize Module 1: 32-Capability Diagnostic Matrix wrapper
+    const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+    if (devMatrixWrap) {
+      devMatrixWrap.innerHTML = buildDevMatrixHtml();
+      const initialCapabilities = typeof evaluateAllCapabilities === 'function'
+        ? (evaluateAllCapabilities(window.lastScanResults || {}).capabilities || [])
+        : [];
+      window.currentEvaluatedCapabilities = initialCapabilities;
+      if (typeof renderDeveloperMatrixRows === 'function') {
+        renderDeveloperMatrixRows(initialCapabilities);
+      }
     }
 
     // Initialize Module 3 drawers wrapper
@@ -2509,6 +2577,9 @@ function updateExecutiveViewData(results) {
   const scoreValEl = document.getElementById('exec-overall-score') || document.getElementById('exec-score-val');
   if (scoreValEl) scoreValEl.innerText = score;
 
+  const dockScoreValEl = document.getElementById('dock-score-value');
+  if (dockScoreValEl) dockScoreValEl.innerText = score;
+
   const dialArc = document.getElementById('score-dial-arc') || document.querySelector('.score-dial-progress');
   if (dialArc) {
     const dashOffset = 264 - (264 * score) / 100;
@@ -4040,6 +4111,14 @@ function updateOptimizeTargetDomain() {
     if (keyMatch && keyMatch[1]) {
       selectEdgeTab(keyMatch[1]);
     }
+  }
+
+  // Also refresh Module 1 matrix if it exists
+  const devMatrixWrap = document.getElementById('dev-matrix-wrapper');
+  if (devMatrixWrap && typeof renderDeveloperMatrixRows === 'function' && typeof evaluateAllCapabilities === 'function') {
+    const updatedCapabilities = evaluateAllCapabilities(window.lastScanResults || {}).capabilities || [];
+    window.currentEvaluatedCapabilities = updatedCapabilities;
+    renderDeveloperMatrixRows(updatedCapabilities);
   }
 }
 

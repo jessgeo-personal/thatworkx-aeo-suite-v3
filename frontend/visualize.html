@@ -148,15 +148,6 @@
             </div>
           </div>
 
-          <!-- View Mode Switcher Toggle Pill -->
-          <div class="view-mode-pill-container" style="display: flex; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.25rem; border-radius: 9999px; gap: 0.25rem;">
-            <button type="button" class="mode-pill-btn active" id="pill-exec-mode" onclick="setVisualizeViewMode('executive')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
-              🏢 Executive Mode
-            </button>
-            <button type="button" class="mode-pill-btn" id="pill-dev-mode" onclick="setVisualizeViewMode('developer')" style="padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s ease;">
-              🛠️ Developer / DIY Mode
-            </button>
-          </div>
         </div>
 
         <!-- Top Action Buttons Bar -->
@@ -240,19 +231,12 @@
             UNAUDITED VISIBILITY
           </div>
           <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;" id="exec-score-summary-text">
-            Enter a domain URL above and click 'Run Audit' to measure live AI Visibility.
-          </p>
-        </div>
-
-        <!-- 4 Strategic Health Pillars arranged in a 2x2 Sub-Grid with Info Popups -->
-        <div class="pillars-2x2-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          
-          <!-- Section 1 Card -->
+            Enter a domain URL above and click 'Run Audit' to measure live AI           <!-- Section 1 Card -->
           <div class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 1: Gateway &amp; Access</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 1: AI-Optimized Gateway &amp; Access</span>
                   <span id="pillar-sec1-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
                 <button type="button" class="info-help-btn" data-section="1" onclick="openSectionHelpModal(1, event)" title="Learn more about Gateway & Access" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
@@ -281,7 +265,7 @@
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 2: Presence &amp; Hygiene</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 2: AI-Optimized Presence &amp; Hygiene</span>
                   <span id="pillar-sec2-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
                 <button type="button" class="info-help-btn" data-section="2" onclick="openSectionHelpModal(2, event)" title="Learn more about Presence & Hygiene" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
@@ -310,7 +294,7 @@
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 3: Content AI-Optimization</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 3: AI-Optimized Content</span>
                   <span id="pillar-sec3-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
                 <button type="button" class="info-help-btn" data-section="3" onclick="openSectionHelpModal(3, event)" title="Learn more about Content AI-Optimization" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
@@ -318,7 +302,7 @@
               <div id="pillar-sec3-title" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem;">Does AI trust your web presence?</div>
               <details id="pillar-sec3-accordion" open style="margin-top: 0.85rem; margin-left: 0.75rem; padding-left: 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); cursor: pointer;">
                 <summary style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); outline: none; user-select: none;">
-                  <strong style="color: #c084fc;">AI-Optimized</strong> page-level readability &amp; trust
+                  <strong style="color: #grid;">AI-Optimized</strong> page-level readability &amp; trust
                 </summary>
                 <ul id="pillar-sec3-checklist" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin: 0.4rem 0 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none;">
                   <li id="chk-sec3-seo" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Title &amp; Meta Desc Sweet Spots</li>
@@ -339,7 +323,7 @@
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 4: Machine Manifest Readiness</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 4: AI-Ready Machine Manifests</span>
                   <span id="pillar-sec4-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
                 </div>
                 <button type="button" class="info-help-btn" data-section="4" title="Learn more about Machine Manifests" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
@@ -368,19 +352,18 @@
       </div>
 
       <!-- 32-Capability Diagnostic Matrix (Relocated to Executive Mode) -->
-      <div id="dev-matrix-wrapper"></div>
-
       <!-- Section 1 Card: Gateway & Access Detail Card -->
-      <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
-        
-        <!-- Section Container Header -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
-          <div>
-            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <span>Section 1: Can AI see your website?</span>
-              <span style="display:none;">1. Can AI see your website?</span>
-              <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
-            </h4>
+      <div id="section-1-card">
+        <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+          
+          <!-- Section Container Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+            <div>
+              <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span>Section 1 (AI-Optimized): Can AI see your website?</span>
+                <span style="display:none;">1. Can AI see your website?</span>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
+              </h4>
             <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
           </div>
           <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Crawlability &amp; Indexing</span>
@@ -414,17 +397,19 @@
 
 
       </div>
+      </div>
 
       <!-- Section 2 Card: Presence & Hygiene Detail Card -->
       <div id="citation-readiness-card">
-        <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
-        
-        <!-- Section Container Header -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
-          <div>
-            <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <span>Section 2: Can AI cite you in their answers?</span>
-              <span style="display:none;">2. What can AI see on your website</span>
+        <div id="section-2-card">
+          <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+          
+          <!-- Section Container Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+            <div>
+              <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span>Section 2 (AI-Optimized): Can AI cite you in their answers?</span>
+                <span style="display:none;">2. What can AI see on your website</span>
               <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
             </h4>
             <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
@@ -537,6 +522,7 @@
         </div>
       </div>
       </div>
+      </div>
 
       <!-- Page-Level Inspector Container -->
       <div id="page-level-inspector-container">
@@ -545,18 +531,16 @@
         </div>
       </div>
 
-      <div class="exec-row-split">
-
-        <!-- Section 3 Container: Can AI trust who you are? -->
-        <div id="exec-section-3">
+      <!-- Section 3 Container: Can AI trust who you are? -->
+      <div id="section-3-card" style="margin-bottom: 1.5rem;">
         <!-- Section 3 Card: E-E-A-T & Trust Detail Card -->
         <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
-          
-          <!-- Section Container Header -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
-            <div>
-              <h4 onclick="openHelpTooltip('sec3_overview')" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; cursor: pointer;">
-                <span>Section 3: Can AI trust who you are?</span>
+            
+            <!-- Section Container Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+              <div>
+                <h4 onclick="openHelpTooltip('sec3_overview')" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; cursor: pointer;">
+                  <span>Section 3 (AI-Optimized): Can AI trust who you are?</span>
                 <span style="display:none;">3. Does AI trust your web presence (?)</span>
               </h4>
               <p style="font-size: 1rem; color: #cbd5e1; font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
@@ -640,7 +624,7 @@
       </div>
 
       <!-- Section 4 Container: Is your brand blueprint AI-ready? -->
-      <div id="exec-section-4" style="margin-bottom: 1.5rem;">
+      <div id="section-4-card" style="margin-bottom: 1.5rem;">
         <!-- Section 4 Card: Machine Friendliness Detail Card -->
         <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
           
@@ -649,7 +633,7 @@
             <div>
               <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">
                 <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif;">
-                  Section 4: Is your brand blueprint AI-ready?
+                  Section 4: Is your brand blueprint AI-ready? (AI-Ready)
                   <span style="display:none;">4. Is your website already AI-ready?</span>
                 </h4>
                 <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; font-family: var(--font-sans), sans-serif;">8 Manifests Tracked</span>
@@ -794,8 +778,6 @@
         </div>
       </div>
 
-      </div> <!-- closing .exec-row-split -->
-
       <!-- Section 5: AIOptimize Full-Width High-Urgency Action Banner -->
       <div id="aioptimize-action-banner" class="action-banner-urgent">
         <div class="action-banner-header">
@@ -830,16 +812,6 @@
 
       </div> <!-- closing #executive-view-container -->
     </div> <!-- closing #exec-mode-container -->
-
-        <!-- ═══════════════════════════════════════════════════════
-         DEVELOPER / DIY MODE CONTAINER (#dev-mode-container)
-    ════════════════════════════════════════════════════════ -->
-    <div id="dev-mode-container" class="view-mode-section" style="display: none; padding-top: 1rem;">
-      <div id="dev-matrix-wrapper"></div>
-      <div id="dev-schema-builder-wrapper"></div>
-      <div id="dev-drawers-wrapper"></div>
-      <div id="dev-module-4-wrapper"></div>
-    </div>
   </main>
 
   <!-- Mega Footer Section -->
@@ -979,6 +951,20 @@
     window.evaluateAllCapabilities = evaluateAllCapabilities;
     window.CAPABILITY_MATRIX = CAPABILITY_MATRIX;
   </script>
+  <!-- Alternative B: Adaptive Floating Glass Dock -->
+  <div id="floating-glass-dock" class="floating-glass-dock glassmorphic border-glow-cyan">
+    <div class="dock-score-section">
+      <span class="dock-score-title">Brand AI Score</span>
+      <span id="dock-score-value" class="dock-score-val">--</span>
+    </div>
+    <div class="dock-links">
+      <a href="#section-1-card" class="dock-link active" data-section="1">1. AI Access</a>
+      <a href="#section-2-card" class="dock-link" data-section="2">2. Page Content</a>
+      <a href="#section-3-card" class="dock-link" data-section="3">3. Brand Trust</a>
+      <a href="#section-4-card" class="dock-link" data-section="4">4. AI Blueprint</a>
+    </div>
+  </div>
+
   <script src="index.js"></script>
 </body>
 </html>

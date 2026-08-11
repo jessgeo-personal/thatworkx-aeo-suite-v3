@@ -47,7 +47,7 @@ describe('Section 4 AI Machine Blueprint Hierarchy BDD/TDD Suite', () => {
   });
 
   it('Scenario 1: Section 4 contains 4 level-divider elements with the new headers', () => {
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     expect(section4).not.toBeNull();
 
     const dividers = Array.from(section4.querySelectorAll('.level-divider')).map(d => d.textContent.trim());
@@ -60,7 +60,7 @@ describe('Section 4 AI Machine Blueprint Hierarchy BDD/TDD Suite', () => {
   });
 
   it('Scenario 2: The 8 files sit in order under their correct level headers', () => {
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     const container = section4.querySelector('.level-divider').parentElement;
     const children = Array.from(container.children);
 
@@ -92,7 +92,7 @@ describe('Section 4 AI Machine Blueprint Hierarchy BDD/TDD Suite', () => {
 
   it('Scenario 3: Status bindings remain preserved and functional in index.js', () => {
     // Assert all 8 status spans are active in Section 4's visible tree (not hidden fallback)
-    const section4 = document.getElementById('exec-section-4');
+    const section4 = document.getElementById('section-4-card');
     
     expect(section4.querySelector('#exec-status-robots')).not.toBeNull();
     expect(section4.querySelector('#exec-status-llms')).not.toBeNull();
