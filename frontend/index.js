@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
               const sectionNum = cardId.replace('section-', '').replace('-card', '');
               
               dockLinks.forEach((link) => {
-                if (link.getAttribute('data-section') === sectionNum || link.getAttribute('href') === `#${cardId}`) {
+                if (link.getAttribute('data-dock-section') === sectionNum || link.getAttribute('href') === `#${cardId}`) {
                   link.classList.add('active');
                 } else {
                   link.classList.remove('active');
@@ -665,6 +665,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cards.forEach((card) => observer.observe(card));
       }
+
+      // Smooth scroll handler for .dock-link anchors
+      document.querySelectorAll('.dock-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const targetId = link.getAttribute('href');
+          const targetEl = document.querySelector(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof targetEl.scrollIntoView === 'function') {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+      });
     } catch (vizInitErr) {
       console.warn('[Visualize] Non-critical init error:', vizInitErr);
     }
@@ -677,6 +692,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!btn) {
         console.log('[AEO-Infotip-Debug] Clicked element did NOT match any known Infotip/Help trigger selectors.');
         return;
+      }
+
+      if (btn.classList.contains('dock-link') || btn.closest('#floating-glass-dock')) {
+        return; // Do not open help modal when clicking dock navigation links
       }
 
       console.log('[AEO-Infotip-Debug] Matched Trigger Element:', btn);
