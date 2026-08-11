@@ -93,9 +93,16 @@ describe('AEO Suite Surgical Repair BDD Test Suite', () => {
     expect(dock).not.toBeNull();
 
     const links = Array.from(dock.querySelectorAll('.dock-link'));
-    expect(links.length).toBe(4);
+    expect(links.length).toBe(6);
 
-    const expectedTargets = ['#section-1-card', '#section-2-card', '#section-3-card', '#section-4-card'];
+    const expectedTargets = [
+      '#control-toolbar-anchor',
+      '#summary-dial-anchor',
+      '#section-1-card',
+      '#section-2-card',
+      '#section-3-card',
+      '#section-4-card'
+    ];
     links.forEach((link, idx) => {
       expect(link.getAttribute('href')).toBe(expectedTargets[idx]);
     });

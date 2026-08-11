@@ -633,6 +633,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Set up IntersectionObserver for Alternative B Floating Glass Dock active link toggling
       const dockLinks = document.querySelectorAll('.dock-link');
       const cards = [
+        document.getElementById('control-toolbar-anchor'),
+        document.getElementById('summary-dial-anchor'),
         document.getElementById('section-1-card'),
         document.getElementById('section-2-card'),
         document.getElementById('section-3-card'),

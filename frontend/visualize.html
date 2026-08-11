@@ -131,6 +131,7 @@
       </div>
 
       <!-- Control Header Card -->
+      <div id="control-toolbar-anchor" style="scroll-margin-top: 100px;"></div>
       <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1rem 1.25rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
         <input type="hidden" id="target-url" value="">
         
@@ -209,6 +210,7 @@
       <div id="executive-view-container">
       
       <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
+      <div id="summary-dial-anchor" style="scroll-margin-top: 100px;"></div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
         
         <!-- Overall AI Visibility Score Dial Gauge -->
@@ -962,7 +964,9 @@
       <span id="dock-score-value" class="dock-score-val">--</span>
     </div>
     <div class="dock-links">
-      <a href="#section-1-card" class="dock-link active" data-dock-section="1">1. AI Access</a>
+      <a href="#control-toolbar-anchor" class="dock-link" data-dock-section="scan">Scan</a>
+      <a href="#summary-dial-anchor" class="dock-link active" data-dock-section="summary">Summary</a>
+      <a href="#section-1-card" class="dock-link" data-dock-section="1">1. AI Access</a>
       <a href="#section-2-card" class="dock-link" data-dock-section="2">2. Page Content</a>
       <a href="#section-3-card" class="dock-link" data-dock-section="3">3. Brand Trust</a>
       <a href="#section-4-card" class="dock-link" data-dock-section="4">4. AI Blueprint</a>
