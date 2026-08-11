@@ -809,6 +809,32 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       });
+
+      // Attach click listeners to .pillar-card (card-wide click navigation)
+      document.querySelectorAll('.pillar-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          // Ignore clicks on help buttons, inspect buttons or child elements with separate controls
+          if (e.target.closest('.info-help-btn') || e.target.closest('.pillar-inspect-btn') || e.target.closest('details') || e.target.closest('a')) {
+            return;
+          }
+          const secNum = card.getAttribute('data-pillar-card') || card.id.replace('pillar-card-', '');
+          if (secNum && typeof window.setActiveVisualizeSection === 'function') {
+            window.setActiveVisualizeSection(secNum, true);
+          }
+        });
+      });
+
+      // Attach click listeners to .btn-return-summary buttons
+      document.querySelectorAll('.btn-return-summary').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const summaryGrid = document.getElementById('visualize-summary-grid') || document.getElementById('pillar-summary-wrapper');
+          if (summaryGrid && typeof summaryGrid.scrollIntoView === 'function') {
+            summaryGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
     } catch (vizInitErr) {
       console.warn('[Visualize] Non-critical init error:', vizInitErr);
     }

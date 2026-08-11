@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
@@ -164,5 +164,52 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     // Assert @media print CSS rules in index.css force all section details to display (display: block !important)
     const printBlockRegex = /@media\s+print\s*\{[\s\S]*?(?:#section-[1-4]-details[\s\S]*?)+display:\s*block\s*!important[\s\S]*?\}/;
     expect(cssContent).toMatch(printBlockRegex);
+  });
+
+  it('Scenario 5: Pillar Card Click Navigation', () => {
+    // Clicking anywhere on top Pillar Card 2 ([data-pillar-card="2"] or #pillar-card-2)
+    // expands #section-2-details and collapses all other section detail containers.
+    const pillarCard2 = document.querySelector('[data-pillar-card="2"]') || document.getElementById('pillar-card-2');
+    expect(pillarCard2).not.toBeNull();
+
+    const details1 = document.getElementById('section-1-details');
+    const details2 = document.getElementById('section-2-details');
+    const details3 = document.getElementById('section-3-details');
+    const details4 = document.getElementById('section-4-details');
+
+    expect(details1).not.toBeNull();
+    expect(details2).not.toBeNull();
+    expect(details3).not.toBeNull();
+    expect(details4).not.toBeNull();
+
+    pillarCard2.click();
+
+    expect(details2.style.display).toBe('block');
+    expect(details1.style.display).toBe('none');
+    expect(details3.style.display).toBe('none');
+    expect(details4.style.display).toBe('none');
+  });
+
+  it('Scenario 6: Return to Pillar Summary CTA', () => {
+    const scrollIntoViewMock = vi.fn();
+    
+    // Target element should exist
+    const summaryGrid = document.querySelector('#visualize-summary-grid') || document.getElementById('pillar-summary-wrapper');
+    expect(summaryGrid).not.toBeNull();
+    summaryGrid.scrollIntoView = scrollIntoViewMock;
+
+    for (let i = 1; i <= 4; i++) {
+      const detailsContainer = document.getElementById(`section-${i}-details`);
+      expect(detailsContainer).not.toBeNull();
+
+      const returnBtn = detailsContainer.querySelector('.btn-return-summary');
+      expect(returnBtn).not.toBeNull();
+      expect(returnBtn.textContent).toContain('Return to Pillar Summary');
+    }
+
+    const returnBtn2 = document.querySelector('#section-2-details .btn-return-summary');
+    returnBtn2.click();
+
+    expect(scrollIntoViewMock).toHaveBeenCalled();
   });
 });
