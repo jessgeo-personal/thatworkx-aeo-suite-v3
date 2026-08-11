@@ -232,9 +232,9 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     const signalsBlock = $('#citation-signals-rows');
     expect(signalsBlock.length).toBe(1);
     
-    expect(sectionHtml).toContain('HasFAQSchema');
+    expect(sectionHtml).toContain('FAQ Structured Markup');
     expect(sectionHtml).toContain('Answer/Question parity');
-    expect(sectionHtml).toContain('HasOrganizationSchema');
+    expect(sectionHtml).toContain('Organization Entity Markup');
     expect(sectionHtml).toContain('emailValue');
     expect(sectionHtml).toContain('phoneValue');
 
@@ -374,7 +374,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(cardTitle.attr('onclick')).toContain("openHelpTooltip('sec3_overview')");
 
     const subheading = $('#exec-section3-card p');
-    expect(subheading.text()).toContain('Verifies brand entity schema, authoritativeness, and sameAs citation signals.');
+    expect(subheading.text()).toContain('Evaluates domain history, SSL certificate parameters, and citation signals.');
 
     // 2. Badges and signal rows checks
     expect($('#sec3-secure-status').length).toBe(1);
@@ -386,11 +386,11 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
 
     // 3. Tooltip button mapping check
     const sectionHtml = card.html() || '';
-    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('isSecure'");
-    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('hasContactInfo'");
-    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('hasPrivacyPolicy'");
-    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('ageEstimate'");
-    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('authorityStatus'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('ssl-security'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('contact-info'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('privacy-policy'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('age-estimate'");
+    expect(sectionHtml).toContain("onclick=\"openHelpTooltip('authority-status'");
 
     // 4. Zero occurrences of legacy phrase "AI-first"
     expect(/AI-first/i.test(card.html() || '')).toBe(false);
@@ -409,7 +409,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(cardTitle.text().trim()).toContain('Section 4: Is your brand blueprint AI-ready?');
 
     const subheading = card.find('p');
-    expect(subheading.text().trim()).toContain('Want to offer AI your content in a form thats easy for it to ingest, utilize and cite? Maintain these machine manifest files.');
+    expect(subheading.text().trim()).toContain('Verifies structure, content parity, and syntax formats of your machine-readable files.');
 
     // 2. Tree container and title presence (accordion details/summary removed)
     const details = card.find('details');
@@ -512,7 +512,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
 
     const expectedLabels = [
       'CDN / Edge Firewall Blocks',
-      'X-Robots-Tag Headers',
+      'Server Crawlability Flags',
       'robots.txt useragents Disallow',
       'robots.txt ai-bots Disallow'
     ];
@@ -561,7 +561,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(items.length).toBe(4);
 
     const expectedLabels = [
-      'isSecure Protocol Check',
+      'HTTPS Security Encryption',
       'SPA Hydration Trap & Density Ratio',
       'RAG Offset: /llms.txt & /ai-context.md',
       'Essential Entity Nodes Discovered'

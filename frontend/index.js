@@ -2871,7 +2871,7 @@ function updateExecutiveViewData(results) {
           </p>
           <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
             <li style="display: flex; align-items: center;">${getStatusIndicator(isCdnPass)}CDN / Edge Firewall Blocks</li>
-            <li style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}X-Robots-Tag Headers</li>
+            <li style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}Server Crawlability Flags</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isUseragentsPass)}robots.txt useragents Disallow</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isAiBotsPass)}robots.txt ai-bots Disallow</li>
           </ul>
@@ -2892,7 +2892,7 @@ function updateExecutiveViewData(results) {
             <strong style="color: #38bdf8; font-weight: 800;">AI-Optimized</strong> web structure &amp; hydration hygiene:
           </p>
           <ul style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none; padding-left: 0;">
-            <li style="display: flex; align-items: center;" data-metric="isSecure">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
+            <li style="display: flex; align-items: center;" data-metric="ssl-security">${getStatusIndicator(isSecurePass)}HTTPS Security Encryption</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isSpaPass)}SPA Hydration Trap &amp; Density Ratio</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isRagPass)}RAG Offset: /llms.txt &amp; /ai-context.md</li>
             <li style="display: flex; align-items: center;">${getStatusIndicator(isEntityPass)}Essential Entity Nodes Discovered</li>
@@ -3178,7 +3178,7 @@ function updateExecutiveViewData(results) {
   if (checklistEl) {
     checklistEl.innerHTML = `
       <li id="chk-sec1-cdn" style="display: flex; align-items: center;">${getStatusIndicator(isCdnPass)}CDN / Edge Firewall Blocks</li>
-      <li id="chk-sec1-xrobots" style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}X-Robots-Tag Headers</li>
+      <li id="chk-sec1-xrobots" style="display: flex; align-items: center;">${getStatusIndicator(isXRobotsPass)}Server Crawlability Flags</li>
       <li id="chk-sec1-useragents" style="display: flex; align-items: center;">${getStatusIndicator(isUseragentsPass)}robots.txt useragents Disallow</li>
       <li id="chk-sec1-aibots" style="display: flex; align-items: center;">${getStatusIndicator(isAiBotsPass)}robots.txt ai-bots Disallow</li>
     `;
@@ -3189,7 +3189,7 @@ function updateExecutiveViewData(results) {
   const checklistSec2El = document.getElementById('pillar-sec2-checklist');
   if (checklistSec2El) {
     checklistSec2El.innerHTML = `
-      <li id="chk-sec2-issecure" style="display: flex; align-items: center;">${getStatusIndicator(isSecurePass)}isSecure Protocol Check</li>
+      <li id="chk-sec2-issecure" style="display: flex; align-items: center;">${getStatusIndicator(isSecurePass)}HTTPS Security Encryption</li>
       <li id="chk-sec2-spatrap" style="display: flex; align-items: center;">${getStatusIndicator(isSpaPass)}SPA Hydration Trap &amp; Density Ratio</li>
       <li id="chk-sec2-ragoffset" style="display: flex; align-items: center;">${getStatusIndicator(isRagPass)}RAG Offset: /llms.txt &amp; /ai-context.md</li>
       <li id="chk-sec2-entitynodes" style="display: flex; align-items: center;">${getStatusIndicator(isEntityPass)}Essential Entity Nodes Discovered</li>
@@ -4756,7 +4756,7 @@ const tooltipExplanationData = {
     body: "<strong>Why AI Citations Are Critical:</strong><br/> In traditional search, getting a user to click a link was the goal. In the age of Generative AI (like ChatGPT, Perplexity, or Gemini), the AI synthesizes the answer directly for the user. To prove its answer is accurate and avoid hallucinations, the AI <em>must</em> cite reliable sources. <br/><br/>If your website's data isn't structured in a way the AI can easily extract, trust, and reference, the AI will simply bypass you and cite your competitor instead. <strong>If you cannot be cited by AI, your brand is practically invisible in the future of search.</strong>"
   },
   'faq-schema': {
-    title: 'FAQ Schema (HasFAQSchema)',
+    title: 'FAQ Schema (FAQ Structured Markup)',
     icon: '❓',
     body: "<strong>Where AI Looks:</strong> AI engines scan your website's underlying code for a hidden snippet called 'JSON-LD FAQ Schema'.<br/><br/><strong>How it should be formatted:</strong> This is a structured code block that pairs your frequently asked questions and answers together perfectly. Instead of forcing the AI bot to read your whole page to figure out what question you are answering, FAQ Schema feeds the exact Q&A directly into the AI's 'brain' in its native language."
   },
@@ -4766,17 +4766,17 @@ const tooltipExplanationData = {
     body: "<strong>Where AI Looks:</strong> AI compares the visible headings (H2/H3 text) on your webpage against your hidden structured code.<br/><br/><strong>How it should be formatted:</strong> AI engines demand consistency to build trust. If you have 5 visible questions on your page, you must have exactly 5 matching answers mapped in your code (a 1:1 parity). If the AI detects a mismatch, it assumes your content is broken, outdated, or deceptive, drastically lowering the chance of your brand being cited."
   },
   'org-schema': {
-    title: 'Organization Schema (HasOrganizationSchema)',
+    title: 'Organization Schema (Organization Entity Markup)',
     icon: '🏢',
     body: "<strong>Where AI Looks:</strong> AI engines scan the header or footer of your website's code for 'Organization Schema'.<br/><br/><strong>How it should be formatted:</strong> Think of this as your company's digital, machine-readable ID card. It must explicitly list your official brand name, logo URL, physical address, and official social media profiles in a strict JSON-LD format. Without this, AI models might hallucinate your brand details or confuse you with a similarly named competitor."
   },
   'email-visible': {
-    title: 'Email Visibility (hasEmailVisibleToAI)',
+    title: 'Email Visibility (AI-Discoverable Contact Email)',
     icon: '📧',
     body: "<strong>Where AI Looks:</strong> AI bots crawl your homepage, contact page, and footer looking for explicit email addresses.<br/><br/><strong>How it should be formatted:</strong> Your email must be readable text (e.g., info@yourbrand.com) and ideally wrapped in a clickable standard HTML <code>mailto:</code> link. If your email is trapped inside an image, locked behind a complex contact form, or spelled out to trick humans (like 'info at yourbrand dot com'), the AI bot will fail to extract and verify it."
   },
   'phone-visible': {
-    title: 'Phone Visibility (hasPhoneVisibleToAI)',
+    title: 'Phone Visibility (AI-Discoverable Phone Line)',
     icon: '📞',
     body: "<strong>Where AI Looks:</strong> Similar to email, AI bots scan your primary pages, footer, and directories to verify you are a reachable business.<br/><br/><strong>How it should be formatted:</strong> Phone numbers must be written in a standard international format (e.g., +1-800-555-1234) and ideally wrapped in an HTML <code>tel:</code> link. If your number is embedded in a graphic or split up by unusual characters, the AI cannot confidently verify your business's accessibility."
   },
@@ -4805,28 +4805,28 @@ const tooltipExplanationData = {
     icon: '🛡️',
     body: '<p>Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T) are critical indicators that search AI engines use to evaluate content reliability and avoid hallucinated citations.</p>'
   },
-  'isSecure': {
-    title: 'SSL Security (isSecure)',
+  'ssl-security': {
+    title: 'SSL Security (HTTPS Security Encryption)',
     icon: '🔒',
     body: '<p>AI web scrapers and crawlers penalize unencrypted HTTP sites to protect user safety and maintain security standards. SSL protection is a basic prerequisite for trustworthiness.</p>'
   },
-  'hasContactInfo': {
-    title: 'Contact Information (hasContactInfo)',
+  'contact-info': {
+    title: 'Contact Information (Verified Contact Credentials)',
     icon: '📞',
     body: '<p>Having visible contact routes/details allows AI models to verify physical business legitimacy, ensuring that the entity has real-world accountability.</p>'
   },
-  'hasPrivacyPolicy': {
-    title: 'Privacy Policy (hasPrivacyPolicy)',
+  'privacy-policy': {
+    title: 'Privacy Policy (Privacy & Trust Governance)',
     icon: '📜',
     body: '<p>Privacy policies verify that user data is handled legally and in compliance with global regulations. AI engines check this to gauge compliance and regulatory readiness.</p>'
   },
-  'ageEstimate': {
-    title: 'Domain Age (ageEstimate)',
+  'age-estimate': {
+    title: 'Domain Age (Brand Entity Authority)',
     icon: '⏳',
     body: '<p>Domain longevity is a primary signal that influences trust weighting. Older domains indicate stability, which reduces LLM hallucination thresholds and builds entity authority.</p>'
   },
-  'authorityStatus': {
-    title: 'Authority Status (authorityStatus)',
+  'authority-status': {
+    title: 'Authority Status (Brand Entity Authority)',
     icon: '👑',
     body: `<strong>Understanding Page vs. Site-Level E-E-A-T:</strong><br/> Generative AI evaluates your Experience, Expertise, Authoritativeness, and Trustworthiness on two levels. <em>Page-level</em> looks at the specific content's depth and authorship. <em>Site-level</em> looks at your domain's historical authority and backlink profile. <br/><br/> <a href='#' onclick="showUpgradeModal('AIO_PRO_EEAT', 'Review your Page and Site-level EEAT signals in-depth', 'AIOptimize Pro'); return false;" style='color: var(--primary-accent); font-weight: bold;'>⚡ Upgrade to AIOptimize Pro to review your E-E-A-T in-depth ↗</a>`
   },
