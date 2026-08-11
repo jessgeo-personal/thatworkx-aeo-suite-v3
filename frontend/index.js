@@ -813,8 +813,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Attach click listeners to .pillar-card (card-wide click navigation)
       document.querySelectorAll('.pillar-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Ignore clicks on help buttons, inspect buttons or child elements with separate controls
-          if (e.target.closest('.info-help-btn') || e.target.closest('.pillar-inspect-btn') || e.target.closest('details') || e.target.closest('a')) {
+          // Ignore clicks on help buttons, inspect buttons, or links
+          if (e.target.closest('.info-help-btn') || e.target.closest('.pillar-inspect-btn') || e.target.closest('a')) {
             return;
           }
           const secNum = card.getAttribute('data-pillar-card') || card.id.replace('pillar-card-', '');
@@ -824,8 +824,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
-      // Attach click listeners to .btn-return-summary buttons
-      document.querySelectorAll('.btn-return-summary').forEach(btn => {
+      // Attach click listeners to .btn-return-summary / .btn-return-summary-outline buttons
+      document.querySelectorAll('.btn-return-summary, .btn-return-summary-outline').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();

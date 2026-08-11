@@ -166,11 +166,10 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     expect(cssContent).toMatch(printBlockRegex);
   });
 
-  it('Scenario 5: Pillar Card Click Navigation', () => {
-    // Clicking anywhere on top Pillar Card 2 ([data-pillar-card="2"] or #pillar-card-2)
-    // expands #section-2-details and collapses all other section detail containers.
-    const pillarCard2 = document.querySelector('[data-pillar-card="2"]') || document.getElementById('pillar-card-2');
-    expect(pillarCard2).not.toBeNull();
+  it('Scenario 5: Pillar Card Inner Accordion Click Delegation & Footer Placement', () => {
+    const pillarCards = document.querySelectorAll('.pillar-card');
+    expect(pillarCards.length).toBe(4);
+    const pillarCard2 = pillarCards[1];
 
     const details1 = document.getElementById('section-1-details');
     const details2 = document.getElementById('section-2-details');
@@ -182,15 +181,40 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     expect(details3).not.toBeNull();
     expect(details4).not.toBeNull();
 
-    pillarCard2.click();
+    // Clicking an inner element like the summary header bubbles up and triggers focus
+    const innerSummary = pillarCard2.querySelector('summary');
+    expect(innerSummary).not.toBeNull();
+    innerSummary.click();
 
     expect(details2.style.display).toBe('block');
     expect(details1.style.display).toBe('none');
     expect(details3.style.display).toBe('none');
     expect(details4.style.display).toBe('none');
+
+    // Click a list item inside the card to verify delegation works on content children too
+    const innerLi = pillarCard2.querySelector('li');
+    expect(innerLi).not.toBeNull();
+    innerLi.click();
+
+    expect(details2.style.display).toBe('block');
+    expect(details1.style.display).toBe('none');
+
+    // Assert .pillar-inspect-btn is positioned at the bottom footer of each pillar card (.pillar-card-footer or bottom node)
+    pillarCards.forEach(card => {
+      const inspectBtn = card.querySelector('.pillar-inspect-btn');
+      expect(inspectBtn).not.toBeNull();
+
+      const footer = card.querySelector('.pillar-card-footer');
+      if (footer) {
+        expect(footer.contains(inspectBtn)).toBe(true);
+      } else {
+        const lastChild = card.children[card.children.length - 1];
+        expect(lastChild.contains(inspectBtn)).toBe(true);
+      }
+    });
   });
 
-  it('Scenario 6: Return to Pillar Summary CTA', () => {
+  it('Scenario 6: Return CTA Text & Outline Styling', () => {
     const scrollIntoViewMock = vi.fn();
     
     // Target element should exist
@@ -204,8 +228,11 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
 
       const returnBtn = detailsContainer.querySelector('.btn-return-summary');
       expect(returnBtn).not.toBeNull();
-      expect(returnBtn.textContent).toContain('Return to Pillar Summary');
+      expect(returnBtn.textContent.trim()).toBe('[ ▲ Return to Summary ]');
+      expect(returnBtn.classList.contains('btn-return-summary-outline')).toBe(true);
     }
+
+    expect(cssContent).toContain('.btn-return-summary-outline');
 
     const returnBtn2 = document.querySelector('#section-2-details .btn-return-summary');
     returnBtn2.click();
