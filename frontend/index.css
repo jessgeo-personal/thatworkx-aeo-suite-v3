@@ -5137,4 +5137,58 @@ body {
     font-size: 0.72rem;
     padding: 0.25rem 0.5rem;
   }
+}
+
+/* Compact Executive Context Strip styling */
+.compact-exec-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background-color: #08090C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1.5rem;
+}
+
+.strip-content-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.strip-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.strip-text {
+  line-height: 1.4;
+}
+
+.strip-btn {
+  padding: 0.4rem 1rem !important;
+  font-size: 0.8rem !important;
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.strip-btn:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+}
+
+#exec-onboarding-modal .modal-card {
+  max-width: 600px;
+  background-color: #08090C !important;
 }

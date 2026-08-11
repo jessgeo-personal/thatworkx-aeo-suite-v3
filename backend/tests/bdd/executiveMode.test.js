@@ -168,7 +168,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(typeof evaluation.scanMetrics.lastScanned).toBe('string');
   });
 
-  it('Scenario E: Executive Mode view template (visualize.html) renders scan duration and 2-method business intro copy', () => {
+  it('Scenario E: Executive Mode view template (visualize.html) renders scan duration and compact context strip with onboarding modal', () => {
     const visPath = path.resolve(__dirname, '../../../frontend/visualize.html');
     const visHtml = fs.readFileSync(visPath, 'utf8');
     const $ = cheerio.load(visHtml);
@@ -178,22 +178,26 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(durationBadge.length).toBe(1);
     expect(durationBadge.text()).toContain('Time to Scan:');
 
-    // 2. Executive Welcome Banner presence and exact copy
+    // 2. Executive Welcome Banner presence and compact context strip
     const welcomeBanner = $('#exec-welcome-banner');
     expect(welcomeBanner.length).toBe(1);
 
     const bannerText = welcomeBanner.text();
-    expect(bannerText).toContain('Let us show you what AI can See');
-    expect(bannerText).toContain('Welcome to Executive Mode — aimed at the business user');
-    expect(bannerText).toContain('AI uses 2 methods to source content from your web presence');
-    expect(bannerText).toContain('1. Your existing human-centric web presence');
     expect(bannerText).toContain('AI-Optimized');
-    expect(bannerText).toContain('2. Your complimentary Machine-friendly web presence');
-    expect(bannerText).toContain('Done correctly, your web presence could become AI-Ready');
-    expect(bannerText).toContain('Take a look at how your web presence is helping your brand be visible to AI engines');
+    expect(bannerText).toContain('AI-Ready');
 
-    // Zero AI-first check in visualize.html banner
+    // 3. Onboarding modal presence and detailed copy
+    const onboardingModal = $('#exec-onboarding-modal');
+    expect(onboardingModal.length).toBe(1);
+
+    const modalText = onboardingModal.text();
+    expect(modalText).toContain('Understanding AI Sourcing Methods');
+    expect(modalText).toContain('Human-Centric Web Presence (AI-Optimized)');
+    expect(modalText).toContain('Machine-Friendly Web Presence (AI-Ready)');
+
+    // Zero AI-first check in visualize.html banner & modal
     expect(/AI-first/i.test(bannerText)).toBe(false);
+    expect(/AI-first/i.test(modalText)).toBe(false);
   });
 
   it('Scenario F: Executive Mode Section 2 (Presence & Hygiene) UI refactoring assertions', () => {

@@ -629,6 +629,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // Default initial scan load for demo
         executeDashboardScan(null);
       }
+      // Educational Onboarding Modal controls
+      const openTourBtn = document.getElementById('btn-open-tour-modal');
+      const closeTourBtn = document.getElementById('btn-close-tour-modal');
+      const onboardingModal = document.getElementById('exec-onboarding-modal');
+
+      if (openTourBtn && onboardingModal) {
+        openTourBtn.addEventListener('click', () => {
+          onboardingModal.style.display = 'block';
+        });
+      }
+
+      if (closeTourBtn && onboardingModal) {
+        closeTourBtn.addEventListener('click', () => {
+          onboardingModal.style.display = 'none';
+        });
+      }
+
+      if (onboardingModal) {
+        onboardingModal.addEventListener('click', (e) => {
+          if (e.target === onboardingModal) {
+            onboardingModal.style.display = 'none';
+          }
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && onboardingModal && onboardingModal.style.display === 'block') {
+          onboardingModal.style.display = 'none';
+        }
+      });
 
       // Set up IntersectionObserver for Alternative B Floating Glass Dock active link toggling
       const dockLinks = document.querySelectorAll('.dock-link');
