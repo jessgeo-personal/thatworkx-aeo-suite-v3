@@ -5206,4 +5206,15 @@ body {
 #exec-onboarding-modal .modal-card {
   max-width: 600px;
   background-color: #08090C !important;
+}
+
+/* @media print overrides to force all section details to display for printing */
+@media print {
+  #section-1-details,
+  #section-2-details,
+  #section-3-details,
+  #section-4-details {
+    display: block !important;
+    visibility: visible !important;
+  }
 }

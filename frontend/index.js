@@ -94,6 +94,58 @@ function setVisualizeViewMode(mode) {
 }
 window.setVisualizeViewMode = setVisualizeViewMode;
 
+function setActiveVisualizeSection(sectionId, triggerScroll = true) {
+  const activeSec = String(sectionId);
+  
+  for (let i = 1; i <= 4; i++) {
+    const detailsContainer = document.getElementById(`section-${i}-details`);
+    const triggerBtn = document.querySelector(`.easy-view-trigger-btn[data-section="${i}"]`);
+    
+    if (detailsContainer) {
+      if (String(i) === activeSec) {
+        const isCurrentOpen = detailsContainer.style.display === 'block';
+        if (triggerScroll) {
+          detailsContainer.style.display = 'block';
+          if (triggerBtn) triggerBtn.textContent = '[ Collapse Details ▲ ]';
+        } else {
+          // Toggle
+          if (isCurrentOpen) {
+            detailsContainer.style.display = 'none';
+            if (triggerBtn) triggerBtn.textContent = '[ Expand Details ▼ ]';
+          } else {
+            detailsContainer.style.display = 'block';
+            if (triggerBtn) triggerBtn.textContent = '[ Collapse Details ▲ ]';
+          }
+        }
+      } else {
+        // Collapse all others
+        detailsContainer.style.display = 'none';
+        if (triggerBtn) triggerBtn.textContent = '[ Expand Details ▼ ]';
+      }
+    }
+  }
+
+  // Update .dock-link.active highlight state on #floating-glass-dock
+  const dockLinks = document.querySelectorAll('.dock-link');
+  dockLinks.forEach(link => {
+    const secNum = link.getAttribute('data-dock-section');
+    if (secNum === activeSec) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+
+  // Optionally scroll to the card if triggerScroll is true and card exists
+  if (triggerScroll) {
+    const cardEl = document.getElementById(`section-${activeSec}-card`);
+    if (cardEl && typeof cardEl.scrollIntoView === 'function') {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+}
+window.setActiveVisualizeSection = setActiveVisualizeSection;
+
 // Executive Mode Action: Export PDF Summary
 function exportExecutiveSummaryPdf() {
   window.print();
@@ -698,17 +750,62 @@ document.addEventListener('DOMContentLoaded', () => {
         cards.forEach((card) => observer.observe(card));
       }
 
-      // Smooth scroll handler for .dock-link anchors
+      // Smooth scroll handler for .dock-link anchors and setActiveVisualizeSection binding
       document.querySelectorAll('.dock-link').forEach(link => {
         link.addEventListener('click', (e) => {
-          const targetId = link.getAttribute('href');
-          const targetEl = document.querySelector(targetId);
-          if (targetEl) {
+          const sectionId = link.getAttribute('data-dock-section');
+          if (sectionId && ['1', '2', '3', '4'].includes(sectionId)) {
             e.preventDefault();
             e.stopPropagation();
-            if (typeof targetEl.scrollIntoView === 'function') {
-              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (typeof window.setActiveVisualizeSection === 'function') {
+              window.setActiveVisualizeSection(sectionId, true);
             }
+          } else {
+            const targetId = link.getAttribute('href');
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof targetEl.scrollIntoView === 'function') {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          }
+        });
+      });
+
+      // Initialize all 4 sections in collapsed state on DOM load
+      for (let i = 1; i <= 4; i++) {
+        const detailsContainer = document.getElementById(`section-${i}-details`);
+        if (detailsContainer) {
+          detailsContainer.style.display = 'none';
+        }
+        const triggerBtn = document.querySelector(`.easy-view-trigger-btn[data-section="${i}"]`);
+        if (triggerBtn) {
+          triggerBtn.textContent = '[ Expand Details ▼ ]';
+        }
+      }
+
+      // Attach click listeners to .easy-view-trigger-btn
+      document.querySelectorAll('.easy-view-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const sectionId = btn.getAttribute('data-section');
+          if (typeof window.setActiveVisualizeSection === 'function') {
+            window.setActiveVisualizeSection(sectionId, false);
+          }
+        });
+      });
+
+      // Attach click listeners to .pillar-inspect-btn
+      document.querySelectorAll('.pillar-inspect-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const targetSection = btn.getAttribute('data-target-section');
+          if (typeof window.setActiveVisualizeSection === 'function') {
+            window.setActiveVisualizeSection(targetSection, true);
           }
         });
       });
@@ -3029,6 +3126,13 @@ function updateExecutiveViewData(results) {
       scoreEl.style.setProperty('background', theme.bg, 'important');
       scoreEl.style.setProperty('color', theme.color, 'important');
       scoreEl.style.setProperty('border', theme.border, 'important');
+    }
+    const easyScoreBadgeEl = document.getElementById(`section-${secNum}-easy-score-badge`);
+    if (easyScoreBadgeEl) {
+      easyScoreBadgeEl.innerText = `${currentScore}/${currentMax} pts`;
+      easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
+      easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
+      easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
     }
     if (noteEl) {
       if (secObj && secObj.deductions && secObj.deductions.length > 0 && currentScore < currentMax) {
