@@ -109,7 +109,7 @@ describe('AIVisualize Sub-Phase 3A BDD Suite', () => {
     expect(callout1.textContent).toContain('Why AI Access Matters:');
     expect(callout2.textContent).toContain('Why Page Content Matters:');
     expect(callout3.textContent).toContain('Why Brand Trust & E-E-A-T Matter:');
-    expect(callout4.textContent).toContain('Why Machine Manifests Matter:');
+    expect(callout4.textContent).toContain('Why the Machine Manifest files Matter:');
   });
 
   it('Scenario 3: Governance & Vocabulary Gate', () => {

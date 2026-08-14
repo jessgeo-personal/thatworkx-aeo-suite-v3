@@ -713,7 +713,7 @@
                 </h4>
                 <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700;">8 Manifests Tracked</span>
               </div>
-              <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">Machine Manifest Tree</p>
+              <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">Your Machine-readable, AI-Ready alternative to your website.</p>
             </div>
             <div style="display: flex; align-items: center; gap: 1rem;">
               <span id="section-4-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3);">--/25 pts</span>
@@ -723,136 +723,161 @@
 
           <!-- Section 4 Details Wrapper -->
           <div id="section-4-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
-            <div class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); padding: 0.8rem 1rem; margin-bottom: 1rem; border-radius: 4px;">
-              <strong style="color: var(--burnt-copper); font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Why Machine Manifests Matter:</strong>
-              <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Providing structured machine manifests like /llms.txt gives AI models context directories for precise, fast indexing.</span>
-            </div>
             <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Verifies structure, content parity, and syntax formats of your machine-readable files.</p>
             
-            <!-- Permanently visible 4-level file hierarchy tree list -->
-            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; font-family: var(--font-sans), sans-serif;">
-            <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 1.25rem; user-select: none; font-family: var(--font-sans), sans-serif;">The 4-level file hierarchy for AI-Readiness</div>
-            
-            <div style="display: flex; flex-direction: column; gap: 0.85rem; font-family: var(--font-sans), sans-serif;">
+            <!-- Two-Column subgrid layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec4-subgrid">
               
-              <!-- Level 1 Divider -->
-              <div class="level-divider">LEVEL 1: PROTOCOL GATES (The Gatekeepers)</div>
-              
-              <!-- Level 1 - robots.txt -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">⚙️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">robots.txt</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Permissions Verification)</span>
-                  </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_robots', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-robots"></span>
+              <!-- Left Column: Why Machine Manifests Matter -->
+              <div id="sec4-why-matters-box" class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); border-radius: 4px; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-sans), sans-serif; min-width: 0; box-sizing: border-box;">
+                <strong style="color: var(--burnt-copper); font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem;">Why the Machine Manifest files Matter:</strong>
+                <span style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.45;">Even the most informative websites run the risk of having too much content being too heavy for AI-bots to run-through before timing out.<br><br>The Machine Manifests are the sleek, light, easy-to-maintain, machine-optimized alternative that are quickly becoming the industry-standard.<br><br>Lets check how many of these you already have.</span>
+                
+                <div style="border-top: 1px solid rgba(245, 158, 11, 0.15); padding-top: 0.75rem; font-family: monospace; font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; white-space: pre-wrap; word-break: break-word;">
+<span style="color: #cbd5e1; font-weight: 700;">🌐 Inbound AI Bot Connection Request</span>
+   │
+   ├──► 🔒 <span style="color: #cbd5e1; font-weight: 700;">LEVEL 1: PROTOCOL GATES (The Gatekeeper)</span>
+   │     └── <span style="color: #ffffff; font-weight: 700;">robots.txt</span> (This controls which files AI-bots and Search-agents can access)
+   │
+   ├──► 🗺️ <span style="color: #cbd5e1; font-weight: 700;">LEVEL 2: MACHINE WELCOME MATS (The Directories)</span>
+   │     ├── <span style="color: #ffffff; font-weight: 700;">llms.txt</span> (Helps AI-bots find your Machine manifest files and ties your brand's social presence to your domain)
+   │     └── <span style="color: #ffffff; font-weight: 700;">sitemap.xml</span> (Standard sitemap to help AI-bots navigate your web presence)
+   │
+   ├──► 🤝 <span style="color: #cbd5e1; font-weight: 700;">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</span>
+   │     └── <span style="color: #ffffff; font-weight: 700;">ai-context.md</span> (Contains answers to questions that are asked of Answer engines about your brand)
+   │
+   └──► 🗂️ <span style="color: #cbd5e1; font-weight: 700;">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</span>
+         ├── <span style="color: #ffffff; font-weight: 700;">README.md</span> (It gives AI a rapid, high-level summary of your business before it dives into the weeds of your website)
+         ├── <span style="color: #ffffff; font-weight: 700;">about.md</span>  (It consolidates all your credentials in one place, proving to the AI that you are a credible source worth citing.)
+         ├── <span style="color: #ffffff; font-weight: 700;">docs.md</span>   (This file feeds the AI exactly what it needs to answer technical or specific questions about your offerings)
+         └── <span style="color: #ffffff; font-weight: 700;">content.md</span> (This is the proof behind your claims - Long-Form Case Studies & Narrative Vault which AI-bots can cite)</div>
               </div>
 
-              <!-- Level 2 Divider -->
-              <div class="level-divider">LEVEL 2: MACHINE WELCOME MATS (The Directories)</div>
-
-              <!-- Level 2 - llms.txt -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗺️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">llms.txt</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Modern AI Directory Index)</span>
+              <!-- Right Column: 4-level file hierarchy tree list -->
+              <div id="sec4-hierarchy-container" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; font-family: var(--font-sans), sans-serif; min-width: 0; box-sizing: border-box;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 1.25rem; user-select: none; font-family: var(--font-sans), sans-serif;">The 4-level file hierarchy for AI-Readiness</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; font-family: var(--font-sans), sans-serif;">
+                  
+                  <!-- Level 1 Divider -->
+                  <div class="level-divider">LEVEL 1: PROTOCOL GATES (The Gatekeepers)</div>
+                  
+                  <!-- Level 1 - robots.txt -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">⚙️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">robots.txt</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Permissions Verification)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_robots', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-robots"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_llms', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-llms"></span>
-              </div>
 
-              <!-- Level 2 - sitemap.xml -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗺️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">sitemap.xml</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Structural URL Web Tree)</span>
+                  <!-- Level 2 Divider -->
+                  <div class="level-divider">LEVEL 2: MACHINE WELCOME MATS (The Directories)</div>
+
+                  <!-- Level 2 - llms.txt -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗺️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">llms.txt</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Modern AI Directory Index)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_llms', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-llms"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_sitemap', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-sitemap-tree"></span>
-              </div>
 
-              <!-- Level 3 Divider -->
-              <div class="level-divider">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</div>
-
-              <!-- Level 3 - ai-context.md -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🤝</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">ai-context.md</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(System Prompts & Context Map)</span>
+                  <!-- Level 2 - sitemap.xml -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗺️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">sitemap.xml</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Structural URL Web Tree)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_sitemap', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-sitemap-tree"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_aicontext', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-aicontext"></span>
-              </div>
 
-              <!-- Level 4 Divider -->
-              <div class="level-divider">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</div>
+                  <!-- Level 3 Divider -->
+                  <div class="level-divider">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</div>
 
-              <!-- Level 4 - README.md -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗂️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">README.md</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Rapid Portal Summary)</span>
+                  <!-- Level 3 - ai-context.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🤝</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">ai-context.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(System Prompts & Context Map)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_aicontext', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-aicontext"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_readme', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-readme"></span>
-              </div>
 
-              <!-- Level 4 - about.md -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗂️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">about.md</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Identity, Trust & E-E-A-T Signatures)</span>
+                  <!-- Level 4 Divider -->
+                  <div class="level-divider">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</div>
+
+                  <!-- Level 4 - README.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">README.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Rapid Portal Summary)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_readme', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-readme"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_about', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-about"></span>
-              </div>
 
-              <!-- Level 4 - docs.md -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗂️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">docs.md</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Hard Metrics, Specs & Technical)</span>
+                  <!-- Level 4 - about.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">about.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Identity, Trust & E-E-A-T Signatures)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_about', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-about"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_docs', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-docs"></span>
-              </div>
 
-              <!-- Level 4 - content.md -->
-              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; padding-left: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span style="font-size: 1.1rem;">🗂️</span>
-                  <div>
-                    <span style="font-weight: 700; color: #ffffff;">content.md</span>
-                    <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Long-Form Case Studies)</span>
+                  <!-- Level 4 - docs.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">docs.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Hard Metrics, Specs & Technical)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_docs', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-docs"></span>
                   </div>
-                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_content', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
-                </div>
-                <span id="exec-status-content"></span>
-              </div>
 
+                  <!-- Level 4 - content.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">content.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Long-Form Case Studies)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_content', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-content"></span>
+                  </div>
+
+                </div>
+              </div>
             </div>
-          </div>
 
           <!-- Keep hidden tbody for safe fallback in case any script tries to access it -->
           <table style="display: none;">
