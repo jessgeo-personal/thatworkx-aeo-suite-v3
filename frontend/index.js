@@ -62,32 +62,19 @@ if (typeof window !== 'undefined') {
 
 
 function setVisualizeViewMode(mode) {
-  activeVisualizeViewMode = mode;
+  // Enforce executive mode exclusively
+  activeVisualizeViewMode = 'executive';
   const execContainer = document.getElementById('exec-mode-container');
   const welcomeBanner = document.getElementById('exec-welcome-banner');
   const executiveViewContainer = document.getElementById('executive-view-container');
-  const inspector = document.getElementById('page-level-inspector-container');
-  const panelRoutes = document.getElementById('sec2-tab-routes-panel');
 
-  if (mode === 'developer' || mode === 'diy') {
-    if (execContainer) execContainer.style.display = 'block';
-    if (welcomeBanner) welcomeBanner.style.display = 'none';
-    if (executiveViewContainer) executiveViewContainer.style.display = 'none';
-    if (inspector && execContainer) {
-      execContainer.appendChild(inspector);
-    }
-  } else {
-    if (execContainer) execContainer.style.display = 'block';
-    if (welcomeBanner) welcomeBanner.style.display = 'block';
-    if (executiveViewContainer) executiveViewContainer.style.display = 'block';
-    if (inspector && panelRoutes) {
-      panelRoutes.appendChild(inspector);
-    }
-  }
+  if (execContainer) execContainer.style.display = 'block';
+  if (welcomeBanner) welcomeBanner.style.display = 'block';
+  if (executiveViewContainer) executiveViewContainer.style.display = 'block';
 
   if (typeof window !== 'undefined' && window.history) {
     const params = new URLSearchParams(window.location.search || '');
-    params.set('mode', mode);
+    params.set('mode', 'executive');
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
   }
 }
@@ -5561,7 +5548,7 @@ function toggleModule4Row(idx) {
   const arrowBtn = document.getElementById(`btn-expand-row-${idx}`);
   if (panel) {
     if (panel.style.display === 'none') {
-      panel.style.display = 'block';
+      panel.style.display = 'table-row';
       if (btn) btn.innerHTML = '<span>Details ▴</span>';
       if (arrowBtn) arrowBtn.innerHTML = '▼';
     } else {
