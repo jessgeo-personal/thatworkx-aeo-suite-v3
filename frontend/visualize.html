@@ -323,34 +323,41 @@
 
           <!-- Section 1 Details Wrapper -->
           <div id="section-1-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
-            <div class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); padding: 0.8rem 1rem; margin-bottom: 1rem; border-radius: 4px;">
-              <strong style="color: var(--burnt-copper); font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Why AI Access Matters:</strong>
-              <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Unrestricted access ensures crawler spiders can retrieve your latest content hydration states without firewall bans.</span>
-            </div>
-            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
-            
-            <!-- Protocol Flags -->
-            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-sans), sans-serif;">
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
-                  <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
-                </div>
-                <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+            <!-- Two-Column subgrid layout -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec1-subgrid">
+              
+              <!-- Left Column: Why AI Access Matters -->
+              <div id="sec1-why-matters-box" class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); border-radius: 4px; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; font-family: var(--font-sans), sans-serif;">
+                <strong style="color: var(--burnt-copper); font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Why AI Access Matters:</strong>
+                <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Unrestricted access ensures crawler spiders can retrieve your latest content hydration states without firewall bans.</span>
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
-                  <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+
+              <!-- Right Column: Protocol Flag Results -->
+              <div id="sec1-protocol-results-container" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
+                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
+                    </div>
+                    <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
+                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+                    </div>
+                    <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
+                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
+                    </div>
+                    <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                  </div>
                 </div>
-                <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
-                  <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
-                </div>
-                <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
               </div>
             </div>
             
