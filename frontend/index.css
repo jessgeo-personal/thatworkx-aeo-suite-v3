@@ -1,4 +1,7 @@
 /* Greenfield CSS Design System - Thatworkx AEO Suite */
+/* Import all typography families with complete weight sets */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
 :root {
   /* Google Fonts inspired Dark Theme Palette (Default) */
   --canvas-bg: #202124;         /* Google dark background grey */
@@ -15,6 +18,21 @@
   --text-secondary: #e8eaed;    /* Medium emphasis secondary/body text */
   --text-muted: #bdc1c6;        /* Muted caption text */
   --text-main: #e8eaed;
+
+  /* Slate Scale (Resolves missing --dark-* references) */
+  --dark-900: #08090c;
+  --dark-800: #0f172a;
+  --dark-700: #1e293b;
+  --dark-600: #334155;
+  --dark-500: #475569;
+  --dark-400: #64748b;
+  --dark-300: #94a3b8;
+  --dark-200: #cbd5e1;
+
+  /* Sky & Accent Colors */
+  --sky-color: #38bdf8;
+  --primary-accent: #38bdf8;
+  --primary-400: #38bdf8;
 
   /* Burnt Copper Accent exception (Primary buttons, active highlights) */
   --burnt-copper: #b7410e;
@@ -42,13 +60,17 @@
 
   /* Typography */
   --font-sans: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', 'TT Interphases', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-code: 'Space Mono', 'JetBrains Mono', monospace;
   --font-headline: 'Plus Jakarta Sans', sans-serif;
 
   /* Shadows & Glows */
   --glow-shadow: 0 0 20px var(--burnt-copper-glow);
   --badge-pass: #10b981;
+  --badge-pass-bg: rgba(16, 185, 129, 0.15);
   --badge-fail: #ef4444;
+  --badge-fail-bg: rgba(239, 68, 68, 0.15);
+  --badge-warn-bg: rgba(245, 158, 11, 0.15);
 }
 
 * {
@@ -1339,12 +1361,14 @@ body {
 }
 
 @keyframes ping {
-
-75%, 100% {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  75%, 100% {
     transform: scale(2.5);
     opacity: 0;
   }
-
 }
 
 /* HEADLINE & SUBHEADLINE */
@@ -2985,7 +3009,7 @@ body {
 }
 
 .inspector-badge {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Plus Jakarta Sans', monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -3018,7 +3042,7 @@ body {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 0.4rem 1rem;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Plus Jakarta Sans', monospace;
   font-size: 0.7rem;
   color: #64748b;
   display: flex;
@@ -3032,7 +3056,7 @@ body {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   padding: 1rem;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Plus Jakarta Sans', monospace;
   font-size: 0.72rem;
   color: #a7f3d0;
   text-align: left;
@@ -5295,4 +5319,4 @@ body {
 .route-path-text {
   color: #38bdf8 !important;
   font-family: var(--font-mono), monospace !important;
-}
+}

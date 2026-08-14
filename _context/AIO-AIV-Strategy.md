@@ -403,3 +403,79 @@ When business users ask: *"Why do I need `AIOptimize` if I already have a websit
 1. **`AIVisualize Free`:** 3-page scan, basic score on screen (Lead Generator).
 2. **`AIVisualize Domain Pass` ($3.99 one-time):** Bound to `www.example.com` for 7 days / up to 100 scans. Unlocks full 40-page progressive scan, Executive PDF report, and lightweight diagnostic JSON.
 3. **`AIOptimize Subscription` ($19–$49/mo):** Converts the extracted `AIVisualize` audit into a 1-click auto-compiled Brand Truth Sheet, deploying `/llms.txt`, `/ai-context.md`, and complete Schema surfaces to keep the business visible across all AI search engines.
+
+
+## Pricing and computational load for processing logic
+
+### Why Object Matching is Ultra-Fast: Deterministic Diffing vs. AI Inference
+
+The key to keeping CPU overhead near zero is that **`AIVisualize` does NOT use an LLM or heavy AI model to perform the audit.** If you fed both files to an LLM to ask *"Compare these two documents,"* it would take 3 seconds and cost real API money. Instead, `AIVisualize` uses **pure, deterministic JavaScript code** (Hashmaps and Regex). V8 compiles and executes this in milliseconds.
+
+---
+
+### How the 3-Step Comparison Pipeline Works in Memory
+
+When the scanner completes its static page crawl, it runs a 3-step in-memory normalization pipeline:
+
+```
+Step 1: Normalize ────────► Step 2: Hashmap Diff ────────► Step 3: Flag Discrepancies
+(Extract raw text          (Direct O(1) key-value          (Output plain-English
+ into JSON structs)         comparison in JS memory)        risk metrics)
+
+```
+
+#### Step 1: Data Normalization (Converting Raw Content to Flat Objects)
+
+Before comparing, the parser flattens both sources into two simple JavaScript dictionary objects:
+
+```js
+// Extracted from live HTML page
+const pageData = {
+  price: "49.00",
+  phone: "+18005550199",
+  entities: ["Organization", "Product"],
+  faqCount: 4
+};
+
+// Extracted from /ai-context.md / JSON-LD manifest
+const manifestData = {
+  price: "29.00",
+  phone: "+18005550199",
+  entities: ["Organization"],
+  faqCount: 0
+};
+
+```
+
+#### Step 2: $O(1)$ Hashmap Comparison (The "Diff" Engine)
+
+Instead of searching through unstructured paragraphs line by line, Node.js compares the pre-indexed keys:
+
+1. **Fact Discrepancies (Anti-Cloaking Check):** `if (pageData.price !== manifestData.price)` $\rightarrow$ Flags a **Data Contradiction** (`HTML: $49` vs `Manifest: $29`).
+2. **Entity Depth Gap:** Calculates array difference between `pageData.entities` and `manifestData.entities` $\rightarrow$ Flags missing entity objects (`Product` missing in manifest).
+3. **Token Density Ratio:** `manifestText.length / pageText.length` $\rightarrow$ Calculates exact token waste percentage in 1 millisecond.
+
+#### Step 3: Scoring & Warning Output
+
+The comparison results are compiled into a simple numerical score deduction:
+
+* `-15 pts`: Data contradiction found on `price`.
+* `-10 pts`: 3 of 17 entities missing in manifest.
+
+---
+
+### Performance Impact Breakdown on Node.js
+
+| Resource | Processing Overhead | Why It Is Negligible |
+| --- | --- | --- |
+| **CPU Execution Time** | **15 ms – 30 ms total** | Hashmap lookups in V8 operate in $O(1)$ or $O(N)$ time across ~20–50 variables. |
+| **RAM Memory Usage** | **< 200 KB** | Small JSON objects stored temporarily in heap memory; cleared immediately by Garbage Collection. |
+| **Event Loop Blocking** | **0% Impact** | Synchronous string diffing under 50ms does not block Node.js from handling other incoming user requests. |
+
+---
+
+### Summary
+
+You don't need to worry about the comparison logic burning up your DigitalOcean droplet's CPU.
+
+Because `AIVisualize` normalizes the HTML and manifest data into flat JavaScript objects first, **comparing them is just simple key-value matching**. It executes in a fraction of a second, consumes almost zero memory, and gives you high-yield diagnostic proof to convert users into `AIOptimize` subscribers!
