@@ -404,6 +404,14 @@
             <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Structuring content cleanly helps LLM readers extract key entity vectors and avoid hydration parsing traps.</span>
           </div>
           <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Audits DOM cleanliness, content density, and essential business page visibility.</p>
+<!-- Sub-tab Navigation Bar -->
+          <div id="sec2-subtabs-nav" class="sec2-subtabs-nav flex items-center space-x-3 mb-6 p-1.5 bg-slate-900/80 rounded-xl border border-white/10" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; flex-wrap: wrap;">
+            <button id="btn-sec2-tab-signals" class="subtab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm" onclick="switchSec2SubTab('signals')" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; border-radius: 6px;">📊 Citation Signals & Overview</button>
+            <button id="btn-sec2-tab-routes" class="subtab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white border border-transparent" onclick="switchSec2SubTab('routes')" style="background: none; border: 1px solid transparent; color: var(--text-muted); padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; border-radius: 6px;">📄 Audited Route Directory</button>
+          </div>
+
+          <!-- Citation Signals Panel -->
+          <div id="sec2-tab-signals-panel" style="display: block;">
           
           <!-- Sub-block grid for Essential Pages and Citation Signals -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec2-subgrid">
@@ -513,21 +521,35 @@
             </div>
             <a href="optimize.html?section=content" class="submit-btn glowing-btn strip-btn" style="padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; display: inline-block; white-space: nowrap;">Generate Citation Markup in AIOptimize Pro</a>
           </div>
+          </div> <!-- Close #sec2-tab-signals-panel -->
+
+          <!-- Audited Route Directory Panel -->
+          <div id="sec2-tab-routes-panel" style="display: none; margin-top: 1rem;">
+            <!-- Page-Level Inspector Container -->
+            <div id="page-level-inspector-container" class="space-y-4">
+              <div class="flex items-center justify-between mb-4" style="margin-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif;">
+                    <span>📄</span> Scanned Route Directory
+                  </h3>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0; font-family: var(--font-sans), sans-serif;">Layout-free text extraction & canonical status per route</p>
+                </div>
+              </div>
+              <div id="dev-module-4-filter-container" class="sec2-route-filter-bar mb-4"></div>
+              <div id="dev-module-4-cards" class="sec2-route-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
+              <div id="dev-module-4-wrapper" style="display: block;">
+                <!-- Dynamically populated via buildDevModule4Html -->
+              </div>
+            </div>
+          </div>
 
           <!-- Return to summary button -->
           <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
         </div> <!-- Close #section-2-details -->
 
-        </div>
+                </div>
       </div>
       </div>
-      </div>
-
-      <!-- Page-Level Inspector Container -->
-      <div id="page-level-inspector-container">
-        <div id="module-4-table">
-          <div id="dev-module-4-wrapper"></div>
-        </div>
       </div>
 
       <!-- Section 3 Container: Can AI trust who you are? -->

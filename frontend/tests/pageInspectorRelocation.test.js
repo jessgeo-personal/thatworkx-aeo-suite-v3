@@ -46,30 +46,17 @@ describe('Page-Level Inspector Relocation BDD Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: Assert Page-Level Inspector container exists inside #executive-view-container directly after #citation-readiness-card', () => {
-    const execContainer = document.getElementById('executive-view-container');
-    expect(execContainer).not.toBeNull();
+  it('Scenario 1: Assert Page-Level Inspector container exists inside #sec2-tab-routes-panel within Section 2', () => {
+    const sec2Card = document.getElementById('exec-section2-card');
+    expect(sec2Card).not.toBeNull();
 
-    const citationCard = document.getElementById('citation-readiness-card');
-    expect(citationCard).not.toBeNull();
+    const panelRoutes = document.getElementById('sec2-tab-routes-panel');
+    expect(panelRoutes).not.toBeNull();
+    expect(sec2Card.contains(panelRoutes)).toBe(true);
 
     const inspectorContainer = document.getElementById('page-level-inspector-container');
     expect(inspectorContainer).not.toBeNull();
-
-    const module4Table = document.getElementById('module-4-table');
-    expect(module4Table).not.toBeNull();
-
-    // Assert inspector container exists inside #executive-view-container
-    expect(execContainer.contains(inspectorContainer)).toBe(true);
-    expect(inspectorContainer.contains(module4Table)).toBe(true);
-
-    // Assert inspector container is positioned directly after #citation-readiness-card
-    const children = Array.from(execContainer.children);
-    const citationIndex = children.indexOf(citationCard);
-    const inspectorIndex = children.indexOf(inspectorContainer);
-
-    expect(citationIndex).toBeGreaterThan(-1);
-    expect(inspectorIndex).toBe(citationIndex + 1);
+    expect(panelRoutes.contains(inspectorContainer)).toBe(true);
   });
 
   it('Scenario 2: Assert the container is visible when scan results render', () => {

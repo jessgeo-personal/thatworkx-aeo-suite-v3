@@ -13,7 +13,7 @@ const jsPath = path.resolve(__dirname, '../index.js');
 const htmlContent = fs.readFileSync(htmlPath, 'utf8');
 const jsContent = fs.readFileSync(jsPath, 'utf8');
 
-describe('Module 4 Relocation Option C (Section 2 Sub-Tabs) BDD Suite', () => {
+describe('Module 4 Option C Relocation & Data Binding BDD Suite', () => {
   let dom;
   let window;
   let document;
@@ -32,7 +32,7 @@ describe('Module 4 Relocation Option C (Section 2 Sub-Tabs) BDD Suite', () => {
     try {
       window.eval(jsContent);
     } catch (err) {
-      // Ignore initial JSDOM evaluation warnings
+      // Catch runtime initialization warnings
     }
 
     const domLoadedEvent = new window.Event('DOMContentLoaded', {
@@ -42,7 +42,7 @@ describe('Module 4 Relocation Option C (Section 2 Sub-Tabs) BDD Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: Assert Section 2 contains sub-tab navigation bar (#sec2-subtabs-nav) and both sub-panel containers', () => {
+  it('Scenario 1: Section 2 contains sub-tab nav bar (#sec2-subtabs-nav), filter container (#dev-module-4-filter-container), and cards grid (#dev-module-4-cards)', () => {
     const sec2Card = document.getElementById('exec-section2-card');
     expect(sec2Card).not.toBeNull();
 
@@ -60,12 +60,16 @@ describe('Module 4 Relocation Option C (Section 2 Sub-Tabs) BDD Suite', () => {
     expect(panelSignals).not.toBeNull();
     expect(panelRoutes).not.toBeNull();
 
-    const inspectorContainer = document.getElementById('page-level-inspector-container');
-    expect(inspectorContainer).not.toBeNull();
-    expect(panelRoutes.contains(inspectorContainer)).toBe(true);
+    const filterContainer = document.getElementById('dev-module-4-filter-container');
+    expect(filterContainer).not.toBeNull();
+    expect(panelRoutes.contains(filterContainer)).toBe(true);
+
+    const cardsContainer = document.getElementById('dev-module-4-cards');
+    expect(cardsContainer).not.toBeNull();
+    expect(panelRoutes.contains(cardsContainer)).toBe(true);
   });
 
-  it('Scenario 2: Assert default sub-tab state displays Citation Signals panel and hides Audited Routes panel', () => {
+  it('Scenario 2: Default sub-tab state displays Citation Signals panel and hides Audited Routes panel', () => {
     const panelSignals = document.getElementById('sec2-tab-signals-panel');
     const panelRoutes = document.getElementById('sec2-tab-routes-panel');
 
@@ -73,51 +77,63 @@ describe('Module 4 Relocation Option C (Section 2 Sub-Tabs) BDD Suite', () => {
     expect(panelRoutes.style.display).toBe('none');
   });
 
-  it('Scenario 3: Assert clicking Audited Route Directory sub-tab toggles panel visibility correctly', () => {
-    const btnRoutes = document.getElementById('btn-sec2-tab-routes');
-    const btnSignals = document.getElementById('btn-sec2-tab-signals');
+  it('Scenario 3: Switching to Audited Routes tab renders cached scan results into glassmorphic cards automatically', () => {
+    const mockScanData = {
+      url: 'https://thatworkx.com',
+      discoveredRoutes: [
+        { path: '/', wordCount: 850, tokenLoad: 1148, canonicalTag: true, isEssential: true, missingStatus: 'Active' },
+        { path: '/services', wordCount: 620, tokenLoad: 837, canonicalTag: true, isEssential: false, missingStatus: 'Active' }
+      ]
+    };
+
+    window.latestScanResults = mockScanData;
+    window.lastScanResults = mockScanData;
+
+    window.switchSec2SubTab('routes');
+
     const panelSignals = document.getElementById('sec2-tab-signals-panel');
     const panelRoutes = document.getElementById('sec2-tab-routes-panel');
-
-    if (typeof window.switchSec2SubTab === 'function') {
-      window.switchSec2SubTab('routes');
-    } else {
-      btnRoutes.click();
-    }
+    const btnRoutes = document.getElementById('btn-sec2-tab-routes');
 
     expect(panelSignals.style.display).toBe('none');
     expect(panelRoutes.style.display).toBe('block');
     expect(btnRoutes.classList.contains('active')).toBe(true);
-    expect(btnSignals.classList.contains('active')).toBe(false);
+
+    const cards = document.querySelectorAll('.sec2-route-card, .route-card-capsule');
+    expect(cards.length).toBeGreaterThanOrEqual(2);
+    expect(cards[0].textContent).toContain('/');
+    expect(cards[1].textContent).toContain('/services');
   });
 
-  it('Scenario 4: Assert rendering Module 4 generates glassmorphic route cards with neon cyan routes and inspect CTAs', () => {
-    const mockResults = {
-      url: 'https://example.com',
-      pages: [
-        {
-          route: '/about',
-          wordCount: 450,
-          status: 200,
-          hasCanonical: true,
-          isSchema: true,
-          html: '<html><body><h1>About Us</h1></body></html>'
-        }
+  it('Scenario 4: Page payload normalization in renderModule4 resolves discoveredRoutes, scannedPages, and pages seamlessly', () => {
+    const mockFromDiscovered = {
+      url: 'https://testbrand.com',
+      discoveredRoutes: [
+        { path: '/pricing', wordCount: 420, tokenLoad: 567, canonicalTag: true }
       ]
     };
 
-    if (typeof window.renderModule4 === 'function') {
-      window.renderModule4(mockResults);
-    }
+    window.renderModule4(mockFromDiscovered);
+    const cards = document.querySelectorAll('.sec2-route-card, .route-card-capsule');
+    expect(cards.length).toBe(1);
+    expect(cards[0].textContent).toContain('/pricing');
+  });
 
-    const routeCard = document.querySelector('.sec2-route-card, .route-card-capsule');
-    expect(routeCard).not.toBeNull();
+  it('Scenario 5: Global scan caching populates window.latestScanResults and window.lastScanResults during updateExecutiveViewData', () => {
+    const payload = {
+      url: 'https://holiknits.com',
+      scoreCard: { overallScore: 88, pillars: { p1: { score: 25 }, p2: { score: 22 }, p3: { score: 20 }, p4: { score: 21 } } },
+      discoveredRoutes: [{ path: '/catalog', wordCount: 900 }]
+    };
 
-    const routePath = routeCard.querySelector('.route-path-text, code');
-    expect(routePath).not.toBeNull();
-    expect(routePath.textContent).toContain('/about');
+    window.updateExecutiveViewData(payload);
 
-    const inspectBtn = routeCard.querySelector('.btn-inspect-text, [onclick*="viewPageMarkdown"]');
-    expect(inspectBtn).not.toBeNull();
+    expect(window.latestScanResults).toEqual(payload);
+    expect(window.lastScanResults).toEqual(payload);
+  });
+
+  it('Scenario 6: Verify switchSec2SubTab is cleanly declared with zero duplicate definitions', () => {
+    const fnMatches = jsContent.match(/window\.switchSec2SubTab\s*=/g) || [];
+    expect(fnMatches.length).toBe(1);
   });
 });

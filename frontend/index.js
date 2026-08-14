@@ -69,6 +69,8 @@ function setVisualizeViewMode(mode) {
   const pillDev = document.getElementById('pill-dev-mode');
   const welcomeBanner = document.getElementById('exec-welcome-banner');
   const executiveViewContainer = document.getElementById('executive-view-container');
+  const inspector = document.getElementById('page-level-inspector-container');
+  const panelRoutes = document.getElementById('sec2-tab-routes-panel');
 
   if (mode === 'developer' || mode === 'diy') {
     if (execContainer) execContainer.style.display = 'block';
@@ -77,6 +79,9 @@ function setVisualizeViewMode(mode) {
     if (devContainer) devContainer.style.display = 'block';
     if (pillExec) pillExec.classList.remove('active');
     if (pillDev) pillDev.classList.add('active');
+    if (inspector && execContainer) {
+      execContainer.appendChild(inspector);
+    }
   } else {
     if (execContainer) execContainer.style.display = 'block';
     if (welcomeBanner) welcomeBanner.style.display = 'block';
@@ -84,6 +89,9 @@ function setVisualizeViewMode(mode) {
     if (devContainer) devContainer.style.display = 'none';
     if (pillExec) pillExec.classList.add('active');
     if (pillDev) pillDev.classList.remove('active');
+    if (inspector && panelRoutes) {
+      panelRoutes.appendChild(inspector);
+    }
   }
 
   if (typeof window !== 'undefined' && window.history) {
@@ -2733,6 +2741,8 @@ function formatRagTextWithTruncation(rawText, pageRoute) {
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 function updateExecutiveViewData(results) {
+  window.latestScanResults = results;
+  window.lastScanResults = results;
   console.log("=== updateExecutiveViewData called ===");
   if (!results) return;
 
@@ -3376,7 +3386,7 @@ function updateExecutiveViewData(results) {
     if (active) {
       return '<span class="status-green">🟢 Available</span>';
     } else {
-      return '<span class="status-red">🔴 Not available</span><a href="?mode=developer&tab=manifests" class="diy-sample-link" style="margin-left: 10px; font-size: 0.75rem; font-weight: 600; color: #34d399; text-decoration: underline; font-family: var(--font-sans), sans-serif;">View DIY sample ↗</a>';
+      return '<span class="status-red">🔴 Not available</span>';
     }
   };
 
@@ -5029,15 +5039,28 @@ function renderModule4(results, filter = 'all') {
   if (!tbody) return;
 
   const data = results || latestScanResults || window.lastScanResults || {};
-  const pages = (data.pages && data.pages.length) ? data.pages : [
-    { 
-      route: '/', 
-      wordCount: data?.status?.wordCount ?? 0, 
-      hasCanonical: true, 
-      canonicalUrl: `https://${currentScannedDomain || 'example.com'}/`, 
-      headingAudit: { isHierarchyValid: data?.status?.hasProperHierarchy ?? true, h1: 1, h2: 2 } 
-    }
-  ];
+  let rawPages = [];
+  if (Array.isArray(data.pages) && data.pages.length) {
+    rawPages = data.pages;
+  } else if (Array.isArray(data.discoveredRoutes) && data.discoveredRoutes.length) {
+    rawPages = data.discoveredRoutes;
+  } else if (Array.isArray(data.scannedPages) && data.scannedPages.length) {
+    rawPages = data.scannedPages;
+  } else {
+    rawPages = [
+      { 
+        route: '/', 
+        wordCount: data?.status?.wordCount ?? 0, 
+        hasCanonical: true, 
+        canonicalUrl: `https://${currentScannedDomain || 'example.com'}/`, 
+        headingAudit: { isHierarchyValid: data?.status?.hasProperHierarchy ?? true, h1: 1, h2: 2 } 
+      }
+    ];
+  }
+  const pages = rawPages.map(p => ({
+    ...p,
+    route: p.route || p.path || p.url || '/'
+  }));
 
   const domain = currentScannedDomain || 'example.com';
   const parser = new DOMParser();
@@ -5232,6 +5255,45 @@ function renderModule4(results, filter = 'all') {
   } else {
     if (expandContainer) {
       expandContainer.innerHTML = '';
+    }
+  }
+
+  const cardsContainer = document.getElementById('dev-module-4-cards');
+  if (cardsContainer) {
+    const cardPages = pages.map(p => ({
+      route: p.route || p.path || p.url || '/',
+      wordCount: p.wordCount || p.words || 0,
+      tokenLoad: p.tokenLoad || Math.round((p.wordCount || p.words || 0) * 1.35),
+      hasCanonical: p.hasCanonical !== undefined ? p.hasCanonical : (p.canonicalTag !== undefined ? p.canonicalTag : true),
+      hasSchema: p.hasSchema !== undefined ? p.hasSchema : (p.schemaDetected !== undefined ? p.schemaDetected : false)
+    }));
+
+    const activeFilter = filter || 'all';
+    const filteredCardPages = cardPages.filter(item => {
+      if (activeFilter === 'warnings' || activeFilter === 'errors') return !item.hasCanonical || !item.hasSchema || item.wordCount < 250;
+      if (activeFilter === 'schema') return !item.hasSchema;
+      if (activeFilter === 'thin') return item.wordCount < 250;
+      return true;
+    });
+
+    if (filteredCardPages.length === 0) {
+      cardsContainer.innerHTML = '<div class="p-4 text-slate-400 text-sm">No audited routes found matching criteria.</div>';
+    } else {
+      cardsContainer.innerHTML = filteredCardPages.map(item => `
+        <div class="sec2-route-card route-card-capsule bg-slate-900/60 border border-slate-800 rounded-xl p-4 mb-3" style="background: rgba(15,23,42,0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1rem;">
+          <div class="flex justify-between items-center mb-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span class="font-mono font-semibold text-sky-400 text-sm" style="color: #38bdf8; font-family: monospace; font-weight: 700;">${item.route}</span>
+            <span class="text-xs px-2 py-0.5 rounded" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 999px; ${item.wordCount >= 250 ? 'background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);' : 'background: rgba(220, 38, 38, 0.1); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3);'}">${item.wordCount} words</span>
+          </div>
+          <div class="flex gap-2 text-xs text-slate-400" style="display: flex; gap: 0.75rem; font-size: 0.78rem; color: #94a3b8;">
+            <span>Tokens: ${item.tokenLoad}</span>
+            <span>•</span>
+            <span>Canonical: ${item.hasCanonical ? '🟢' : '🔴'}</span>
+            <span>•</span>
+            <span>Schema: ${item.hasSchema ? '🟢' : '⚠️'}</span>
+          </div>
+        </div>
+      `).join('');
     }
   }
 
@@ -5803,3 +5865,45 @@ window.expandModule4Pages = expandModule4Pages;
 
 
 
+
+window.switchSec2SubTab = function(tabName) {
+  const btnSignals = document.getElementById('btn-sec2-tab-signals');
+  const btnRoutes = document.getElementById('btn-sec2-tab-routes');
+  const panelSignals = document.getElementById('sec2-tab-signals-panel');
+  const panelRoutes = document.getElementById('sec2-tab-routes-panel');
+
+  if (tabName === 'signals') {
+    if (panelSignals) panelSignals.style.display = 'block';
+    if (panelRoutes) panelRoutes.style.display = 'none';
+    if (btnSignals) {
+      btnSignals.classList.add('active');
+      btnSignals.style.background = 'rgba(56, 189, 248, 0.15)';
+      btnSignals.style.color = '#38bdf8';
+      btnSignals.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+    }
+    if (btnRoutes) {
+      btnRoutes.classList.remove('active');
+      btnRoutes.style.background = 'transparent';
+      btnRoutes.style.color = '#94a3b8';
+      btnRoutes.style.borderColor = 'transparent';
+    }
+  } else if (tabName === 'routes') {
+    if (panelSignals) panelSignals.style.display = 'none';
+    if (panelRoutes) panelRoutes.style.display = 'block';
+    if (btnRoutes) {
+      btnRoutes.classList.add('active');
+      btnRoutes.style.background = 'rgba(56, 189, 248, 0.15)';
+      btnRoutes.style.color = '#38bdf8';
+      btnRoutes.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+    }
+    if (btnSignals) {
+      btnSignals.classList.remove('active');
+      btnSignals.style.background = 'transparent';
+      btnSignals.style.color = '#94a3b8';
+      btnSignals.style.borderColor = 'transparent';
+    }
+    if (typeof window.renderModule4 === 'function') {
+      window.renderModule4(window.latestScanResults || window.lastScanResults || {});
+    }
+  }
+};

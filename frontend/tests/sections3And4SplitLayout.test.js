@@ -57,12 +57,12 @@ describe('Section 3 & 4 Split Grid Layout BDD Suite', () => {
     expect(sec4).not.toBeNull();
   });
 
-  it('Scenario 2: Card wrappers reside sequentially after page-level-inspector-container and before upsell banner', () => {
+  it('Scenario 2: Card wrappers reside sequentially after citation-readiness-card and before upsell banner', () => {
     const execContainer = document.getElementById('executive-view-container');
     expect(execContainer).not.toBeNull();
 
-    const inspector = document.getElementById('page-level-inspector-container');
-    expect(inspector).not.toBeNull();
+    const citationCard = document.getElementById('citation-readiness-card');
+    expect(citationCard).not.toBeNull();
 
     const sec3 = document.getElementById('section-3-card');
     expect(sec3).not.toBeNull();
@@ -74,7 +74,7 @@ describe('Section 3 & 4 Split Grid Layout BDD Suite', () => {
     expect(upsellBanner).not.toBeNull();
 
     // Verify ordering
-    expect(inspector.nextElementSibling).toBe(sec3);
+    expect(citationCard.nextElementSibling).toBe(sec3);
     expect(sec3.nextElementSibling).toBe(sec4);
     expect(sec4.nextElementSibling).toBe(upsellBanner);
   });

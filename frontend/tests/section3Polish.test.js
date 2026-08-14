@@ -46,15 +46,15 @@ describe('Section 3 Polish BDD Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: Section 3 container exists directly following page-level-inspector-container', () => {
-    const inspectorContainer = document.getElementById('page-level-inspector-container');
-    expect(inspectorContainer).not.toBeNull();
+  it('Scenario 1: Section 3 container exists directly following citation-readiness-card', () => {
+    const citationCard = document.getElementById('citation-readiness-card');
+    expect(citationCard).not.toBeNull();
 
     const section3Container = document.getElementById('section-3-card');
     expect(section3Container).not.toBeNull();
 
-    // Verify Section 3 resides directly after page-level inspector
-    expect(inspectorContainer.nextElementSibling).toBe(section3Container);
+    // Verify Section 3 resides directly after Section 2 card
+    expect(citationCard.nextElementSibling).toBe(section3Container);
   });
 
   it('Scenario 2: Section 3 contains the required E-E-A-T trust diagnostic badges', () => {
