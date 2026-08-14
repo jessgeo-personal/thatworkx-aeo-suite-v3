@@ -5217,6 +5217,13 @@ body {
     display: block !important;
     visibility: visible !important;
   }
+  #sec1-remediation-banner,
+  #sec2-remediation-banner,
+  #sec3-remediation-banner,
+  #sec4-remediation-banner {
+    display: block !important;
+    visibility: visible !important;
+  }
 }
 
 /* Outline-only Return to Summary Button Style with Copper Glow hover */
@@ -5231,4 +5238,34 @@ body {
 .btn-return-summary-outline:hover {
   background: rgba(255, 255, 255, 0.05) !important;
   border-color: rgba(212, 118, 78, 0.4) !important;
+}
+
+/* Contextual Remediation Banners styling */
+.remediation-banner {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.remediation-banner:hover {
+  transform: translateY(-2px);
+}
+
+.remediation-banner.border-glow-cyan:hover {
+  box-shadow: 0 4px 25px rgba(14, 165, 233, 0.4) !important;
+  border-color: rgba(14, 165, 233, 0.6) !important;
+}
+
+.remediation-banner.border-glow-emerald:hover {
+  box-shadow: 0 4px 25px rgba(16, 185, 129, 0.4) !important;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+}
+
+.remediation-banner.border-glow-amber:hover {
+  box-shadow: 0 4px 25px rgba(245, 158, 11, 0.4) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.remediation-banner.border-glow-burnt:hover {
+  box-shadow: 0 4px 25px rgba(220, 38, 38, 0.4) !important;
+  border-color: rgba(220, 38, 38, 0.6) !important;
 }

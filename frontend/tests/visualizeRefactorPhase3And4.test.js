@@ -135,3 +135,98 @@ describe('AIVisualize Sub-Phase 3A BDD Suite', () => {
     expect(s4Text).toContain('AI-Ready');
   });
 });
+
+describe('AIVisualize Phase 4 Remediation Banners & Section 2 CTA BDD Suite', () => {
+  let dom;
+  let window;
+  let document;
+
+  beforeEach(() => {
+    dom = new JSDOM(htmlContent, {
+      runScripts: 'dangerously',
+      resources: 'usable',
+      url: 'http://localhost/visualize.html'
+    });
+    window = dom.window;
+    document = window.document;
+
+    window.API_BASE = 'http://localhost:5000';
+    window.evaluateAllCapabilities = () => ({ capabilities: [] });
+    window.CAPABILITY_MATRIX = [];
+
+    try {
+      window.eval(jsContent);
+    } catch (err) {
+      // Ignore evaluation warnings in JSDOM
+    }
+
+    const domLoadedEvent = new window.Event('DOMContentLoaded', {
+      bubbles: true,
+      cancelable: true
+    });
+    window.document.dispatchEvent(domLoadedEvent);
+  });
+
+  it('Scenario A: Section 2 Return CTA Full-Width Alignment', () => {
+    const sec2ReturnBtn = document.querySelector('#section-2-details .btn-return-summary');
+    expect(sec2ReturnBtn).not.toBeNull();
+    const styleAttribute = sec2ReturnBtn.getAttribute('style') || '';
+    const hasFullWidth = styleAttribute.includes('width: 100%') || styleAttribute.includes('grid-column: 1 / -1') || styleAttribute.includes('grid-column: span 2');
+    expect(hasFullWidth).toBe(true);
+  });
+
+  it('Scenario B: Contextual Remediation Banners & Deep Link Routing', () => {
+    // Assert Section 1 details banner
+    const sec1Banner = document.getElementById('sec1-remediation-banner');
+    expect(sec1Banner).not.toBeNull();
+    expect(sec1Banner.classList.contains('border-glow-cyan')).toBe(true);
+    const sec1Link = sec1Banner.querySelector('a[href="optimize.html?section=access"]');
+    expect(sec1Link).not.toBeNull();
+    expect(sec1Link.textContent.trim()).toContain('Restore AI Access Permissions in AIOptimize Pro');
+
+    // Assert Section 2 details banner
+    const sec2Banner = document.getElementById('sec2-remediation-banner');
+    expect(sec2Banner).not.toBeNull();
+    expect(sec2Banner.classList.contains('border-glow-emerald')).toBe(true);
+    const sec2Link = sec2Banner.querySelector('a[href="optimize.html?section=content"]');
+    expect(sec2Link).not.toBeNull();
+    expect(sec2Link.textContent.trim()).toContain('Generate Citation Markup in AIOptimize Pro');
+
+    // Assert Section 3 details banner
+    const sec3Banner = document.getElementById('sec3-remediation-banner');
+    expect(sec3Banner).not.toBeNull();
+    expect(sec3Banner.classList.contains('border-glow-amber')).toBe(true);
+    const sec3Link = sec3Banner.querySelector('a[href="optimize.html?section=trust"]');
+    expect(sec3Link).not.toBeNull();
+    expect(sec3Link.textContent.trim()).toContain('Verify Brand Trust Signals in AIOptimize Pro');
+
+    // Assert Section 4 details banner
+    const sec4Banner = document.getElementById('sec4-remediation-banner');
+    expect(sec4Banner).not.toBeNull();
+    expect(sec4Banner.classList.contains('border-glow-burnt')).toBe(true);
+    const sec4Link = sec4Banner.querySelector('a[href="optimize.html?section=blueprint"]');
+    expect(sec4Link).not.toBeNull();
+    expect(sec4Link.textContent.trim()).toContain('Deploy Machine Manifests in AIOptimize Pro');
+  });
+
+  it('Scenario C: PDF Print Overrides for Remediation Banners', () => {
+    expect(cssContent).toContain('@media print');
+    const printIndex = cssContent.indexOf('@media print');
+    const printBlock = cssContent.slice(printIndex);
+
+    expect(printBlock).toContain('#sec1-remediation-banner');
+    expect(printBlock).toContain('#sec2-remediation-banner');
+    expect(printBlock).toContain('#sec3-remediation-banner');
+    expect(printBlock).toContain('#sec4-remediation-banner');
+
+    const sec1Regex = /#sec1-remediation-banner[^}]+?display\s*:\s*block\s*!important/i;
+    const sec2Regex = /#sec2-remediation-banner[^}]+?display\s*:\s*block\s*!important/i;
+    const sec3Regex = /#sec3-remediation-banner[^}]+?display\s*:\s*block\s*!important/i;
+    const sec4Regex = /#sec4-remediation-banner[^}]+?display\s*:\s*block\s*!important/i;
+
+    expect(printBlock).toMatch(sec1Regex);
+    expect(printBlock).toMatch(sec2Regex);
+    expect(printBlock).toMatch(sec3Regex);
+    expect(printBlock).toMatch(sec4Regex);
+  });
+});
