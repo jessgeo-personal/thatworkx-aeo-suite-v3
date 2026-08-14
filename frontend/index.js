@@ -4650,15 +4650,15 @@ function openSectionHelpModal(secNum, evt) {
   console.log('[AEO-Infotip-Debug] Modal State After Mutation:', 'Classes After:', modalEl.className, 'Display After:', modalEl.style.display);
 }
 
-function closeHelpModal() {
-  const modalEl = document.getElementById('help-modal');
-  if (modalEl) {
-    modalEl.classList.add('help-modal-hidden');
-  }
-}
+//function closeHelpModal() {
+ // const modalEl = document.getElementById('help-modal');
+ // if (modalEl) {
+   // modalEl.classList.add('help-modal-hidden');
+  //}
+//}
 
-window.openSectionHelpModal = openSectionHelpModal;
-window.closeHelpModal = closeHelpModal;
+//window.openSectionHelpModal = openSectionHelpModal;
+//window.closeHelpModal = closeHelpModal;
 
 let simHumanFontSize = 0.78; // rem
 let simAiFontSize = 0.75; // rem
