@@ -4965,7 +4965,7 @@ function buildDevModule4Html() {
       <div id="dev-module-4-filter-container"></div>
 
       <div class="table-responsive-wrapper" style="overflow-x: auto;">
-        <table class="exec-table dev-expandable-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <table id="module-4-table" class="exec-table dev-expandable-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
           <thead>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
               <th style="padding: 0.6rem; width: 40px;"></th>
@@ -5530,7 +5530,7 @@ function renderModule4(results, filter = 'all') {
     }
 
     return `
-      <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" class="module4-data-row">
         <td>
           <button type="button" class="btn-expand-row" id="btn-expand-row-${idx}" onclick="toggleModule4Row(${idx})">▶</button>
         </td>
@@ -5544,12 +5544,10 @@ function renderModule4(results, filter = 'all') {
         <td>${semanticHtml}</td>
         <td>${imagesAltHtml}</td>
         <td>${lastUpdatedHtml}</td>
-        <td style="text-align: right;">${actionHtml}</td>
-      </tr>
-      <tr id="dev-module-4-row-${idx}" style="display: none;">
-        <td colspan="10" style="padding: 1.2rem; background: rgba(0,0,0,0.15); border-left: 3px solid var(--border-color);">
-          <div class="row-expanded-content">
-            ${fixPanelsHtml}
+        <td style="text-align: right; vertical-align: top;">
+          ${actionHtml}
+          <div id="dev-module-4-row-${idx}" class="module4-expand-panel" style="display: none; text-align: left; padding: 1.2rem 0 0.5rem 0;">
+            <div class="row-expanded-content">${fixPanelsHtml}</div>
           </div>
         </td>
       </tr>
@@ -5558,16 +5556,16 @@ function renderModule4(results, filter = 'all') {
 }
 
 function toggleModule4Row(idx) {
-  const row = document.getElementById(`dev-module-4-row-${idx}`);
+  const panel = document.getElementById(`dev-module-4-row-${idx}`);
   const btn = document.getElementById(`btn-toggle-row-${idx}`);
   const arrowBtn = document.getElementById(`btn-expand-row-${idx}`);
-  if (row) {
-    if (row.style.display === 'none') {
-      row.style.display = 'table-row';
+  if (panel) {
+    if (panel.style.display === 'none') {
+      panel.style.display = 'block';
       if (btn) btn.innerHTML = '<span>Details ▴</span>';
       if (arrowBtn) arrowBtn.innerHTML = '▼';
     } else {
-      row.style.display = 'none';
+      panel.style.display = 'none';
       if (btn) btn.innerHTML = '<span>Details ▾</span>';
       if (arrowBtn) arrowBtn.innerHTML = '▶';
     }

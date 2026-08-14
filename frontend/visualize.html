@@ -530,7 +530,7 @@
               <div class="flex items-center justify-between mb-4" style="margin-bottom: 1rem;">
                 <div>
                   <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif;">
-                    <span>📄</span> Scanned Route Directory
+                    <span>📄</span> Audited Route Directory
                   </h3>
                   <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0; font-family: var(--font-sans), sans-serif;">Layout-free text extraction & canonical status per route</p>
                 </div>
@@ -538,7 +538,23 @@
               <div id="dev-module-4-filter-container" class="sec2-route-filter-bar mb-4"></div>
               <div id="dev-module-4-cards" class="sec2-route-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
               <div id="dev-module-4-wrapper" style="display: block;">
-                <!-- Dynamically populated via buildDevModule4Html -->
+                <table id="module-4-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8; font-size: 0.8rem;">
+                      <th style="padding: 0.5rem; width: 2rem;"></th>
+                      <th style="padding: 0.5rem;">Route / Path</th>
+                      <th style="padding: 0.5rem;">Crawl</th>
+                      <th style="padding: 0.5rem;">Word Count</th>
+                      <th style="padding: 0.5rem;">Hidden from AI</th>
+                      <th style="padding: 0.5rem;">Canonical</th>
+                      <th style="padding: 0.5rem;">Semantic HTML</th>
+                      <th style="padding: 0.5rem;">Images Alt</th>
+                      <th style="padding: 0.5rem;">Last Updated</th>
+                      <th style="padding: 0.5rem; text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dev-module-4-tbody"></tbody>
+                </table>
               </div>
             </div>
           </div>
