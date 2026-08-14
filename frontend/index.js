@@ -64,9 +64,6 @@ if (typeof window !== 'undefined') {
 function setVisualizeViewMode(mode) {
   activeVisualizeViewMode = mode;
   const execContainer = document.getElementById('exec-mode-container');
-  const devContainer = document.getElementById('dev-mode-container');
-  const pillExec = document.getElementById('pill-exec-mode');
-  const pillDev = document.getElementById('pill-dev-mode');
   const welcomeBanner = document.getElementById('exec-welcome-banner');
   const executiveViewContainer = document.getElementById('executive-view-container');
   const inspector = document.getElementById('page-level-inspector-container');
@@ -76,9 +73,6 @@ function setVisualizeViewMode(mode) {
     if (execContainer) execContainer.style.display = 'block';
     if (welcomeBanner) welcomeBanner.style.display = 'none';
     if (executiveViewContainer) executiveViewContainer.style.display = 'none';
-    if (devContainer) devContainer.style.display = 'block';
-    if (pillExec) pillExec.classList.remove('active');
-    if (pillDev) pillDev.classList.add('active');
     if (inspector && execContainer) {
       execContainer.appendChild(inspector);
     }
@@ -86,9 +80,6 @@ function setVisualizeViewMode(mode) {
     if (execContainer) execContainer.style.display = 'block';
     if (welcomeBanner) welcomeBanner.style.display = 'block';
     if (executiveViewContainer) executiveViewContainer.style.display = 'block';
-    if (devContainer) devContainer.style.display = 'none';
-    if (pillExec) pillExec.classList.add('active');
-    if (pillDev) pillDev.classList.remove('active');
     if (inspector && panelRoutes) {
       panelRoutes.appendChild(inspector);
     }

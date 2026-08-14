@@ -3521,14 +3521,7 @@ body {
    MILESTONE 3: EXECUTIVE MODE UI & PERCEPTION SIMULATOR
    ═════════════════════════════════════════════════════════ */
 
-/* Mode Scoping: Hide Developer Mode components in Executive Mode */
-[data-visualize-mode="executive"] .dev-only-component {
-  display: none !important;
-}
-
-[data-visualize-mode="developer"] .exec-only-component {
-  display: none !important;
-}
+/* Mode Scoping: Handled via setVisualizeViewMode() in index.js — no CSS attribute selector needed */
 
 /* Executive Top Banner */
 .executive-banner-card {
@@ -4684,9 +4677,7 @@ body {
   }
 }
 
-#exec-section-4 .diy-sample-link {
-  display: none !important;
-}
+/* .diy-sample-link removed — link no longer generated in getTreeStatusHtml() */
 
 .section4-upsell-card {
   background: var(--surface-bg);
