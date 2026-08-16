@@ -5536,7 +5536,7 @@ function renderModule4(results, filter = 'all') {
         </td>
       </tr>
       <tr id="dev-module-4-row-${idx}" style="display: none;">
-        <td colspan="7" class="module4-detail-cell">
+        <td colspan="10" class="module4-detail-cell">
           <div class="module4-detail-card" style="text-align: left; padding: 1.2rem 0 0.5rem 0;">
             <div class="row-expanded-content">${fixPanelsHtml}</div>
           </div>

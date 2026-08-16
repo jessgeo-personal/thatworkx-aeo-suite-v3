@@ -5338,18 +5338,25 @@ body {
 }
 
 
+
 /* ==========================================================================
    Module 4 Full-Width Table & Accordion Spanning Overhaul
    ========================================================================== */
+#sec2-module-4-container,
+#module-4-table,
+#dev-module-4-table,
 #dev-module-4-wrapper,
 #diy-module-4,
 .table-responsive-wrapper {
   width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
 }
 
+#module-4-table,
 #dev-module-4-table,
 .health-inspector-table,
+.dev-expandable-table,
 .table-responsive-wrapper table {
   width: 100% !important;
   border-collapse: collapse !important;
@@ -5357,11 +5364,13 @@ body {
   display: table !important;
 }
 
+#dev-module-4-tbody tr.module4-data-row,
 #dev-module-4-tbody tr.module4-main-row {
   display: table-row !important;
 }
 
 #dev-module-4-tbody tr[id^="dev-module-4-row-"] {
+  display: table-row;
   width: 100% !important;
 }
 
@@ -5370,7 +5379,7 @@ body {
   width: 100% !important;
   box-sizing: border-box !important;
   padding: 1.25rem 1.5rem !important;
-  background: rgba(15, 23, 42, 0.85) !important;
+  background: rgba(15, 23, 42, 0.9) !important;
   border-top: 1px dashed rgba(255, 255, 255, 0.1) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
@@ -5379,4 +5388,9 @@ body {
   width: 100% !important;
   box-sizing: border-box !important;
   display: block !important;
+}
+
+.row-expanded-content {
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
