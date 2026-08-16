@@ -5533,7 +5533,11 @@ function renderModule4(results, filter = 'all') {
         <td>${lastUpdatedHtml}</td>
         <td style="text-align: right; vertical-align: top;">
           ${actionHtml}
-          <div id="dev-module-4-row-${idx}" class="module4-expand-panel" style="display: none; text-align: left; padding: 1.2rem 0 0.5rem 0;">
+        </td>
+      </tr>
+      <tr id="dev-module-4-row-${idx}" style="display: none;">
+        <td colspan="7" class="module4-detail-cell">
+          <div class="module4-detail-card" style="text-align: left; padding: 1.2rem 0 0.5rem 0;">
             <div class="row-expanded-content">${fixPanelsHtml}</div>
           </div>
         </td>
@@ -5544,17 +5548,25 @@ function renderModule4(results, filter = 'all') {
 
 function toggleModule4Row(idx) {
   const panel = document.getElementById(`dev-module-4-row-${idx}`);
-  const btn = document.getElementById(`btn-toggle-row-${idx}`);
+  const btn = document.getElementById(`btn-toggle-row-${idx}`) || document.getElementById(`btn-detail-toggle-${idx}`);
   const arrowBtn = document.getElementById(`btn-expand-row-${idx}`);
   if (panel) {
     if (panel.style.display === 'none') {
       panel.style.display = 'table-row';
-      if (btn) btn.innerHTML = '<span>Details ▴</span>';
-      if (arrowBtn) arrowBtn.innerHTML = '▼';
+      if (btn) {
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Details ▴';
+        else btn.textContent = 'Close Details ▴';
+      }
+      if (arrowBtn) arrowBtn.textContent = '▼';
     } else {
       panel.style.display = 'none';
-      if (btn) btn.innerHTML = '<span>Details ▾</span>';
-      if (arrowBtn) arrowBtn.innerHTML = '▶';
+      if (btn) {
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Details ▾';
+        else btn.textContent = 'Details ▾';
+      }
+      if (arrowBtn) arrowBtn.textContent = '▶';
     }
   }
 }
@@ -5883,3 +5895,5 @@ window.switchSec2SubTab = function(tabName) {
     }
   }
 };
+
+window.toggleModule4Row = toggleModule4Row;

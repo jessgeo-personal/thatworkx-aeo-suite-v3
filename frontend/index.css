@@ -5320,3 +5320,63 @@ body {
   color: #38bdf8 !important;
   font-family: var(--font-mono), monospace !important;
 }
+
+
+/* Module 4 Full-Width Accordion Expansion */
+#dev-module-4-tbody tr[id^="dev-module-4-row-"] {
+  width: 100% !important;
+}
+#dev-module-4-tbody tr[id^="dev-module-4-row-"] > td {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1rem 1.25rem !important;
+  background: rgba(15, 23, 42, 0.75) !important;
+}
+.module4-detail-card {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+
+/* ==========================================================================
+   Module 4 Full-Width Table & Accordion Spanning Overhaul
+   ========================================================================== */
+#dev-module-4-wrapper,
+#diy-module-4,
+.table-responsive-wrapper {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#dev-module-4-table,
+.health-inspector-table,
+.table-responsive-wrapper table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: auto !important;
+  display: table !important;
+}
+
+#dev-module-4-tbody tr.module4-main-row {
+  display: table-row !important;
+}
+
+#dev-module-4-tbody tr[id^="dev-module-4-row-"] {
+  width: 100% !important;
+}
+
+#dev-module-4-tbody tr[id^="dev-module-4-row-"] > td,
+.module4-detail-cell {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1.25rem 1.5rem !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.module4-detail-card {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
