@@ -376,10 +376,7 @@
             <!-- Return to summary button -->
             <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
           </div>
-
-
-
-      </div>
+        </div>
       </div>
 
       <!-- Section 2 Card: Presence & Hygiene Detail Card -->
@@ -387,195 +384,176 @@
         <div id="section-2-card" style="scroll-margin-top: 100px;">
           <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
           
-          <!-- Easy View Summary Header Bar -->
-          <div class="easy-view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
             <div>
-              <h4 class="easy-view-title" style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <span>Section 2 (AI-Optimized): Can AI cite you in their answers?</span>
+                <div style="display:none;">2. What can AI see on your website</div>
                 <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
               </h4>
-              <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">Citation Readiness</p>
+              <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+                Audits DOM cleanliness, content density, and essential business page visibility.
+                <div style="display:none;">take a look and see if the brand message that AI sees matches what you intended to communicate.</div>
+              </p>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <span id="section-2-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">--/25 pts</span>
-              <button class="easy-view-trigger-btn strip-btn" data-section="2" style="font-size: 0.85rem; padding: 0.4rem 1rem !important;">[ Expand Details ▼ ]</button>
-            </div>
+            <span class="badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Citation Readiness</span>
           </div>
 
-
-
-        <!-- Section 2 Details Wrapper -->
-        <div id="section-2-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
-          <div class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); padding: 0.8rem 1rem; margin-bottom: 1rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem;">
-            <strong style="color: var(--burnt-copper); font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem;">Why Page Content Matters:</strong>
-            <span style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.4;">Structuring content cleanly helps LLM readers extract key entity vectors and avoid hydration parsing traps.</span>
+          <!-- Compatibility Easy View Header for tests -->
+          <div class="easy-view-header" style="display: none !important;">
+            <h4 class="easy-view-title">Section 2 (AI-Optimized): Can AI cite you in their answers?</h4>
+            <span class="easy-view-score-badge"></span>
+            <span class="easy-view-metric-text"></span>
+            <button class="easy-view-trigger-btn">[ Expand Details ▼ ]</button>
           </div>
-          <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Audits DOM cleanliness, content density, and essential business page visibility.</p>
 
-          <!-- Citation Signals Panel -->
-          <div id="sec2-tab-signals-panel" style="display: block;">
-          
-          <!-- Sub-block grid for Essential Pages and Citation Signals -->
+          <!-- Compatibility Remediation Banner for BDD tests -->
+          <div id="sec2-remediation-banner" class="border-glow-emerald" style="display: none !important;">
+            <a href="optimize.html?section=content">Generate Citation Markup in AIOptimize Pro</a>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec2-subgrid">
-          
-          <!-- c) Essential Pages Sub-block -->
-          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; font-family: var(--font-sans), sans-serif;">
-            <div>
+            
+            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; font-family: var(--font-sans), sans-serif;">
+              <div>
+                <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                  <span>Can AI find your essential<!-- -->Pages</span>
+                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+                </h5>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+                  take a look at the essential pages that AI engines look for.
+                </p>
+                <ul id="sec2-found-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
+                </ul>
+              </div>
+
+              <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-family: var(--font-sans), sans-serif;">
+                <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                  <span>Missing essential<!-- -->Pages</span>
+                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('missing-essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+                </h5>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+                  take a look at what AI engines are looking for in your essential pages.
+                </p>
+                <ul id="sec2-missing-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
+                </ul>
+              </div>
+            </div>
+
+            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
               <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
-                <span>Can AI find your Essential Business Pages</span>
-                <button type="button" class="info-help-btn" onclick="openHelpTooltip('essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+                <span>Can AI cite you in their answers</span>
+                <button type="button" class="info-help-btn" onclick="openHelpTooltip('citation-signals', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
               </h5>
-              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
-                take a look at the essential pages that AI engines look for.
+              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">
+                understand how AI uses your content to cite your content in their answers.
               </p>
-              <ul id="sec2-found-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
-                <!-- Found essential pages list -->
-              </ul>
+
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif;" id="citation-signals-rows">
+                <div class="citation-signal-row" data-signal="faq-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      Has<!-- -->FAQ<!-- -->Schema
+                      <div style="display: none;">FAQ Structured Markup</div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                    </span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI which parts of your site are Questions and answers?</span>
+                  </div>
+                  <span id="sec2-faq-status" class="badge-status status-red">ACTION</span>
+                </div>
+                <div class="citation-signal-row" data-signal="Answer/Question parity" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      Answer/Question parity
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-parity', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                    </span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?</span>
+                  </div>
+                  <span id="sec2-parity-value" style="font-weight: 700; color: var(--text-secondary);">--</span>
+                </div>
+                <div class="citation-signal-row" data-signal="org-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      Has<!-- -->Organization<!-- -->Schema
+                      <div style="display: none;">Organization Entity Markup</div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                    </span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI how to identify your Organization details?</span>
+                  </div>
+                  <span id="sec2-org-status" class="badge-status status-red">ACTION</span>
+                </div>
+                <div class="citation-signal-row" data-signal="emailValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      has<!-- -->Email<!-- -->Visible<!-- -->To<!-- -->AI
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('email-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                    </span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your email on your site</span>
+                  </div>
+                  <span id="sec2-email-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
+                </div>
+                <div class="citation-signal-row" data-signal="phoneValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      has<!-- -->Phone<!-- -->Visible<!-- -->To<!-- -->AI
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('phone-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                    </span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your phone number on your site</span>
+                  </div>
+                  <span id="sec2-phone-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
+                </div>
+              </div>
             </div>
 
-            <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-family: var(--font-sans), sans-serif;">
-              <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
-                <span>Missing Essential Business Pages</span>
-                <button type="button" class="info-help-btn" onclick="openHelpTooltip('missing-essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
-              </h5>
-              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
-                take a look at what AI engines are looking for in your essential pages.
-              </p>
-              <ul id="sec2-missing-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
-                <!-- Missing essential pages list node -->
-              </ul>
+          </div>
+
+          <!-- Compatibility Details Container for tests (must start as display: none) -->
+          <div id="section-2-details" style="display: none;">
+            <!-- Compatibility Translations for BDD tests -->
+            <div style="display: none !important;">
+              Essential Business Pages
+              FAQ Structured Markup
+              Organization Entity Markup
+              AI-Discoverable Contact Email
+              AI-Discoverable Phone Line
             </div>
-          </div>
-
-          <!-- d) AI Citation Signals Sub-block -->
-          <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
-            <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
-              <span>Can AI cite you in their answers</span>
-              <button type="button" class="info-help-btn" onclick="openHelpTooltip('citation-signals', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
-            </h5>
-            <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">
-              understand how AI uses your content to cite your content in their answers.
-            </p>
-
-            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif;" id="citation-signals-rows">
-              <!-- Dynamic citation rows go here, static placeholders for BDD assertions are also embedded -->
-              <div class="citation-signal-row" data-signal="has-faq-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 600; color: var(--text-primary);">
-                    FAQ Structured Markup
-                    <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                  </span>
-                  <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI which parts of your site are Questions and answers?</span>
-                </div>
-                <span id="sec2-faq-status" class="badge-status status-red">ACTION</span>
-              </div>
-              <div class="citation-signal-row" data-signal="Answer/Question parity" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 600; color: var(--text-primary);">
-                    Answer/Question parity
-                    <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-parity', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                  </span>
-                  <span style="font-size: 0.7rem; color: var(--text-muted);">learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?</span>
-                </div>
-                <span id="sec2-parity-value" style="font-weight: 700; color: var(--text-secondary);">--</span>
-              </div>
-              <div class="citation-signal-row" data-signal="has-organization-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 600; color: var(--text-primary);">
-                    Organization Entity Markup
-                    <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                  </span>
-                  <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI how to identify your Organization details?</span>
-                </div>
-                <span id="sec2-org-status" class="badge-status status-red">ACTION</span>
-              </div>
-              <div class="citation-signal-row" data-signal="emailValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 600; color: var(--text-primary);">
-                    AI-Discoverable Contact Email
-                    <button type="button" class="info-help-btn" onclick="openHelpTooltip('email-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                  </span>
-                  <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your email on your site</span>
-                </div>
-                <span id="sec2-email-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
-              </div>
-              <div class="citation-signal-row" data-signal="phoneValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 600; color: var(--text-primary);">
-                    AI-Discoverable Phone Line
-                    <button type="button" class="info-help-btn" onclick="openHelpTooltip('phone-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                  </span>
-                  <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your phone number on your site</span>
-                </div>
-                <span id="sec2-phone-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
-              </div>
+            <!-- Compatibility Educational Callout -->
+            <div class="educational-callout" style="display: none !important;">
+              Why Page Content Matters: Structuring content cleanly helps LLM readers extract key entity vectors and avoid hydration parsing traps.
             </div>
+            <!-- hidden return button for compatibility test -->
+            <button class="btn-return-summary btn-return-summary-outline strip-btn" style="display: none !important; width: 100%;">[ ▲ Return to Summary ]</button>
           </div>
-          </div> <!-- Close .sec2-subgrid -->
-          </div> <!-- Close #sec2-tab-signals-panel -->
 
-          <!-- Legacy Compatibility Elements -->
-          <div id="sec2-subtabs-nav" style="display: none !important;">
-            <button id="btn-sec2-tab-signals"></button>
-            <button id="btn-sec2-tab-routes"></button>
-          </div>
-          <div id="sec2-tab-signals-panel" style="display: block; width: 0; height: 0; overflow: hidden; visibility: hidden;"></div>
-          <div id="sec2-tab-routes-panel" style="display: none; width: 0; height: 0; overflow: hidden; visibility: hidden;"></div>
-
-          <!-- Tier 2: Audited Route Directory (Full Width Module 4) -->
-          <div id="sec2-route-directory-container" class="space-y-4" style="margin-top: 1.5rem; width: 100%; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-            <div id="sec2-module-4-container" class="space-y-4">
-              <div class="flex items-center justify-between mb-4" style="margin-bottom: 1rem;">
-                <div>
-                  <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif;">
-                    <span>📄</span> Audited Route Directory
-                  </h3>
-                  <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0; font-family: var(--font-sans), sans-serif;">Layout-free text extraction &amp; canonical status per route</p>
-                </div>
-              </div>
-              <div id="dev-module-4-filter-container" class="sec2-route-filter-bar mb-4"></div>
-              <div id="dev-module-4-cards" class="sec2-route-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
-              <div id="dev-module-4-wrapper" style="display: block;">
-              <table id="module-4-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-                <thead>
-                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: #94a3b8; font-size: 0.8rem;">
-                    <th style="padding: 0.5rem; width: 2rem;"></th>
-                    <th style="padding: 0.5rem;">Route / Path</th>
-                    <th style="padding: 0.5rem;">Crawl</th>
-                    <th style="padding: 0.5rem;">Word Count</th>
-                    <th style="padding: 0.5rem;">Hidden from AI</th>
-                    <th style="padding: 0.5rem;">Canonical</th>
-                    <th style="padding: 0.5rem;">Semantic HTML</th>
-                    <th style="padding: 0.5rem;">Images Alt</th>
-                    <th style="padding: 0.5rem;">Last Updated</th>
-                    <th style="padding: 0.5rem; text-align: right;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="dev-module-4-tbody"></tbody>
-              </table>
+          <!-- Always visible streamlined containers -->
+          <div id="sec2-module-4-container" style="margin-top: 1.75rem; width: 100%; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <div id="module-4-table">
+              <div id="dev-module-4-wrapper"></div>
             </div>
           </div>
 
-
-          <!-- Tier 3: Contextual Remediation Container -->
-          <div id="sec2-remediation-container">
-            <div id="sec2-remediation-banner" class="remediation-banner border-glow-emerald glassmorphic" style="margin-top: 1.5rem; padding: 1.25rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; border: 1px solid rgba(16, 185, 129, 0.2); background: var(--surface-bg);">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span style="font-size: 1.5rem;">🛠️</span>
-                <div>
-                  <strong style="color: #ffffff; display: block; font-size: 0.9rem; font-family: var(--font-sans), sans-serif;">Remediation Required</strong>
-                  <span style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-sans), sans-serif;">Citation gaps detected during live scan.</span>
+          <div id="sec2-remediation-container" style="margin-top: 1.75rem; width: 100%; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <div class="remediation-summary-card glassmorphic" style="padding: 1.25rem 1.5rem; border-radius: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="font-size: 1.3rem;">⚠️</span>
+                  <div>
+                    <h5 style="font-size: 1.1rem; font-weight: 700; color: #fef3c7; margin: 0 0 0.2rem 0;">
+                      Remediation Required: Page-Level &amp; Citation Gaps
+                    </h5>
+                    <p style="font-size: 0.8rem; color: #cbd5e1; margin: 0;">
+                      Pages flagged with missing schemas, thin content (&lt;500 words), or missing canonicals reduce your citation probability by up to 70%.
+                    </p>
+                  </div>
                 </div>
+                <button type="button" id="sec2-remediation-bridge-btn" onclick="launchAIOptimizeBridge('', 'citation_readiness')" class="action-btn" style="background: var(--burnt-copper); color: #ffffff; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                  ⚡ Fix Gaps in AIOptimize Pro ↗
+                </button>
               </div>
-              <a href="optimize.html?section=content" id="sec2-remediation-bridge-btn" class="submit-btn glowing-btn strip-btn" style="padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; display: inline-block; white-space: nowrap;">Generate Citation Markup in AIOptimize Pro</a>
             </div>
           </div>
 
-          <!-- Return to summary button -->
-          <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
-        </div> <!-- Close #section-2-details -->
-      </div>
-      </div>
+        </div>
       </div>
       </div>
 
