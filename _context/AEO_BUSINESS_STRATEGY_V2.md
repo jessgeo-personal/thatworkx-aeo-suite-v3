@@ -8,6 +8,30 @@
 ### Objective
 * Though most people will come to AEO/GEO with the intention of being listed and cited at the top of any Answer engine across AI summaries, the objective of the AEO and whatever our tools provide is to be confident that their web presense is optimized, accessible, credible and citable when a question comes through.  We do not want brand, content or personal data to end up with hallucinative or muddled answers due to a lack of well formed, attributable content.  In order to acheive this, we support businesses and individuals with tools that can continously monitor and maintain web presences and content with an approach to content publishing by ensuring core assets are AI-Optimized, and scaling up to fully AI-Ready status through dedicated machine manifests..
 
+### AI-bots to be covered
+### Allow all Top Global, European, and Asian AI engines to cite and index your content
+  * 1. User-agent: OAI-SearchBot
+  * 2. User-agent: GPTBot
+  * 3. User-agent: ChatGPT-User
+  * 4. User-agent: Googlebot
+  * 5. User-agent: Meta-WebIndexer
+  * 6. User-agent: Meta-ExternalAgent
+  * 7. User-agent: Bingbot
+  * 8. User-agent: PerplexityBot
+  * 9. User-agent: Applebot-Extended
+  * 10. User-agent: Amazonbot
+  * 11. User-agent: QwenBot
+  * 12. User-agent: Baidu-Ansur
+  * 13. User-agent: ERNIEBot
+  * 14. User-agent: Bytespider
+  * 15. User-agent: TencentBot
+  * 16. User-agent: Claude-SearchBot
+  * 17. User-agent: ClaudeBot
+  * 18. User-agent: MistralBot
+  * 19. User-agent: CCBot
+  * 20. User-agent: cohere-ai
+
+
 ### Dashboard Container Track Categorizations
 To guide the user along an educational onboarding path, all capabilities and diagnostic results are dynamically grouped into the following visual containers:
 
