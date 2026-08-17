@@ -104,4 +104,15 @@ describe('Phase 2 - UI & Content Refactoring on AIVisualize BDD Test Suite', () 
     expect(/AI-first/i.test(htmlContent)).toBe(false);
     expect(/AI-first/i.test(jsContent)).toBe(false);
   });
+
+  it("Scenario 6: Verify Control Header Card contains top-right export actions and toolbar Upgrade to AIOptimize Pro CTA", () => {
+    const jsonBtn = document.getElementById("btn-export-json");
+    const pdfBtn = document.getElementById("btn-export-pdf");
+    const upgradeBtn = document.getElementById("btn-toolbar-upgrade-aioptimize");
+
+    expect(jsonBtn).not.toBeNull();
+    expect(pdfBtn).not.toBeNull();
+    expect(upgradeBtn).not.toBeNull();
+    expect(upgradeBtn.getAttribute("href")).toContain("optimize.html");
+  });
 });

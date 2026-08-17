@@ -59,12 +59,10 @@
     <div id="exec-mode-container" class="view-mode-section">
 
       <!-- Executive Welcome & Business Explainer Banner -->
-      <div id="exec-welcome-banner" class="compact-exec-strip glassmorphic border-glow-amber mb-6" style="padding: 1.5rem 1.75rem; border-radius: 12px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; gap: 1.5rem; width: 100%; box-sizing: border-box;">
-        <div class="welcome-banner-logo-wrapper" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-          <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="exec-welcome-logo" style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));" onerror="this.onerror=null; this.src='src/images/AIV-light-logo.png';">
-        </div>
-        <div class="strip-content-left" style="display: flex; flex-direction: column; gap: 0.35rem; flex: 1 1 auto;">
-          <h4 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif; letter-spacing: -0.02em; line-height: 1.3;">
+      <div id="exec-welcome-banner" class="compact-exec-strip glassmorphic border-glow-amber mb-6" style="padding: 1.25rem 1.5rem; border-radius: 12px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; gap: 1rem; width: 100%; box-sizing: border-box;">
+        <span class="strip-icon" style="font-size: 1.6rem; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45)); flex-shrink: 0;">💡</span>
+        <div class="strip-content-left" style="display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 auto;">
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif; letter-spacing: -0.02em; line-height: 1.3;">
             Analyse how AI Visualizes your brand using your human-friendly web presence.
           </h4>
           <p style="font-size: 0.88rem; color: #cbd5e1; margin: 0; font-family: var(--font-sans), sans-serif; line-height: 1.5;">
@@ -75,32 +73,34 @@
 
       <!-- Control Header Card -->
       <div id="control-toolbar-anchor" style="scroll-margin-top: 100px;"></div>
-      <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1rem 1.25rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
+      <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1.25rem 1.5rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
         <input type="hidden" id="target-url" value="">
         
-        <!-- Top Capsule Badge & Mode Switcher Row -->
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
-          
-          <div class="badge-group" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <!-- Platform Capsule Badge -->
-            <div class="onboarding-badge-capsule" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.5rem 1.2rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; color: #cbd5e1; text-transform: uppercase;">
-              <span class="pulsing-dot-wrapper" style="display: inline-flex; width: 8px; height: 8px; position: relative; margin-right: 0.4rem;">
-                <span class="pulsing-dot-ping" style="position: absolute; width: 100%; height: 100%; border-radius: 9999px; background-color: #0ea5e9; opacity: 0.75;"></span>
-                <span class="pulsing-dot" style="position: relative; width: 8px; height: 8px; border-radius: 9999px; background-color: #38bdf8;"></span>
-              </span>
-              AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE
-            </div>
+          <div class="brand-logo-container" style="display: flex; align-items: center; gap: 0.75rem;">
+            <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="aivisualize-header-logo" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));" onerror="this.onerror=null; this.src='src/images/AIV-light-logo.png';">
           </div>
 
+          <div class="export-btn-container export-actions-row" style="display: flex; align-items: center; gap: 0.6rem; margin-left: auto;">
+            <button type="button" class="action-btn" id="btn-export-json" onclick="exportRawJsonDiagnostics()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;">📄 Export RAW JSON Report</button>
+            <button type="button" class="action-btn" id="btn-export-pdf" onclick="exportExecutiveSummaryPdf()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;">🖨️ Export PDF Summary</button>
+          </div>
         </div>
 
-        <!-- Top Action Buttons Bar -->
-        <div class="visualize-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-          <button type="button" class="action-btn btn-large" id="btn-new-scan" onclick="openNewScanModal()">⬅ New Scan</button>
-          <button type="button" class="action-btn btn-large" id="btn-refresh-analysis" onclick="executeDashboardScan()">🔄 Refresh Analysis</button>
+        <div class="visualize-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="action-btn btn-large" id="btn-new-scan" onclick="openNewScanModal()">⬅ New Scan</button>
+            <button type="button" class="action-btn btn-large" id="btn-refresh-analysis" onclick="executeDashboardScan()">🔄 Refresh Analysis</button>
+          </div>
+
+          <div class="toolbar-upgrade-cta" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-left: auto;">
+            <span style="font-size: 0.82rem; color: #cbd5e1; font-weight: 500; font-family: var(--font-sans), sans-serif;">To supercharge your AI Presence:</span>
+            <a href="optimize.html?section=blueprint" id="btn-toolbar-upgrade-aioptimize" class="action-btn btn-large" style="background: var(--burnt-copper); color: #ffffff; text-decoration: none; box-shadow: 0 4px 14px var(--burnt-copper-glow); font-size: 0.88rem; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+              ⚡ Upgrade to AIOptimize Pro ↗
+            </a>
+          </div>
         </div>
 
-        <!-- Compact Metadata Bubble Bar -->
         <div class="visualize-meta-bubble" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.6rem 1.25rem; background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 9999px; width: fit-content; max-width: 100%;">
           <span class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">
             Scanned URL: <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin-left: 0.35rem;">--</strong>
@@ -108,18 +108,10 @@
           <span id="scan-timestamp-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Last Scanned: Not scanned</span>
           <span id="scan-duration-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Time to Scan: -- seconds</span>
           <span id="scan-pages-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Pages Reviewed: 0</span>
-          <!-- Hidden elements to preserve bindings in index.js -->
           <span id="display-scanned-time" style="display: none;">--</span>
           <span id="display-scan-duration" style="display: none;">--</span>
         </div>
 
-        <!-- Dedicated Right-Aligned Export Buttons Container -->
-        <div class="export-btn-container export-actions-row">
-          <button type="button" class="action-btn" id="btn-export-json" onclick="exportRawJsonDiagnostics()">📄 Export RAW JSON Report<!-- Export Raw JSON --></button>
-          <button type="button" class="action-btn" id="btn-export-pdf" onclick="exportExecutiveSummaryPdf()">🖨️ Export PDF Summary</button>
-        </div>
-
-        <!-- Backward Compatibility Elements -->
         <div id="scan-input-container" style="display: none;">
           <button id="new-scan-btn"></button>
         </div>

@@ -825,7 +825,7 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     // 1. Check DOM order: #exec-welcome-banner appears BEFORE the control hero card ("AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE")
     const htmlText = $('body').html();
     const idxWelcomeBanner = htmlText.indexOf('id="exec-welcome-banner"');
-    const idxControlHero = htmlText.indexOf('AI VISUALIZE • EXECUTIVE DIAGNOSTIC SUITE');
+    const idxControlHero = htmlText.indexOf('class="aivisualize-header-logo"');
 
     expect(idxWelcomeBanner).toBeGreaterThan(-1);
     expect(idxControlHero).toBeGreaterThan(-1);
