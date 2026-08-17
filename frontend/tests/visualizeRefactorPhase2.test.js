@@ -15,7 +15,7 @@ const htmlContent = fs.readFileSync(htmlPath, 'utf8');
 const jsContent = fs.readFileSync(jsPath, 'utf8');
 const cssContent = fs.readFileSync(cssPath, 'utf8');
 
-describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
+describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2 & Return CTA)', () => {
   let dom;
   let window;
   let document;
@@ -62,7 +62,6 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
     expect(s3Details.style.display).toBe('none');
     expect(s4Details.style.display).toBe('none');
 
-    // Pattern B2: Each section card renders a visible "Easy View" header with "Details ▾" pill
     for (let i = 1; i <= 4; i++) {
       const card = document.getElementById(`section-${i}-card`);
       expect(card).not.toBeNull();
@@ -93,12 +92,10 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
     const details = document.getElementById('section-1-details');
     expect(details).not.toBeNull();
 
-    // Click to expand details -> Details ▴
     triggerBtn.click();
     expect(details.style.display).toBe('block');
     expect(triggerBtn.textContent.trim()).toBe('Details ▴');
 
-    // Click again to collapse details -> Details ▾
     triggerBtn.click();
     expect(details.style.display).toBe('none');
     expect(triggerBtn.textContent.trim()).toBe('Details ▾');
@@ -110,6 +107,7 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
 
     const details1 = document.getElementById('section-1-details');
     const details2 = document.getElementById('section-2-details');
+
     const details3 = document.getElementById('section-3-details');
     const details4 = document.getElementById('section-4-details');
 
@@ -128,7 +126,6 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
     const activeDockLink = document.querySelector('.dock-link.active');
     expect(activeDockLink).toBe(dockLink2);
 
-    // Pattern A2: Clicking anywhere on Pillar Card 3 expands #section-3-details
     const pillarCards = document.querySelectorAll('.pillar-card');
     expect(pillarCards.length).toBe(4);
     const pillarCard3 = pillarCards[2];
@@ -170,7 +167,6 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
     expect(details2.style.display).toBe('block');
     expect(details1.style.display).toBe('none');
 
-    // Pattern A2 assertions: Corner affordance indicator exists and footer inspect button is removed
     pillarCards.forEach(card => {
       const cornerIndicator = card.querySelector('.pillar-corner-indicator');
       expect(cornerIndicator).not.toBeNull();
@@ -181,26 +177,34 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
     });
   });
 
-  it('Scenario 6: Return CTA Text & Outline Styling', () => {
+  it('Scenario 6: Return CTA Visibility Across All 4 Sections & Header Offset Scrolling', () => {
     const scrollIntoViewMock = vi.fn();
     
-    const summaryGrid = document.querySelector('#visualize-summary-grid') || document.getElementById('pillar-summary-wrapper');
-    expect(summaryGrid).not.toBeNull();
-    summaryGrid.scrollIntoView = scrollIntoViewMock;
+    const summaryAnchor = document.getElementById('summary-dial-anchor');
+    expect(summaryAnchor).not.toBeNull();
+    summaryAnchor.scrollIntoView = scrollIntoViewMock;
 
+    // Verify all 4 sections have a visible return button that is NOT hidden by compatibility-hidden
     for (let i = 1; i <= 4; i++) {
-      const detailsContainer = document.getElementById(`section-${i}-details`);
-      expect(detailsContainer).not.toBeNull();
+      const card = document.getElementById(`section-${i}-card`);
+      expect(card).not.toBeNull();
 
-      const returnBtn = detailsContainer.querySelector('.btn-return-summary');
+      const returnBtn = card.querySelector('.btn-return-summary');
       expect(returnBtn).not.toBeNull();
       expect(returnBtn.textContent.trim()).toBe('[ ▲ Return to Summary ]');
       expect(returnBtn.classList.contains('btn-return-summary-outline')).toBe(true);
+      expect(returnBtn.classList.contains('compatibility-hidden')).toBe(false);
     }
 
+    // Verify CSS contains .btn-return-summary-outline styling
     expect(cssContent).toContain('.btn-return-summary-outline');
 
-    const returnBtn2 = document.querySelector('#section-2-details .btn-return-summary');
+    // Verify CSS defines scroll-margin-top (>= 100px) on #summary-dial-anchor to offset sticky header
+    expect(cssContent).toMatch(/#summary-dial-anchor[\s\S]*?scroll-margin-top:\s*(?:100|110|120)px/);
+
+    // Clicking Section 2's return button triggers scrollIntoView on #summary-dial-anchor
+    const returnBtn2 = document.querySelector('#section-2-card .btn-return-summary');
+    expect(returnBtn2).not.toBeNull();
     returnBtn2.click();
 
     expect(scrollIntoViewMock).toHaveBeenCalled();

@@ -821,14 +821,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
-      // Attach click listeners to .btn-return-summary / .btn-return-summary-outline buttons
-      document.querySelectorAll('.btn-return-summary, .btn-return-summary-outline').forEach(btn => {
+      // Return to Summary button scroll handler with sticky header offset
+      document.querySelectorAll('.btn-return-summary').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
-          e.stopPropagation();
-          const summaryGrid = document.getElementById('visualize-summary-grid') || document.getElementById('pillar-summary-wrapper');
-          if (summaryGrid && typeof summaryGrid.scrollIntoView === 'function') {
-            summaryGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const summaryAnchor = document.getElementById('summary-dial-anchor') || document.getElementById('visualize-summary-grid');
+          if (summaryAnchor && typeof summaryAnchor.scrollIntoView === 'function') {
+            summaryAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         });
       });

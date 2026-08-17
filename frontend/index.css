@@ -5233,18 +5233,28 @@ body {
   }
 }
 
-/* Outline-only Return to Summary Button Style with Copper Glow hover */
+/* ═══════════════════════════════════════════════════════════════════
+   RETURN TO SUMMARY BUTTON & HEADER OFFSET SCROLLING
+   ═══════════════════════════════════════════════════════════════════ */
+
+#summary-dial-anchor {
+  scroll-margin-top: 100px;
+}
+
 .btn-return-summary-outline {
   background: transparent !important;
-  color: inherit !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease-in-out !important;
+  color: var(--text-muted, #94a3b8) !important;
+  border-radius: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
 }
 
 .btn-return-summary-outline:hover {
   background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(212, 118, 78, 0.4) !important;
+  border-color: var(--burnt-copper, #d97706) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px var(--burnt-copper-glow, rgba(217, 119, 6, 0.3)) !important;
 }
 
 /* Contextual Remediation Banners styling */
