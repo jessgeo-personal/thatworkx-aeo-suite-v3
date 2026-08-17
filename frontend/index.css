@@ -5169,19 +5169,7 @@ body {
   }
 }
 
-/* Compact Executive Context Strip styling */
-.compact-exec-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  background-color: #08090C !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  margin-bottom: 1.5rem;
-}
+/* Compact Executive Context Strip styling (Managed via Harmonized Toolbar System) */
 
 .strip-content-left {
   display: flex;
