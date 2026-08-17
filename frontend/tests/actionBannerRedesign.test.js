@@ -105,4 +105,10 @@ describe('Action Banner Redesign BDD Suite', () => {
     expect(headline).not.toBeNull();
     expect(headline.textContent).toBe('Your Website Was Built for Human Eyes—Not AI Search Engines');
   });
+
+  it("Scenario 4: Action banner inherits smooth hover reaction and elevation styling", () => {
+    const cssFile = fs.readFileSync(path.resolve(__dirname, "../index.css"), "utf8");
+    expect(cssFile).toContain("#aioptimize-action-banner:hover");
+    expect(cssFile).toContain("transform: translateY(-2px)");
+  });
 });
