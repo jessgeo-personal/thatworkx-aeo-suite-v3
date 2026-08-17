@@ -5420,3 +5420,22 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
+/* ==========================================================================
+   Floating Glass Dock Conversion CTA Token (Item 3)
+   ========================================================================== */
+.dock-link-cta {
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+}
+
+.dock-link-cta:hover {
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.6);
+  transform: translateY(-1px);
+}
+
+
