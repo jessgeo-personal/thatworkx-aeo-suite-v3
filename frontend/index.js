@@ -4950,11 +4950,16 @@ function buildDevModule4Html() {
       <div style="margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
           <div>
+            <span class="onboarding-badge-capsule" style="font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-transform: uppercase; font-weight: 700; display: inline-block; margin-bottom: 0.5rem;">
+              ✦ See if AI can actually cite the content on your pages
+            </span>
             <h4 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-              <span>🔍 Module 4: Page-Level Crawl & Content Health Inspector</span>
-              <span id="dev-module-4-pages-count" class="pill-badge" style="display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Total Pages Reviewed: 0</span>
+              <span>Per-webpage AI Citation Audit</span>
+              <span id="dev-module-4-pages-count" style="display: none;"></span>
             </h4>
-            <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">Audit and fix every page on your site to guarantee search engines and AI assistants can index and cite your content.</p>
+            <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+              A page-by-page breakdown of what AI can read and make sense of. This can guide you through optimizing your pages for AI.
+            </p>
           </div>
         </div>
       </div>
