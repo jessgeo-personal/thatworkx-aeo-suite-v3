@@ -183,8 +183,8 @@ describe('Executive Mode Rendering Engine & Undefined Mapping (BDD Phase 2 & Exe
     expect(welcomeBanner.length).toBe(1);
 
     const bannerText = welcomeBanner.text();
-    expect(bannerText).toContain('AI-Optimized');
-    expect(bannerText).toContain('AI-Ready');
+    expect(bannerText).toContain('Analyse how AI Visualizes your brand');
+    expect(bannerText).toContain('human-friendly web presence');
 
     // 3. Onboarding modal presence and detailed copy
     const onboardingModal = $('#exec-onboarding-modal');
