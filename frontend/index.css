@@ -3965,12 +3965,16 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
 }
 
 .pillar-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(225, 29, 72, 0.3);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(245, 158, 11, 0.15);
 }
 
 .pillar-card-header {
@@ -5547,6 +5551,56 @@ body {
 
 #btn-refresh-analysis:active {
   transform: translateY(0);
+}
+
+.pillar-corner-indicator {
+  font-size: 0.95rem;
+  color: var(--text-muted, #64748b);
+  transition: all 0.25s ease;
+  margin-left: auto;
+  margin-right: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pillar-card:hover .pillar-corner-indicator {
+  color: #fbbf24;
+  transform: translate(2px, 2px);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.easy-view-header {
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  margin: -0.6rem -0.8rem 0.5rem -0.8rem;
+  border-radius: 10px;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+}
+
+.easy-view-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.easy-view-trigger-btn {
+  padding: 0.35rem 0.9rem !important;
+  font-family: var(--font-sans), sans-serif !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.easy-view-trigger-btn:hover,
+.easy-view-header:hover .easy-view-trigger-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
 }
 
 

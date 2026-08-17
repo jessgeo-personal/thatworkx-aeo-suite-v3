@@ -92,21 +92,21 @@ function setActiveVisualizeSection(sectionId, triggerScroll = true) {
         const isCurrentOpen = detailsContainer.style.display === 'block';
         if (triggerScroll) {
           detailsContainer.style.display = 'block';
-          if (triggerBtn) triggerBtn.textContent = '[ Collapse Details ▲ ]';
+          if (triggerBtn) triggerBtn.textContent = 'Details ▴';
         } else {
           // Toggle
           if (isCurrentOpen) {
             detailsContainer.style.display = 'none';
-            if (triggerBtn) triggerBtn.textContent = '[ Expand Details ▼ ]';
+            if (triggerBtn) triggerBtn.textContent = 'Details ▾';
           } else {
             detailsContainer.style.display = 'block';
-            if (triggerBtn) triggerBtn.textContent = '[ Collapse Details ▲ ]';
+            if (triggerBtn) triggerBtn.textContent = 'Details ▴';
           }
         }
       } else {
         // Collapse all others
         detailsContainer.style.display = 'none';
-        if (triggerBtn) triggerBtn.textContent = '[ Expand Details ▼ ]';
+        if (triggerBtn) triggerBtn.textContent = 'Details ▾';
       }
     }
   }
@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const triggerBtn = document.querySelector(`.easy-view-trigger-btn[data-section="${i}"]`);
         if (triggerBtn) {
-          triggerBtn.textContent = '[ Expand Details ▼ ]';
+          triggerBtn.textContent = 'Details ▾';
         }
       }
 
@@ -780,6 +780,20 @@ document.addEventListener('DOMContentLoaded', () => {
           const sectionId = btn.getAttribute('data-section');
           if (typeof window.setActiveVisualizeSection === 'function') {
             window.setActiveVisualizeSection(sectionId, false);
+          }
+        });
+      });
+
+      // Attach click listener to .easy-view-header for seamless header row toggling
+      document.querySelectorAll('.easy-view-header').forEach(header => {
+        header.addEventListener('click', (e) => {
+          if (e.target.closest('.info-help-btn') || e.target.closest('a')) return;
+          const triggerBtn = header.querySelector('.easy-view-trigger-btn');
+          if (triggerBtn) {
+            const sectionId = triggerBtn.getAttribute('data-section');
+            if (typeof window.setActiveVisualizeSection === 'function') {
+              window.setActiveVisualizeSection(sectionId, false);
+            }
           }
         });
       });
@@ -799,10 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Attach click listeners to .pillar-card (card-wide click navigation)
       document.querySelectorAll('.pillar-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Ignore clicks on help buttons, inspect buttons, or links
-          if (e.target.closest('.info-help-btn') || e.target.closest('.pillar-inspect-btn') || e.target.closest('a')) {
-            return;
-          }
+          if (e.target.closest('.info-help-btn') || e.target.closest('a')) return;
           const secNum = card.getAttribute('data-pillar-card') || card.id.replace('pillar-card-', '');
           if (secNum && typeof window.setActiveVisualizeSection === 'function') {
             window.setActiveVisualizeSection(secNum, true);

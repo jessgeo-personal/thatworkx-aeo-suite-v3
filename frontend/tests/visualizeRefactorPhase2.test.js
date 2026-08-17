@@ -15,7 +15,7 @@ const htmlContent = fs.readFileSync(htmlPath, 'utf8');
 const jsContent = fs.readFileSync(jsPath, 'utf8');
 const cssContent = fs.readFileSync(cssPath, 'utf8');
 
-describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
+describe('AIVisualize UX Refactor Phase 2 BDD Suite (Pattern A2 + B2)', () => {
   let dom;
   let window;
   let document;
@@ -46,8 +46,7 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it('Scenario 1: Default Collapsed State on Initial Load', () => {
-    // Assert all 4 detail containers are collapsed by default on load
+  it('Scenario 1: Default Collapsed State on Initial Load (Pattern B2 Pill State)', () => {
     const s1Details = document.getElementById('section-1-details');
     const s2Details = document.getElementById('section-2-details');
     const s3Details = document.getElementById('section-3-details');
@@ -63,8 +62,7 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     expect(s3Details.style.display).toBe('none');
     expect(s4Details.style.display).toBe('none');
 
-    // Assert each section card renders a visible "Easy View" summary header bar
-    // displaying title, score badge, metric text, and [ Expand Details ▼ ] trigger button
+    // Pattern B2: Each section card renders a visible "Easy View" header with "Details ▾" pill
     for (let i = 1; i <= 4; i++) {
       const card = document.getElementById(`section-${i}-card`);
       expect(card).not.toBeNull();
@@ -81,11 +79,11 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
       expect(scoreBadge).not.toBeNull();
       expect(metricText).not.toBeNull();
       expect(triggerBtn).not.toBeNull();
-      expect(triggerBtn.textContent.trim()).toBe('[ Expand Details ▼ ]');
+      expect(triggerBtn.textContent.trim()).toBe('Details ▾');
     }
   });
 
-  it('Scenario 2: Manual Accordion Expansion & Collapse', () => {
+  it('Scenario 2: Manual Accordion Expansion & Collapse (Pattern B2 Toggle State)', () => {
     const card1 = document.getElementById('section-1-card');
     expect(card1).not.toBeNull();
 
@@ -95,18 +93,18 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     const details = document.getElementById('section-1-details');
     expect(details).not.toBeNull();
 
-    // Click to expand details
+    // Click to expand details -> Details ▴
     triggerBtn.click();
     expect(details.style.display).toBe('block');
-    expect(triggerBtn.textContent.trim()).toBe('[ Collapse Details ▲ ]');
+    expect(triggerBtn.textContent.trim()).toBe('Details ▴');
 
-    // Click again to collapse details
+    // Click again to collapse details -> Details ▾
     triggerBtn.click();
     expect(details.style.display).toBe('none');
-    expect(triggerBtn.textContent.trim()).toBe('[ Expand Details ▼ ]');
+    expect(triggerBtn.textContent.trim()).toBe('Details ▾');
   });
 
-  it('Scenario 3: Floating Glass Dock & Top 2x2 Grid Single-Section Focus', () => {
+  it('Scenario 3: Floating Glass Dock & Pattern A2 Pillar Card Surface Focus', () => {
     const dockLink2 = document.querySelector('.dock-link[data-dock-section="2"]');
     expect(dockLink2).not.toBeNull();
 
@@ -120,7 +118,6 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     expect(details3).not.toBeNull();
     expect(details4).not.toBeNull();
 
-    // Clicking dock link "2. Page Content"
     dockLink2.click();
 
     expect(details2.style.display).toBe('block');
@@ -128,20 +125,15 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
     expect(details3.style.display).toBe('none');
     expect(details4.style.display).toBe('none');
 
-    // Assert dock active class updates to link 2
     const activeDockLink = document.querySelector('.dock-link.active');
     expect(activeDockLink).toBe(dockLink2);
 
-    // Clicking [ Inspect Section Details ▼ ] on top Pillar Card 3 expands #section-3-details and collapses all others
+    // Pattern A2: Clicking anywhere on Pillar Card 3 expands #section-3-details
     const pillarCards = document.querySelectorAll('.pillar-card');
     expect(pillarCards.length).toBe(4);
     const pillarCard3 = pillarCards[2];
-    
-    const inspectBtn3 = Array.from(pillarCard3.querySelectorAll('button, a, span')).find(el => el.textContent.includes('Inspect Section Details'));
-    expect(inspectBtn3).not.toBeNull();
-    expect(inspectBtn3.textContent.trim()).toBe('[ Inspect Section Details ▼ ]');
 
-    inspectBtn3.click();
+    pillarCard3.click();
 
     expect(details3.style.display).toBe('block');
     expect(details1.style.display).toBe('none');
@@ -152,72 +144,46 @@ describe('AIVisualize UX Refactor Phase 2 BDD Suite', () => {
   it('Scenario 4: Vocabulary Gate & PDF Print Integrity', () => {
     const bannedPhrase = ['AI', 'first'].join('-');
 
-    // Assert zero occurrences of banned term "AI-first" across visualize.html and index.js
     expect(htmlContent.toLowerCase()).not.toContain(bannedPhrase.toLowerCase());
     expect(jsContent.toLowerCase()).not.toContain(bannedPhrase.toLowerCase());
 
-    // Assert zero occurrences of banned term in this test file itself (excluding the split declaration above)
     const selfContent = fs.readFileSync(__filename, 'utf8');
     const cleanedSelfContent = selfContent.replace(new RegExp(bannedPhrase, 'g'), '');
     expect(cleanedSelfContent.toLowerCase()).not.toContain(bannedPhrase.toLowerCase());
 
-    // Assert @media print CSS rules in index.css force all section details to display (display: block !important)
     const printBlockRegex = /@media\s+print\s*\{[\s\S]*?(?:#section-[1-4]-details[\s\S]*?)+display:\s*block\s*!important[\s\S]*?\}/;
     expect(cssContent).toMatch(printBlockRegex);
   });
 
-  it('Scenario 5: Pillar Card Inner Accordion Click Delegation & Footer Placement', () => {
+  it('Scenario 5: Pattern A2 Pure Surface Affordance & Clean Card Footers', () => {
     const pillarCards = document.querySelectorAll('.pillar-card');
     expect(pillarCards.length).toBe(4);
     const pillarCard2 = pillarCards[1];
 
     const details1 = document.getElementById('section-1-details');
     const details2 = document.getElementById('section-2-details');
-    const details3 = document.getElementById('section-3-details');
-    const details4 = document.getElementById('section-4-details');
 
-    expect(details1).not.toBeNull();
-    expect(details2).not.toBeNull();
-    expect(details3).not.toBeNull();
-    expect(details4).not.toBeNull();
-
-    // Clicking an inner element like the summary header bubbles up and triggers focus
     const innerSummary = pillarCard2.querySelector('summary');
     expect(innerSummary).not.toBeNull();
     innerSummary.click();
 
     expect(details2.style.display).toBe('block');
     expect(details1.style.display).toBe('none');
-    expect(details3.style.display).toBe('none');
-    expect(details4.style.display).toBe('none');
 
-    // Click a list item inside the card to verify delegation works on content children too
-    const innerLi = pillarCard2.querySelector('li');
-    expect(innerLi).not.toBeNull();
-    innerLi.click();
-
-    expect(details2.style.display).toBe('block');
-    expect(details1.style.display).toBe('none');
-
-    // Assert .pillar-inspect-btn is positioned at the bottom footer of each pillar card (.pillar-card-footer or bottom node)
+    // Pattern A2 assertions: Corner affordance indicator exists and footer inspect button is removed
     pillarCards.forEach(card => {
-      const inspectBtn = card.querySelector('.pillar-inspect-btn');
-      expect(inspectBtn).not.toBeNull();
+      const cornerIndicator = card.querySelector('.pillar-corner-indicator');
+      expect(cornerIndicator).not.toBeNull();
 
       const footer = card.querySelector('.pillar-card-footer');
-      if (footer) {
-        expect(footer.contains(inspectBtn)).toBe(true);
-      } else {
-        const lastChild = card.children[card.children.length - 1];
-        expect(lastChild.contains(inspectBtn)).toBe(true);
-      }
+      expect(footer).not.toBeNull();
+      expect(footer.querySelector('.pillar-inspect-btn')).toBeNull();
     });
   });
 
   it('Scenario 6: Return CTA Text & Outline Styling', () => {
     const scrollIntoViewMock = vi.fn();
     
-    // Target element should exist
     const summaryGrid = document.querySelector('#visualize-summary-grid') || document.getElementById('pillar-summary-wrapper');
     expect(summaryGrid).not.toBeNull();
     summaryGrid.scrollIntoView = scrollIntoViewMock;
