@@ -82,11 +82,15 @@ describe("Section 2 Streamlined Module 4 Layout (No Audited Route Directory Head
     expect(mod4Container.contains(devMod4Wrap)).toBe(true);
   });
 
-  it("Scenario 4: Remediation Required container (#sec2-remediation-container) is present directly underneath Module 4", () => {
+  it("Scenario 4: Remediation Required container (#sec2-remediation-container) is present directly underneath Module 4 with hover reaction styling", () => {
     const sec2Card = document.getElementById("exec-section2-card");
     const remediationContainer = document.getElementById("sec2-remediation-container");
     expect(remediationContainer).not.toBeNull();
     expect(sec2Card.contains(remediationContainer)).toBe(true);
+
+    const remediationCard = remediationContainer.querySelector(".remediation-banner");
+    expect(remediationCard).not.toBeNull();
+    expect(remediationCard.classList.contains("border-glow-amber")).toBe(true);
 
     const bridgeBtn = document.getElementById("sec2-remediation-bridge-btn");
     expect(bridgeBtn).not.toBeNull();

@@ -12,13 +12,13 @@ describe('Floating Glass Dock Summary and Scan Links BDD Suite', () => {
   const htmlContent = fs.readFileSync(visualizeHtmlPath, 'utf8');
   const jsContent = fs.readFileSync(indexJsPath, 'utf8');
 
-  it('Scenario 1: Verify #floating-glass-dock in visualize.html contains 6 navigation links', () => {
+  it('Scenario 1: Verify #floating-glass-dock in visualize.html contains 7 navigation links', () => {
     const $ = cheerio.load(htmlContent);
     const dock = $('#floating-glass-dock');
     expect(dock.length).toBe(1);
 
     const links = dock.find('.dock-link');
-    expect(links.length).toBe(6);
+    expect(links.length).toBe(7);
 
     const linkTexts = links.map((i, el) => $(el).text().trim()).get();
     expect(linkTexts.some(t => t.includes('Scan'))).toBe(true);

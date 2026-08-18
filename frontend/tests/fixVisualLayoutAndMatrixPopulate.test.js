@@ -93,7 +93,7 @@ describe('AEO Suite Surgical Repair BDD Test Suite', () => {
     expect(dock).not.toBeNull();
 
     const links = Array.from(dock.querySelectorAll('.dock-link'));
-    expect(links.length).toBe(6);
+    expect(links.length).toBe(7);
 
     const expectedTargets = [
       '#control-toolbar-anchor',
@@ -101,7 +101,8 @@ describe('AEO Suite Surgical Repair BDD Test Suite', () => {
       '#section-1-card',
       '#section-2-card',
       '#section-3-card',
-      '#section-4-card'
+      '#section-4-card',
+      '#aioptimize-action-banner'
     ];
     links.forEach((link, idx) => {
       expect(link.getAttribute('href')).toBe(expectedTargets[idx]);

@@ -3965,12 +3965,16 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
 }
 
 .pillar-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(225, 29, 72, 0.3);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(245, 158, 11, 0.15);
 }
 
 .pillar-card-header {
@@ -4925,8 +4929,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--burnt-copper) !important;
-  border: 1px solid var(--burnt-copper) !important;
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
   color: #ffffff !important;
   font-weight: 800;
   font-size: 1.1rem;
@@ -4934,20 +4938,20 @@ body {
   border-radius: 8px;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 20px var(--burnt-copper-glow) !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
 }
 
 .action-banner-urgent .btn-urgent:hover {
-  background: var(--burnt-copper-hover) !important;
-  border-color: var(--burnt-copper-hover) !important;
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(183, 65, 14, 0.45) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6) !important;
 }
 
 .action-banner-urgent .btn-urgent:active {
-  background: var(--burnt-copper-active) !important;
-  border-color: var(--burnt-copper-active) !important;
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
   transform: translateY(0);
 }
 
@@ -5169,19 +5173,7 @@ body {
   }
 }
 
-/* Compact Executive Context Strip styling */
-.compact-exec-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  background-color: #08090C !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  margin-bottom: 1.5rem;
-}
+/* Compact Executive Context Strip styling (Managed via Harmonized Toolbar System) */
 
 .strip-content-left {
   display: flex;
@@ -5241,18 +5233,35 @@ body {
   }
 }
 
-/* Outline-only Return to Summary Button Style with Copper Glow hover */
+/* ═══════════════════════════════════════════════════════════════════
+   RETURN TO SUMMARY BUTTON & HEADER OFFSET SCROLLING
+   ═══════════════════════════════════════════════════════════════════ */
+
+#summary-dial-anchor {
+  scroll-margin-top: 100px;
+}
+
 .btn-return-summary-outline {
-  background: transparent !important;
-  color: inherit !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease-in-out !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 3.5px solid rgba(255, 255, 255, 0.4) !important;
+  color: #f1f5f9 !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  transition: transform 0.1s ease, border-bottom-width 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+  cursor: pointer !important;
+  transform: translateY(0);
 }
 
 .btn-return-summary-outline:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(212, 118, 78, 0.4) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+.btn-return-summary-outline:active {
+  border-bottom-width: 1.5px !important;
+  transform: translateY(2px) !important;
 }
 
 /* Contextual Remediation Banners styling */
@@ -5394,3 +5403,248 @@ body {
   width: 100% !important;
   box-sizing: border-box !important;
 }
+
+/* ==========================================================================
+   Obsidian Bento Tokens for Asymmetric Drawers (Item 2)
+   ========================================================================== */
+.obsidian-bento-callout {
+  background: rgba(245, 158, 11, 0.06);
+  border-left: 3px solid var(--burnt-copper);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.obsidian-bento-results {
+  background: var(--surface-nested-bg, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   Floating Glass Dock Conversion CTA Token (Item 3)
+   ========================================================================== */
+.dock-link-cta {
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+}
+
+.dock-link-cta:hover {
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Action Banner Hover Reaction */
+#aioptimize-action-banner {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#aioptimize-action-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(234, 88, 12, 0.25);
+  border-color: rgba(234, 88, 12, 0.45) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HARMONIZED TOP BANNER & ACTION TOOLBAR (Aceternity UI Motion System)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.compact-exec-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.04) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  margin-bottom: 1.5rem;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-exec-strip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(245, 158, 11, 0.3) !important;
+  border-color: rgba(245, 158, 11, 0.55) !important;
+}
+
+.strip-btn {
+  padding: 0.55rem 1.15rem !important;
+  font-family: var(--font-sans), sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px var(--burnt-copper-glow);
+}
+
+.strip-btn:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--burnt-copper-glow) !important;
+}
+
+.strip-btn:active {
+  background: var(--burnt-copper-active) !important;
+  transform: translateY(0);
+}
+
+/* Harmonized Toolbar Action Buttons */
+.visualize-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.visualize-toolbar .btn-large,
+.btn-large {
+  padding: 0.65rem 1.35rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-sans), sans-serif !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+#btn-new-scan {
+  background: var(--burnt-copper) !important;
+  border: 1px solid var(--burnt-copper) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px var(--burnt-copper-glow) !important;
+}
+
+#btn-new-scan:hover {
+  background: var(--burnt-copper-hover) !important;
+  border-color: var(--burnt-copper-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(183, 65, 14, 0.45) !important;
+}
+
+#btn-new-scan:active {
+  background: var(--burnt-copper-active) !important;
+  transform: translateY(0);
+}
+
+#btn-refresh-analysis {
+  background: var(--surface-nested-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#btn-refresh-analysis:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.25) !important;
+}
+
+#btn-refresh-analysis:active {
+  transform: translateY(0);
+}
+
+.pillar-corner-indicator {
+  font-size: 0.95rem;
+  color: var(--text-muted, #64748b);
+  transition: all 0.25s ease;
+  margin-left: auto;
+  margin-right: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pillar-card:hover .pillar-corner-indicator {
+  color: #fbbf24;
+  transform: translate(2px, 2px);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.easy-view-header {
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  margin: -0.6rem -0.8rem 0.5rem -0.8rem;
+  border-radius: 10px;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+}
+
+.easy-view-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.easy-view-trigger-btn {
+  padding: 0.35rem 0.9rem !important;
+  font-family: var(--font-sans), sans-serif !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 3.5px solid rgba(255, 255, 255, 0.4) !important;
+  color: #f1f5f9 !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.1s ease, border-bottom-width 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+  transform: translateY(0);
+}
+
+.easy-view-trigger-btn:hover,
+.easy-view-header:hover .easy-view-trigger-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.easy-view-trigger-btn:active,
+.easy-view-header:hover .easy-view-trigger-btn:active {
+  border-bottom-width: 1.5px !important;
+  transform: translateY(2px) !important;
+}
+
+/* Premium Orange Burnt Copper Button Styling */
+.btn-burnt-copper {
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-burnt-copper:hover {
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6) !important;
+  transform: translateY(-1px) !important;
+}
+
+
+
+
