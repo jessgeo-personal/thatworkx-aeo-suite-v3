@@ -4929,8 +4929,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--burnt-copper) !important;
-  border: 1px solid var(--burnt-copper) !important;
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
   color: #ffffff !important;
   font-weight: 800;
   font-size: 1.1rem;
@@ -4938,20 +4938,20 @@ body {
   border-radius: 8px;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 20px var(--burnt-copper-glow) !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
 }
 
 .action-banner-urgent .btn-urgent:hover {
-  background: var(--burnt-copper-hover) !important;
-  border-color: var(--burnt-copper-hover) !important;
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(183, 65, 14, 0.45) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6) !important;
 }
 
 .action-banner-urgent .btn-urgent:active {
-  background: var(--burnt-copper-active) !important;
-  border-color: var(--burnt-copper-active) !important;
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
   transform: translateY(0);
 }
 
@@ -5242,19 +5242,26 @@ body {
 }
 
 .btn-return-summary-outline {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: var(--text-muted, #94a3b8) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 3.5px solid rgba(255, 255, 255, 0.4) !important;
+  color: #f1f5f9 !important;
   border-radius: 8px !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-weight: 700 !important;
+  transition: transform 0.1s ease, border-bottom-width 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
   cursor: pointer !important;
+  transform: translateY(0);
 }
 
 .btn-return-summary-outline:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: var(--burnt-copper, #d97706) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 12px var(--burnt-copper-glow, rgba(217, 119, 6, 0.3)) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+.btn-return-summary-outline:active {
+  border-bottom-width: 1.5px !important;
+  transform: translateY(2px) !important;
 }
 
 /* Contextual Remediation Banners styling */
@@ -5598,19 +5605,44 @@ body {
   font-size: 0.8rem !important;
   font-weight: 700 !important;
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #cbd5e1 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 3.5px solid rgba(255, 255, 255, 0.4) !important;
+  color: #f1f5f9 !important;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.1s ease, border-bottom-width 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+  transform: translateY(0);
 }
 
 .easy-view-trigger-btn:hover,
 .easy-view-header:hover .easy-view-trigger-btn {
   background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
+}
+
+.easy-view-trigger-btn:active,
+.easy-view-header:hover .easy-view-trigger-btn:active {
+  border-bottom-width: 1.5px !important;
+  transform: translateY(2px) !important;
+}
+
+/* Premium Orange Burnt Copper Button Styling */
+.btn-burnt-copper {
+  background: linear-gradient(135deg, var(--burnt-copper, #b7410e) 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-burnt-copper:hover {
+  background: linear-gradient(135deg, #d97706 0%, var(--burnt-copper, #b7410e) 100%) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6) !important;
+  transform: translateY(-1px) !important;
 }
 
 
