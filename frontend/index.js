@@ -4300,98 +4300,62 @@ function updateOptimizeTargetDomain() {
 
 let onboardingSelectedMode = 'visualize';
 
+/**
+ * Interactive Launcher for 3-Pillar Console Cards
+ * @param {string} pillar - 'visualize' | 'optimize' | 'socialize'
+ */
+function launchPillarAction(pillar = 'visualize') {
+  const input = document.getElementById('onboarding-target-url');
+  let urlVal = input ? input.value.trim() : '';
+  
+  if (!urlVal) {
+    if (input) {
+      input.focus({ preventScroll: true });
+      input.classList.add('input-highlight-pulse');
+      setTimeout(() => input.classList.remove('input-highlight-pulse'), 1200);
+    }
+    return;
+  }
+  
+  const encoded = encodeURIComponent(urlVal);
+  if (pillar === 'optimize') {
+    window.location.href = `optimize.html?url=${encoded}`;
+  } else if (pillar === 'socialize') {
+    window.location.href = `socialize.html?url=${encoded}`;
+  } else {
+    window.location.href = `visualize.html?url=${encoded}`;
+  }
+}
+window.launchPillarAction = launchPillarAction;
+
+/**
+ * Handle form submission on pressing Enter in search box
+ */
+function executeOnboardingScan(event, pillar = 'visualize') {
+  if (event && event.preventDefault) event.preventDefault();
+  launchPillarAction(pillar);
+}
+window.executeOnboardingScan = executeOnboardingScan;
+
+// Modify selectConsoleTab to NEVER auto-scroll the window on initial boot
 function selectConsoleTab(tabId) {
   onboardingSelectedMode = tabId;
-  
-  // 1. Update Segmented tab active states & visible focus rings
-  document.querySelectorAll('.console-tab-btn').forEach(btn => {
-    btn.classList.remove('active');
-    btn.style.borderColor = '';
-    btn.style.boxShadow = '';
-  });
-
-  const activeTabBtn = document.getElementById(`btn-tab-${tabId}`);
-  if (activeTabBtn) {
-    activeTabBtn.classList.add('active');
-  }
-  
-  // 2. Update Console Card accent glow border
-  const consoleCard = document.getElementById('onboarding-console-card');
-  if (consoleCard) {
-    consoleCard.className = 'onboarding-console-card'; // Reset
-    consoleCard.classList.add(`active-${tabId}-glow`);
-  }
-  
-  // 3. Update Focused Form Header Label
-  const toolLabel = document.getElementById('onboarding-form-tool-label');
-  if (toolLabel) {
-    if (tabId === 'visualize') {
-      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AIVisualize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AI Visualize</span> Diagnostic Scanner';
-      toolLabel.style.color = 'var(--text-primary)';
-    } else if (tabId === 'optimize') {
-      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AIOptimize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AIOptimize</span> Remediation Workspace';
-      toolLabel.style.color = 'var(--text-primary)';
-    } else if (tabId === 'socialize') {
-      toolLabel.innerHTML = '<span class="logo-placeholder" data-logo="AISocialize" style="height: 28px; min-width: 100px; font-size: 0.75rem; padding: 0.2rem 0.5rem;">AISocialize</span> Citation Footprint Engine';
-      toolLabel.style.color = 'var(--text-primary)';
-    }
-  }
-
-  // 4. Update Main Input Placeholder & Extension Badge display
   const inputField = document.getElementById('onboarding-target-url');
-  const extensionBadge = document.getElementById('socialize-extension-badge');
-  
   if (inputField) {
     if (tabId === 'visualize') {
       inputField.placeholder = 'Enter domain URL to scan (e.g., example.com)...';
-      if (extensionBadge) extensionBadge.style.display = 'none';
     } else if (tabId === 'optimize') {
       inputField.placeholder = 'Enter domain URL to generate fix manifests...';
-      if (extensionBadge) extensionBadge.style.display = 'none';
     } else if (tabId === 'socialize') {
       inputField.placeholder = 'Enter target URL or social profile link...';
-      if (extensionBadge) extensionBadge.style.display = 'flex';
     }
-    inputField.focus();
-  }
-  
-  // 5. Update Button text & colors
-  const btn = document.getElementById('onboarding-submit-btn');
-  const btnText = document.getElementById('onboarding-btn-text');
-  if (btn && btnText) {
-    btn.className = 'onboarding-submit-btn'; // Reset
-    if (tabId === 'visualize') {
-      btnText.innerText = 'Initiate Diagnostic Scan →';
-      btn.classList.add('bg-cyan');
-    } else if (tabId === 'optimize') {
-      btnText.innerText = 'Launch AIOptimize Remediation →';
-      btn.classList.add('bg-amber');
-    } else if (tabId === 'socialize') {
-      btnText.innerText = 'Check Social Citation Footprint →';
-      btn.classList.add('bg-violet');
+    // Only focus if user initiated, without forcing scroll jumps
+    if (document.activeElement === inputField) {
+      inputField.focus({ preventScroll: true });
     }
   }
 }
-
-
-async function executeOnboardingScan(event) {
-  if (event && event.preventDefault) event.preventDefault();
-  
-  const onboardingInput = document.getElementById('onboarding-target-url');
-  if (!onboardingInput) return;
-  const onboardingUrl = onboardingInput.value.trim();
-  if (!onboardingUrl) return;
-
-  const targetParam = encodeURIComponent(onboardingUrl);
-
-  if (onboardingSelectedMode === 'optimize') {
-    window.location.href = `optimize.html?url=${targetParam}`;
-  } else if (onboardingSelectedMode === 'socialize') {
-    window.location.href = `socialize.html?url=${targetParam}`;
-  } else {
-    window.location.href = `visualize.html?url=${targetParam}`;
-  }
-}
+window.selectConsoleTab = selectConsoleTab;
 
 
 function goBackToHome() {

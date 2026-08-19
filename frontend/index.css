@@ -6829,6 +6829,91 @@ body {
   font-size: 0.6rem;
 }
 
+/* Launcher Card Actions */
+.launcher-card {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.launcher-card:hover {
+  transform: translateY(-4px);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.launcher-card#btn-tab-visualize:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.launcher-card#btn-tab-optimize:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+.launcher-card#btn-tab-socialize:hover {
+  border-color: rgba(192, 132, 252, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(192, 132, 252, 0.15);
+}
+
+.launcher-card-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.launcher-btn-visualize {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+.launcher-card#btn-tab-visualize:hover .launcher-btn-visualize {
+  background: #38bdf8;
+  color: #04060a;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4);
+}
+
+.launcher-btn-optimize {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.launcher-card#btn-tab-optimize:hover .launcher-btn-optimize {
+  background: #fbbf24;
+  color: #04060a;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+}
+
+.launcher-btn-socialize {
+  background: rgba(192, 132, 252, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+}
+.launcher-card#btn-tab-socialize:hover .launcher-btn-socialize {
+  background: #c084fc;
+  color: #04060a;
+  box-shadow: 0 4px 16px rgba(192, 132, 252, 0.4);
+}
+
+@keyframes input-pulse {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.08); }
+  50% { border-color: rgba(56, 189, 248, 0.8); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+}
+
+.input-highlight-pulse {
+  animation: input-pulse 0.6s ease 2;
+}
+
 
 
 
