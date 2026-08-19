@@ -13,7 +13,7 @@ const jsPath = path.resolve(__dirname, "../index.js");
 const htmlContent = fs.readFileSync(htmlPath, "utf8");
 const jsContent = fs.readFileSync(jsPath, "utf8");
 
-describe("Slice 2: 3-Pillar Bento & 20-Bot Radar BDD Suite", () => {
+describe("Slice 2: 3-Pillar Bento & 12-Provider AI Logo Cloud BDD Suite", () => {
   let dom;
   let window;
   let document;
@@ -96,76 +96,55 @@ describe("Slice 2: 3-Pillar Bento & 20-Bot Radar BDD Suite", () => {
     });
   });
 
-  describe("Scenario 2.2: 20-Bot AI Crawler Live Radar Grid & Categorization Filters", () => {
-    it("Verify #ai-crawler-radar container exists in static DOM", () => {
-      const radar = document.getElementById("ai-crawler-radar");
-      expect(radar).not.toBeNull();
+  describe("Scenario 2.2: 12-Provider Global AI Ecosystem Logo Cloud (Aceternity Spotlight)", () => {
+    it("Verify #ai-crawler-radar (or #ai-provider-cloud) container exists in static DOM", () => {
+      const container = document.getElementById("ai-crawler-radar") || document.getElementById("ai-provider-cloud");
+      expect(container).not.toBeNull();
     });
 
-    it("Verify filter button controls exist with data-filter attributes: all, search, llm, scraper", () => {
-      const radar = document.getElementById("ai-crawler-radar");
-      expect(radar).not.toBeNull();
-
-      const btnAll = radar.querySelector("[data-filter='all']");
-      const btnSearch = radar.querySelector("[data-filter='search']");
-      const btnLlm = radar.querySelector("[data-filter='llm']");
-      const btnScraper = radar.querySelector("[data-filter='scraper']");
-
-      expect(btnAll).not.toBeNull();
-      expect(btnSearch).not.toBeNull();
-      expect(btnLlm).not.toBeNull();
-      expect(btnScraper).not.toBeNull();
+    it("Verify EXACTLY 12 provider cards exist with class .provider-logo-card", () => {
+      const cards = document.querySelectorAll(".provider-logo-card");
+      expect(cards.length).toBe(12);
     });
 
-    it("Verify exactly 20 AI crawler bot cards are pre-rendered in static DOM (.bot-radar-card)", () => {
-      const cards = document.querySelectorAll(".bot-radar-card");
-      expect(cards.length).toBe(20);
-    });
-
-    it("Verify all 20 specified bot agents are present in the DOM", () => {
-      const radar = document.getElementById("ai-crawler-radar");
-      expect(radar).not.toBeNull();
-
-      const bots = [
-        "OAI-SearchBot", "GPTBot", "ChatGPT-User", "Googlebot", "Meta-WebIndexer",
-        "Meta-ExternalAgent", "Bingbot", "PerplexityBot", "Applebot-Extended", "Amazonbot",
-        "QwenBot", "Baidu-Ansur", "ERNIEBot", "Bytespider", "TencentBot", "Claude-SearchBot",
-        "ClaudeBot", "MistralBot", "CCBot", "cohere-ai"
+    it("Verify all 12 global provider brands are present in the DOM", () => {
+      const container = document.getElementById("ai-crawler-radar") || document.getElementById("ai-provider-cloud");
+      const text = container ? container.textContent : "";
+      const brands = [
+        "ChatGPT", "Claude", "Perplexity", "Google Gemini", "Apple Intelligence",
+        "Microsoft Copilot", "Meta AI", "Mistral AI", "Amazon Q", "DeepSeek",
+        "Doubao", "Alibaba Qwen"
       ];
-
-      const text = radar.textContent || "";
-      bots.forEach(bot => {
-        expect(text).toContain(bot);
+      brands.forEach(brand => {
+        expect(text).toContain(brand);
       });
     });
 
-    it("Verify default status badges display un-scanned state with zero fake default scores", () => {
-      const cards = document.querySelectorAll(".bot-radar-card");
+    it("Verify each of the 12 .provider-logo-card elements contains an inline <svg> icon with viewBox", () => {
+      const cards = document.querySelectorAll(".provider-logo-card");
+      expect(cards.length).toBe(12);
       cards.forEach(card => {
-        const badge = card.querySelector(".bot-status-badge, .status-badge, .bot-score");
-        expect(badge).not.toBeNull();
-        const text = badge.textContent.trim().toUpperCase();
-        
-        // Assert it displays "UNAUDITED", "--", or "PENDING" but NOT numeric scores like "100" or active statuses
-        const isUnscanned = text === "UNAUDITED" || text === "--" || text === "PENDING" || text === "NOT SCANNED" || text === "PENDING AUDIT";
-        expect(isUnscanned).toBe(true);
-
-        // Verify no fake default scores like "85/100" or similar exist by default
-        expect(text).not.toMatch(/\d+/);
+        const svg = card.querySelector("svg");
+        expect(svg).not.toBeNull();
+        expect(svg.getAttribute("viewBox")).not.toBeNull();
       });
+    });
+
+    it("Verify that legacy filter buttons (.bot-filter-btn) have been removed (zero filter elements)", () => {
+      const filterBtns = document.querySelectorAll(".bot-filter-btn");
+      expect(filterBtns.length).toBe(0);
     });
   });
 
-  describe("Scenario 2.3: Strict Governance & Static DOM Indexability", () => {
-    it("Verify zero occurrences of the banned phrase 'AI-first' across the entire file", () => {
-      const fullText = document.body.innerHTML;
-      expect(fullText.toLowerCase()).not.toContain("ai-first");
+  describe("Scenario 2.3: Strict Governance & Static Pre-rendering", () => {
+    it("Verify zero occurrences of the banned phrase 'AI-first' across the entire DOM", () => {
+      const bodyText = document.body.innerHTML;
+      expect(bodyText.toLowerCase()).not.toContain("ai-first");
     });
 
-    it("Verify all cards and educational copy are statically rendered in the HTML without requiring JS hydration", () => {
-      // Assert that without executing scripts, they exist in raw HTML string
+    it("Verify the provider logo cards and 3-pillar bento grid are statically rendered in raw HTML string", () => {
       expect(htmlContent).toContain("product-bento-grid");
-      expect(htmlContent).toContain("ai-crawler-radar");
+      expect(htmlContent).toContain("provider-logo-card");
     });
   });
 });

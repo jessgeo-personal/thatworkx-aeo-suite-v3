@@ -5846,25 +5846,20 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', copyMarkdownFromModal);
   }
 
-  // AI Crawler Radar filter logic
-  const filterBtns = document.querySelectorAll('.bot-filter-btn');
-  const botCards = document.querySelectorAll('.bot-radar-card');
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const filterValue = btn.getAttribute('data-filter');
-      botCards.forEach(card => {
-        const category = card.getAttribute('data-category');
-        if (filterValue === 'all' || category === filterValue) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
+  // Aceternity Spotlight effect for provider logo cards
+  const providerGrid = document.getElementById('provider-logo-grid');
+  if (providerGrid) {
+    providerGrid.addEventListener('mousemove', (e) => {
+      const cards = providerGrid.querySelectorAll('.provider-logo-card');
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
       });
     });
-  });
+  }
 });
 
 window.buildDevModule4Html = buildDevModule4Html;
