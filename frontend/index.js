@@ -5927,3 +5927,82 @@ window.switchSec2SubTab = function(tabName) {
 };
 
 window.toggleModule4Row = toggleModule4Row;
+
+/**
+ * Section 7: 4-Category Static FAQ Hub Accordion & Filtering Logic
+ * @param {Document} doc - DOM document context
+ */
+function initFaqHub(doc = document) {
+  const triggers = doc.querySelectorAll('#faq-accordion-hub .faq-question, #faq-accordion-hub [data-faq-trigger]');
+  const filterBtns = doc.querySelectorAll('#faq-accordion-hub [data-faq-filter]');
+  const faqItems = doc.querySelectorAll('#faq-accordion-hub .faq-accordion-item, #faq-accordion-hub [data-faq-category]');
+
+  if (triggers.length === 0 && filterBtns.length === 0) return;
+
+  // Accordion Expand/Collapse
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const item = trigger.closest('.faq-accordion-item') || trigger.parentElement;
+      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+
+      // Toggle aria & open class
+      trigger.setAttribute('aria-expanded', String(!isExpanded));
+      if (item) {
+        item.classList.toggle('is-open', !isExpanded);
+      }
+
+      const answer = item ? item.querySelector('.faq-answer, [data-faq-content]') : null;
+      if (answer) {
+        answer.style.display = isExpanded ? 'none' : 'block';
+      }
+    });
+  });
+
+  // Category Filtering
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.getAttribute('data-faq-filter');
+
+      // Update active filter button state
+      filterBtns.forEach(b => {
+        b.classList.remove('active-faq-filter');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active-faq-filter');
+      btn.setAttribute('aria-selected', 'true');
+
+      // Filter FAQ items
+      faqItems.forEach(item => {
+        const category = item.getAttribute('data-faq-category');
+        if (filter === 'all' || category === filter) {
+          item.style.display = 'block';
+          item.classList.remove('hidden');
+        } else {
+          item.style.display = 'none';
+          item.classList.add('hidden');
+        }
+      });
+    });
+  });
+}
+
+// Auto-boot if in browser context
+if (typeof window !== 'undefined') {
+  const bootAll = () => {
+    if (typeof initHierarchySandbox === 'function') initHierarchySandbox(document);
+    initFaqHub(document);
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootAll);
+  } else {
+    bootAll();
+  }
+}
+
+// Support CommonJS/ESM interop exports for Vitest environment
+if (typeof module !== 'undefined' && module.exports) {
+  initFaqHub.initFaqHub = initFaqHub;
+  module.exports = initFaqHub;
+}
+
