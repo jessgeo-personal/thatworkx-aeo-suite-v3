@@ -80,6 +80,44 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Universal Form Controls Font Reset */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: inherit;
+}
+
+/* ==========================================================================
+   Smooth Anchor Navigation & Sticky Header Offset
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+/* Ensure all anchor target sections inherit proper top clearance */
+section,
+[id^="onboarding-"],
+[id^="seo-vs-aeo"],
+[id^="product-bento"],
+[id^="ai-crawler"],
+[id^="machine-file"],
+[id^="eeat-"],
+[id^="faq-"],
+.seo-aeo-comparison-section,
+.bento-grid-section,
+.provider-cloud-section,
+.pipeline-section,
+.eeat-deck-section,
+.faq-hub-section,
+.final-cta-section {
+  scroll-margin-top: 5.5rem;
+}
+
 body {
   background-color: var(--canvas-bg);
   color: var(--text-primary);
@@ -1324,9 +1362,10 @@ body {
   border-radius: 9999px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: #cbd5e1;
   text-transform: uppercase;
   backdrop-filter: blur(12px);
@@ -1461,7 +1500,9 @@ body {
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* SEARCH CONSOLE TAB BUTTONS */
 .console-tab-btn {
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   background: rgba(8, 9, 12, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.04);
   outline: none;
@@ -1585,6 +1626,7 @@ body {
   pointer-events: none;
 }
 
+/* DOMAIN SCAN INPUT BOX */
 .onboarding-input-wrapper input {
   width: 100%;
   height: 56px;
@@ -1593,9 +1635,16 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   color: #ffffff;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.95rem;
-  font-weight: 550;
+  font-weight: 500;
   transition: all 0.3s ease;
+}
+
+.onboarding-input-wrapper input::placeholder {
+  color: #64748b;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 400;
 }
 
 .onboarding-input-wrapper input:focus {
@@ -1619,13 +1668,16 @@ body {
 }
 
 /* ACTION CTAS */
+/* SCAN ACTION CTA BUTTON */
 .onboarding-submit-btn {
   height: 56px;
   padding: 0 2.2rem;
   border: none;
   border-radius: 12px;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 0.95rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
@@ -1701,29 +1753,33 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* INSTANT DEMO PILLS */
 .instant-try-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.75rem;
   font-weight: 600;
-  color: #475569;
+  color: #64748b;
   flex-shrink: 0;
 }
 
 .instant-try-pill {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
-  background: rgba(159, 18, 57, 0.10);
-  border: 1px solid rgba(159, 18, 57, 0.28);
-  color: #9F1239;
+  background: rgba(183, 65, 14, 0.10);
+  border: 1px solid rgba(183, 65, 14, 0.28);
+  color: var(--burnt-copper-hover, #d45d2a);
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .instant-try-pill:hover {
-  background: rgba(159, 18, 57, 0.18);
+  background: rgba(183, 65, 14, 0.20);
+  border-color: rgba(183, 65, 14, 0.5);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -3009,7 +3065,7 @@ body {
 }
 
 .inspector-badge {
-  font-family: 'Plus Jakarta Sans', monospace;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -3042,7 +3098,7 @@ body {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 0.4rem 1rem;
-  font-family: 'Plus Jakarta Sans', monospace;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.7rem;
   color: #64748b;
   display: flex;
@@ -3056,7 +3112,7 @@ body {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   padding: 1rem;
-  font-family: 'Plus Jakarta Sans', monospace;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.72rem;
   color: #a7f3d0;
   text-align: left;
@@ -3067,11 +3123,11 @@ body {
 /* ─────────────────────────────────────────────────────────────────────────
    4-LAYER MACHINE HIERARCHY & DELIVERY PIPELINE STYLES
 ───────────────────────────────────────────────────────────────────────── */
+/* Standardized Pipeline Section */
 .pipeline-section {
-  margin-top: 4rem;
+  margin: 3.5rem auto 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 4rem;
-  margin-bottom: 2rem;
+  padding: 3rem 1.5rem 0;
 }
 
 .pipeline-header {
@@ -6116,11 +6172,12 @@ body {
 /* ==========================================================================
    Section 6: E-E-A-T Citation Architecture Styles
    ========================================================================== */
+/* Standardized E-E-A-T Deck */
 .eeat-deck-section {
   position: relative;
-  margin: 4rem auto;
+  margin: 3.5rem auto 0;
   max-width: 1240px;
-  padding: 4rem 1.5rem;
+  padding: 3rem 1.5rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -6275,11 +6332,12 @@ body {
 /* ==========================================================================
    Section 7: 4-Category Static FAQ Hub Styles
    ========================================================================== */
+/* Standardized FAQ Hub */
 .faq-hub-section {
   position: relative;
-  margin: 4rem auto;
+  margin: 3.5rem auto 0;
   max-width: 1000px;
-  padding: 4rem 1.5rem;
+  padding: 3rem 1.5rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -6441,9 +6499,10 @@ body {
 /* ==========================================================================
    Section 8: High-Conversion Shimmer CTA Deck Styles
    ========================================================================== */
+/* Standardized Final CTA */
 .final-cta-section {
   position: relative;
-  margin: 5rem auto 3rem;
+  margin: 3.5rem auto 0;
   max-width: 1140px;
   padding: 0 1.5rem;
 }
@@ -6603,11 +6662,12 @@ body {
 /* ==========================================================================
    Section 9: 5-Column Mega-Footer Styles
    ========================================================================== */
+/* Standardized Mega Footer (Eliminate excessive stacking gap) */
 .global-mega-footer {
   background: #04060a;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4.5rem 1.5rem 2rem;
-  margin-top: 5rem;
+  padding: 3.5rem 1.5rem 2rem;
+  margin-top: 3.5rem;
 }
 
 .global-mega-footer .footer-container {
