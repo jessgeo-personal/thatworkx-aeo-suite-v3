@@ -1,0 +1,9 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-08-20T17:51:38.249Z
+
+FILE: backend\server.js
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: All files passed.
