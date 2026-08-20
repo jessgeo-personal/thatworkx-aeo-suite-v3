@@ -1,7 +1,7 @@
 // Global API Base URL Resolution with fallback & window binding
 const API_BASE = (typeof window !== 'undefined' && window.API_BASE !== undefined)
   ? window.API_BASE
-  : ((typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.port !== '5000')) ? 'http://localhost:5000' : '');
+  : ((typeof window !== 'undefined' && window.location.protocol === 'file:') ? 'http://localhost:5000' : '');
 
 if (typeof window !== 'undefined') {
   window.API_BASE = API_BASE;
