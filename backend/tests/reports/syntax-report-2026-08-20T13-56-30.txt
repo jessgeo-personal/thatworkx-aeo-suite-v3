@@ -1,0 +1,9 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-08-20T13:56:30.949Z
+
+FILE: backend\middleware\rateLimiter.js
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: All files passed.

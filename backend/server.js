@@ -67,25 +67,35 @@ app.use(cors({
 }));
 app.use(express.json());
 
+let lastMongoError = null;
 // Health Check Endpoint for DigitalOcean App Platform / Load Balancers
 app.get('/health', (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  const isConnected = mongoose.connection.readyState === 1;
   res.status(200).json({
     status: 'ok',
     service: 'thatworkx-aeo-suite',
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    database: dbStatus
+    database: isConnected ? 'connected' : 'disconnected',
+    db_readyState: mongoose.connection.readyState,
+    db_error: isConnected ? null : lastMongoError
   });
 });
 
 // MongoDB Connection with native bare-metal fallback
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/thatworkx-aeo';
+
+console.log('[MongoDB] Attempting connection. URI configured:', Boolean(process.env.MONGODB_URI));
+
 mongoose.connect(mongoURI)
-  .then(() => console.log('Successfully connected to MongoDB.'))
+  .then(() => {
+    lastMongoError = null;
+    console.log('Successfully connected to MongoDB.');
+  })
   .catch((err) => {
-    console.warn('MongoDB local connection warning. Using memory store or mock db fallback.');
+    lastMongoError = err.message || String(err);
+    console.error('MongoDB connection error details:', err);
   });
 
 // Endpoint to execute URL scan with rate-limiting and tier-gating active
