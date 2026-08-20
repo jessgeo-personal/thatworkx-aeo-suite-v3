@@ -1,5 +1,14 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env.development') });
+const fs = require('fs');
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
+  const devEnv = path.join(__dirname, '../.env.development');
+  const defaultEnv = path.join(__dirname, '../.env');
+  if (fs.existsSync(devEnv)) {
+    require('dotenv').config({ path: devEnv });
+  } else if (fs.existsSync(defaultEnv)) {
+    require('dotenv').config({ path: defaultEnv });
+  }
+}
 const express = require('express');
 const cors = require('cors');
 const queueService = require('./services/queueService');
@@ -31,12 +40,25 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'https://thatworkx.com',
   'https://www.thatworkx.com',
-  'http://localhost:3000'
+  'https://aeo-stg.thatworkx.com',
+  'http://localhost:3000',
+  'http://localhost:5000'
 ];
+
+if (process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN.split(',').forEach(o => {
+    const origin = o.trim();
+    if (origin && !allowedOrigins.includes(origin)) allowedOrigins.push(origin);
+  });
+}
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // Dynamic staging / preview environments
+    if (/\.ondigitalocean\.app$/i.test(origin) || origin.includes('staging') || origin.includes('preview')) {
       return callback(null, true);
     }
     return callback(null, true);
@@ -44,6 +66,19 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Health Check Endpoint for DigitalOcean App Platform / Load Balancers
+app.get('/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.status(200).json({
+    status: 'ok',
+    service: 'thatworkx-aeo-suite',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: dbStatus
+  });
+});
 
 // MongoDB Connection with native bare-metal fallback
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/thatworkx-aeo';

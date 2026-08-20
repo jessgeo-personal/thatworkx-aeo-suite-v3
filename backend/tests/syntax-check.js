@@ -183,6 +183,22 @@ function checkJS(src) {
       if (!closed) errors.push({ line: startLine, msg: `Unclosed template literal (backtick) starting at line ${startLine}` });
       continue;
     }
+    // RegExp literal detection (e.g. /pattern/flags)
+    if (ch === '/') {
+      const prevNonWhitespace = src.slice(0, i).trim().slice(-1);
+      const isRegexContext = ['=', '(', ',', ':', '[', '!', '&', '|', '?', ';'].includes(prevNonWhitespace) || prevNonWhitespace === '';
+      if (isRegexContext && src[i+1] !== '/' && src[i+1] !== '*') {
+        i++;
+        while (i < src.length && src[i] !== '/') {
+          if (src[i] === '\\') i++;
+          if (src[i] === '\n') { line++; colN = 0; }
+          i++;
+        }
+        i++; // skip trailing '/'
+        while (i < src.length && /[a-z]/i.test(src[i])) i++; // skip flags (g, i, m, etc)
+        continue;
+      }
+    }
     // Bracket/brace/paren balance
     if (openers[ch]) {
       stack.push({ char: ch, expected: openers[ch], line, col: colN });

@@ -1,5 +1,4 @@
-# DigitalOcean App Platform Spec file for Staging Environment
-name: aeo-audit-tool-v3
+name: thatworkx-aeo-suite-staging
 region: nyc
 services:
   - name: aeo-server
@@ -8,22 +7,47 @@ services:
       branch: staging
       deploy_on_push: true
     source_dir: /
-    dockerfile_path: Dockerfile
+    environment_slug: node-js
+    build_command: npm run build
+    run_command: npm start
     instance_count: 1
     instance_size_slug: basic-xxs
     http_port: 5000
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 15
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
     routes:
       - path: /
     envs:
       - key: NODE_ENV
         scope: RUN_AND_BUILD_TIME
         value: staging
+      - key: PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "5000"
       - key: MONGODB_URI
         scope: RUN_TIME
-        value: ${aeo-db.DATABASE_URL}
-databases:
-  - name: aeo-db
-    engine: MONGODB
-    version: "6.0"
-    num_nodes: 1
-    size_slug: db-s-1vcpu-1gb
+        type: SECRET
+        value: "mongodb+srv://<USER>:<PASSWORD>@cluster0.xxxxx.mongodb.net/thatworkx-aeo?retryWrites=true&w=majority"
+      - key: RESEND_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: FROM_EMAIL
+        scope: RUN_TIME
+        value: "noreply-staging@thatworkx.com"
+      - key: EMAIL_FROM_NAME
+        scope: RUN_TIME
+        value: "AEO Tools by Thatworkx - STAGING"
+      - key: ENABLE_EMAIL_VERIFICATION
+        scope: RUN_TIME
+        value: "true"
+      - key: CORS_ORIGIN
+        scope: RUN_TIME
+        value: "https://aeo-stg.thatworkx.com"
+      - key: SEMRUSH_AFFILIATE_URL
+        scope: RUN_TIME
+        value: "https://www.semrush.com/affiliate-redirect-placeholder"

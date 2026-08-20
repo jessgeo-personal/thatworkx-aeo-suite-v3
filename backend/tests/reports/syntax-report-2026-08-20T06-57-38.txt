@@ -1,0 +1,48 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-08-20T06:57:38.889Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\optimize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\socialize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\index.js
+------------------------------------------------------------------------
+  [ERR   1]  Line 614  Unclosed '(' opened at line 614 col 26 — never closed
+  [ERR   2]  Line 614  Unclosed '{' opened at line 614 col 36 — never closed
+  [ERR   3]  Line 924  Unclosed '{' opened at line 924 col 37 — never closed
+  [ERR   4]  Line 929  Mismatched: '(' opened line 926 col 49 expected ')' but found '}' at line 929
+  [ERR   5]  Line 966  Mismatched: '(' opened line 965 col 64 expected ')' but found '}' at line 966
+  [ERR   6]  Line 1014  Mismatched: '(' opened line 1002 col 49 expected ')' but found '}' at line 1014
+  [ERR   7]  Line 1021  Mismatched: '{' opened line 925 col 25 expected '}' but found ')' at line 1021
+  [ERR   8]  Line 1135  Mismatched: '(' opened line 1133 col 6 expected ')' but found '}' at line 1135
+  [ERR   9]  Line 1736  Unclosed '{' opened at line 1736 col 43 — never closed
+  [ERR  10]  Line 1743  Mismatched: '(' opened line 1742 col 42 expected ')' but found '}' at line 1743
+  [ERR  11]  Line 2459  Unclosed '{' opened at line 2459 col 31 — never closed
+  [ERR  12]  Line 2473  Mismatched: '(' opened line 2468 col 37 expected ')' but found '}' at line 2473
+  [ERR  13]  Line 2582  Unclosed '{' opened at line 2582 col 44 — never closed
+  [ERR  14]  Line 2601  Mismatched: '(' opened line 2599 col 6 expected ')' but found '}' at line 2601
+  [ERR  15]  Line 2632  Mismatched: '(' opened line 2628 col 47 expected ')' but found '}' at line 2632
+  [ERR  16]  Line 2731  Unclosed '{' opened at line 2731 col 43 — never closed
+  [ERR  17]  Line 3414  Mismatched: '(' opened line 2740 col 34 expected ')' but found '}' at line 3414
+  [ERR  18]  Line 4243  Unclosed '{' opened at line 4243 col 41 — never closed
+  [ERR  19]  Line 4264  Mismatched: '(' opened line 4246 col 26 expected ')' but found '}' at line 4264
+  [ERR  20]  Line 4286  Mismatched: '(' opened line 4286 col 61 expected ')' but found ']' at line 4286
+  [ERR  21]  Line 4286  Mismatched: '{' opened line 4285 col 25 expected '}' but found ')' at line 4286
+  [ERR  22]  Line 4424  Mismatched: '(' opened line 4269 col 50 expected ')' but found '}' at line 4424
+  [ERR  23]  Line 4426  Mismatched: '{' opened line 4266 col 39 expected '}' but found ')' at line 4426
+  23 error(s).
+
+========================================================================
+RESULT: 23 error(s) - review above.

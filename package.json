@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "Thatworkx AEO Suite (AI Engine Optimization) - Greenfield Build",
   "main": "backend/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
+    "build": "node scripts/build-layouts.js",
     "start": "node backend/server.js",
-    "dev:backend": "nodemon backend/server.js",
+    "dev": "node backend/server.js",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "syntax-check": "node backend/tests/syntax-check.js",
     "lint": "node backend/tests/syntax-check.js"
   },
   "dependencies": {
@@ -14,8 +20,9 @@
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "mongoose": "^8.8.1"
+    "express": "^4.19.2",
+    "mongoose": "^8.5.2",
+    "resend": "^3.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7",
