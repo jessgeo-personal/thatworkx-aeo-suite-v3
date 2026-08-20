@@ -4,7 +4,7 @@
   "description": "Thatworkx AEO Suite (AI Engine Optimization) - Greenfield Build",
   "main": "backend/server.js",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   },
   "scripts": {
     "build": "node scripts/build-layouts.js",
@@ -25,6 +25,7 @@
     "resend": "^3.5.0"
   },
   "devDependencies": {
+    "jsdom": "^22.1.0",
     "nodemon": "^3.1.7",
     "vitest": "^2.1.4"
   }
