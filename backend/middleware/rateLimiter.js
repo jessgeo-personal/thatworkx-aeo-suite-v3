@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const TIER_LIMITS = {
@@ -37,24 +38,41 @@ const checkTierLimits = async (req, res, next) => {
   try {
     const { email, headless } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ error: 'User email is required for quota validation' });
+    const userEmail = (email && typeof email === 'string' && email.trim()) 
+      ? email.trim().toLowerCase() 
+      : 'user@thatworkx.com';
+
+    let user = null;
+
+    // Only query database if MongoDB connection is active or in test mode
+    if (mongoose.connection.readyState === 1 || process.env.NODE_ENV === 'test') {
+      try {
+        user = await User.findOne({ email: userEmail });
+      } catch (dbErr) {
+        console.warn('[RateLimiter] Database query error, using memory fallback:', dbErr.message);
+      }
     }
 
-    // Load or create a mock/database user record
-    let user = await User.findOne({ email });
+    // In-memory user fallback
     if (!user) {
-      user = new User({ email, subscription_tier: 'AIVisualize Free' });
+      user = new User({ 
+        email: userEmail, 
+        subscription_tier: 'AIVisualize Free',
+        daily_scans_performed: 0,
+        daily_headless_runs_performed: 0
+      });
     }
 
-    // Reset counts on UTC day boundaries
-    user.checkAndResetDailyLimits();
+    // Reset counts on UTC day boundaries if available
+    if (typeof user.checkAndResetDailyLimits === 'function') {
+      user.checkAndResetDailyLimits();
+    }
 
-    const tier = user.subscription_tier;
+    const tier = user.subscription_tier || 'AIVisualize Free';
     const limits = TIER_LIMITS[tier] || TIER_LIMITS['AIVisualize Free'];
 
     // 1. Verify daily scan quota
-    if (user.daily_scans_performed >= limits.maxScans) {
+    if ((user.daily_scans_performed || 0) >= limits.maxScans) {
       return res.status(403).json({
         code: 'LIMIT_EXCEEDED',
         error: `Daily scan allocation exceeded. Limit is ${limits.maxScans} per day.`,
@@ -74,7 +92,7 @@ const checkTierLimits = async (req, res, next) => {
         });
       }
 
-      if (user.daily_headless_runs_performed >= limits.maxHeadless) {
+      if ((user.daily_headless_runs_performed || 0) >= limits.maxHeadless) {
         return res.status(403).json({
           code: 'HEADLESS_LIMIT_EXCEEDED',
           error: `Daily headless browser sweep allocation exceeded. Limit is ${limits.maxHeadless} sessions per day.`,
@@ -94,8 +112,20 @@ const checkTierLimits = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Rate Limiter Error:', error);
-    res.status(500).json({ error: 'Internal validation server error' });
+    console.error('[RateLimiter] Error during validation:', error);
+    // Fallback: Proceed with standard Free Tier limits rather than blocking the scan
+    req.userLimits = {
+      maxPages: 500,
+      maxHeadless: 0,
+      tier: 'AIVisualize Free'
+    };
+    req.userRecord = {
+      email: 'user@thatworkx.com',
+      daily_scans_performed: 0,
+      daily_headless_runs_performed: 0,
+      subscription_tier: 'AIVisualize Free'
+    };
+    next();
   }
 };
 
