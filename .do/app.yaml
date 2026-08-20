@@ -32,13 +32,14 @@ services:
       - key: MONGODB_URI
         scope: RUN_TIME
         type: SECRET
-        value: "mongodb+srv://<USER>:<PASSWORD>@cluster0.xxxxx.mongodb.net/thatworkx-aeo?retryWrites=true&w=majority"
+        value: EV[1:lNIrF4e2pskHoyEy4ckA4qFy/EYvR9eg:rFpamm+BeCi834I4mwHIIwD1VhOGiRbniTEAmT9cjXv1Qt/ZaMaBjP+aNFQK5vbiqjhWZrz3J5GgMVw8rmSxzXzorfxP8yv9SIznTuIapexsxZYjtRlyOKhWCppfWLvXcdIkdIBHwR/pL2YJG4vO/wK89vulbFeDqanEXL8NW6g=]
       - key: RESEND_API_KEY
         scope: RUN_TIME
         type: SECRET
+        value: EV[1:IlXicmweLm8TIOR1weDRBYrksgx7MWjk:VgUkNsE+kwQFzYf51kFZdUIAre2CXMaJXQp/B00QSEvQjGy+LOdWLtJRozlWsdw0ZLNkYw==]
       - key: FROM_EMAIL
         scope: RUN_TIME
-        value: "noreply-staging@thatworkx.com"
+        value: noreply-stg@thatworkx.com
       - key: EMAIL_FROM_NAME
         scope: RUN_TIME
         value: "AEO Tools by Thatworkx - STAGING"
@@ -47,7 +48,18 @@ services:
         value: "true"
       - key: CORS_ORIGIN
         scope: RUN_TIME
-        value: "https://aeo-stg.thatworkx.com"
+        value: "https://aeo-2-stg.thatworkx.com"
       - key: SEMRUSH_AFFILIATE_URL
         scope: RUN_TIME
         value: "https://www.semrush.com/affiliate-redirect-placeholder"
+      - key: STRIPE_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:05TP84jQopdvymche4FIPm46qq86faeB:xMXFrUalzMSUWipz0Ri+uVS7imurw9EhTBRLbnwlViR8/qOPsB7ElF91VaR3TsTNWy5aZbjq4Xg70U1EkcEjTwKe2jixRFjzLGNTHbbEa6wl/0I5gTOquJ9xE91iHb/ef/VAd4pl/jF63c7w/lOy+KTYKvQFZInyuDhu]
+      - key: STRIPE_PUBLISHABLE_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: pk_test_51RZA2GB2iSRHKVlZWNuWYn1YSxDOiYZSsRyNYJQUrKLEy9zs8cYkpeoMbs9zLv0SbRWBSZGfp3oIRf11gbcEFLG500nG2NZIaz
+      - key: STRIPE_WEBHOOK_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:N445nF5B5NuqZF8DXrE9syTeQ6DHfoVi:+VUpV0M/T8px9s3sUg2qAqV6qP37AnvjbA+4axcosDa//q6IL+NL0aJ7VhL+pciozjZw0n0j]
