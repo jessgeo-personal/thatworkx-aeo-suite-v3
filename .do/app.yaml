@@ -48,7 +48,7 @@ services:
         value: "true"
       - key: CORS_ORIGIN
         scope: RUN_TIME
-        value: "https://aeo-2-stg.thatworkx.com"
+        value: "https://aeo-v3-stg-ysoyb.ondigitalocean.app"
       - key: SEMRUSH_AFFILIATE_URL
         scope: RUN_TIME
         value: "https://www.semrush.com/affiliate-redirect-placeholder"
