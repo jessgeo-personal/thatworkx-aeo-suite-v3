@@ -41,7 +41,7 @@ describe("Module 2: Boardroom Telemetry & Section 1-4 Refactor BDD Suite", () =>
     window.document.dispatchEvent(domLoadedEvent);
   });
 
-  it("Scenario 1: Verify WAF 403 rendering contains Security Shield Active suffix", () => {
+  it("Scenario 1: Verify WAF 403 rendering contains correct blocked copy and scores", () => {
     const mockScanData = {
       url: "https://example-waf-blocked.com",
       status: {
@@ -53,7 +53,7 @@ describe("Module 2: Boardroom Telemetry & Section 1-4 Refactor BDD Suite", () =>
       scoreCard: {
         overallScore: 0,
         pillars: {
-          p1: { score: 0, max: 25, badge: "CRITICAL" },
+          p1: { score: 0, max: 25, badge: "BLOCKED" },
           p2: { score: 0, max: 25 },
           p3: { score: 0, max: 25 },
           p4: { score: 0, max: 25 }
@@ -64,7 +64,8 @@ describe("Module 2: Boardroom Telemetry & Section 1-4 Refactor BDD Suite", () =>
           score: 0,
           max: 25,
           blocked: true,
-          blockMessage: "Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active"
+          status: 'BLOCKED',
+          blockMessage: "Automated Bot Traffic Rejected (HTTP 403)"
         }
       }
     };
@@ -77,8 +78,8 @@ describe("Module 2: Boardroom Telemetry & Section 1-4 Refactor BDD Suite", () =>
     expect(robotsTxtStatus).not.toBeNull();
     expect(pillar1Score).not.toBeNull();
 
-    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
-    expect(pillar1Score.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
+    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403)");
+    expect(pillar1Score.textContent.trim().toLowerCase()).toBe("0/25 pts");
   });
 
   it("Scenario 2: Verify updated executive terminology across Sections 1-4 and Module 4 headings", () => {

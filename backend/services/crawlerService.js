@@ -211,6 +211,9 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     if (failedWithWaf) {
       result.status.isWafBlocked = true;
       result.status.wafStatusCode = failedWithWaf.reason.response.status;
+      result.status.statusCode = failedWithWaf.reason.response.status;
+      result.status.gateState = 'BLOCKED';
+      result.status.disallowCount = -1;
     }
 
     // 2. Parse Robots.txt for blanket disallow vs targeted AI bot rules
@@ -279,6 +282,9 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       if (e.response && (e.response.status === 403 || e.response.status === 429)) {
         result.status.isWafBlocked = true;
         result.status.wafStatusCode = e.response.status;
+        result.status.statusCode = e.response.status;
+        result.status.gateState = 'BLOCKED';
+        result.status.disallowCount = -1;
       }
     }
 

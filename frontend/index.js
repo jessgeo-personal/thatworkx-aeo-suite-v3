@@ -2745,6 +2745,30 @@ function formatRagTextWithTruncation(rawText, pageRoute) {
          `*Ingestion Metadata:* Token Density ~${totalTokens} tokens | 🔴 Exceeds Maximum AI Bot Context Budget (${totalWords - 2500} words lost to AI search)`;
 }
 
+function getBadgeClass(status, score) {
+  const normStatus = String(status || '').toUpperCase();
+  const normScore = Number(score ?? 0);
+  if (normStatus === 'BLOCKED' || normScore === 0) {
+    return 'status-badge--blocked';
+  }
+  if (normStatus === 'WARNING') {
+    return 'status-badge--warning';
+  }
+  if (normStatus === 'PASS' || (normScore > 0 && normStatus !== 'FAIL' && normStatus !== 'CRITICAL')) {
+    return 'status-badge--pass';
+  }
+  return 'status-badge--blocked';
+}
+
+function getStatusPillClass(status, score) {
+  return getBadgeClass(status, score);
+}
+
+if (typeof window !== 'undefined') {
+  window.getBadgeClass = getBadgeClass;
+  window.getStatusPillClass = getStatusPillClass;
+}
+
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 function updateExecutiveViewData(results) {
   window.latestScanResults = results;
@@ -2846,10 +2870,10 @@ function updateExecutiveViewData(results) {
 
   // Dynamically evaluate pass/fail for every individual check inside the 4 section cards against live scan results:
   // Card 1 Checks:
-  const isCdnPass = !(results.sec1?.cdnBlocked === true);
-  const isXRobotsPass = !(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false);
-  const isUseragentsPass = !(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false);
-  const isAiBotsPass = Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
+  const isCdnPass = !(results.sec1?.cdnBlocked === true || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isXRobotsPass = !(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isUseragentsPass = !(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isAiBotsPass = !(results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED') && Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
 
   // Card 2 Checks:
   const isSecurePass = results.sec2?.isHttps !== false;
@@ -3156,6 +3180,22 @@ function updateExecutiveViewData(results) {
         : (pData && pData.note ? pData.note : 'Deductions identified during scan.');
     }
 
+    let statusEnum = 'FAIL';
+    if (secNum === 1 && isWafBlocked) {
+      statusEnum = 'BLOCKED';
+    } else if (secObj && secObj.status) {
+      statusEnum = secObj.status;
+    } else {
+      if (currentScore === 25) {
+        statusEnum = 'PASS';
+      } else if (currentScore >= 10) {
+        statusEnum = 'WARNING';
+      } else {
+        statusEnum = 'FAIL';
+      }
+    }
+    const badgeClass = getBadgeClass(statusEnum, currentScore);
+
     const isGreen = currentScore >= 20 && !(secNum === 1 && isWafBlocked);
     const isAmber = currentScore >= 10 && currentScore < 20 && !(secNum === 1 && isWafBlocked);
     
@@ -3176,31 +3216,51 @@ function updateExecutiveViewData(results) {
     }
     if (badgeEl) {
       badgeEl.innerText = badgeText;
-      badgeEl.className = theme.class;
-      badgeEl.style.setProperty('background', theme.bg, 'important');
-      badgeEl.style.setProperty('color', theme.color, 'important');
-      badgeEl.style.setProperty('border', theme.border, 'important');
+      badgeEl.className = `badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        badgeEl.style.background = '';
+        badgeEl.style.color = '';
+        badgeEl.style.border = '';
+      } else {
+        badgeEl.style.setProperty('background', theme.bg, 'important');
+        badgeEl.style.setProperty('color', theme.color, 'important');
+        badgeEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     if (scoreEl) {
       if (secNum === 1 && isWafBlocked) {
-        scoreEl.textContent = blockedMessage;
+        scoreEl.textContent = '0/25 pts';
       } else {
         scoreEl.textContent = `${currentScore}/${currentMax} pts`;
       }
-      scoreEl.style.setProperty('background', theme.bg, 'important');
-      scoreEl.style.setProperty('color', theme.color, 'important');
-      scoreEl.style.setProperty('border', theme.border, 'important');
+      scoreEl.className = `badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        scoreEl.style.background = '';
+        scoreEl.style.color = '';
+        scoreEl.style.border = '';
+      } else {
+        scoreEl.style.setProperty('background', theme.bg, 'important');
+        scoreEl.style.setProperty('color', theme.color, 'important');
+        scoreEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     const easyScoreBadgeEl = document.getElementById(`section-${secNum}-easy-score-badge`);
     if (easyScoreBadgeEl) {
       if (secNum === 1 && isWafBlocked) {
-        easyScoreBadgeEl.textContent = blockedMessage;
+        easyScoreBadgeEl.textContent = '[ 🔴 SECURITY SHIELD ACTIVE ]';
       } else {
         easyScoreBadgeEl.textContent = `${currentScore}/${currentMax} pts`;
       }
-      easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
-      easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
-      easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
+      easyScoreBadgeEl.className = `easy-view-score-badge badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        easyScoreBadgeEl.style.background = '';
+        easyScoreBadgeEl.style.color = '';
+        easyScoreBadgeEl.style.border = '';
+      } else {
+        easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
+        easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
+        easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     if (noteEl) {
       if (secObj && secObj.deductions && secObj.deductions.length > 0 && currentScore < currentMax) {
@@ -3305,31 +3365,44 @@ function updateExecutiveViewData(results) {
   const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus}) — Security Shield Active`;
 
   if (robotsTxtEl) {
-    console.log("Updating robotsTxtEl to:", isWafBlocked ? blockedMessage : "normal");
+    const wafClass = getBadgeClass(isWafBlocked ? 'BLOCKED' : (isRobotsTxtAllowed ? 'PASS' : 'FAIL'), isWafBlocked ? 0 : 25);
+    robotsTxtEl.className = `badge-status ${wafClass}`;
     if (isWafBlocked) {
-      robotsTxtEl.textContent = blockedMessage;
-      robotsTxtEl.className = "badge-status status-red";
-      robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
-      robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
-      robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+      robotsTxtEl.textContent = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+      robotsTxtEl.style.background = '';
+      robotsTxtEl.style.color = '';
+      robotsTxtEl.style.border = '';
     } else if (isRobotsTxtAllowed) {
       robotsTxtEl.textContent = "Passed / Allow";
-      robotsTxtEl.className = "badge-status status-green";
-      robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
-      robotsTxtEl.style.setProperty('color', '#34d399', 'important');
-      robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+      if (wafClass.startsWith('status-badge--')) {
+        robotsTxtEl.style.background = '';
+        robotsTxtEl.style.color = '';
+        robotsTxtEl.style.border = '';
+      } else {
+        robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
+        robotsTxtEl.style.setProperty('color', '#34d399', 'important');
+        robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+      }
     } else {
       robotsTxtEl.textContent = "Blocked / Disallow";
-      robotsTxtEl.className = "badge-status status-red";
-      robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
-      robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
-      robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+      if (wafClass.startsWith('status-badge--')) {
+        robotsTxtEl.style.background = '';
+        robotsTxtEl.style.color = '';
+        robotsTxtEl.style.border = '';
+      } else {
+        robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+        robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
+        robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+      }
     }
   }
 
   // Handle sec1 contextual remediation banner link override
   const sec1Banner = document.getElementById('sec1-remediation-banner');
   if (sec1Banner) {
+    if (isWafBlocked) {
+      sec1Banner.style.setProperty('display', 'block', 'important');
+    }
     const bridgeBtn = document.getElementById('sec1-remediation-bridge-btn') || sec1Banner.querySelector('a');
     if (bridgeBtn) {
       if (isWafBlocked) {

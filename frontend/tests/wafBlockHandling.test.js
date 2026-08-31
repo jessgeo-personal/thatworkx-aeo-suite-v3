@@ -53,7 +53,7 @@ describe("Module 1: WAF Edge Block Detection BDD Suite", () => {
       scoreCard: {
         overallScore: 0,
         pillars: {
-          p1: { score: 0, max: 25, badge: "CRITICAL", note: "Automated Bot Traffic Rejected (HTTP 403)" },
+          p1: { score: 0, max: 25, badge: "BLOCKED", note: "Automated Bot Traffic Rejected (HTTP 403)" },
           p2: { score: 0, max: 25 },
           p3: { score: 0, max: 25 },
           p4: { score: 0, max: 25 }
@@ -64,6 +64,7 @@ describe("Module 1: WAF Edge Block Detection BDD Suite", () => {
           score: 0,
           max: 25,
           blocked: true,
+          status: "BLOCKED",
           blockMessage: "Automated Bot Traffic Rejected (HTTP 403)"
         }
       }
@@ -79,13 +80,33 @@ describe("Module 1: WAF Edge Block Detection BDD Suite", () => {
     const robotsTxtStatus = document.getElementById("exec-robots-txt-status");
     const pillar1Score = document.getElementById("pillar-sec1-score");
     const sec1Banner = document.getElementById("sec1-remediation-banner");
+    const easyScoreBadge = document.getElementById("section-1-easy-score-badge");
 
     expect(robotsTxtStatus).not.toBeNull();
     expect(pillar1Score).not.toBeNull();
     expect(sec1Banner).not.toBeNull();
+    expect(easyScoreBadge).not.toBeNull();
 
-    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
-    expect(pillar1Score.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
+    // Assertions updated for new spec
+    expect(pillar1Score.textContent.trim().toLowerCase()).toBe("0/25 pts");
+    
+    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403)");
+    expect(robotsTxtStatus.className).toContain("status-badge--blocked");
+    expect(robotsTxtStatus.className).not.toContain("status-badge--pass");
+
+    expect(easyScoreBadge.textContent.trim()).toBe("[ 🔴 SECURITY SHIELD ACTIVE ]");
+    expect(easyScoreBadge.className).toContain("status-badge--blocked");
+
     expect(sec1Banner.style.display).not.toBe("none");
+    const remediationLink = document.getElementById("sec1-remediation-bridge-btn");
+    expect(remediationLink.getAttribute("href")).toContain("optimize.html");
+
+    const checks = ["chk-sec1-cdn", "chk-sec1-xrobots", "chk-sec1-useragents", "chk-sec1-aibots"];
+    checks.forEach(id => {
+      const element = document.getElementById(id);
+      expect(element).not.toBeNull();
+      expect(element.innerHTML).toContain("✗");
+      expect(element.innerHTML).not.toContain("✓");
+    });
   });
 });

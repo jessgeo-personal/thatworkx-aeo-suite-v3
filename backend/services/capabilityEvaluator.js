@@ -21,6 +21,22 @@ const CAPABILITY_MATRIX = [
     description: 'Cloudflare WAF / Crowdstrike Falcon challenge rule evaluation for AI bots.',
     impact: 'Edge firewalls and WAF challenges prevent AI bots from connecting to your domain.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'Edge firewalls and WAF challenges prevent AI bots from connecting to your domain.',
+          recommendation: 'Configure Cloudflare WAF / Crowdstrike Falcon exceptions for GPTBot, PerplexityBot, and ClaudeBot.'
+        };
+      }
+
       const isBlocked = data.sec1?.cdnBlocked || data.status?.gatewayBadge === 'Total AI Blindness';
       return {
         status: isBlocked ? 'critical' : 'active',
@@ -41,6 +57,22 @@ const CAPABILITY_MATRIX = [
     description: 'HTTP response header checks (noindex / nofollow) per page.',
     impact: 'HTTP X-Robots-Tag noindex headers instruct search AI agents not to record your content.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'HTTP X-Robots-Tag noindex headers instruct search AI agents not to record your content.',
+          recommendation: 'Remove noindex/none directives from HTTP response headers for public pages.'
+        };
+      }
+
       const noIndex = data.sec1?.xRobotsNoIndex || (data.status?.xRobotsIndexable === false);
       return {
         status: noIndex ? 'warning' : 'active',
@@ -61,6 +93,22 @@ const CAPABILITY_MATRIX = [
     description: 'Blanket Disallow directives vs bot-specific rules for GPTBot, PerplexityBot, ClaudeBot, Google-Extended.',
     impact: 'Blanket robots.txt disallows completely blind generative search crawlers from reading your site.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'Blanket robots.txt disallows completely blind generative search crawlers from reading your site.',
+          recommendation: 'Replace blanket Disallow: / with granular bot rules permitting search crawlers.'
+        };
+      }
+
       const isBlind = data.sec1?.disallowAll || (data.status?.robotsTxtExists === false);
       return {
         status: isBlind ? 'critical' : 'active',
@@ -794,8 +842,8 @@ function evaluateCapabilities(crawledData = {}) {
   const botPermissions = status.botPermissions || {};
   const blockedBotCount = Object.values(botPermissions).filter(allowed => allowed === false).length;
 
-  const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || crawledData.executiveSections?.section1?.blocked === true;
-  const wafStatusCode = status.wafStatusCode || sec1.wafStatusCode || crawledData.executiveSections?.section1?.wafStatusCode || 403;
+  const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || crawledData.executiveSections?.section1?.blocked === true || status.statusCode === 403 || status.statusCode === 429 || crawledData.statusCode === 403 || crawledData.statusCode === 429;
+  const wafStatusCode = status.wafStatusCode || status.statusCode || crawledData.statusCode || sec1.wafStatusCode || crawledData.executiveSections?.section1?.wafStatusCode || 403;
 
   if (isWafBlocked) {
     p1Score = 0;
@@ -935,7 +983,7 @@ function evaluateCapabilities(crawledData = {}) {
       category: 'Gateway & Access',
       score: p1Score,
       max: 25,
-      status: isWafBlocked ? 'CRITICAL' : getStatusFromScore(p1Score, 25),
+      status: isWafBlocked ? 'BLOCKED' : getStatusFromScore(p1Score, 25),
       deductions: p1Deductions,
       deductionReason: isWafBlocked ? `Automated Bot Traffic Rejected (HTTP ${wafStatusCode}) — Security Shield Active` : (p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason)),
       impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.',
