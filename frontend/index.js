@@ -3555,6 +3555,78 @@ function updateExecutiveViewData(results) {
       </tr>
     `).join('');
   }
+
+  // Calculate deductions dynamically for Executive Triage Card
+  const deductions = [
+    {
+      sectionNum: 1,
+      deduction: 25 - score1,
+      pill: 'GATEWAY BLOCK',
+      impact: 'Search engine crawlers and AI bots are restricted from accessing your site.',
+      actionHtml: `<a href="optimize.html?section=access" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    },
+    {
+      sectionNum: 2,
+      deduction: 25 - score2,
+      pill: 'CITATION RISK',
+      impact: 'Your site content lacks optimized citation formats and structured HTML hygiene.',
+      actionHtml: `<button id="btn-copy-genai-prompt" class="action-btn" onclick="copySec2Prompt()" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; cursor: pointer;">📋 Copy GenAI Prompt</button>`
+    },
+    {
+      sectionNum: 3,
+      deduction: 25 - score3,
+      pill: 'AUTHORITY GAP',
+      impact: 'Missing corporate organization metadata and verified contact signals decrease citation trust.',
+      actionHtml: `<a href="optimize.html?section=trust" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    },
+    {
+      sectionNum: 4,
+      deduction: 25 - score4,
+      pill: 'AI-READY GAP',
+      impact: 'Absence of /llms.txt, /ai-context.md, or semantic workspace files slows down AI crawlers.',
+      actionHtml: `<a href="optimize.html?section=blueprint" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    }
+  ];
+
+  // Sort deductions descending
+  deductions.sort((a, b) => b.deduction - a.deduction);
+
+  // Filter only those with deduction > 0
+  const activeDeductions = deductions.filter(d => d.deduction > 0).slice(0, 3);
+
+  // Render inside #exec-action-triage
+  const triageContainer = document.getElementById('exec-action-triage');
+  if (triageContainer) {
+    if (activeDeductions.length > 0) {
+      triageContainer.innerHTML = `
+        <div class="triage-card-header" style="margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem; color: #ffffff;">
+          ⚠️ Executive Action Triage (Top Priority Fixes)
+        </div>
+        <div class="triage-items-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          ${activeDeductions.map(d => `
+            <div class="triage-item" style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 0.75rem 1rem; gap: 1rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 250px;">
+                <span class="badge-status status-red" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; font-weight: bold; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); white-space: nowrap;">
+                  ${d.pill}
+                </span>
+                <span style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.45;">${d.impact}</span>
+              </div>
+              <div class="triage-action-btn">
+                ${d.actionHtml}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      triageContainer.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 1rem; color: #34d399; font-size: 0.9rem; font-weight: 700; text-align: center;">
+          🟢 All Systems AI-Optimized & AI-Ready — No Critical Issues Detected
+        </div>
+      `;
+    }
+    triageContainer.style.display = 'block';
+  }
 }
 
 function updateChecklistStatus(elementId, value) {

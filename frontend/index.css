@@ -7011,6 +7011,29 @@ body, h1, h2, h3, h4, h5, h6 {
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* 3-Tier Boardroom Refactor Layout Overrides */
+.exec-action-triage {
+  background: rgba(8, 9, 12, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sec1-subgrid, .sec2-subgrid, .sec3-subgrid, .sec4-subgrid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
+#sec1-why-matters-box, #sec3-why-matters-box, #sec4-why-matters-box {
+  display: none !important;
+}
+
+
 
 
 

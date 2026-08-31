@@ -146,6 +146,7 @@
       
       <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
       <div id="summary-dial-anchor" style="scroll-margin-top: 100px;"></div>
+      <div id="exec-action-triage" class="exec-action-triage">UNAUDITED</div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
         
         <!-- Overall AI Visibility Score Dial Gauge -->
@@ -346,29 +347,38 @@
               <!-- Right Column: Protocol Flag Results -->
               <div id="sec1-protocol-results-container" class="obsidian-bento-results" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
                 <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
-                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
+                <details class="executive-drawer">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
+                      </div>
+                      <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
-                  </div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
-                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+                      </div>
+                      <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
                   </div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
-                      <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
+                </details>
+
+                <details class="executive-drawer" style="margin-top: 0.5rem;">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
+                      </div>
+                      <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
                   </div>
-                </div>
+                </details>
               </div>
             </div>
             
@@ -462,58 +472,61 @@
                 understand how AI uses your content to cite your content in their answers.
               </p>
 
-              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif;" id="citation-signals-rows">
-                <div class="citation-signal-row" data-signal="faq-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                  <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600; color: var(--text-primary);">
-                      Has FAQ Schema
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                    </span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI which parts of your site are Questions and answers?</span>
+              <details class="executive-drawer">
+                <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif; margin-top: 1rem;" id="citation-signals-rows">
+                  <div class="citation-signal-row" data-signal="faq-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Has FAQ Schema
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI which parts of your site are Questions and answers?</span>
+                    </div>
+                    <span id="sec2-faq-status" class="badge-status status-red">ACTION</span>
                   </div>
-                  <span id="sec2-faq-status" class="badge-status status-red">ACTION</span>
-                </div>
-                <div class="citation-signal-row" data-signal="Answer/Question parity" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                  <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600; color: var(--text-primary);">
-                      Answer/Question parity
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-parity', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                    </span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?</span>
+                  <div class="citation-signal-row" data-signal="Answer/Question parity" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Answer/Question parity
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-parity', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?</span>
+                    </div>
+                    <span id="sec2-parity-value" style="font-weight: 700; color: var(--text-secondary);">--</span>
                   </div>
-                  <span id="sec2-parity-value" style="font-weight: 700; color: var(--text-secondary);">--</span>
-                </div>
-                <div class="citation-signal-row" data-signal="org-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                  <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600; color: var(--text-primary);">
-                      Has Organization Schema
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                    </span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI how to identify your Organization details?</span>
+                  <div class="citation-signal-row" data-signal="org-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Has Organization Schema
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI how to identify your Organization details?</span>
+                    </div>
+                    <span id="sec2-org-status" class="badge-status status-red">ACTION</span>
                   </div>
-                  <span id="sec2-org-status" class="badge-status status-red">ACTION</span>
-                </div>
-                <div class="citation-signal-row" data-signal="emailValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                  <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600; color: var(--text-primary);">
-                      Email Visible to AI
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('email-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                    </span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your email on your site</span>
+                  <div class="citation-signal-row" data-signal="emailValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Email Visible to AI
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('email-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your email on your site</span>
+                    </div>
+                    <span id="sec2-email-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
                   </div>
-                  <span id="sec2-email-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
-                </div>
-                <div class="citation-signal-row" data-signal="phoneValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
-                  <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600; color: var(--text-primary);">
-                      Phone Visible to AI
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('phone-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
-                    </span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your phone number on your site</span>
+                  <div class="citation-signal-row" data-signal="phoneValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Phone Visible to AI
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('phone-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your phone number on your site</span>
+                    </div>
+                    <span id="sec2-phone-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
                   </div>
-                  <span id="sec2-phone-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
                 </div>
-              </div>
+              </details>
             </div>
 
           </div>
@@ -550,10 +563,8 @@
               <!-- Tier 1: Free In-Page Action -->
               <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
                 <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24;">Tier 1 (Free In-Page Action): Copy-pasteable prompt box for ChatGPT/Gemini</div>
-                <textarea id="sec2-prompt-box" readonly style="width: 100%; height: 80px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e2e8f0; font-family: var(--font-mono), monospace; font-size: 0.78rem; padding: 0.5rem; resize: none; outline: none;">Act as an Answer Engine Optimization (AEO) specialist. Rewrite my core pricing/service details into 3 clear H2 questions followed immediately by concise 40-word direct answers for conversational AI quotation: [Insert text]</textarea>
-                <button type="button" id="copy-sec2-prompt-btn" onclick="copySec2Prompt()" class="action-btn" style="align-self: flex-start; padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; cursor: pointer;">
-                  [ 📋 Copy GenAI Prompt ]
-                </button>
+                <textarea id="sec2-prompt-box" readonly style="width: 100%; height: 80px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e2e8f0; font-family: var(--font-mono), monospace; font-size: 0.78rem; padding: 0.5rem; resize: none; outline: none;">Act as an Answer Engine Optimization (AEO) specialist. Rewrite my core pricing and service details into 3 clear H2 questions followed immediately by concise 40-word direct answers formatted for conversational AI search engines: [Paste content here]</textarea>
+                <button type="button" id="btn-copy-genai-prompt" onclick="copySec2Prompt()" class="action-btn" style="align-self: flex-start; padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; cursor: pointer;">📋 Copy GenAI Prompt</button>
               </div>
 
               <!-- Tier 2: Automation Bridge -->
@@ -561,9 +572,7 @@
                 <div style="font-size: 0.82rem; color: #cbd5e1;">
                   <strong>Tier 2 (Automation Bridge):</strong> Automatically configure and structure manifests for search engine bots.
                 </div>
-                <button type="button" id="sec2-remediation-bridge-btn" onclick="launchAIOptimizeBridge('', 'citation_readiness')" class="action-btn btn-burnt-copper" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
-                  [ ⚡ Synthesize /ai-context.md in AIOptimize → ]
-                </button>
+                <a href="optimize.html?section=blueprint" id="sec2-remediation-bridge-btn" class="bridge-btn" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; background: var(--burnt-copper); color: #fff; border: 1px solid var(--burnt-copper);">⚡ Synthesize Machine Manifests in AIOptimize →</a>
               </div>
             </div>
           </div>
@@ -601,71 +610,73 @@
               <!-- Left Column: E-E-A-T parameters results container -->
               <div id="sec3-protocol-results-container" class="obsidian-bento-results" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
                 <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates domain history, SSL certificate parameters, and citation signals.</p>
-                
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                  
-                  <!-- HTTPS Security row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;" data-metric="ssl-security">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">HTTPS Security Encryption</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('ssl-security', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                <details class="executive-drawer">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                    
+                    <!-- HTTPS Security row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;" data-metric="ssl-security">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">HTTPS Security Encryption</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('ssl-security', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-secure-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="sec3-secure-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
-                  </div>
 
-                  <!-- Verified Contact Credentials row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Verified Contact Credentials</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('contact-info', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    <!-- Verified Contact Credentials row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Verified Contact Credentials</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('contact-info', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-contact-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="sec3-contact-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
-                  </div>
 
-                  <!-- Organization Entity Markup row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Organization Entity Markup</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    <!-- Organization Entity Markup row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Organization Entity Markup</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-org-schema-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="sec3-org-schema-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
-                  </div>
 
-                  <!-- Privacy Policy row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Privacy &amp; Trust Governance</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('privacy-policy', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    <!-- Privacy Policy row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Privacy &amp; Trust Governance</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('privacy-policy', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-privacy-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="sec3-privacy-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
-                  </div>
 
-                  <!-- Brand Entity Authority row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('age-estimate', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    <!-- Brand Entity Authority row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('age-estimate', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-age-estimate" style="font-weight: 700; color: var(--text-secondary);">--</span>
                     </div>
-                    <span id="sec3-age-estimate" style="font-weight: 700; color: var(--text-secondary);">--</span>
-                  </div>
 
-                  <!-- Brand Entity Authority Status row -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
-                      <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority Status</span>
-                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('authority-status', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    <!-- Brand Entity Authority Status row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority Status</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('authority-status', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-authority-status" class="badge-status status-amber" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
                     </div>
-                    <span id="sec3-authority-status" class="badge-status status-amber" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
-                  </div>
 
-                  <!-- DiagnosticSummary -->
-                  <div style="font-size: 0.82rem; margin-top: 0.4rem; font-family: var(--font-sans), sans-serif;">
-                    <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">Diagnostic Summary:</div>
-                    <p id="sec3-diagnostic-summary" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; padding: 0.5rem; background: var(--canvas-bg); border-radius: 4px; border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
-                      Pending live scan.
-                    </p>
+                    <!-- DiagnosticSummary -->
+                    <div style="font-size: 0.82rem; margin-top: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">Diagnostic Summary:</div>
+                      <p id="sec3-diagnostic-summary" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; padding: 0.5rem; background: var(--canvas-bg); border-radius: 4px; border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
+                        Pending live scan.
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </details>
               </div>
 
               <!-- Right Column: Why Brand Trust &amp; E-E-A-T Matter -->
@@ -899,8 +910,8 @@
                     Human-Facing Web Presence (AI-Optimized)
                   </h6>
                   <ul style="font-size: 0.8rem; color: #cbd5e1; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.35rem;">
-                    <li><strong>➕ Trust &amp; UI:</strong> Highly polished visual branding for human conversion.</li>
-                    <li><strong>➖ Code Drag:</strong> Heavier page sizes, scripts, and styling overhead.</li>
+                    <li><strong>➕ Visual Trust:</strong> Highly polished visual branding for human conversion.</li>
+                    <li><strong>➖ Token Drag:</strong> Heavier page sizes, scripts, and styling overhead.</li>
                   </ul>
                 </div>
                 
@@ -918,8 +929,9 @@
               
               <!-- Efficiency Highlight Banner -->
               <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 6px; font-size: 0.8rem; color: #cbd5e1; text-align: left;">
-                <span style="font-weight: 700; color: #38bdf8;">Implementation Velocity:</span>
-                <strong>AIOptimize (1-Click Manifest Compiler)</strong> deploys full protocols instantly, saving <strong>2–4 hrs of Manual Prompting</strong>.
+                <span style="font-weight: 700; color: #38bdf8;">Execution Pathways:</span><br>
+                • <strong>Path 1:</strong> Manual Page-by-Page Prompting (AIVisualize) — 2–4 hours.<br>
+                • <strong>Path 2:</strong> Automated 1-Click Manifest Synthesizer (AIOptimize) — Under 60 seconds.
               </div>
             </div>
 
