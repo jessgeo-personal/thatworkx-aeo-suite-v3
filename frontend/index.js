@@ -2876,7 +2876,7 @@ function updateExecutiveViewData(results) {
   const isAiBotsPass = !(results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED') && Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
 
   // Card 2 Checks:
-  const isSecurePass = results.sec2?.isHttps !== false;
+  const isSecurePass = results.sec2?.isHttps !== false && results.eeatMetrics?.isSecure !== false;
   const isSpaPass = !(results.status?.spaTrapDetected === true || results.sec2?.isHeavyJs === true);
   const isRagPass = results.status?.llmsTxtExists === true && results.status?.aiContextExists === true;
   const isEntityPass = (results.sec2?.essentialPagesFound ?? (results.status?.aboutTxtExists ? 3 : 2)) === 3;
@@ -2885,7 +2885,8 @@ function updateExecutiveViewData(results) {
   const isSeoPass = results.status?.seoOptimalTitle !== false && results.status?.seoOptimalDesc !== false;
   const isTokenPass = (results.sec3?.fleschScore ?? 68) >= 50 && (results.status?.wordCount ?? results.sec3?.wordCount ?? 800) >= 500;
   const isParityPass = (results.sec3?.faqQuestions ?? 4) === (results.sec3?.faqAnswers ?? 4) && (results.status?.jsonLdExists ?? results.sec3?.hasFaqSchema ?? true) === true;
-  const isEeatPass = results.sec3?.hasContactInfo !== false && results.sec3?.hasPrivacyPolicy !== false;
+  const isEeatPass = results.sec3?.hasContactInfo !== false && results.sec3?.hasPrivacyPolicy !== false &&
+                     results.eeatMetrics?.hasContactInfo !== false && results.eeatMetrics?.hasPrivacyPolicy !== false;
 
   // Card 4 Checks:
   const isRobotsPass = results.status?.robotsTxtExists === true;
