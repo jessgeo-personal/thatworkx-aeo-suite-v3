@@ -84,8 +84,8 @@ describe("Module 1: WAF Edge Block Detection BDD Suite", () => {
     expect(pillar1Score).not.toBeNull();
     expect(sec1Banner).not.toBeNull();
 
-    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403)");
-    expect(pillar1Score.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403)");
+    expect(robotsTxtStatus.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
+    expect(pillar1Score.textContent.trim()).toBe("Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active");
     expect(sec1Banner.style.display).not.toBe("none");
   });
 });

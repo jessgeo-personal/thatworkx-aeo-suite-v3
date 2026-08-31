@@ -2579,6 +2579,20 @@ function copyEdgeScript() {
   }
 }
 
+function copySec2Prompt() {
+  const promptBox = document.getElementById('sec2-prompt-box');
+  if (promptBox) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(promptBox.value);
+    } else {
+      promptBox.select();
+      document.execCommand('copy');
+    }
+    alert('GenAI Prompt copied to clipboard!');
+  }
+}
+window.copySec2Prompt = copySec2Prompt;
+
 
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
@@ -3120,7 +3134,7 @@ function updateExecutiveViewData(results) {
 
     const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
     const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
-    const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+    const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus}) — Security Shield Active`;
 
     let currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
     const currentMax = secObj ? secObj.max : (pData ? pData.max : 25);
@@ -3151,8 +3165,14 @@ function updateExecutiveViewData(results) {
       ? { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', class: 'badge-status status-amber' }
       : { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.4)', class: 'badge-status status-red' };
 
-    if (titleEl && secObj && secObj.title) {
-      titleEl.innerText = secObj.title;
+    let displayTitle = secObj && secObj.title ? secObj.title : (titleEl ? titleEl.textContent : '');
+    if (secNum === 1) displayTitle = "AI Search Permissions & Gateway Access";
+    if (secNum === 2) displayTitle = "Content Readability & Answer Citation";
+    if (secNum === 3) displayTitle = "Brand Authority & Entity Consensus";
+    if (secNum === 4) displayTitle = "Dedicated Machine Manifests & 4-Tier Blueprint";
+
+    if (titleEl && displayTitle) {
+      titleEl.textContent = displayTitle;
     }
     if (badgeEl) {
       badgeEl.innerText = badgeText;
@@ -3282,7 +3302,7 @@ function updateExecutiveViewData(results) {
   const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
   console.log("isWafBlocked is:", isWafBlocked);
   const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
-  const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+  const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus}) — Security Shield Active`;
 
   if (robotsTxtEl) {
     console.log("Updating robotsTxtEl to:", isWafBlocked ? blockedMessage : "normal");
