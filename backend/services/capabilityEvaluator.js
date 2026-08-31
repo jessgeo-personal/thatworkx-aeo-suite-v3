@@ -794,7 +794,13 @@ function evaluateCapabilities(crawledData = {}) {
   const botPermissions = status.botPermissions || {};
   const blockedBotCount = Object.values(botPermissions).filter(allowed => allowed === false).length;
 
-  if (isDisallowed) {
+  const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || crawledData.executiveSections?.section1?.blocked === true;
+  const wafStatusCode = status.wafStatusCode || sec1.wafStatusCode || crawledData.executiveSections?.section1?.wafStatusCode || 403;
+
+  if (isWafBlocked) {
+    p1Score = 0;
+    p1Deductions.push(`Automated Bot Traffic Rejected (HTTP ${wafStatusCode})`);
+  } else if (isDisallowed) {
     p1Score -= 25;
     p1Deductions.push('Blanket Disallow: / or missing robots.txt causes Total AI Blindness (-25 pts)');
   } else {
@@ -929,12 +935,14 @@ function evaluateCapabilities(crawledData = {}) {
       category: 'Gateway & Access',
       score: p1Score,
       max: 25,
-      status: getStatusFromScore(p1Score, 25),
+      status: isWafBlocked ? 'CRITICAL' : getStatusFromScore(p1Score, 25),
       deductions: p1Deductions,
-      deductionReason: p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason),
+      deductionReason: isWafBlocked ? `Automated Bot Traffic Rejected (HTTP ${wafStatusCode})` : (p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason)),
       impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.',
-      xRobotsIndexable: status.xRobotsIndexable !== false && sec1.xRobotsNoIndex !== true,
-      robotsTxtExists: robotsTxtExists && sec1.disallowAll !== true
+      xRobotsIndexable: isWafBlocked ? false : (status.xRobotsIndexable !== false && sec1.xRobotsNoIndex !== true),
+      robotsTxtExists: isWafBlocked ? false : (robotsTxtExists && sec1.disallowAll !== true),
+      blocked: isWafBlocked,
+      wafStatusCode: wafStatusCode
     },
     section2: {
       title: 'What can AI see?',

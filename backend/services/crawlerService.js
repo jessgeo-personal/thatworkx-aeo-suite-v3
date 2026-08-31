@@ -205,6 +205,14 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       sitemapContent = typeof sitemapSettled.value.data === 'string' ? sitemapSettled.value.data : JSON.stringify(sitemapSettled.value.data);
     }
 
+    const failedWithWaf = [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled].find(
+      r => r.status === 'rejected' && r.reason?.response && (r.reason.response.status === 403 || r.reason.response.status === 429)
+    );
+    if (failedWithWaf) {
+      result.status.isWafBlocked = true;
+      result.status.wafStatusCode = failedWithWaf.reason.response.status;
+    }
+
     // 2. Parse Robots.txt for blanket disallow vs targeted AI bot rules
     result.status.xRobotsIndexable = true;
     if (result.status.robotsTxtExists && robotsContent) {
@@ -268,6 +276,10 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         severity: 'critical',
         message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
       });
+      if (e.response && (e.response.status === 403 || e.response.status === 429)) {
+        result.status.isWafBlocked = true;
+        result.status.wafStatusCode = e.response.status;
+      }
     }
 
     // Run Level 2 Parser Service

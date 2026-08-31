@@ -38,10 +38,12 @@
 	|								|  |                                   |  |                      |
 	---------------------------------  -------------------------------------  ------------------------
 	----------------------------------------------------------------------------------------------------------------------------------------------------
-	1. Your site - Ready for AI?  (Gateway and Access)
+	1. Is your site ready for AI?  (Gateway and Access)
 	-----------------------------------------------------------------------
 		Scanned Site Fixes
-			1. Has JSON-LD Schema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+			1. X-Robots-Tag Headers (give a green light is ok, if blocking, then provide instructions to fix)
+			2. 
+			6. Has JSON-LD Schema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
 				- HasOrganizationSchema in (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
 				- HasFAQSchema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
 			2. HasEmailVisibletoAI
@@ -49,7 +51,7 @@
 			4. AuthorityStatus
 			5. Diagnostic Summary
 			6. Identified EssentialPages
-				- Missing EssentialPages(upgrade to AIV Pro/ENT so if pages exist, they can be fixed, or create sample about.md/README.md/docs.md to supplement.  Conversely upgrade to AIO Pro to use headless browser to identify and fix existing essentialpages)
+				- Missing EssentialPages(upgrade to AIV Pro/ENT to see if pages exist, they can be fixed, or create sample about.md/README.md/docs.md to supplement.  Conversely upgrade to AIO Pro to use headless browser to identify and fix existing essentialpages)
 				
 	-----------------------------------------------------------------------		
 	2. Your human-centric pages - what to fix so its optimized for AI.  (Gateway and Access)

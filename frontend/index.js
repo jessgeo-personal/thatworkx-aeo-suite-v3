@@ -928,6 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (domainInput) domainInput.value = cleanDomain;
     }
     switchOptimizeTrack(1);
+    const issueParam = params.get('issue');
+    if (issueParam === 'cloudflare') {
+      switchOptimizeTool('cloudflare');
+    }
 
     const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
     if (devSchemaBuilderWrap) {
@@ -3114,20 +3118,32 @@ function updateExecutiveViewData(results) {
     const noteEl = document.getElementById(`pillar-sec${secNum}-note`);
     const titleEl = document.getElementById(`pillar-sec${secNum}-title`);
 
-    const currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
+    const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
+    const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
+    const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+
+    let currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
     const currentMax = secObj ? secObj.max : (pData ? pData.max : 25);
-    const badgeText = secObj ? (currentScore === 25 ? 'OPTIMIZED' : (currentScore >= 15 ? 'PARTIAL' : 'CRITICAL')) : (pData ? pData.badge : 'UNAUDITED');
+    if (secNum === 1 && isWafBlocked) {
+      currentScore = 0;
+    }
+    let badgeText = secObj ? (currentScore === 25 ? 'OPTIMIZED' : (currentScore >= 15 ? 'PARTIAL' : 'CRITICAL')) : (pData ? pData.badge : 'UNAUDITED');
+    if (secNum === 1 && isWafBlocked) {
+      badgeText = 'BLOCKED';
+    }
     
     // deductionReason resolution: if 25/25, "🟢 No deductions — All protocols clean.", never undefined
     let deductionReason = '🟢 No deductions — All protocols clean.';
-    if (currentScore < currentMax) {
+    if (secNum === 1 && isWafBlocked) {
+      deductionReason = blockedMessage;
+    } else if (currentScore < currentMax) {
       deductionReason = (secObj && secObj.deductionReason) 
         ? secObj.deductionReason 
         : (pData && pData.note ? pData.note : 'Deductions identified during scan.');
     }
 
-    const isGreen = currentScore >= 20;
-    const isAmber = currentScore >= 10 && currentScore < 20;
+    const isGreen = currentScore >= 20 && !(secNum === 1 && isWafBlocked);
+    const isAmber = currentScore >= 10 && currentScore < 20 && !(secNum === 1 && isWafBlocked);
     
     const theme = isGreen
       ? { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)', class: 'badge-status status-green' }
@@ -3146,14 +3162,22 @@ function updateExecutiveViewData(results) {
       badgeEl.style.setProperty('border', theme.border, 'important');
     }
     if (scoreEl) {
-      scoreEl.innerText = `${currentScore}/${currentMax} pts`;
+      if (secNum === 1 && isWafBlocked) {
+        scoreEl.textContent = blockedMessage;
+      } else {
+        scoreEl.textContent = `${currentScore}/${currentMax} pts`;
+      }
       scoreEl.style.setProperty('background', theme.bg, 'important');
       scoreEl.style.setProperty('color', theme.color, 'important');
       scoreEl.style.setProperty('border', theme.border, 'important');
     }
     const easyScoreBadgeEl = document.getElementById(`section-${secNum}-easy-score-badge`);
     if (easyScoreBadgeEl) {
-      easyScoreBadgeEl.innerText = `${currentScore}/${currentMax} pts`;
+      if (secNum === 1 && isWafBlocked) {
+        easyScoreBadgeEl.textContent = blockedMessage;
+      } else {
+        easyScoreBadgeEl.textContent = `${currentScore}/${currentMax} pts`;
+      }
       easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
       easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
       easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
@@ -3254,19 +3278,45 @@ function updateExecutiveViewData(results) {
     }
   }
 
+  console.log("robotsTxtEl is found:", !!robotsTxtEl);
+  const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
+  console.log("isWafBlocked is:", isWafBlocked);
+  const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
+  const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+
   if (robotsTxtEl) {
-    if (isRobotsTxtAllowed) {
-      robotsTxtEl.innerText = "Passed / Allow";
+    console.log("Updating robotsTxtEl to:", isWafBlocked ? blockedMessage : "normal");
+    if (isWafBlocked) {
+      robotsTxtEl.textContent = blockedMessage;
+      robotsTxtEl.className = "badge-status status-red";
+      robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+      robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
+      robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+    } else if (isRobotsTxtAllowed) {
+      robotsTxtEl.textContent = "Passed / Allow";
       robotsTxtEl.className = "badge-status status-green";
       robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
       robotsTxtEl.style.setProperty('color', '#34d399', 'important');
       robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
     } else {
-      robotsTxtEl.innerText = "Blocked / Disallow";
+      robotsTxtEl.textContent = "Blocked / Disallow";
       robotsTxtEl.className = "badge-status status-red";
       robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
       robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
       robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+    }
+  }
+
+  // Handle sec1 contextual remediation banner link override
+  const sec1Banner = document.getElementById('sec1-remediation-banner');
+  if (sec1Banner) {
+    const bridgeBtn = document.getElementById('sec1-remediation-bridge-btn') || sec1Banner.querySelector('a');
+    if (bridgeBtn) {
+      if (isWafBlocked) {
+        bridgeBtn.setAttribute('href', 'optimize.html?section=access&issue=cloudflare');
+      } else {
+        bridgeBtn.setAttribute('href', 'optimize.html?section=access');
+      }
     }
   }
 
