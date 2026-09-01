@@ -6185,4 +6185,148 @@ if (typeof module !== 'undefined' && module.exports) {
   initFaqHub.initFaqHub = initFaqHub;
   module.exports = initFaqHub;
 }
+
+// Appended to frontend/index.js for Visualize V4 Cockpit Interactivity
+
+const MANIFEST_PAYLOADS = {
+  '/robots.txt': {
+    format: 'TXT (Level 1)',
+    formatClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    code: `User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: *
+Allow: /
+Sitemap: https://--/sitemap.xml`
+  },
+  '/llms.txt': {
+    format: 'Markdown (Level 2)',
+    formatClass: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+    code: `# Machine Manifest Spec (AI-Ready)
+> Title: Domain Knowledge Architecture
+> Summary: Curated markdown entrypoint for LLM inference & entity extraction.
+
+## Core Capabilities
+- Entity Hierarchy & Grounding Protocol
+- Verified Citation Matrix (AI-Optimized)
+- Real-time LLM Crawler Directives`
+  },
+  '/ai-context.md': {
+    format: 'Markdown (Level 3)',
+    formatClass: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+    code: `# AI Context & Entity Definition (AI-Ready)
+> Domain: --
+> Audit Protocol: AI-Optimized
+
+## Semantic Knowledge Graph
+- Primary Entity: Organization Core Capabilities
+- Service Taxonomy: Verified Technical Grounding
+- Citation Boundaries: Level 3 Deep Protocol`
+  },
+  'schema.jsonld': {
+    format: 'JSON-LD (Level 4)',
+    formatClass: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    code: `{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "--",
+  "url": "https://--",
+  "description": "AI-Ready domain knowledge architecture.",
+  "knowsAbout": [
+    "Answer Engine Optimization",
+    "LLM Ingestion Protocol",
+    "Entity Hierarchy"
+  ]
+}`
+  }
+};
+
+function initVisualizeV4Cockpit() {
+  // 1. Center Feed Tab Switcher
+  const feedTabs = document.querySelectorAll('[data-feed-tab]');
+  feedTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      feedTabs.forEach(t => {
+        t.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30', 'active');
+        t.classList.add('text-zinc-400');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.remove('text-zinc-400');
+      tab.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30', 'active');
+      tab.setAttribute('aria-selected', 'true');
+    });
+  });
+
+  // 2. Discovery Card Selection -> Inspector Update
+  const discoveryCards = document.querySelectorAll('[data-testid="discovery-card"], .discovery-card');
+  const targetTitle = document.querySelector('[data-testid="inspector-target-title"]');
+  const formatPill = document.querySelector('[data-testid="inspector-format-pill"]');
+  const codeViewer = document.querySelector('[data-testid="manifest-code-viewer"]');
+
+  discoveryCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const cardTitleEl = card.querySelector('[data-card-title], .card-title');
+      if (!cardTitleEl) return;
+      const key = cardTitleEl.textContent.trim();
+      const payload = MANIFEST_PAYLOADS[key];
+
+      if (targetTitle) {
+        targetTitle.textContent = key;
+        targetTitle.setAttribute('data-inspector-target', key);
+      }
+
+      if (payload) {
+        if (formatPill) {
+          formatPill.textContent = payload.format;
+        }
+        if (codeViewer) {
+          const codeEl = codeViewer.querySelector('code') || codeViewer.querySelector('pre');
+          if (codeEl) {
+            codeEl.textContent = payload.code;
+          }
+        }
+      }
+    });
+  });
+
+  // 3. Inspector Copy Trigger
+  const copyBtn = document.querySelector('[data-action="copy-manifest"]');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const codeEl = document.querySelector('[data-testid="manifest-code-viewer"] code') || document.querySelector('[data-testid="manifest-code-viewer"] pre');
+      const textToCopy = codeEl ? codeEl.textContent : '';
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy);
+        }
+      } catch (err) {
+        // Ignore clipboard failure
+      }
+
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    });
+  }
+
+}
+
+// Auto-initialize on DOMContentLoaded or immediately if DOM is already ready
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVisualizeV4Cockpit);
+  } else {
+    initVisualizeV4Cockpit();
+  }
+}
+
 

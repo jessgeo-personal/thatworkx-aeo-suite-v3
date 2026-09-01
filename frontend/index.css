@@ -7033,6 +7033,83 @@ body, h1, h2, h3, h4, h5, h6 {
   display: none !important;
 }
 
+/* ==========================================================================
+   V4 Cockpit Layout & Progression Stepper Styles
+   ========================================================================== */
+.pipeline-header {
+  background-color: rgba(15, 17, 23, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.pipeline-stepper .step-num {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.pipeline-stepper .step-ready .step-num {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.v4-cockpit-container {
+  min-height: calc(100vh - 65px);
+}
+
+.v4-left-pane {
+  min-width: 260px;
+}
+
+.v4-center-feed {
+  min-width: 320px;
+}
+
+.cockpit-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* Discovery Stream & Cockpit Cards */
+.discovery-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.discovery-card:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.feed-tab-switcher button {
+  font-size: 11px;
+}
+
+.validator-pill {
+  letter-spacing: 0.02em;
+}
+
+/* Inspector Studio Code Viewer & Diagnostics */
+.manifest-code-viewer pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.manifest-code-viewer code {
+  color: #a1a1aa;
+}
+
+.diagnostic-card {
+  transition: border-color 0.2s ease;
+}
+
+.diagnostic-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.inspector-format-pill {
+  letter-spacing: 0.02em;
+}
+
+
+
+
 
 
 

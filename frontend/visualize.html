@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIVisualize - AEO Suite V3</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="bg-dark text-light min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Top Progress Stepper Header -->
+  <header class="pipeline-header border-b border-white/10 bg-black/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand / App Logo -->
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-2">
+          <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="h-7 w-auto object-contain">
+          <span class="font-bold text-base tracking-tight text-white">AI<span class="text-emerald-400">Visualize</span></span>
+        </a>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">V4 Cockpit</span>
+      </div>
+
+      <!-- 6-Stage AEO Readiness Pipeline Stepper -->
+      <nav id="pipeline-stepper" data-testid="pipeline-stepper" class="pipeline-stepper flex items-center space-x-2 text-xs" aria-label="Readiness Pipeline">
+        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="1">
+          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">1</span>
+          <span class="step-label hidden md:inline">Intake</span>
+        </div>
+        <span class="step-divider text-zinc-600">→</span>
+
+        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="2">
+          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">2</span>
+          <span class="step-label hidden md:inline">Protocols</span>
+        </div>
+        <span class="step-divider text-zinc-600">→</span>
+
+        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="3">
+          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">3</span>
+          <span class="step-label hidden md:inline">Schema</span>
+        </div>
+        <span class="step-divider text-zinc-600">→</span>
+
+        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="4">
+          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">4</span>
+          <span class="step-label hidden md:inline">Hierarchy</span>
+        </div>
+        <span class="step-divider text-zinc-600">→</span>
+
+        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="5">
+          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">5</span>
+          <span class="step-label hidden md:inline">Entity Graph</span>
+        </div>
+        <span class="step-divider text-zinc-600">→</span>
+
+        <!-- Step 6 Milestone -->
+        <div class="pipeline-step step-ready flex items-center space-x-1.5 text-emerald-400 font-semibold" data-step="6" data-step-ready="true">
+          <span class="step-num w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-mono text-[10px]">6</span>
+          <span class="step-label">AI-Ready Manifest Ready</span>
+        </div>
+      </nav>
+
+      <!-- Downstream "What Happens Next" Steps (7, 8, 9) -->
+      <div data-testid="pipeline-next-steps" class="pipeline-next-steps hidden lg:flex items-center space-x-3 border-l border-white/10 pl-4 text-xs text-zinc-400">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-zinc-300">What Happens Next:</span>
+        <div class="next-step-item flex items-center space-x-1" data-next-step="7">
+          <span class="font-mono text-zinc-400">7</span>
+          <span>LLM Ingestion</span>
+        </div>
+        <span class="text-zinc-700">|</span>
+        <div class="next-step-item flex items-center space-x-1" data-next-step="8">
+          <span class="font-mono text-zinc-400">8</span>
+          <span>Citation Audits</span>
+        </div>
+        <span class="text-zinc-700">|</span>
+        <div class="next-step-item flex items-center space-x-1" data-next-step="9">
+          <span class="font-mono text-zinc-400">9</span>
+          <span>AEO Scale</span>
+        </div>
+      </div>
+
+      <!-- Action Trigger Dock -->
+      <div data-testid="header-action-dock" class="header-action-dock flex items-center space-x-2">
+        <button type="button" data-action="export-manifests" class="btn-primary bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
+          <span>Export All Manifests</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main 3-Column Cockpit Scaffolding Container -->
+  <main id="v4-cockpit" data-testid="v4-cockpit" class="v4-cockpit-container flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-4">
+
+    <!-- Column 1: Left Context & Profile Pane -->
+    <aside id="v4-left-pane" data-testid="v4-left-pane" class="v4-left-pane md:col-span-3 lg:col-span-3 flex flex-col space-y-4">
+      
+      <!-- Domain Profile Overview Card -->
+      <div data-testid="domain-profile-card" class="domain-profile-card cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Target Domain</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-mono">Pre-Scan</span>
+        </div>
+        <div class="domain-name-display text-sm font-mono font-medium text-white truncate" data-field="domain-name">--</div>
+        
+        <!-- Metadata Fields -->
+        <div class="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <span class="text-zinc-500 text-[10px] block uppercase">Audit Date</span>
+            <span data-field="audit-date" data-meta-default class="font-mono text-zinc-300">--</span>
+          </div>
+          <div>
+            <span class="text-zinc-500 text-[10px] block uppercase">Region</span>
+            <span data-field="region" data-meta-default class="font-mono text-zinc-300">--</span>
+          </div>
+          <div class="col-span-2">
+            <span class="text-zinc-500 text-[10px] block uppercase">Crawl Scope</span>
+            <span data-field="crawl-scope" data-meta-default class="font-mono text-yellow-400/90 text-[11px]">UNAUDITED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Competitor Benchmark Targets -->
+      <div data-testid="competitor-benchmark-section" class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Competitors</span>
+          <span class="text-[10px] font-mono text-zinc-500">Benchmark Mode</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
+            <span class="truncate">mails.com</span>
+            <span class="text-zinc-500 text-[9px]">↗</span>
+          </div>
+          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
+            <span class="truncate">proofpoint.com</span>
+            <span class="text-zinc-500 text-[9px]">↗</span>
+          </div>
+          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
+            <span class="truncate">mimecast.com</span>
+            <span class="text-zinc-500 text-[9px]">↗</span>
+          </div>
+          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
+            <span class="truncate">trendmicro.com</span>
+            <span class="text-zinc-500 text-[9px]">↗</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campaign & Category Scopes -->
+      <div data-testid="category-filter-section" class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <div class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Scope Filters</div>
+          <div class="space-y-1.5">
+            <button type="button" data-category-filter="mid-market-legal" class="category-filter-btn w-full text-left p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center justify-between">
+              <span>Mid-market legal</span>
+              <span class="font-mono text-[10px] text-zinc-400">1.4K</span>
+            </button>
+            <button type="button" data-category-filter="financial-services" class="category-filter-btn w-full text-left p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-zinc-300 text-xs font-medium flex items-center justify-between">
+              <span>Financial services</span>
+              <span class="font-mono text-[10px] text-zinc-500">1.0K</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-white/5 space-y-1 text-[11px]">
+          <div class="flex items-center justify-between">
+            <span class="text-zinc-400">Audit Protocol:</span>
+            <span class="text-emerald-400 font-mono text-[10px]">AI-Optimized</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-zinc-400">Target Schema:</span>
+            <span class="text-cyan-400 font-mono text-[10px]">AI-Ready</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Column 2: Center Discovery & Queue Stream -->
+    <section id="v4-center-feed" data-testid="v4-center-feed" class="v4-center-feed md:col-span-4 lg:col-span-4 flex flex-col space-y-4">
+      <div class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col">
+        
+        <!-- Feed Tab Switcher -->
+        <div data-testid="center-feed-tabs" class="feed-tab-switcher grid grid-cols-3 gap-1 bg-black/40 p-1 rounded-lg border border-white/5 mb-3 text-xs">
+          <button type="button" data-feed-tab="manifests" class="py-1 px-2 rounded font-medium text-center transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Manifests</button>
+          <button type="button" data-feed-tab="pages" class="py-1 px-2 rounded font-medium text-center transition-all text-zinc-400 hover:text-white">Pages</button>
+          <button type="button" data-feed-tab="competitors" class="py-1 px-2 rounded font-medium text-center transition-all text-zinc-400 hover:text-white">Competitors</button>
+        </div>
+
+        <!-- Pre-rendered Discovery Stream Cards -->
+        <div class="feed-stream space-y-2.5 flex-1 overflow-y-auto pr-1">
+          
+          <!-- Card 1: /robots.txt -->
+          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/robots.txt</span>
+              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Bot crawler access rules and directive controls.</p>
+            <div class="flex items-center space-x-2">
+              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Crawl Protocol</span>
+              <span class="text-[10px] text-zinc-500 font-mono">Level 1</span>
+            </div>
+          </div>
+
+          <!-- Card 2: /llms.txt -->
+          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/llms.txt</span>
+              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Curated markdown entrypoint for LLM inference.</p>
+            <div class="flex items-center space-x-2">
+              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">LLM Manifest</span>
+              <span class="text-[10px] text-zinc-500 font-mono">Level 2</span>
+            </div>
+          </div>
+
+          <!-- Card 3: /ai-context.md -->
+          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/ai-context.md</span>
+              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Deep semantic entity boundaries and service claims.</p>
+            <div class="flex items-center space-x-2">
+              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Semantic Graph</span>
+              <span class="text-[10px] text-zinc-500 font-mono">Level 3</span>
+            </div>
+          </div>
+
+          <!-- Card 4: schema.jsonld -->
+          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>schema.jsonld</span>
+              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Structured Schema.org organization & service taxonomy.</p>
+            <div class="flex items-center space-x-2">
+              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Schema.org</span>
+              <span class="text-[10px] text-zinc-500 font-mono">Level 4</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Column 3: Right Inspector Studio -->
+    <section id="v4-right-inspector" data-testid="v4-right-inspector" class="v4-right-inspector md:col-span-5 lg:col-span-5 flex flex-col space-y-4">
+      <div class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col justify-between">
+        
+        <div>
+          <!-- Inspector Header -->
+          <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+            <div class="flex items-center space-x-2">
+              <h2 data-testid="inspector-target-title" data-inspector-target="/llms.txt" class="text-xs font-mono font-semibold text-white">/llms.txt</h2>
+              <span data-testid="inspector-format-pill" class="inspector-format-pill text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Markdown (Level 2)</span>
+            </div>
+            
+            <div class="flex items-center space-x-1.5">
+              <button type="button" data-action="copy-manifest" class="btn-copy-manifest text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-mono transition-all">Copy</button>
+              <button type="button" data-action="download-manifest" class="btn-download-manifest text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-mono transition-all">Download</button>
+            </div>
+          </div>
+
+          <!-- Manifest Code Viewer -->
+          <div data-testid="manifest-code-viewer" class="manifest-code-viewer bg-black/60 border border-white/5 rounded-lg p-3 overflow-x-auto text-xs font-mono text-zinc-300 mb-3">
+            <pre><code># Machine Manifest Spec (AI-Ready)
+> Title: Domain Knowledge Architecture
+> Summary: Curated markdown entrypoint for LLM inference & entity extraction.
+
+## Core Capabilities
+- Entity Hierarchy & Grounding Protocol
+- Verified Citation Matrix (AI-Optimized)
+- Real-time LLM Crawler Directives</code></pre>
+          </div>
+
+          <!-- AEO Diagnostic & Remediation Cards -->
+          <div class="space-y-2 mb-3">
+            <div data-testid="diagnostic-card" class="diagnostic-card p-3 rounded-lg bg-white/5 border border-white/5">
+              <div class="text-xs font-semibold text-emerald-400 mb-1">LLM Visibility & Citation Gap Diagnostic</div>
+              <p class="text-[11px] text-zinc-400">Audits identify unindexed service capabilities. Pre-rendered manifests anchor direct entity citations across LLM response engines.</p>
+            </div>
+            
+            <div data-testid="diagnostic-card" class="diagnostic-card p-3 rounded-lg bg-white/5 border border-white/5">
+              <div class="text-xs font-semibold text-cyan-400 mb-1">Machine Protocol Remediation Action</div>
+              <p class="text-[11px] text-zinc-400">Deploying /llms.txt at domain root ensures crawler ingestion accuracy and eliminates hallucinated entity claims.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inspector Action Dock -->
+        <div data-testid="inspector-action-dock" class="inspector-action-dock border-t border-white/10 pt-3 mt-auto flex items-center justify-between gap-2">
+          <button type="button" data-action="deploy-worker" class="btn-deploy-worker w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs py-2 px-3 rounded-lg transition-all flex items-center justify-center space-x-1.5 shadow-sm">
+            <span>Deploy via Cloudflare Worker</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="index.js" type="module"></script>
+</body>
+</html>
