@@ -6191,59 +6191,31 @@ if (typeof module !== 'undefined' && module.exports) {
 const MANIFEST_PAYLOADS = {
   '/robots.txt': {
     format: 'TXT (Level 1)',
-    formatClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    code: `User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: *
-Allow: /
-Sitemap: https://--/sitemap.xml`
+    to: 'crawler-directives@thatworkx.com',
+    subj: 'Thatworkx x Bot Crawler Rules & Access Policy',
+    body: `Hi Webmaster,\n\nWe have generated the /robots.txt crawl directives for AI-Optimized presence. LLM search engines require explicit Allow rules to index core services without hallucination.\n\nDirectives configured for GPTBot, ClaudeBot, and PerplexityBot.`,
+    code: `User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /\nSitemap: https://thatworkx.com/sitemap.xml`
   },
   '/llms.txt': {
     format: 'Markdown (Level 2)',
-    formatClass: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-    code: `# Machine Manifest Spec (AI-Ready)
-> Title: Domain Knowledge Architecture
-> Summary: Curated markdown entrypoint for LLM inference & entity extraction.
-
-## Core Capabilities
-- Entity Hierarchy & Grounding Protocol
-- Verified Citation Matrix (AI-Optimized)
-- Real-time LLM Crawler Directives`
+    to: 'abdelaziz@alhanaee.com',
+    subj: 'Thatworkx x Abdelaziz Alhanaee Law Firm',
+    body: `Hi Abdelaziz,\n\nSaw Abdelaziz Alhanaee Law Firm handles 350+ cases across construction, real estate, and financial crimes in Dubai. With that volume, AI search gaps and email confidentiality can get messy fast.\n\nI'm with Thatworkx. We help firms tighten AI visibility and secure client email workflows with compliant legal setups (AI-Optimized citation matrix & Level 1–4 AI-Ready manifests).\n\nIf useful, reply and I'll send a short outline of where firms usually miss citations and where email risk shows up first.`,
+    code: `# Machine Manifest Spec (AI-Ready)\n> Title: Thatworkx Solutions\n> Scope: AI-Optimized Web Presence & Legal Workflows\n\n## Core Capabilities\n- Entity Grounding & Knowledge Architecture\n- Verified Citation Matrix for MENA Legal Practice\n- Real-time LLM Crawler Directives (/robots.txt & /llms.txt)`
   },
   '/ai-context.md': {
     format: 'Markdown (Level 3)',
-    formatClass: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-    code: `# AI Context & Entity Definition (AI-Ready)
-> Domain: --
-> Audit Protocol: AI-Optimized
-
-## Semantic Knowledge Graph
-- Primary Entity: Organization Core Capabilities
-- Service Taxonomy: Verified Technical Grounding
-- Citation Boundaries: Level 3 Deep Protocol`
+    to: 'nasser@nmlawyers.ae',
+    subj: 'Thatworkx x NM Lawyers Entity Boundaries',
+    body: `Hi Nasser,\n\nWe reviewed your firm's entity graph. Pre-rendered AI Context files anchor direct domain grounding across LLM inference engines.\n\nLevel 3 semantic definition is ready for deployment.`,
+    code: `# AI Context & Entity Definition (AI-Ready)\n> Domain: thatworkx.com\n> Audit Protocol: AI-Optimized\n\n## Semantic Knowledge Graph\n- Primary Entity: Organization Core Capabilities\n- Service Taxonomy: Verified Technical Grounding\n- Citation Boundaries: Level 3 Deep Protocol`
   },
   'schema.jsonld': {
     format: 'JSON-LD (Level 4)',
-    formatClass: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    code: `{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "--",
-  "url": "https://--",
-  "description": "AI-Ready domain knowledge architecture.",
-  "knowsAbout": [
-    "Answer Engine Optimization",
-    "LLM Ingestion Protocol",
-    "Entity Hierarchy"
-  ]
-}`
+    to: 'schema-validator@thatworkx.com',
+    subj: 'Thatworkx x Structured Schema.org Graph',
+    body: `Hi Engineering Lead,\n\nThe JSON-LD knowledge graph definition is validated against Schema.org standards. Ready for injection into the root document head.`,
+    code: `{\n  "@context": "https://schema.org",\n  "@type": "Organization",\n  "name": "Thatworkx Solutions",\n  "url": "https://thatworkx.com",\n  "description": "AI-Ready domain knowledge architecture.",\n  "knowsAbout": [\n    "Answer Engine Optimization",\n    "LLM Ingestion Protocol",\n    "Entity Hierarchy"\n  ]\n}`
   }
 };
 
@@ -6253,27 +6225,36 @@ function initVisualizeV4Cockpit() {
   feedTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       feedTabs.forEach(t => {
-        t.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30', 'active');
-        t.classList.add('text-zinc-400');
+        t.classList.remove('bg-[#1E2330]', 'text-white', 'border-[#2F374A]', 'shadow-sm', 'active');
+        t.classList.add('text-[#8B949E]');
         t.setAttribute('aria-selected', 'false');
       });
-      tab.classList.remove('text-zinc-400');
-      tab.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30', 'active');
+      tab.classList.remove('text-[#8B949E]');
+      tab.classList.add('bg-[#1E2330]', 'text-white', 'border-[#2F374A]', 'shadow-sm', 'active');
       tab.setAttribute('aria-selected', 'true');
     });
   });
 
-  // 2. Discovery Card Selection -> Inspector Update
+  // 2. Discovery Card Selection -> Dynamic Inspector Canvas Update
   const discoveryCards = document.querySelectorAll('[data-testid="discovery-card"], .discovery-card');
   const targetTitle = document.querySelector('[data-testid="inspector-target-title"]');
   const formatPill = document.querySelector('[data-testid="inspector-format-pill"]');
+  const metaTo = document.querySelector('[data-field="meta-to"]');
+  const metaSubj = document.querySelector('[data-field="meta-subj"]');
+  const studioBody = document.querySelector('[data-testid="inspector-studio-body"]');
   const codeViewer = document.querySelector('[data-testid="manifest-code-viewer"]');
 
   discoveryCards.forEach(card => {
     card.addEventListener('click', () => {
-      const cardTitleEl = card.querySelector('[data-card-title], .card-title');
-      if (!cardTitleEl) return;
-      const key = cardTitleEl.textContent.trim();
+      discoveryCards.forEach(c => {
+        c.classList.remove('border-[#00E599]/30', 'bg-[#141720]');
+        c.classList.add('border-[#1C202B]', 'bg-[#10131A]');
+      });
+      card.classList.remove('border-[#1C202B]', 'bg-[#10131A]');
+      card.classList.add('border-[#00E599]/30', 'bg-[#141720]');
+
+      const cardTitleEl = card.querySelector('[data-card-title], .card-title') || card;
+      const key = card.getAttribute('data-card-title') || cardTitleEl.textContent.trim();
       const payload = MANIFEST_PAYLOADS[key];
 
       if (targetTitle) {
@@ -6282,14 +6263,19 @@ function initVisualizeV4Cockpit() {
       }
 
       if (payload) {
-        if (formatPill) {
-          formatPill.textContent = payload.format;
+        if (formatPill) formatPill.textContent = payload.format;
+        if (metaTo) metaTo.textContent = payload.to;
+        if (metaSubj) metaSubj.textContent = payload.subj;
+        if (studioBody) {
+          studioBody.innerHTML = `
+            <p>Hi there,</p>
+            <p>${payload.body}</p>
+            <p class="pt-2 text-[#8B949E]">Best,<br><span class="text-white font-medium">Thatworkx</span></p>
+          `;
         }
         if (codeViewer) {
           const codeEl = codeViewer.querySelector('code') || codeViewer.querySelector('pre');
-          if (codeEl) {
-            codeEl.textContent = payload.code;
-          }
+          if (codeEl) codeEl.textContent = payload.code;
         }
       }
     });
@@ -6317,10 +6303,8 @@ function initVisualizeV4Cockpit() {
       }, 2000);
     });
   }
-
 }
 
-// Auto-initialize on DOMContentLoaded or immediately if DOM is already ready
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initVisualizeV4Cockpit);
@@ -6328,5 +6312,6 @@ if (typeof document !== 'undefined') {
     initVisualizeV4Cockpit();
   }
 }
+
 
 

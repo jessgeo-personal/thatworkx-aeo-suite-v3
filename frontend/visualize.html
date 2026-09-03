@@ -1,305 +1,582 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark h-full bg-[#08090C]">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIVisualize - AEO Suite V3</title>
+  <title>AIVisualize Cockpit - AEO Suite V3</title>
   <link rel="stylesheet" href="index.css">
 </head>
-<body class="bg-dark text-light min-h-screen flex flex-col font-sans antialiased">
+<body class="bg-[#08090C] text-[#E1E4EA] h-screen flex flex-col font-sans antialiased overflow-hidden select-none">
 
-  <!-- Top Progress Stepper Header -->
-  <header class="pipeline-header border-b border-white/10 bg-black/60 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+  <!-- ==========================================================================
+       TOP GLOBAL HEADER & MILESTONE PROGRESSION TIMELINE
+       ========================================================================== -->
+  <header class="pipeline-header h-14 border-b border-[#1C2029] bg-[#0C0E14] px-4 flex items-center justify-between flex-shrink-0 z-40">
+    
+    <!-- Left: Brand Logo Lockup -->
+    <div class="flex items-center space-x-3 min-w-[200px]">
+      <a href="index.html" class="flex items-center space-x-2 group">
+        <div class="w-6 h-6 rounded bg-[#00E599] flex items-center justify-center font-bold text-black text-xs shadow-[0_0_12px_rgba(0,229,153,0.35)]">
+          ❖
+        </div>
+        <span class="font-bold text-sm tracking-tight text-white flex items-center">
+          explee<span class="text-[#00E599] font-mono text-xs ml-1 font-normal opacity-80">·aeo</span>
+        </span>
+      </a>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#161A22] text-[#8B949E] border border-[#232834] font-mono">v4.2</span>
+    </div>
+
+    <!-- Center: 6-Stage Timeline + Downstream "What Happens Next" -->
+    <div class="flex items-center space-x-6">
       
-      <!-- Brand / App Logo -->
-      <div class="flex items-center space-x-3">
-        <a href="index.html" class="flex items-center space-x-2">
-          <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="h-7 w-auto object-contain">
-          <span class="font-bold text-base tracking-tight text-white">AI<span class="text-emerald-400">Visualize</span></span>
-        </a>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">V4 Cockpit</span>
-      </div>
-
-      <!-- 6-Stage AEO Readiness Pipeline Stepper -->
-      <nav id="pipeline-stepper" data-testid="pipeline-stepper" class="pipeline-stepper flex items-center space-x-2 text-xs" aria-label="Readiness Pipeline">
-        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="1">
-          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">1</span>
-          <span class="step-label hidden md:inline">Intake</span>
+      <!-- Connected Progression Pipeline (1 to 6) -->
+      <nav id="pipeline-stepper" data-testid="pipeline-stepper" class="pipeline-stepper explee-stepper flex items-center" aria-label="AEO Progression Timeline">
+        
+        <!-- Step 1 -->
+        <div class="pipeline-step flex items-center" data-step="1">
+          <div class="step-circle step-num w-6 h-6 rounded-full bg-[#181C24] border border-[#2A3140] flex items-center justify-center text-[11px] font-mono text-[#8B949E]" data-step-circle>1</div>
+          <span class="step-label hidden md:inline"></span>
+          <div class="step-divider w-6 h-[1px] bg-[#2A3140]"></div>
         </div>
-        <span class="step-divider text-zinc-600">→</span>
 
-        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="2">
-          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">2</span>
-          <span class="step-label hidden md:inline">Protocols</span>
+        <!-- Step 2 -->
+        <div class="pipeline-step flex items-center" data-step="2">
+          <div class="step-circle step-num w-6 h-6 rounded-full bg-[#181C24] border border-[#2A3140] flex items-center justify-center text-[11px] font-mono text-[#8B949E]" data-step-circle>2</div>
+          <span class="step-label hidden md:inline"></span>
+          <div class="step-divider w-6 h-[1px] bg-[#2A3140]"></div>
         </div>
-        <span class="step-divider text-zinc-600">→</span>
 
-        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="3">
-          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">3</span>
-          <span class="step-label hidden md:inline">Schema</span>
+        <!-- Step 3 -->
+        <div class="pipeline-step flex items-center" data-step="3">
+          <div class="step-circle step-num w-6 h-6 rounded-full bg-[#181C24] border border-[#2A3140] flex items-center justify-center text-[11px] font-mono text-[#8B949E]" data-step-circle>3</div>
+          <span class="step-label hidden md:inline"></span>
+          <div class="step-divider w-6 h-[1px] bg-[#2A3140]"></div>
         </div>
-        <span class="step-divider text-zinc-600">→</span>
 
-        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="4">
-          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">4</span>
-          <span class="step-label hidden md:inline">Hierarchy</span>
+        <!-- Step 4 -->
+        <div class="pipeline-step flex items-center" data-step="4">
+          <div class="step-circle step-num w-6 h-6 rounded-full bg-[#181C24] border border-[#2A3140] flex items-center justify-center text-[11px] font-mono text-[#8B949E]" data-step-circle>4</div>
+          <span class="step-label hidden md:inline"></span>
+          <div class="step-divider w-6 h-[1px] bg-[#2A3140]"></div>
         </div>
-        <span class="step-divider text-zinc-600">→</span>
 
-        <div class="pipeline-step flex items-center space-x-1.5 text-zinc-400" data-step="5">
-          <span class="step-num w-5 h-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px]">5</span>
-          <span class="step-label hidden md:inline">Entity Graph</span>
+        <!-- Step 5 -->
+        <div class="pipeline-step flex items-center" data-step="5">
+          <div class="step-circle step-num w-6 h-6 rounded-full bg-[#181C24] border border-[#2A3140] flex items-center justify-center text-[11px] font-mono text-[#8B949E]" data-step-circle>5</div>
+          <span class="step-label hidden md:inline"></span>
+          <div class="step-divider w-6 h-[1px] bg-[#2A3140]"></div>
         </div>
-        <span class="step-divider text-zinc-600">→</span>
 
-        <!-- Step 6 Milestone -->
-        <div class="pipeline-step step-ready flex items-center space-x-1.5 text-emerald-400 font-semibold" data-step="6" data-step-ready="true">
-          <span class="step-num w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-mono text-[10px]">6</span>
-          <span class="step-label">AI-Ready Manifest Ready</span>
+        <!-- Step 6 Milestone Capsule (Active) -->
+        <div class="pipeline-step step-ready step-capsule-active flex items-center px-3 py-1 rounded-full bg-[#00E599]/10 border border-[#00E599]/40 text-[#00E599] font-medium text-xs shadow-[0_0_15px_rgba(0,229,153,0.15)]" data-step="6" data-step-ready="true" data-step-active="6">
+          <span class="step-num w-2 h-2 rounded-full bg-[#00E599] mr-2 animate-pulse"></span>
+          <span class="step-label">6 Outreach ready · AI-Ready Manifest Ready</span>
         </div>
       </nav>
 
-      <!-- Downstream "What Happens Next" Steps (7, 8, 9) -->
-      <div data-testid="pipeline-next-steps" class="pipeline-next-steps hidden lg:flex items-center space-x-3 border-l border-white/10 pl-4 text-xs text-zinc-400">
-        <span class="text-[11px] font-semibold uppercase tracking-wider text-zinc-300">What Happens Next:</span>
-        <div class="next-step-item flex items-center space-x-1" data-next-step="7">
-          <span class="font-mono text-zinc-400">7</span>
-          <span>LLM Ingestion</span>
+      <!-- Downstream "WHAT HAPPENS NEXT" Stages -->
+      <div data-testid="pipeline-next-steps" class="pipeline-next-steps explee-what-next hidden xl:flex flex-col space-y-0.5 border-l border-[#1C2029] pl-6">
+        <span class="text-[9px] font-bold uppercase tracking-wider text-[#636C7E]">WHAT HAPPENS NEXT</span>
+        <div class="flex items-center space-x-4 text-[11px] text-[#8B949E]">
+          <div class="next-step-item flex items-center space-x-1 opacity-70 hover:opacity-100 transition-opacity" data-next-step="7" data-downstream-step="7">
+            <span class="w-4 h-4 rounded-full border border-dashed border-[#3A4252] flex items-center justify-center text-[9px] font-mono">7</span>
+            <span>Send emails · LLM Ingestion</span>
+          </div>
+          <div class="next-step-item flex items-center space-x-1 opacity-70 hover:opacity-100 transition-opacity" data-next-step="8" data-downstream-step="8">
+            <span class="w-4 h-4 rounded-full border border-dashed border-[#3A4252] flex items-center justify-center text-[9px] font-mono">8</span>
+            <span>Book meetings · Citation Audits</span>
+          </div>
+          <div class="next-step-item flex items-center space-x-1 opacity-70 hover:opacity-100 transition-opacity" data-next-step="9" data-downstream-step="9">
+            <span class="w-4 h-4 rounded-full border border-dashed border-[#3A4252] flex items-center justify-center text-[9px] font-mono">9</span>
+            <span>Learn & double down · AEO Scale</span>
+          </div>
         </div>
-        <span class="text-zinc-700">|</span>
-        <div class="next-step-item flex items-center space-x-1" data-next-step="8">
-          <span class="font-mono text-zinc-400">8</span>
-          <span>Citation Audits</span>
-        </div>
-        <span class="text-zinc-700">|</span>
-        <div class="next-step-item flex items-center space-x-1" data-next-step="9">
-          <span class="font-mono text-zinc-400">9</span>
-          <span>AEO Scale</span>
-        </div>
-      </div>
-
-      <!-- Action Trigger Dock -->
-      <div data-testid="header-action-dock" class="header-action-dock flex items-center space-x-2">
-        <button type="button" data-action="export-manifests" class="btn-primary bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
-          <span>Export All Manifests</span>
-        </button>
       </div>
 
     </div>
+
+    <!-- Right: Credit Indicator & Start Action Dock -->
+    <div data-testid="header-action-dock" class="header-action-dock explee-credit-dock flex items-center space-x-3">
+      <div class="text-right hidden sm:block">
+        <div class="text-xs font-semibold text-white leading-tight">$30 free credits</div>
+        <div class="text-[10px] text-[#8B949E] leading-tight">No upfront charge</div>
+      </div>
+      <button type="button" data-action="export-manifests" class="btn-primary btn-explee-primary bg-[#00E599] hover:bg-[#00FFA3] text-black font-semibold text-xs px-4 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(0,229,153,0.3)] flex items-center space-x-1.5 active:scale-95">
+        <span>Start outreach</span>
+      </button>
+    </div>
+
   </header>
 
-  <!-- Main 3-Column Cockpit Scaffolding Container -->
-  <main id="v4-cockpit" data-testid="v4-cockpit" class="v4-cockpit-container flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-4">
+  <!-- ==========================================================================
+       MAIN 3-COLUMN FIXED WORKSPACE (EDGE-TO-EDGE, NO MAX-W-7XL BOXING)
+       ========================================================================== -->
+  <main id="v4-cockpit" data-testid="v4-cockpit" class="v4-cockpit-container explee-workspace flex-1 flex overflow-hidden w-full relative">
 
-    <!-- Column 1: Left Context & Profile Pane -->
-    <aside id="v4-left-pane" data-testid="v4-left-pane" class="v4-left-pane md:col-span-3 lg:col-span-3 flex flex-col space-y-4">
+    <!-- ----------------------------------------------------------------------
+         COLUMN 1: LEFT SIDEBAR (3-STEP CONTEXT WORKFLOW, 280px)
+         ---------------------------------------------------------------------- -->
+    <aside id="v4-left-pane" data-testid="v4-left-pane" class="v4-left-pane explee-col-left w-[290px] border-r border-[#1C2029] bg-[#0A0C10] flex flex-col overflow-y-auto custom-scroll p-4 space-y-5 flex-shrink-0">
       
-      <!-- Domain Profile Overview Card -->
-      <div data-testid="domain-profile-card" class="domain-profile-card cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Target Domain</span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-mono">Pre-Scan</span>
+      <!-- Step 1: Research your company -->
+      <section data-testid="step-1-research" class="space-y-2.5">
+        <div class="flex items-center space-x-1.5 text-xs text-[#8B949E] font-medium">
+          <span class="text-[#00E599] text-xs">✓</span>
+          <span>step 1 · Research your company</span>
         </div>
-        <div class="domain-name-display text-sm font-mono font-medium text-white truncate" data-field="domain-name">--</div>
-        
-        <!-- Metadata Fields -->
-        <div class="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <span class="text-zinc-500 text-[10px] block uppercase">Audit Date</span>
-            <span data-field="audit-date" data-meta-default class="font-mono text-zinc-300">--</span>
-          </div>
-          <div>
-            <span class="text-zinc-500 text-[10px] block uppercase">Region</span>
-            <span data-field="region" data-meta-default class="font-mono text-zinc-300">--</span>
-          </div>
-          <div class="col-span-2">
-            <span class="text-zinc-500 text-[10px] block uppercase">Crawl Scope</span>
-            <span data-field="crawl-scope" data-meta-default class="font-mono text-yellow-400/90 text-[11px]">UNAUDITED</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Competitor Benchmark Targets -->
-      <div data-testid="competitor-benchmark-section" class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Competitors</span>
-          <span class="text-[10px] font-mono text-zinc-500">Benchmark Mode</span>
-        </div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
-            <span class="truncate">mails.com</span>
-            <span class="text-zinc-500 text-[9px]">↗</span>
+        <div data-testid="domain-profile-card" class="domain-profile-card bg-[#12151D] border border-[#202532] rounded-xl p-3 space-y-2.5">
+          <!-- Company & Domain Lockup -->
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-lg bg-black border border-[#2A3142] flex items-center justify-center font-bold text-white text-xs">
+                TW
+              </div>
+              <div>
+                <h2 data-field="company-name" class="text-xs font-semibold text-white leading-tight">Thatworkx Solutions</h2>
+                <a href="https://thatworkx.com" target="_blank" data-field="company-domain" class="text-[11px] text-[#8B949E] hover:text-[#00E599] font-mono leading-tight block">thatworkx.com</a>
+                <div class="domain-name-display hidden" data-field="domain-name">--</div>
+              </div>
+            </div>
           </div>
-          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
-            <span class="truncate">proofpoint.com</span>
-            <span class="text-zinc-500 text-[9px]">↗</span>
-          </div>
-          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
-            <span class="truncate">mimecast.com</span>
-            <span class="text-zinc-500 text-[9px]">↗</span>
-          </div>
-          <div data-competitor-item class="competitor-item p-1.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-zinc-300 flex items-center justify-between">
-            <span class="truncate">trendmicro.com</span>
-            <span class="text-zinc-500 text-[9px]">↗</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Campaign & Category Scopes -->
-      <div data-testid="category-filter-section" class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col justify-between">
-        <div>
-          <div class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Scope Filters</div>
+          <!-- Bio / Summary -->
+          <p class="text-[11px] text-[#9EA7B8] leading-relaxed">
+            A MENA-based tech firm building affordable AI-Optimized tools and machine protocols for SMBs, offering Level 1–4 AI-Ready manifests.
+          </p>
+
+          <!-- Metadata Chip Pills Row -->
+          <div class="flex items-center space-x-1.5 pt-1">
+            <div class="meta-chip flex items-center space-x-1 px-2 py-1 rounded bg-[#181C26] border border-[#252C3B] text-[10px] text-[#C5CAD4]" data-meta-chip>
+              <span>📅</span>
+              <span data-field="audit-date" data-meta-default>--</span>
+            </div>
+            <div class="meta-chip flex items-center space-x-1 px-2 py-1 rounded bg-[#181C26] border border-[#252C3B] text-[10px] text-[#C5CAD4]" data-meta-chip>
+              <span>👥</span>
+              <span data-field="region" data-meta-default>--</span>
+            </div>
+            <div class="meta-chip flex items-center space-x-1 px-2 py-1 rounded bg-[#181C26] border border-[#252C3B] text-[10px] text-[#C5CAD4]" data-meta-chip>
+              <span>🌐</span>
+              <span data-field="crawl-scope" data-meta-default>UNAUDITED</span>
+            </div>
+          </div>
+
+          <!-- More Toggle Link -->
+          <div class="pt-0.5">
+            <button type="button" class="text-[11px] text-[#8B949E] hover:text-white flex items-center space-x-1 transition-colors">
+              <span>⌵ More</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Explore competitors -->
+      <section data-testid="step-2-competitors" class="space-y-2.5">
+        <div class="flex items-center justify-between text-xs text-[#8B949E] font-medium">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-[#00E599] text-xs">✓</span>
+            <span>step 2 · Explore competitors</span>
+          </div>
+        </div>
+
+        <div data-testid="competitor-benchmark-section" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#636C7E]">COMPETITORS 13</span>
+            <button type="button" class="text-[#636C7E] hover:text-white text-xs">⚙</button>
+          </div>
+
+          <!-- 2-Column Favicon Grid of Competitors -->
+          <div class="grid grid-cols-2 gap-1.5">
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#E50914]/20 text-[#E50914] flex items-center justify-center font-bold text-[9px]">M</span>
+                <span class="truncate">mails.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#00A4E4]/20 text-[#00A4E4] flex items-center justify-center font-bold text-[9px]">P</span>
+                <span class="truncate">proofpoint.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#FF6B00]/20 text-[#FF6B00] flex items-center justify-center font-bold text-[9px]">M</span>
+                <span class="truncate">mimecast.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#D8232A]/20 text-[#D8232A] flex items-center justify-center font-bold text-[9px]">T</span>
+                <span class="truncate">trendmicro.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#EE3124]/20 text-[#EE3124] flex items-center justify-center font-bold text-[9px]">F</span>
+                <span class="truncate">fortinet.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+
+            <div data-competitor-item data-competitor-chip class="competitor-chip competitor-item p-2 rounded-lg bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[11px] text-[#D1D5DF] flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-1.5 truncate">
+                <span class="w-4 h-4 rounded bg-[#FA5B00]/20 text-[#FA5B00] flex items-center justify-center font-bold text-[9px]">P</span>
+                <span class="truncate">paloaltonetworks.com</span>
+              </div>
+              <span class="text-[#555E70] text-[9px]">↗</span>
+            </div>
+          </div>
+
+          <div class="pt-0.5">
+            <button type="button" class="text-[11px] text-[#8B949E] hover:text-white transition-colors">
+              +5 more
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3: Define campaigns -->
+      <section data-testid="step-3-campaigns" class="space-y-2.5 pt-1">
+        <div class="flex items-center justify-between text-xs text-[#8B949E] font-medium">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-[#00E599] text-xs">✓</span>
+            <span>step 3 · Define campaigns</span>
+          </div>
+        </div>
+
+        <div data-testid="category-filter-section" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#636C7E]">CAMPAIGNS 6</span>
+            <button type="button" class="text-[#636C7E] hover:text-white text-xs">⚙</button>
+          </div>
+
           <div class="space-y-1.5">
-            <button type="button" data-category-filter="mid-market-legal" class="category-filter-btn w-full text-left p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center justify-between">
-              <span>Mid-market legal</span>
-              <span class="font-mono text-[10px] text-zinc-400">1.4K</span>
+            <!-- Active Campaign Tile -->
+            <button type="button" data-category-filter="mid-market-legal" data-campaign-tile class="campaign-tile category-filter-btn w-full text-left p-2.5 rounded-xl bg-[#151923] border border-[#00E599]/40 text-white flex items-center justify-between shadow-[0_0_12px_rgba(0,229,153,0.1)] cursor-pointer">
+              <div class="flex items-center space-x-2 truncate">
+                <span class="text-xs">🔑</span>
+                <span class="text-xs font-medium truncate">Mid-market legal</span>
+              </div>
+              <span class="text-[11px] font-mono text-[#8B949E] bg-[#1E2330] px-1.5 py-0.5 rounded">1.4K</span>
             </button>
-            <button type="button" data-category-filter="financial-services" class="category-filter-btn w-full text-left p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-zinc-300 text-xs font-medium flex items-center justify-between">
-              <span>Financial services</span>
-              <span class="font-mono text-[10px] text-zinc-500">1.0K</span>
-            </button>
-          </div>
-        </div>
 
-        <div class="mt-4 pt-3 border-t border-white/5 space-y-1 text-[11px]">
-          <div class="flex items-center justify-between">
-            <span class="text-zinc-400">Audit Protocol:</span>
-            <span class="text-emerald-400 font-mono text-[10px]">AI-Optimized</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-zinc-400">Target Schema:</span>
-            <span class="text-cyan-400 font-mono text-[10px]">AI-Ready</span>
+            <!-- Inactive Campaign Tile -->
+            <button type="button" data-category-filter="financial-services" data-campaign-tile class="campaign-tile category-filter-btn w-full text-left p-2.5 rounded-xl bg-[#12151D] border border-[#1E2330] hover:border-[#2D3548] text-[#8B949E] hover:text-white flex items-center justify-between transition-colors cursor-pointer">
+              <div class="flex items-center space-x-2 truncate">
+                <span class="text-xs">🗂</span>
+                <span class="text-xs font-medium truncate">Financial services</span>
+              </div>
+              <span class="text-[11px] font-mono text-[#555E70] bg-[#181C26] px-1.5 py-0.5 rounded">1.0K</span>
+            </button>
           </div>
         </div>
-      </div>
+      </section>
+
     </aside>
 
-    <!-- Column 2: Center Discovery & Queue Stream -->
-    <section id="v4-center-feed" data-testid="v4-center-feed" class="v4-center-feed md:col-span-4 lg:col-span-4 flex flex-col space-y-4">
-      <div class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col">
+    <!-- ----------------------------------------------------------------------
+         COLUMN 2: CENTER DISCOVERY STREAM FEED (380px)
+         ---------------------------------------------------------------------- -->
+    <section id="v4-center-feed" data-testid="v4-center-feed" class="v4-center-feed explee-col-center w-[390px] border-r border-[#1C2029] bg-[#0C0E14] flex flex-col flex-shrink-0">
+      
+      <!-- Top 3-Segment Pill Switcher -->
+      <div class="p-3 border-b border-[#1C2029] flex-shrink-0">
+        <div data-testid="center-feed-tabs" class="feed-tab-switcher explee-feed-switcher grid grid-cols-3 gap-1 bg-[#141720] p-1 rounded-xl border border-[#212634]">
+          <button type="button" data-feed-tab="manifests" class="segment-btn py-1.5 rounded-lg text-xs font-medium text-center transition-all bg-[#1E2330] text-white border border-[#2F374A] shadow-sm flex items-center justify-center space-x-1 active" aria-selected="true">
+            <span>🏢</span>
+            <span>Companies</span>
+          </button>
+          <button type="button" data-feed-tab="pages" class="segment-btn py-1.5 rounded-lg text-xs font-medium text-center transition-all text-[#8B949E] hover:text-white flex items-center justify-center space-x-1" aria-selected="false">
+            <span>👥</span>
+            <span>People</span>
+          </button>
+          <button type="button" data-feed-tab="competitors" class="segment-btn py-1.5 rounded-lg text-xs font-medium text-center transition-all text-[#8B949E] hover:text-white flex items-center justify-center space-x-1" aria-selected="false">
+            <span>✉</span>
+            <span>Emails</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Stream Cards Feed -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-3 space-y-2.5">
         
-        <!-- Feed Tab Switcher -->
-        <div data-testid="center-feed-tabs" class="feed-tab-switcher grid grid-cols-3 gap-1 bg-black/40 p-1 rounded-lg border border-white/5 mb-3 text-xs">
-          <button type="button" data-feed-tab="manifests" class="py-1 px-2 rounded font-medium text-center transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Manifests</button>
-          <button type="button" data-feed-tab="pages" class="py-1 px-2 rounded font-medium text-center transition-all text-zinc-400 hover:text-white">Pages</button>
-          <button type="button" data-feed-tab="competitors" class="py-1 px-2 rounded font-medium text-center transition-all text-zinc-400 hover:text-white">Competitors</button>
+        <!-- Stream Card 1: Selected / Active (/llms.txt) -->
+        <div data-testid="discovery-card" data-card-title="/llms.txt" class="discovery-card explee-stream-card p-3 rounded-xl bg-[#141720] border border-[#00E599]/30 hover:border-[#00E599]/60 transition-all cursor-pointer space-y-2.5 relative shadow-[0_0_15px_rgba(0,0,0,0.4)]">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#1A2234] border border-[#283552] flex items-center justify-center text-xs font-semibold text-white">
+                AA
+              </div>
+              <div>
+                <h3 class="card-title text-xs font-semibold text-white leading-tight" data-card-title>/llms.txt</h3>
+                <p class="text-[11px] text-[#8B949E] leading-tight">Founder & Managing Partner · alhanaee.com</p>
+              </div>
+            </div>
+            <span data-card-status class="card-status-badge text-[10px] text-[#00E599] font-mono">● active</span>
+          </div>
+
+          <!-- Multi-Tool Validation Badges Row -->
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#1B1E28] border border-[#272D3C] text-[10px] text-[#CBD1DC] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF7A00]"></span>
+              <span>hunter</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#1B1E28] border border-[#272D3C] text-[10px] text-[#CBD1DC] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00A3FF]"></span>
+              <span>exreacher</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#1B1E28] border border-[#272D3C] text-[10px] text-[#CBD1DC] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
+              <span>findymail</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#1B1E28] border border-[#272D3C] text-[10px] text-[#CBD1DC] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#9E00FF]"></span>
+              <span>leadmagic</span>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-[#636C7E] font-mono flex items-center justify-between border-t border-[#1F2432] pt-2">
+            <span>abdelaziz@alhanaee.com via findymail</span>
+            <span class="validator-pill text-[#00E599]" data-validator-status="valid">valid</span>
+          </div>
         </div>
 
-        <!-- Pre-rendered Discovery Stream Cards -->
-        <div class="feed-stream space-y-2.5 flex-1 overflow-y-auto pr-1">
-          
-          <!-- Card 1: /robots.txt -->
-          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/robots.txt</span>
-              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
+        <!-- Stream Card 2: (/robots.txt) -->
+        <div data-testid="discovery-card" data-card-title="/robots.txt" class="discovery-card explee-stream-card p-3 rounded-xl bg-[#10131A] border border-[#1C202B] hover:border-[#2D3546] transition-all cursor-pointer space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#1F232D] border border-[#2D3342] flex items-center justify-center text-xs font-semibold text-white">
+                SM
+              </div>
+              <div>
+                <h3 class="card-title text-xs font-semibold text-white leading-tight" data-card-title>/robots.txt</h3>
+                <p class="text-[11px] text-[#8B949E] leading-tight">Chief Executive Officer · nextgen...</p>
+              </div>
             </div>
-            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Bot crawler access rules and directive controls.</p>
-            <div class="flex items-center space-x-2">
-              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Crawl Protocol</span>
-              <span class="text-[10px] text-zinc-500 font-mono">Level 1</span>
+            <span data-card-status class="card-status-badge text-[10px] text-[#8B949E] font-mono">⟳ ready</span>
+          </div>
+
+          <!-- Multi-Tool Badges -->
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF7A00]"></span>
+              <span>hunter</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00A3FF]"></span>
+              <span>exreacher</span>
             </div>
           </div>
 
-          <!-- Card 2: /llms.txt -->
-          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/llms.txt</span>
-              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
-            </div>
-            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Curated markdown entrypoint for LLM inference.</p>
-            <div class="flex items-center space-x-2">
-              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">LLM Manifest</span>
-              <span class="text-[10px] text-zinc-500 font-mono">Level 2</span>
-            </div>
+          <div class="text-[10px] text-[#636C7E] font-mono flex items-center justify-between border-t border-[#1C202B] pt-2">
+            <span>Crawl rules protocol · Level 1</span>
+            <span class="validator-pill text-[#8B949E]" data-validator-status="ready">verified</span>
           </div>
-
-          <!-- Card 3: /ai-context.md -->
-          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>/ai-context.md</span>
-              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
-            </div>
-            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Deep semantic entity boundaries and service claims.</p>
-            <div class="flex items-center space-x-2">
-              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Semantic Graph</span>
-              <span class="text-[10px] text-zinc-500 font-mono">Level 3</span>
-            </div>
-          </div>
-
-          <!-- Card 4: schema.jsonld -->
-          <div data-testid="discovery-card" class="discovery-card p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="card-title font-mono text-xs font-semibold text-white truncate" data-card-title>schema.jsonld</span>
-              <span data-card-status class="card-status-badge text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">UNAUDITED</span>
-            </div>
-            <p class="text-[11px] text-zinc-400 line-clamp-1 mb-2">Structured Schema.org organization & service taxonomy.</p>
-            <div class="flex items-center space-x-2">
-              <span data-validator-status="pending" class="validator-pill text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/5 font-mono">Schema.org</span>
-              <span class="text-[10px] text-zinc-500 font-mono">Level 4</span>
-            </div>
-          </div>
-
         </div>
+
+        <!-- Stream Card 3: (/ai-context.md) -->
+        <div data-testid="discovery-card" data-card-title="/ai-context.md" class="discovery-card explee-stream-card p-3 rounded-xl bg-[#10131A] border border-[#1C202B] hover:border-[#2D3546] transition-all cursor-pointer space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#1F232D] border border-[#2D3342] flex items-center justify-center text-xs font-semibold text-white">
+                NH
+              </div>
+              <div>
+                <h3 class="card-title text-xs font-semibold text-white leading-tight" data-card-title>/ai-context.md</h3>
+                <p class="text-[11px] text-[#8B949E] leading-tight">Partner · nmlawyers.ae</p>
+              </div>
+            </div>
+            <span data-card-status class="card-status-badge text-[10px] text-[#00E599] font-mono">✓ valid</span>
+          </div>
+
+          <!-- Multi-Tool Badges -->
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF7A00]"></span>
+              <span>hunter</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#9E00FF]"></span>
+              <span>leadmagic</span>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-[#636C7E] font-mono flex items-center justify-between border-t border-[#1C202B] pt-2">
+            <span>nasser@nmlawyers.ae via leadmagic</span>
+            <span class="validator-pill text-[#00E599]" data-validator-status="valid">valid</span>
+          </div>
+        </div>
+
+        <!-- Stream Card 4: (schema.jsonld) -->
+        <div data-testid="discovery-card" data-card-title="schema.jsonld" class="discovery-card explee-stream-card p-3 rounded-xl bg-[#10131A] border border-[#1C202B] hover:border-[#2D3546] transition-all cursor-pointer space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#1F232D] border border-[#2D3342] flex items-center justify-center text-xs font-semibold text-white">
+                SA
+              </div>
+              <div>
+                <h3 class="card-title text-xs font-semibold text-white leading-tight" data-card-title>schema.jsonld</h3>
+                <p class="text-[11px] text-[#8B949E] leading-tight">Founder Partner · conceptadv...</p>
+              </div>
+            </div>
+            <span data-card-status class="card-status-badge text-[10px] text-[#8B949E] font-mono">⟳ ready</span>
+          </div>
+
+          <!-- Multi-Tool Badges -->
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
+              <span>findymail</span>
+            </div>
+            <div data-tool-badge class="tool-badge px-2 py-0.5 rounded bg-[#161922] border border-[#232836] text-[10px] text-[#9EA7B8] flex items-center space-x-1 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00A3FF]"></span>
+              <span>schema.org</span>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-[#636C7E] font-mono flex items-center justify-between border-t border-[#1C202B] pt-2">
+            <span>Structured Graph Protocol · Level 4</span>
+            <span class="validator-pill text-[#8B949E]" data-validator-status="ready">verified</span>
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- Column 3: Right Inspector Studio -->
-    <section id="v4-right-inspector" data-testid="v4-right-inspector" class="v4-right-inspector md:col-span-5 lg:col-span-5 flex flex-col space-y-4">
-      <div class="cockpit-card bg-zinc-900/70 border border-white/10 rounded-xl p-4 flex-1 flex flex-col justify-between">
+    <!-- ----------------------------------------------------------------------
+         COLUMN 3: RIGHT INSPECTOR STUDIO CANVAS (FLEX-1)
+         ---------------------------------------------------------------------- -->
+    <section id="v4-right-inspector" data-testid="v4-right-inspector" class="v4-right-inspector explee-col-right flex-1 bg-[#08090C] flex flex-col overflow-hidden">
+      
+      <!-- Studio Inner Wrapper -->
+      <div class="flex-1 flex flex-col overflow-y-auto custom-scroll p-6 max-w-4xl w-full mx-auto space-y-4">
         
-        <div>
-          <!-- Inspector Header -->
-          <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-            <div class="flex items-center space-x-2">
-              <h2 data-testid="inspector-target-title" data-inspector-target="/llms.txt" class="text-xs font-mono font-semibold text-white">/llms.txt</h2>
-              <span data-testid="inspector-format-pill" class="inspector-format-pill text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Markdown (Level 2)</span>
+        <!-- Inspector Entity Header Card -->
+        <div data-testid="inspector-entity-header" class="p-4 rounded-xl bg-[#12151D] border border-[#1E2330] flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="entity-avatar w-10 h-10 rounded-full bg-[#182030] border border-[#293652] flex items-center justify-center font-bold text-white text-sm">
+              AA
             </div>
-            
-            <div class="flex items-center space-x-1.5">
-              <button type="button" data-action="copy-manifest" class="btn-copy-manifest text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-mono transition-all">Copy</button>
-              <button type="button" data-action="download-manifest" class="btn-download-manifest text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-mono transition-all">Download</button>
+            <div>
+              <div class="flex items-center space-x-2">
+                <span data-testid="inspector-target-title" data-inspector-target="/llms.txt" class="font-mono text-xs text-[#00E599] font-semibold">/llms.txt</span>
+                <span class="text-zinc-600">·</span>
+                <h2 class="entity-name text-sm font-semibold text-white">Abdelaziz Alhanaee</h2>
+                <span class="w-4 h-4 rounded bg-[#0A66C2] flex items-center justify-center text-[10px] text-white font-bold">in</span>
+              </div>
+              <p class="entity-role text-xs text-[#8B949E]">Founder & Managing Partner · alhanaee.com</p>
             </div>
           </div>
 
-          <!-- Manifest Code Viewer -->
-          <div data-testid="manifest-code-viewer" class="manifest-code-viewer bg-black/60 border border-white/5 rounded-lg p-3 overflow-x-auto text-xs font-mono text-zinc-300 mb-3">
-            <pre><code># Machine Manifest Spec (AI-Ready)
-> Title: Domain Knowledge Architecture
-> Summary: Curated markdown entrypoint for LLM inference & entity extraction.
-
-## Core Capabilities
-- Entity Hierarchy & Grounding Protocol
-- Verified Citation Matrix (AI-Optimized)
-- Real-time LLM Crawler Directives</code></pre>
-          </div>
-
-          <!-- AEO Diagnostic & Remediation Cards -->
-          <div class="space-y-2 mb-3">
-            <div data-testid="diagnostic-card" class="diagnostic-card p-3 rounded-lg bg-white/5 border border-white/5">
-              <div class="text-xs font-semibold text-emerald-400 mb-1">LLM Visibility & Citation Gap Diagnostic</div>
-              <p class="text-[11px] text-zinc-400">Audits identify unindexed service capabilities. Pre-rendered manifests anchor direct entity citations across LLM response engines.</p>
-            </div>
-            
-            <div data-testid="diagnostic-card" class="diagnostic-card p-3 rounded-lg bg-white/5 border border-white/5">
-              <div class="text-xs font-semibold text-cyan-400 mb-1">Machine Protocol Remediation Action</div>
-              <p class="text-[11px] text-zinc-400">Deploying /llms.txt at domain root ensures crawler ingestion accuracy and eliminates hallucinated entity claims.</p>
-            </div>
+          <div class="flex items-center space-x-2">
+            <span data-testid="inspector-format-pill" class="inspector-format-pill text-[10px] px-2.5 py-1 rounded-full bg-[#00E599]/10 text-[#00E599] border border-[#00E599]/30 font-mono">
+              AI-Ready · Markdown (Level 2)
+            </span>
+            <button type="button" data-action="copy-manifest" class="btn-copy-manifest text-xs px-3 py-1 rounded-lg bg-[#181C26] hover:bg-[#222836] text-[#C5CAD4] border border-[#262E3E] font-mono transition-colors">
+              Copy
+            </button>
+            <button type="button" data-action="download-manifest" class="btn-download-manifest text-xs px-3 py-1 rounded-lg bg-[#181C26] hover:bg-[#222836] text-[#C5CAD4] border border-[#262E3E] font-mono transition-colors">
+              Download
+            </button>
           </div>
         </div>
 
-        <!-- Inspector Action Dock -->
-        <div data-testid="inspector-action-dock" class="inspector-action-dock border-t border-white/10 pt-3 mt-auto flex items-center justify-between gap-2">
-          <button type="button" data-action="deploy-worker" class="btn-deploy-worker w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs py-2 px-3 rounded-lg transition-all flex items-center justify-center space-x-1.5 shadow-sm">
-            <span>Deploy via Cloudflare Worker</span>
-          </button>
+        <!-- Metadata Field Rows (To / Subj) -->
+        <div class="rounded-xl bg-[#12151D] border border-[#1E2330] overflow-hidden text-xs font-mono">
+          <div class="p-3 border-b border-[#1A1F2B] flex items-center space-x-3">
+            <span class="text-[#636C7E] w-10 flex-shrink-0">To</span>
+            <span data-field="meta-to" class="text-white">abdelaziz@alhanaee.com</span>
+          </div>
+          <div class="p-3 flex items-center space-x-3">
+            <span class="text-[#636C7E] w-10 flex-shrink-0">Subj</span>
+            <span data-field="meta-subj" class="text-white font-sans font-medium">Thatworkx x Abdelaziz Alhanaee Law Firm</span>
+          </div>
+        </div>
+
+        <!-- Rich Studio / Message Canvas -->
+        <div data-testid="inspector-studio-body" class="p-6 rounded-xl bg-[#12151D] border border-[#1E2330] text-xs leading-relaxed text-[#D1D5DF] space-y-4 font-sans">
+          <p>Hi Abdelaziz,</p>
+          <p>
+            Saw Abdelaziz Alhanaee Law Firm handles 350+ cases across construction, real estate, and financial crimes in Dubai. With that volume, AI search gaps and email confidentiality can get messy fast.
+          </p>
+          <p>
+            I'm with Thatworkx. We help firms tighten AI visibility and secure client email workflows with compliant legal setups (AI-Optimized citation matrix & Level 1–4 AI-Ready manifests).
+          </p>
+          <p>
+            If useful, reply and I'll send a short outline of where firms usually miss citations and where email risk shows up first.
+          </p>
+          <p class="pt-2 text-[#8B949E]">
+            Best,<br>
+            <span class="text-white font-medium">Thatworkx</span>
+          </p>
+        </div>
+
+        <!-- Pre-rendered Manifest Code Viewer (Dual compatible) -->
+        <div data-testid="manifest-code-viewer" class="manifest-code-viewer rounded-xl bg-[#0D0F15] border border-[#1C212D] p-4 text-xs font-mono text-[#8B949E] overflow-x-auto">
+          <pre class="m-0 text-[11px] leading-relaxed"><code># Machine Manifest Spec (AI-Ready)
+> Title: Thatworkx Solutions
+> Scope: AI-Optimized Web Presence & Legal Workflows
+
+## Core Capabilities
+- Entity Grounding & Knowledge Architecture
+- Verified Citation Matrix for MENA Legal Practice
+- Real-time LLM Crawler Directives (/robots.txt & /llms.txt)</code></pre>
+        </div>
+
+        <!-- Educational Diagnostic Cards -->
+        <div class="grid grid-cols-2 gap-3">
+          <div data-testid="diagnostic-card" class="diagnostic-card p-3.5 rounded-xl bg-[#12151D] border border-[#1E2330]">
+            <div class="text-xs font-semibold text-[#00E599] mb-1">LLM Visibility & Citation Gap Diagnostic</div>
+            <p class="text-[11px] text-[#8B949E] leading-relaxed">Audits identify unindexed service capabilities. Pre-rendered manifests anchor direct entity citations across LLM response engines.</p>
+          </div>
+          
+          <div data-testid="diagnostic-card" class="diagnostic-card p-3.5 rounded-xl bg-[#12151D] border border-[#1E2330]">
+            <div class="text-xs font-semibold text-[#00A3FF] mb-1">Machine Protocol Remediation Action</div>
+            <p class="text-[11px] text-[#8B949E] leading-relaxed">Deploying /llms.txt at domain root ensures crawler ingestion accuracy and eliminates hallucinated entity claims.</p>
+          </div>
         </div>
 
       </div>
+
+      <!-- Inspector Bottom Action Bar Lockup -->
+      <footer data-testid="inspector-footer-bar" class="inspector-action-dock inspector-footer-bar h-16 border-t border-[#1C2029] bg-[#0C0E14] px-6 flex items-center justify-between flex-shrink-0">
+        <div role="button" tabindex="0" aria-label="Settings" class="text-[#636C7E] hover:text-white transition-colors p-2 rounded-lg hover:bg-[#161A22] cursor-pointer">
+          ⚙
+        </div>
+
+
+        <div class="flex items-center space-x-4">
+          <span class="text-[11px] text-[#555E70] font-sans">Click to edit</span>
+          <button type="button" data-action="deploy-worker" class="btn-deploy-worker btn-submit-action bg-[#00E599] hover:bg-[#00FFA3] text-black font-semibold text-xs px-5 py-2.5 rounded-xl transition-all shadow-[0_0_18px_rgba(0,229,153,0.35)] flex items-center space-x-2 active:scale-95">
+            <span>✈</span>
+            <span>Claim $30 credits & send</span>
+          </button>
+        </div>
+      </footer>
+
     </section>
 
   </main>
+
+  <!-- ==========================================================================
+       FLOATING ACCESSORIES
+       ========================================================================== -->
+  <!-- Bottom-Center Notification Banner Pill -->
+  <div data-testid="floating-update-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-[#181C26]/90 backdrop-blur-md border border-[#2D3548] text-xs text-[#CBD1DC] flex items-center space-x-2 shadow-2xl z-50"><span>A new version of Explee is available.</span> <button type="button" class="text-xs font-semibold text-black bg-[#E1E4EA] hover:bg-white px-2.5 py-0.5 rounded-full transition-colors">Refresh</button></div>
+
+  <!-- Bottom-Right Help FAB -->
+  <button data-testid="floating-help-btn" type="button" class="fixed bottom-5 right-5 w-10 h-10 rounded-full bg-[#00E599] text-black font-bold flex items-center justify-center shadow-[0_0_15px_rgba(0,229,153,0.4)] hover:scale-105 active:scale-95 transition-transform z-50">
+    💬
+  </button>
 
   <script src="index.js" type="module"></script>
 </body>

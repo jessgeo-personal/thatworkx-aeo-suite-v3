@@ -7107,6 +7107,65 @@ body, h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.02em;
 }
 
+/* ==========================================================================
+   Explee Cockpit Layout & Design Tokens
+   ========================================================================== */
+
+/* Custom Clean Scrollbars */
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #1F2430;
+  border-radius: 9999px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #2E3648;
+}
+
+/* Timeline Progression Connectors */
+.explee-stepper .step-circle {
+  transition: all 0.2s ease;
+}
+
+.step-capsule-active {
+  box-shadow: 0 0 16px rgba(0, 229, 153, 0.2);
+}
+
+/* Card Transitions */
+.explee-stream-card {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.explee-stream-card:hover {
+  background-color: #161A24;
+}
+
+.explee-stream-card:active {
+  transform: scale(0.99);
+}
+
+.campaign-tile {
+  transition: all 0.15s ease;
+}
+
+.campaign-tile:hover {
+  background-color: #171C26;
+}
+
+.competitor-chip {
+  transition: all 0.15s ease;
+}
+
+.competitor-chip:hover {
+  background-color: #171C26;
+}
+
+
 
 
 
