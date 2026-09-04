@@ -94,7 +94,7 @@
       <!-- ======================================================== -->
       <!-- ZONE A: STREAMLINED MULTI-ROW HEADER BAR                 -->
       <!-- ======================================================== -->
-      <header class="bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
+      <header class="app-header bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
         
         <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-3.5 space-y-3">
           
@@ -112,8 +112,12 @@
               </div>
             </div>
 
+            <!-- Domain input search & Actions -->
             <div class="flex items-center space-x-2.5 flex-shrink-0">
-              <button onclick="toggleScanSimulation()" class="px-4 py-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#e8eaed] hover:text-[#d45d2a] text-sm font-mono font-bold transition active:scale-95 flex items-center space-x-2 shadow-sm">
+              <input type="text" id="cockpit-url-input" class="cockpit-domain-input hidden sm:block px-3 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-white text-xs font-mono focus:border-[#b7410e] outline-none" placeholder="https://example.com" />
+              <button id="cockpit-search-btn" class="domain-search-btn hidden sm:flex px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#bdc1c6] text-xs font-mono font-bold transition">Scan</button>
+
+              <button id="rescan-btn" onclick="toggleScanSimulation()" class="rescan-btn px-4 py-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#e8eaed] hover:text-[#d45d2a] text-sm font-mono font-bold transition active:scale-95 flex items-center space-x-2 shadow-sm">
                 <svg class="w-4 h-4 text-[#d45d2a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 <span>Rescan</span>
               </button>
@@ -132,22 +136,22 @@
               <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-sm font-mono">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
                 <span class="text-[#bdc1c6] text-xs font-semibold">URL:</span>
-                <span id="target-domain-badge" class="font-bold text-white">https://thatworkx.com</span>
+                <span id="current-target-domain" class="cockpit-domain-display font-bold text-white"><span id="target-domain-badge">--</span></span>
               </div>
 
               <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
                 <svg class="w-4 h-4 text-[#bdc1c6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Scanned: <strong id="timestamp-label" class="text-white">Aug 20, 2026 • 11:30 AM IST</strong></span>
+                <span>Scanned: <strong id="timestamp-label" class="text-white">--</strong></span>
               </div>
 
               <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
                 <svg class="w-4 h-4 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                <span>Duration: <strong id="scan-duration-label" class="text-[#38bdf8]">3.8s</strong></span>
+                <span>Duration: <strong id="scan-duration-label" class="text-[#38bdf8]">--</strong></span>
               </div>
 
               <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
                 <svg class="w-4 h-4 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>No. of pages scanned: <strong id="total-pages-label" class="text-white font-bold">24</strong></span>
+                <span>No. of pages scanned: <strong id="total-pages-label" class="text-white font-bold">--</strong></span>
               </div>
             </div>
 
@@ -182,6 +186,9 @@
       <main id="main-workspace-canvas" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative flex flex-col pb-28 scroll-smooth">
         <div class="max-w-[1200px] w-full mx-auto flex-1 flex flex-col">
           
+          <!-- Cockpit Live Error Notification Banner -->
+          <div id="cockpit-error-banner" class="cockpit-error-banner hidden mb-6 p-4 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-200 shadow-2xl font-mono text-sm" role="alert"></div>
+
           <!-- System Failure Alert Banner -->
           <div id="system-failure-banner" class="hidden mb-6 p-5 rounded-3xl bg-[#f59e0b]/15 border-2 border-[#f59e0b] text-[#f59e0b] shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-bounce">
             <div class="flex items-center space-x-3.5">
@@ -222,11 +229,17 @@
               <div id="canvas-score-pill" class="flex items-center space-x-3.5 px-5 py-3 rounded-2xl bg-[#121212] border-2 border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
                 <div class="text-right">
                   <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold leading-none">Diagnostic Score</span>
-                  <span id="canvas-score-value" class="text-3xl font-mono font-black text-[#10b981] leading-tight">78/100</span>
+                  <span id="canvas-score-value" class="health-score-value font-mono font-black text-[#10b981] leading-tight text-3xl"><span id="health-score">--</span></span>
                 </div>
                 <span id="canvas-score-status" class="px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">
-                  OPTIMIZED
+                  UNAUDITED
                 </span>
+              </div>
+
+              <!-- Dual Pillar Score Markers -->
+              <div class="hidden">
+                <span id="ai-optimized-score" class="score-optimized">--</span>
+                <span id="ai-ready-score" class="score-ready">--</span>
               </div>
 
               <!-- Floating Return Anchor -->
@@ -239,13 +252,48 @@
             </div>
           </div>
 
+          <!-- Stage Containers -->
+          <div id="stage-containers" class="space-y-6">
+            <div id="stage-1" data-stage="1" class="stage-container"></div>
+            <div id="stage-2" data-stage="2" class="stage-container"></div>
+            <div id="stage-3" data-stage="3" class="stage-container"></div>
+            <div id="stage-4" data-stage="4" class="stage-container"></div>
+            <div id="stage-5" data-stage="5" class="stage-container"></div>
+            <div id="stage-6" data-stage="6" class="stage-container"></div>
+          </div>
+
           <!-- Dynamic Contextual Canvas Area -->
-          <div id="canvas-body" class="flex-1 flex flex-col">
+          <div id="canvas-body" class="flex-1 flex flex-col mt-6">
             <!-- Educational Pre-rendered Classification Footnotes (Crawler Crawlable) -->
             <div class="sr-only">
               <span>Stages 1-4: AI-Optimized Human Presence &amp; Parity Audits.</span>
               <span>Stage 5: AI-Ready Machine Manifest Hierarchy (llms.txt &amp; ai-context.md).</span>
             </div>
+          </div>
+
+          <!-- Pre-rendered Static FAQ Accordions -->
+          <section class="faq-accordion mt-10 p-6 rounded-2xl bg-[#1a1a1a] border border-[#3c4043]">
+            <h3 class="text-lg font-bold text-white mb-4">Frequently Asked Questions</h3>
+            <div class="space-y-3">
+              <details class="group bg-[#121212] p-4 rounded-xl border border-[#3c4043]">
+                <summary class="font-bold text-white cursor-pointer list-none flex justify-between items-center">
+                  <span>What is AI-Optimized vs AI-Ready?</span>
+                  <span class="text-[#b7410e] transition group-open:rotate-180">▼</span>
+                </summary>
+                <p class="mt-2 text-sm text-[#bdc1c6] leading-relaxed">
+                  AI-Optimized refers to ensuring human-centric web presences have clean crawlability and no bot blocks. AI-Ready refers to implementing machine manifest standards like llms.txt and ai-context.md.
+                </p>
+              </details>
+            </div>
+          </section>
+
+          <!-- In-Page Remediation 3D Details Drawer -->
+          <div id="details-drawer" class="hidden fixed inset-y-0 right-0 w-96 bg-[#1a1a1a] border-l border-[#3c4043] p-6 shadow-2xl z-50 overflow-y-auto">
+            <div class="flex justify-between items-center pb-4 border-b border-[#3c4043]">
+              <h4 class="drawer-title text-base font-bold text-white">In-Page Remediation</h4>
+              <button onclick="closeDrawer()" class="text-[#bdc1c6] hover:text-white font-bold text-lg">✕</button>
+            </div>
+            <div class="drawer-body mt-4 space-y-3 text-sm text-[#bdc1c6]"></div>
           </div>
         </div>
       </main>
