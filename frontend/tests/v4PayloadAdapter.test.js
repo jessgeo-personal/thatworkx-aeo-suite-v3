@@ -168,4 +168,71 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
 
     expect(serialized).not.toMatch(/AI-first/i);
   });
+
+  it('Gate 9: Correctly maps wrapped backend scan response from server.js (res.json with results envelope)', () => {
+    const backendServerPayload = {
+      success: true,
+      status: 'complete',
+      stats: { dailyScansPerformed: 1, dailyHeadlessRunsPerformed: 0, tier: 'AIVisualize Free' },
+      results: {
+        url: 'https://acme-analytics.io',
+        pageDepthCrawled: 3,
+        totalPagesFound: 3,
+        status: {
+          robotsTxtExists: true,
+          llmsTxtExists: false,
+          aiContextExists: false,
+          sitemapExists: true,
+          xRobotsIndexable: true,
+          botPermissions: {
+            gptBot: true,
+            perplexityBot: true,
+            claudeBot: false,
+            googleExtended: false
+          },
+          jsonLdTypes: ['Organization', 'WebSite']
+        },
+        pages: [
+          {
+            route: '/',
+            url: 'https://acme-analytics.io/',
+            wordCount: 1850,
+            contentDensityRatio: 32,
+            schema: { detectedTypes: ['Organization', 'WebSite'], hasAuthorBio: false, graphEntities: 2 }
+          },
+          {
+            route: '/about',
+            url: 'https://acme-analytics.io/about',
+            wordCount: 920,
+            contentDensityRatio: 24,
+            schema: { detectedTypes: ['AboutPage', 'Person'], hasAuthorBio: true, graphEntities: 2 }
+          }
+        ],
+        missingEssentialPages: ['/pricing', '/privacy-policy', '/terms-of-service'],
+        overallScore: 74,
+        pillarScores: { P1: 82, P2: 46, P3: 75, P4: 70 },
+        alerts: [{ type: 'AI_BOT_BLOCKED', severity: 'warning', message: 'Targeted AI crawler blocks detected for: claudeBot, googleExtended.' }]
+      },
+      overallScore: 74,
+      pillarScores: { P1: 82, P2: 46, P3: 75, P4: 70 }
+    };
+
+    const state = mapBackendScanToV4State(backendServerPayload);
+    expect(state.meta.targetUrl).toBe('https://acme-analytics.io');
+    expect(state.meta.status).toBe('complete');
+    expect(state.stage1.crawlers.length).toBeGreaterThanOrEqual(4);
+    expect(state.stage1.crawlers.find(c => c.key === 'gptBot')?.allowed).toBe(true);
+    expect(state.stage1.crawlers.find(c => c.key === 'claudeBot')?.allowed).toBe(false);
+    expect(state.stage2.discoveredCount).toBe(1); // /about
+    expect(state.stage2.missingCount).toBe(4);
+    expect(state.stage3.pages).toHaveLength(2);
+    expect(state.stage3.pages[0].wordCount).toBe(1850);
+    expect(state.stage4.detectedTypes).toContain('Organization');
+    expect(state.stage4.hasAuthorBio).toBe(true);
+    expect(state.stage5.manifests.find(m => m.path === '/robots.txt')?.exists).toBe(true);
+    expect(state.stage5.manifests.find(m => m.path === '/llms.txt')?.exists).toBe(false);
+    expect(state.stage6.overallHealthIndex).toBe(74);
+    expect(state.stage6.aiOptimizedScore).toBe(82);
+    expect(state.stage6.aiReadyScore).toBe(46);
+  });
 });

@@ -3,20 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AEO Diagnostic Cockpit - Deep Raw Scan Inspector</title>
+  <title>AEO Diagnostic Cockpit - Raw Scan Inspection Harness</title>
   <style>
     :root {
       --bg: #090d16;
       --card: #111827;
       --card-alt: #162032;
       --border: #1f2937;
-      --border-focus: #374151;
       --text: #f3f4f6;
       --text-muted: #9ca3af;
-      --text-dim: #6b7280;
       --accent: #10b981;
-      --accent-blue: #3b82f6;
-      --accent-purple: #8b5cf6;
       --danger: #ef4444;
       --warning: #f59e0b;
       --code-bg: #030712;
@@ -46,36 +42,31 @@
     p.subtitle {
       margin: 0;
       color: var(--text-muted);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
     #scan-controls {
       display: flex;
       gap: 12px;
       margin-bottom: 24px;
-      background: var(--card);
-      padding: 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
     }
     #target-url-input {
       flex: 1;
       padding: 12px 16px;
-      background: var(--code-bg);
+      background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 6px;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
     button {
-      padding: 12px 20px;
+      padding: 12px 22px;
       border-radius: 6px;
       border: none;
       font-weight: 600;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       transition: opacity 0.2s ease;
     }
-    button:hover { opacity: 0.9; }
     #fetch-scan-btn {
       background: var(--accent);
       color: #000;
@@ -84,7 +75,7 @@
       background: #374151;
       color: #fff;
     }
-    #rescan-btn:disabled {
+    button:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
@@ -97,94 +88,63 @@
       margin-bottom: 24px;
       font-weight: 500;
     }
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
     .stage-section {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .stage-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-    }
-    .stage-header h2 {
-      margin: 0;
+    .stage-section h2 {
+      margin: 0 0 12px 0;
       font-size: 1.1rem;
       color: var(--accent);
-      letter-spacing: 0.03em;
-    }
-    .source-tag {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
     }
     pre, .output-block {
       background: var(--code-bg);
       padding: 14px;
       border-radius: 6px;
-      border: 1px solid #1f2937;
+      border: 1px solid #111827;
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
-      font-family: inherit;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 0.88rem;
-      line-height: 1.6;
+      color: #e5e7eb;
     }
-    /* Collapsible JSON & Content Drawers */
-    details.drawer {
+    details {
       margin-top: 14px;
       background: var(--card-alt);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 8px 12px;
     }
-    details.drawer summary {
+    summary {
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.86rem;
-      color: var(--accent-blue);
+      color: var(--text-muted);
+      font-size: 0.85rem;
       outline: none;
-      user-select: none;
-      padding: 4px 0;
     }
-    details.drawer summary:hover {
-      color: #93c5fd;
+    summary:hover {
+      color: var(--accent);
     }
-    details.drawer .drawer-content {
+    details pre {
       margin-top: 10px;
-      border-top: 1px solid var(--border);
-      padding-top: 10px;
+      max-height: 400px;
+      overflow-y: auto;
     }
-    /* Sub-cards inside stages */
-    .item-card {
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-    .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .badge-info { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     #error-log-console {
       margin-top: 36px;
       border-top: 1px solid var(--border);
-      padding-top: 20px;
+      padding-top: 18px;
     }
     #error-log-list {
       list-style-type: none;
@@ -194,11 +154,8 @@
       color: #f87171;
     }
     .error-log-entry {
-      padding: 8px 12px;
+      padding: 8px 0;
       border-bottom: 1px solid #1f2937;
-      background: rgba(239, 68, 68, 0.05);
-      border-radius: 4px;
-      margin-bottom: 6px;
     }
   </style>
 </head>
@@ -206,7 +163,7 @@
   <div id="raw-inspector-app">
     <header>
       <h1>AEO Diagnostic Cockpit: Raw Scan Data Harness</h1>
-      <p class="subtitle">Direct Scenario A inspection harness with complete scraped content, markdown, EEAT, manifest, and per-stage JSON trees.</p>
+      <p class="subtitle">Live backend inspection for analyzers, evaluators, crawlers, and manifest pipelines with zero mock fallbacks.</p>
     </header>
 
     <section id="scan-controls">
@@ -218,103 +175,71 @@
     <div id="error-notification-banner" class="hidden" role="alert"></div>
 
     <main id="raw-output-display">
-      <!-- 0. Telemetry -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>0. Metadata & Telemetry</h2>
-          <span class="source-tag">[source: meta]</span>
-        </div>
+        <h2>0. Metadata & Scan Telemetry</h2>
         <div id="meta-telemetry-output" class="output-block">--</div>
-        <details class="drawer">
-          <summary>View Telemetry Raw JSON</summary>
-          <pre id="meta-telemetry-json" class="drawer-content">--</pre>
+        <details>
+          <summary>View Meta & Stats Raw JSON</summary>
+          <pre id="meta-telemetry-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 1 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 1: AI Crawler Bot Allow/Block Matrix</h2>
-          <span class="source-tag">[source: results.capabilities.crawlers]</span>
-        </div>
+        <h2>Stage 1: AI Crawler Bot Permissions (Crawler Service)</h2>
         <div id="stage1-crawlers-output" class="output-block">--</div>
-        <details class="drawer">
+        <details>
           <summary>View Stage 1 Crawlers Raw JSON</summary>
-          <pre id="stage1-crawlers-json" class="drawer-content">--</pre>
+          <pre id="stage1-crawlers-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 2 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 2: Essential Pages (Discovered vs Missing)</h2>
-          <span class="source-tag">[source: results.missingEssentialPages]</span>
-        </div>
+        <h2>Stage 2: Canonical Routes (Discovered vs Missing Essential)</h2>
         <div id="stage2-routes-output" class="output-block">--</div>
-        <details class="drawer">
+        <details>
           <summary>View Stage 2 Routes Raw JSON</summary>
-          <pre id="stage2-routes-json" class="drawer-content">--</pre>
+          <pre id="stage2-routes-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 3 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 3: Crawled Pages, Scraped Content & LLM Markdown</h2>
-          <span class="source-tag">[source: results.pages]</span>
-        </div>
+        <h2>Stage 3: Crawled Pages, Scraped Text & LLM Markdown</h2>
         <div id="stage3-pages-output" class="output-block">--</div>
-        <details class="drawer">
+        <details>
           <summary>View Stage 3 Pages Raw JSON</summary>
-          <pre id="stage3-pages-json" class="drawer-content">--</pre>
+          <pre id="stage3-pages-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 4 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 4: Schema.org Graph & Author E-E-A-T Analyzer Results</h2>
-          <span class="source-tag">[source: results.pages[n].schema & analyzers]</span>
-        </div>
+        <h2>Stage 4: Schema.org Graph & E-E-A-T Trust Signals</h2>
         <div id="stage4-schema-output" class="output-block">--</div>
-        <details class="drawer">
+        <details>
           <summary>View Stage 4 Schema & EEAT Raw JSON</summary>
-          <pre id="stage4-schema-json" class="drawer-content">--</pre>
+          <pre id="stage4-schema-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 5 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 5: Machine Manifest Hierarchy (AI-Ready Files)</h2>
-          <span class="source-tag">[source: results.capabilities.manifests]</span>
-        </div>
+        <h2>Stage 5: Machine Manifest Hierarchy (AI-Ready Directives)</h2>
         <div id="stage5-manifests-output" class="output-block">--</div>
-        <details class="drawer">
+        <details>
           <summary>View Stage 5 Manifests Raw JSON</summary>
-          <pre id="stage5-manifests-json" class="drawer-content">--</pre>
+          <pre id="stage5-manifests-json">--</pre>
         </details>
       </div>
 
-      <!-- Stage 6 -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Stage 6: Health Index & Capability Evaluator Diagnostics</h2>
-          <span class="source-tag">[source: results.capabilities.scores & capabilityEvaluator]</span>
-        </div>
+        <h2>Stage 6: Capability Evaluator, Scores & 32-Capability Matrix</h2>
         <div id="stage6-scores-output" class="output-block">--</div>
-        <details class="drawer">
-          <summary>View Stage 6 Capability Evaluator Raw JSON</summary>
-          <pre id="stage6-scores-json" class="drawer-content">--</pre>
+        <details>
+          <summary>View Stage 6 Capability Matrix & Scores Raw JSON</summary>
+          <pre id="stage6-scores-json">--</pre>
         </details>
       </div>
 
-      <!-- Full Dump -->
       <div class="stage-section">
-        <div class="stage-header">
-          <h2>Complete Payload JSON Dump (Scenario A)</h2>
-          <span class="source-tag">[Full Network Response]</span>
-        </div>
+        <h2>Complete Backend POST /api/scan JSON Envelope</h2>
         <pre id="raw-json-dump">--</pre>
       </div>
     </main>

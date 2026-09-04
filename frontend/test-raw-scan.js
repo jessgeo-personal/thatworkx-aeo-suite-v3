@@ -1,8 +1,7 @@
 /**
  * AEO Suite V3 - Deep Raw Scan Inspection Harness Controller
- * Phase 1 Diagnostic Tool: Scenario A unwrapping, per-stage JSON, markdown & scraped content viewer.
- * Defensive extraction: Safe string/relative URL normalization, null-safe manifest & page handling.
- * Governance: Strictly zero mock fallbacks. Zero occurrences of banned terms.
+ * Phase 1 Diagnostic Tool: Maps live data from crawlerService, parserService, and capabilityEvaluator.
+ * Governance: Strict Dual-Pillar rules ("AI-Optimized" vs "AI-Ready"). Zero mock fallbacks. Zero banned terms.
  */
 
 let currentTargetUrl = '';
@@ -63,6 +62,23 @@ function logInternalError(targetUrl, errorMessage) {
 }
 
 /**
+ * Safely extracts a normalized pathname string from any page representation.
+ */
+function extractPathname(pageItem, baseDomain) {
+  if (!pageItem) return '';
+  const raw = typeof pageItem === 'string' ? pageItem : (pageItem.url || pageItem.route || pageItem.path || '');
+  if (!raw || typeof raw !== 'string') return '';
+
+  const fallbackBase = baseDomain && baseDomain.startsWith('http') ? baseDomain : 'https://example.com';
+  try {
+    const parsed = new URL(raw, fallbackBase);
+    return parsed.pathname.toLowerCase().replace(/\/$/, '') || '/';
+  } catch {
+    return raw.toLowerCase().replace(/\/$/, '') || '/';
+  }
+}
+
+/**
  * Dispatches scan request to POST /api/scan and renders complete diagnostics.
  */
 export async function executeScan(targetUrl) {
@@ -105,28 +121,11 @@ export async function executeScan(targetUrl) {
 }
 
 /**
- * Safely extracts a normalized pathname string from any page representation.
- */
-function extractPathname(pageItem, baseDomain) {
-  if (!pageItem) return '';
-  const raw = typeof pageItem === 'string' ? pageItem : (pageItem.url || pageItem.path || pageItem.loc || '');
-  if (!raw || typeof raw !== 'string') return '';
-
-  const fallbackBase = baseDomain && baseDomain.startsWith('http') ? baseDomain : 'https://dummy-base.local';
-  try {
-    const parsed = new URL(raw, fallbackBase);
-    return parsed.pathname.toLowerCase().replace(/\/$/, '') || '/';
-  } catch {
-    return raw.toLowerCase().replace(/\/$/, '') || '/';
-  }
-}
-
-/**
  * Renders raw backend schema fields with explicit source path labels and per-stage JSON blocks.
  */
 function renderScanData(rawResponse, targetUrl) {
-  // Scenario A: Unpack results wrapper if present
-  const data = rawResponse && rawResponse.results ? rawResponse.results : rawResponse;
+  // Unpack envelope wrapper
+  const data = (rawResponse && rawResponse.results) ? rawResponse.results : (rawResponse || {});
 
   // Complete JSON dump
   const dumpEl = document.getElementById('raw-json-dump');
@@ -137,125 +136,166 @@ function renderScanData(rawResponse, targetUrl) {
   // 0. Telemetry & Meta
   const metaEl = document.getElementById('meta-telemetry-output');
   const metaJsonEl = document.getElementById('meta-telemetry-json');
+  const scanUrl = data.url || data.targetUrl || targetUrl;
+  const scanStatus = data.status?.status || (typeof data.status === 'string' ? data.status : rawResponse.status) || 'complete';
+  const totalPages = data.totalPagesFound || data.scanMetrics?.totalPages || (Array.isArray(data.pages) ? data.pages.length : 0);
+  const totalWords = data.scanMetrics?.totalWords || 0;
+  const depth = data.pageDepthCrawled ?? 'N/A';
+  const tier = rawResponse.stats?.tier || 'Standard';
+
   if (metaEl) {
-    metaEl.textContent = `[source: meta] Status: ${data.status || 'unknown'} | Target: ${data.targetUrl || targetUrl} | Timestamp: ${data.timestamp || new Date().toISOString()}`;
+    metaEl.textContent = [
+      `[source: meta / results]`,
+      `Target URL: ${scanUrl}`,
+      `Scan Status: ${scanStatus}`,
+      `Crawled Pages Count: ${totalPages}`,
+      `Crawled Total Words: ${totalWords}`,
+      `Crawl Depth: ${depth}`,
+      `Tier: ${tier}`,
+      `Timestamp: ${data.timestamp || new Date().toISOString()}`
+    ].join('\n');
   }
   if (metaJsonEl) {
-    metaJsonEl.textContent = JSON.stringify(
-      {
-        status: data.status,
-        targetUrl: data.targetUrl || targetUrl,
-        timestamp: data.timestamp
-      },
-      null,
-      2
-    );
+    metaJsonEl.textContent = JSON.stringify({
+      targetUrl: scanUrl,
+      status: scanStatus,
+      stats: rawResponse.stats || null,
+      scanMetrics: data.scanMetrics || null,
+      totalPagesFound: data.totalPagesFound,
+      pageDepthCrawled: data.pageDepthCrawled
+    }, null, 2);
   }
 
-  // 1. Stage 1: All Evaluated Bots
+  // 1. Stage 1: AI Crawler Bot Permissions
   const s1El = document.getElementById('stage1-crawlers-output');
   const s1JsonEl = document.getElementById('stage1-crawlers-json');
-  const rawCrawlers = data.capabilities?.crawlers || data.crawlers || {};
-  if (s1El) {
-    const crawlerEntries = Object.entries(rawCrawlers);
-    const crawlerLines = crawlerEntries.map(([bot, info]) => {
-      const allowed = Boolean(info && info.allowed);
-      const status = (info && info.status) || (allowed ? 200 : 403);
-      const state = allowed ? `ALLOWED (${status})` : `BLOCKED (${status})`;
-      const latency = info && info.latencyMs ? ` | Latency: ${info.latencyMs}ms` : '';
-      const matchedRule = info && info.matchedDirective ? ` | Rule: "${info.matchedDirective}"` : '';
-      return `• ${bot}: ${state}${latency}${matchedRule}`;
-    });
 
-    s1El.textContent =
-      `[source: results.capabilities.crawlers]\n` +
-      `Evaluated Bots Count: ${crawlerEntries.length}\n\n` +
-      (crawlerLines.length > 0 ? crawlerLines.join('\n') : 'No crawler bots evaluated in payload.');
+  const rawCrawlers =
+    data.status?.botPermissions ||
+    data.capabilities?.crawlers ||
+    data.capabilities?.crawlerRadar ||
+    data.crawlers ||
+    {};
+
+  if (s1El) {
+    let crawlerLines = [];
+    let count = 0;
+
+    if (Array.isArray(rawCrawlers)) {
+      count = rawCrawlers.length;
+      crawlerLines = rawCrawlers.map((item) => {
+        const name = item.name || item.bot || 'Unknown Bot';
+        const allowed = item.allowed ?? (item.status === 200 || !item.blocked);
+        const statusCode = item.statusCode || item.status || (allowed ? 200 : 403);
+        return `• ${name}: ${allowed ? 'ALLOWED' : 'BLOCKED'} (${statusCode})`;
+      });
+    } else if (typeof rawCrawlers === 'object' && rawCrawlers !== null) {
+      const entries = Object.entries(rawCrawlers);
+      count = entries.length;
+      crawlerLines = entries.map(([bot, info]) => {
+        const isObj = typeof info === 'object' && info !== null;
+        const allowed = isObj ? Boolean(info.allowed ?? (info.status === 200)) : Boolean(info);
+        const status = isObj ? (info.status || (allowed ? 200 : 403)) : (allowed ? 200 : 403);
+        const latency = isObj && info.latencyMs ? ` | Latency: ${info.latencyMs}ms` : '';
+        const rule = isObj && info.matchedDirective ? ` | Rule: "${info.matchedDirective}"` : '';
+        return `• ${bot}: ${allowed ? 'ALLOWED' : 'BLOCKED'} (${status})${latency}${rule}`;
+      });
+    }
+
+    s1El.textContent = [
+      `[source: results.status.botPermissions / results.capabilities.crawlers]`,
+      `Evaluated Bots Count: ${count}`,
+      ``,
+      ...(crawlerLines.length > 0 ? crawlerLines : ['No crawler bots evaluated in payload.'])
+    ].join('\n');
   }
   if (s1JsonEl) {
     s1JsonEl.textContent = JSON.stringify(rawCrawlers, null, 2);
   }
 
-  // 2. Stage 2: Essential Pages (Discovered vs Missing)
+  // 2. Stage 2: Canonical Routes (Discovered vs Missing Essential)
   const s2El = document.getElementById('stage2-routes-output');
   const s2JsonEl = document.getElementById('stage2-routes-json');
   const missing = data.missingEssentialPages || [];
   const crawledPages = Array.isArray(data.pages) ? data.pages : [];
+  const discoveredRoutes = data.discoveredRoutes || [];
 
-  const crawledNormalizedPaths = crawledPages
-    .map((p) => extractPathname(p, targetUrl))
-    .filter(Boolean);
+  const allDetectedPaths = [
+    ...new Set([
+      ...discoveredRoutes.map((r) => extractPathname(r, targetUrl)),
+      ...crawledPages.map((p) => extractPathname(p, targetUrl))
+    ])
+  ].filter(Boolean);
 
   const discoveredEssential = CANONICAL_ESSENTIAL_ROUTES.filter((route) =>
-    crawledNormalizedPaths.some((path) => path === route || path.endsWith(route))
+    allDetectedPaths.some((p) => p === route || p.endsWith(route))
   );
 
   if (s2El) {
     const lines = [
-      `[source: results.missingEssentialPages]`,
+      `[source: results.discoveredRoutes & results.missingEssentialPages]`,
       `--- Canonical Essential Routes Audit ---`,
       `Discovered Essential Routes (${discoveredEssential.length}): ${discoveredEssential.length > 0 ? discoveredEssential.join(', ') : 'None detected'}`,
-      `Missing: ${missing.join(', ') || 'None (all essential canonical routes detected)'}`,
+      `Missing: ${missing.length > 0 ? missing.join(', ') : 'None (all essential canonical routes detected)'}`,
       ``,
-      `--- All Crawled Routes Detected (${crawledPages.length}) ---`,
-      ...crawledPages.map((p) => {
-        const urlStr = typeof p === 'string' ? p : (p?.url || p?.path || 'Unknown URL');
-        const statusCode = typeof p === 'object' ? (p?.status || 200) : 200;
-        return `• ${urlStr} (Status: ${statusCode})`;
-      })
+      `--- All Crawled Routes Detected (${allDetectedPaths.length}) ---`,
+      ...allDetectedPaths.map((p) => `• ${p}`)
     ];
     s2El.textContent = lines.join('\n');
   }
   if (s2JsonEl) {
-    s2JsonEl.textContent = JSON.stringify(
-      {
-        discoveredEssentialRoutes: discoveredEssential,
-        missingEssentialPages: missing,
-        allCrawledPages: crawledPages.map((p) => ({
-          url: typeof p === 'string' ? p : (p?.url || p?.path || 'N/A'),
-          status: typeof p === 'object' ? (p?.status || 200) : 200
-        }))
-      },
-      null,
-      2
-    );
+    s2JsonEl.textContent = JSON.stringify({
+      discoveredEssentialRoutes: discoveredEssential,
+      missingEssentialPages: missing,
+      allDetectedPaths,
+      rawDiscoveredRoutes: discoveredRoutes
+    }, null, 2);
   }
 
-  // 3. Stage 3: Crawled Pages, Scraped Text & LLM Markdown
+  // 3. Stage 3: Crawled Pages, Scraped Content & LLM Markdown
   const s3El = document.getElementById('stage3-pages-output');
   const s3JsonEl = document.getElementById('stage3-pages-json');
+
   if (s3El) {
     if (crawledPages.length === 0) {
       s3El.textContent = `[source: results.pages]\nNo crawled pages returned.`;
     } else {
       const pageSections = crawledPages.map((p, idx) => {
         const isObj = typeof p === 'object' && p !== null;
-        const pageUrl = isObj ? (p.url || p.path || `Page ${idx + 1}`) : String(p);
-        const ratio = isObj ? Math.round((Number(p.textCodeRatio || p.textToCodeRatio) || 0) * 100) : 0;
-        const headings = isObj && p.headings
-          ? `H1: ${p.headings.h1?.length || 0} | H2: ${p.headings.h2?.length || 0} | H3: ${p.headings.h3?.length || 0}`
-          : 'Headings: N/A';
+        const route = isObj ? (p.route || p.url || `Page ${idx + 1}`) : String(p);
+        const words = isObj ? (p.wordCount || 0) : 0;
+        const ratio = isObj ? Math.round((Number(p.textCodeRatio || data.status?.contentDensityRatio) || 0) * 100) : 0;
+        const title = isObj ? (p.title || 'N/A') : 'N/A';
+        const desc = isObj ? (p.metaDescription || p.description || 'N/A') : 'N/A';
+
+        let headingsStr = 'Headings: N/A';
+        if (isObj && p.headingAudit) {
+          headingsStr = `H1: ${p.headingAudit.h1 ?? 0} | H2: ${p.headingAudit.h2 ?? 0} | Hierarchy Valid: ${p.headingAudit.isHierarchyValid ? 'Yes' : 'No'}`;
+        } else if (isObj && Array.isArray(p.headings)) {
+          headingsStr = `Headings Count: ${p.headings.length}`;
+        }
 
         const scrapedText = isObj
-          ? (p.content || p.textContent || p.text || p.rawContent || '[No body text captured]')
+          ? (p.content || p.rawText || p.bodySnippet || data.scrapedContentPreview || '[No body text captured]')
           : '[Content not available]';
 
         const markdown = isObj
-          ? (p.markdown || p.markdownContent || p.md || '[No markdown version generated by crawler]')
+          ? (p.markdown || p.rawText || p.content || '[Markdown not available]')
           : '[Markdown not available]';
 
         return [
           `================================================================================`,
-          `Page ${idx + 1}: ${pageUrl} - Words: ${isObj ? (p.wordCount || 0) : 0} | Ratio: ${ratio}%`,
-          `Title: ${isObj ? (p.title || 'N/A') : 'N/A'}`,
-          `Description: ${isObj ? (p.description || p.metaDescription || 'N/A') : 'N/A'}`,
-          `Structure: ${headings}`,
+          `Page ${idx + 1}: ${route} - Words: ${words} | Ratio: ${ratio}%`,
+          `Title: ${title}`,
+          `Description: ${desc}`,
+          `Structure: ${headingsStr}`,
+          `Canonical: ${p.hasCanonical ? p.canonicalUrl : 'None'}`,
           `--------------------------------------------------------------------------------`,
           `[SCRAPED PLAIN-TEXT CONTENT PREVIEW]:`,
-          scrapedText.slice(0, 1500) + (scrapedText.length > 1500 ? '\n... [content truncated for display]' : ''),
+          scrapedText.slice(0, 1200) + (scrapedText.length > 1200 ? '\n... [truncated]' : ''),
           `--------------------------------------------------------------------------------`,
           `[LLM MARKDOWN VERSION]:`,
-          markdown.slice(0, 2000) + (markdown.length > 2000 ? '\n... [markdown truncated for display]' : '')
+          markdown.slice(0, 1500) + (markdown.length > 1500 ? '\n... [truncated]' : '')
         ].join('\n');
       });
 
@@ -266,128 +306,146 @@ function renderScanData(rawResponse, targetUrl) {
     s3JsonEl.textContent = JSON.stringify(crawledPages, null, 2);
   }
 
-  // 4. Stage 4: Schema.org Graph & E-E-A-T Analyzers
+  // 4. Stage 4: Schema.org Graph & E-E-A-T Trust Signals
   const s4El = document.getElementById('stage4-schema-output');
   const s4JsonEl = document.getElementById('stage4-schema-json');
+
+  const jsonLdTypes = data.status?.jsonLdTypes || [];
+  const jsonLdExists = Boolean(data.status?.jsonLdExists ?? jsonLdTypes.length > 0);
+  const eeat = data.eeatMetrics || {};
+
   if (s4El) {
-    const allDetectedTypes = [
-      ...new Set(
-        crawledPages.flatMap((p) => (typeof p === 'object' && p?.schema?.detectedTypes) || [])
-      )
+    const pageTypes = [
+      ...new Set([
+        ...jsonLdTypes,
+        ...crawledPages.flatMap((p) => (typeof p === 'object' && p?.schema?.detectedTypes) || [])
+      ])
     ];
-    const hasAuthorBio = crawledPages.some(
-      (p) => typeof p === 'object' && (p?.schema?.hasAuthorBio === true || p?.eeat?.hasAuthorBio === true)
+
+    const hasAuthorBio = Boolean(
+      crawledPages.some((p) => p?.schema?.hasAuthorBio === true || p?.eeat?.hasAuthorBio === true) ||
+      eeat.hasAuthorBio
     );
 
-    const pageSchemas = crawledPages.map((p, idx) => {
-      const isObj = typeof p === 'object' && p !== null;
-      const pageUrl = isObj ? (p.url || p.path || `Page ${idx + 1}`) : String(p);
-      const types = isObj && p.schema?.detectedTypes ? p.schema.detectedTypes : [];
-      const author = isObj ? (p.schema?.author || p.eeat?.author || 'Not specified') : 'Not specified';
-      const trustSignals = isObj ? (p.eeat?.trustSignals || p.schema?.trustSignals || []) : [];
-      const jsonLdBlocks = isObj ? (p.schema?.rawJsonLd?.length || (types.length ? 1 : 0)) : 0;
-
-      return [
-        `Page ${idx + 1}: ${pageUrl}`,
-        `• Detected Types: ${types.join(', ') || 'None detected'}`,
-        `• Author Bio Credential: ${isObj && (p.schema?.hasAuthorBio || p.eeat?.hasAuthorBio) ? 'DETECTED' : 'MISSING'} (Author: ${JSON.stringify(author)})`,
-        `• Trust Signals: ${Array.isArray(trustSignals) ? trustSignals.join(', ') : JSON.stringify(trustSignals)}`,
-        `• Raw JSON-LD Blocks Found: ${jsonLdBlocks}`
-      ].join('\n');
-    });
-
     s4El.textContent = [
-      `[source: results.pages[n].schema]`,
-      `Aggregate Types Detected: ${allDetectedTypes.join(', ') || 'None detected'}`,
-      `Author Bio Entity Detected: ${hasAuthorBio}`,
+      `[source: results.status.jsonLdTypes & results.eeatMetrics]`,
+      `JSON-LD Structured Data: ${jsonLdExists ? 'EXISTS' : 'NOT FOUND'}`,
+      `Detected Types: ${pageTypes.length > 0 ? pageTypes.join(', ') : 'None detected'}`,
+      `Author Bio Entity Detected: ${hasAuthorBio ? 'true' : 'false'}`,
       ``,
-      `--- Per-Page Schema.org & E-E-A-T Analyzer Findings ---`,
-      pageSchemas.length > 0 ? pageSchemas.join('\n\n') : 'No page schema data available.'
+      `--- E-E-A-T Trust & Credibility Signals ---`,
+      `• SSL / Secure Protocol: ${eeat.isSecure ? 'SECURE (HTTPS)' : 'INSECURE'}`,
+      `• Contact Information Present: ${eeat.hasContactInfo ? 'YES' : 'MISSING'}`,
+      `• Privacy Policy Linked: ${eeat.hasPrivacyPolicy ? 'YES' : 'MISSING'}`,
+      `• Authority Status: ${eeat.authorityStatus || 'Unrated'}`,
+      `• Experience Rating: ${data.status?.experienceScore ?? 'N/A'}`,
+      `• Readability Rating: ${data.status?.readabilityRating || 'N/A'}`,
+      `• Content Density Ratio: ${data.status?.contentDensityRatio ?? 'N/A'}%`
     ].join('\n');
   }
   if (s4JsonEl) {
-    s4JsonEl.textContent = JSON.stringify(
-      crawledPages.map((p) => ({
-        url: typeof p === 'object' ? (p?.url || p?.path || 'N/A') : String(p),
-        schema: typeof p === 'object' ? p?.schema : null,
-        eeat: typeof p === 'object' ? p?.eeat : null
-      })),
-      null,
-      2
-    );
+    s4JsonEl.textContent = JSON.stringify({
+      jsonLdExists,
+      jsonLdTypes,
+      eeatMetrics: eeat,
+      pageSchemas: crawledPages.map((p) => ({ route: p.route || p.url, schema: p.schema || null }))
+    }, null, 2);
   }
 
-  // 5. Stage 5: All Manifest Files Under Manifest Hierarchy
+  // 5. Stage 5: Machine Manifest Hierarchy (AI-Ready Directives)
   const s5El = document.getElementById('stage5-manifests-output');
   const s5JsonEl = document.getElementById('stage5-manifests-json');
-  const rawManifests = data.capabilities?.manifests || data.manifests || {};
-  if (s5El) {
-    const manifestEntries = Object.entries(rawManifests);
-    const manifestLines = manifestEntries.map(([key, info]) => {
-      const isObj = typeof info === 'object' && info !== null;
-      const exists = isObj ? Boolean(info.exists) : Boolean(info);
-      const status = isObj ? (info.status || (exists ? 200 : 404)) : (exists ? 200 : 404);
-      const statusText = exists ? `${status} OK` : `${status} NOT FOUND`;
-      const size = isObj && info.sizeBytes ? ` (${info.sizeBytes} bytes)` : '';
-      const snippet = isObj && info.snippet ? `\n    Snippet: "${info.snippet.replace(/\n/g, ' ')}"` : '';
-      const pathLabel = isObj && info.path ? info.path : key;
-      return `• /${pathLabel.replace(/^\//, '')}: ${statusText}${size}${snippet}`;
-    });
 
-    const hasRobotsLine = manifestLines.some((l) => l.includes('robots.txt'));
-    const hasLlmsLine = manifestLines.some((l) => l.includes('llms.txt'));
+  const statusObj = data.status || {};
+  const previews = data.manifestPreviews || {};
+
+  const manifestMap = [
+    { path: '/robots.txt', exists: Boolean(statusObj.robotsTxtExists ?? data.capabilities?.manifests?.robotsTxt?.exists), preview: previews.robotsTxt },
+    { path: '/sitemap.xml', exists: Boolean(statusObj.sitemapExists ?? data.capabilities?.manifests?.sitemapXml?.exists), preview: previews.sitemap },
+    { path: '/llms.txt', exists: Boolean(statusObj.llmsTxtExists ?? data.capabilities?.manifests?.llmsTxt?.exists), preview: previews.llmsTxt },
+    { path: '/ai-context.md', exists: Boolean(statusObj.aiContextExists ?? data.capabilities?.manifests?.aiContextMd?.exists), preview: previews.aiContext },
+    { path: '/about.txt', exists: Boolean(statusObj.aboutTxtExists), preview: null },
+    { path: '/docs.txt', exists: Boolean(statusObj.docsTxtExists), preview: null },
+    { path: '/content.txt', exists: Boolean(statusObj.contentTxtExists), preview: null }
+  ];
+
+  if (s5El) {
+    const lines = manifestMap.map((m) => {
+      const statusText = m.exists ? '200 OK' : '404 NOT FOUND';
+      const snippet = m.preview ? `\n    Content Preview: "${String(m.preview).slice(0, 100).replace(/\n/g, ' ')}..."` : '';
+      return `• ${m.path}: ${statusText}${snippet}`;
+    });
 
     s5El.textContent = [
       `[source: results.capabilities.manifests] AI-Ready Manifests:`,
-      `Total Manifest Directives Checked: ${manifestEntries.length}`,
-      ...(manifestLines.length > 0 ? manifestLines : []),
-      ...(!hasRobotsLine ? [`/robots.txt: ${rawManifests.robotsTxt?.exists ? '200 OK' : '404 NOT FOUND'}`] : []),
-      ...(!hasLlmsLine ? [`/llms.txt: ${rawManifests.llmsTxt?.exists ? '200 OK' : '404 NOT FOUND'}`] : [])
+      `Total Manifest Directives Checked: ${manifestMap.length}`,
+      ...lines
     ].join('\n');
   }
   if (s5JsonEl) {
-    s5JsonEl.textContent = JSON.stringify(rawManifests, null, 2);
+    s5JsonEl.textContent = JSON.stringify({
+      manifestPresence: statusObj,
+      manifestPreviews: previews,
+      capabilitiesManifests: data.capabilities?.manifests || null
+    }, null, 2);
   }
 
-  // 6. Stage 6: All Results from capabilityEvaluator.js
+  // 6. Stage 6: Capability Evaluator, Scores & 32-Capability Matrix
   const s6El = document.getElementById('stage6-scores-output');
   const s6JsonEl = document.getElementById('stage6-scores-json');
-  const scores = data.capabilities?.scores || data.scores || {};
-  const rawFlags = scores.triageFlags || scores.actionItems || [];
-  const flags = Array.isArray(rawFlags) ? rawFlags : Object.values(rawFlags);
+
+  const scoreCard = data.scoreCard || {};
+  const overall = data.overallScore ?? scoreCard.overallScore ?? data.capabilities?.scores?.overallHealthIndex ?? 0;
+  const pScores = data.pillarScores || scoreCard.pillars || {};
+
+  const p1 = Number(pScores.P1 ?? pScores.p1?.score ?? data.capabilities?.scores?.aiOptimizedScore ?? 0);
+  const p2 = Number(pScores.P2 ?? pScores.p2?.score ?? 0);
+  const p3 = Number(pScores.P3 ?? pScores.p3?.score ?? 0);
+  const p4 = Number(pScores.P4 ?? pScores.p4?.score ?? data.capabilities?.scores?.aiReadyScore ?? 0);
+
+  const capMatrix = Array.isArray(data.capabilityMatrix) ? data.capabilityMatrix : (rawResponse.capabilityMatrix || []);
+  const alerts = data.alerts || data.capabilities?.scores?.triageFlags || [];
 
   if (s6El) {
-    const scoreLines = [
+    const matrixLines = capMatrix.slice(0, 15).map((cap, i) => {
+      const name = cap.name || cap.title || `Capability ${i + 1}`;
+      const score = cap.score ?? cap.value ?? 'N/A';
+      const status = cap.status ? ` [${cap.status}]` : '';
+      return `  ${i + 1}. ${name}: ${score}${status}`;
+    });
+
+    s6El.textContent = [
       `[source: results.capabilities.scores]`,
       `--- Composite & Dual-Pillar Scores ---`,
-      `Health Index: ${scores.overallHealthIndex || scores.healthIndex || 0}/100`,
-      `AI-Optimized (Crawlability): ${scores.aiOptimizedScore || 0}/100`,
-      `AI-Ready (Manifests): ${scores.aiReadyScore || 0}/100`,
+      `Health Index: ${overall}/100`,
+      `AI-Optimized (Crawlability): ${p1}/100`,
+      `AI-Ready (Manifests): ${p4}/100`,
       ``,
-      `--- Sub-Pillar Capability Breakdown ---`,
-      `• Crawlability Index: ${scores.crawlabilityScore ?? 'N/A'}/100`,
-      `• Content & Semantic Quality: ${scores.contentQualityScore ?? 'N/A'}/100`,
-      `• Knowledge Graph / Schema Index: ${scores.schemaScore ?? 'N/A'}/100`,
-      `• Machine Manifest Alignment: ${scores.manifestScore ?? 'N/A'}/100`,
-      `• E-E-A-T Source Credibility: ${scores.eeatScore ?? 'N/A'}/100`,
+      `--- 4-Pillar Score Breakdown ---`,
+      `• Pillar 1 (AI Crawlability & Indexing): ${p1}/100`,
+      `• Pillar 2 (Content & Architecture): ${p2}/100`,
+      `• Pillar 3 (Authority & E-E-A-T): ${p3}/100`,
+      `• Pillar 4 (AI Context & Machine Manifests): ${p4}/100`,
       ``,
-      `--- High-Impact Triage Flags & Remediation Warnings (${flags.length}) ---`,
-      ...(flags.length > 0
-        ? flags.map((f, i) => `${i + 1}. ${typeof f === 'string' ? f : f.title || JSON.stringify(f)}`)
+      `--- Evaluated Capability Matrix (${capMatrix.length} Total Capabilities) ---`,
+      ...(matrixLines.length > 0 ? matrixLines : ['No capability matrix entries returned.']),
+      ...(capMatrix.length > 15 ? [`  ... [${capMatrix.length - 15} additional capabilities in JSON drawer]`] : []),
+      ``,
+      `--- High-Impact Triage Warnings (${alerts.length}) ---`,
+      ...(alerts.length > 0
+        ? alerts.map((a, i) => `${i + 1}. ${typeof a === 'string' ? a : a.title || a.message || JSON.stringify(a)}`)
         : ['No active triage flags registered.'])
-    ];
-    s6El.textContent = scoreLines.join('\n');
+    ].join('\n');
   }
   if (s6JsonEl) {
-    s6JsonEl.textContent = JSON.stringify(
-      {
-        capabilities: data.capabilities,
-        scores: scores,
-        triageMatrix: flags
-      },
-      null,
-      2
-    );
+    s6JsonEl.textContent = JSON.stringify({
+      overallScore: overall,
+      pillarScores: pScores,
+      scoreCard,
+      alerts,
+      totalCapabilitiesEvaluated: capMatrix.length,
+      capabilityMatrix: capMatrix
+    }, null, 2);
   }
 }
 
