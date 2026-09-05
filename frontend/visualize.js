@@ -541,7 +541,7 @@ export function navigateToStep(stepNum) {
   renderStageFromState(stepNum, cockpitState);
 
   const canvas = document.getElementById('main-workspace-canvas');
-  if (canvas) {
+  if (canvas && typeof canvas.scrollTo === 'function') {
     canvas.scrollTo({ top: 0, behavior: 'instant' });
   }
 }
@@ -629,25 +629,49 @@ function renderStepper() {
 
   STAGE_MATRIX.forEach((stage, idx) => {
     const isCompleted = cockpitState.completedSteps.includes(stage.step);
+    const isScanning = cockpitState.scanningStep === stage.step;
     const isCurrent = cockpitState.currentStep === stage.step;
 
     const btn = document.createElement('button');
-    btn.className = `stepper-pill flex items-center px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold transition ${
-      isCurrent ? 'bg-[#b7410e] text-white shadow-lg' : isCompleted ? 'bg-[#1f1f1f] text-[#38bdf8]' : 'bg-[#121212] text-[#bdc1c6]'
-    }`;
-    btn.innerHTML = `
-      <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black mr-2 ${
-        isCurrent ? 'bg-black text-[#d45d2a]' : 'bg-[#181818] text-[#e8eaed]'
-      }">${stage.step}</span>
-      <span>${stage.shortTitle}</span>
-    `;
+    btn.title = `${stage.shortTitle} (${stage.classification})`;
     btn.onclick = () => navigateToStep(stage.step);
+
+    let btnClasses = "stepper-pill flex items-center px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold relative cursor-pointer ";
+
+    if (isCurrent) {
+      btnClasses += "is-active ";
+      btnClasses += stage.step === 5 
+        ? "bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] scale-105 " 
+        : "bg-[#b7410e] text-white shadow-[0_0_20px_rgba(183,65,14,0.6)] scale-105 ";
+    } else if (isScanning) {
+      btnClasses += "is-scanning border-2 border-[#b7410e] text-[#d45d2a] bg-[#b7410e]/20 ";
+    } else if (isCompleted || cockpitState.isAudited) {
+      btnClasses += "bg-[#1f1f1f] border border-[#3c4043] text-[#e8eaed] hover:border-[#b7410e]/60 hover:text-white ";
+    } else {
+      btnClasses += "opacity-35 cursor-not-allowed bg-[#121212] text-[#bdc1c6] border border-transparent ";
+    }
+
+    btn.className = btnClasses;
+    btn.innerHTML = `
+      <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${
+        isCurrent
+          ? (stage.step === 5 ? 'bg-black text-indigo-300' : 'bg-black text-[#d45d2a]')
+          : (isCompleted ? 'bg-[#121212] text-[#38bdf8]' : 'bg-[#121212] text-[#bdc1c6]')
+      }">
+        ${isScanning ? '●' : stage.step}
+      </span>
+      <span class="stepper-label text-xs font-bold font-headline truncate">${stage.shortTitle}</span>
+    `;
     container.appendChild(btn);
 
     if (idx < STAGE_MATRIX.length - 1) {
-      const line = document.createElement('div');
-      line.className = 'w-3 sm:w-4 h-0.5 bg-[#3c4043]';
-      container.appendChild(line);
+      const conduit = document.createElement('div');
+      conduit.className = `w-2.5 sm:w-4 lg:w-5 h-0.5 flex-shrink-0 ${
+        cockpitState.completedSteps.includes(stage.step + 1) || cockpitState.isAudited
+          ? 'bg-[#b7410e]/60'
+          : 'bg-[#3c4043]'
+      }`;
+      container.appendChild(conduit);
     }
   });
 }
@@ -674,39 +698,27 @@ export function renderStageFromState(stepNum, state) {
   const descEl = document.getElementById('canvas-stage-desc');
   if (descEl) descEl.innerText = stageMeta.desc;
 
-  // 2. Synchronize Diagnostic Score Pill
+  // 2. Synchronize Diagnostic Score Pill (Hidden on Stages 1-5 to match clean prototype)
   const scorePill = document.getElementById('canvas-score-pill');
   const scoreVal = document.getElementById('canvas-score-value');
   const scoreStatus = document.getElementById('canvas-score-status');
 
-  if (scorePill && scoreVal && scoreStatus) {
-    scorePill.classList.remove('hidden');
-
-    if (!state.isAudited) {
-      scoreVal.innerText = '--';
-      scoreStatus.innerText = 'UNAUDITED';
-      scoreStatus.className = 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#121212] text-[#bdc1c6] border border-[#3c4043]';
-    } else if (stepNum === 6) {
+  if (scorePill) {
+    if (stepNum === 6 && state.isAudited) {
+      scorePill.classList.remove('hidden');
+      scorePill.style.display = 'flex';
       const hScore = state.healthIndex ?? state.summary?.healthScore ?? 0;
-      scoreVal.innerText = `${hScore}/100`;
-      scoreStatus.innerText = hScore >= 80 ? 'OPTIMIZED' : 'NEEDS ATTENTION';
-      scoreStatus.className = hScore >= 80
-        ? 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
-        : 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40';
-    } else if (stepNum === 1) {
-      const crawlers = state.stage1?.crawlers || [];
-      const allowed = crawlers.filter(c => c.allowed).length;
-      const pct = crawlers.length > 0 ? Math.round((allowed / crawlers.length) * 100) : 100;
-      scoreVal.innerText = `${pct}%`;
-      scoreStatus.innerText = pct === 100 ? 'PASS' : (pct >= 75 ? 'WARN' : 'FAIL');
-      scoreStatus.className = pct === 100
-        ? 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
-        : 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40';
+      if (scoreVal) scoreVal.innerText = `${hScore}/100`;
+      if (scoreStatus) {
+        scoreStatus.innerText = hScore >= 80 ? 'OPTIMIZED' : 'NEEDS ATTENTION';
+        scoreStatus.className = hScore >= 80
+          ? 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
+          : 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40';
+      }
     } else {
-      const sScore = state[`stage${stepNum}`]?.score || state.sections?.[stepNum]?.score || '--';
-      scoreVal.innerText = sScore;
-      scoreStatus.innerText = 'ACTIVE';
-      scoreStatus.className = 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40';
+      // Hide on Stages 1 through 5 — Eliminates clutter and duplication
+      scorePill.classList.add('hidden');
+      scorePill.style.display = 'none';
     }
   }
 

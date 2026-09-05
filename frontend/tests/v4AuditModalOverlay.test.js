@@ -8,7 +8,7 @@ describe('Audit Progress Modal Overlay & New Scan Flow Suite', () => {
     document.body.innerHTML = `
       <input id="target-url-input" type="text" value="https://thatworkx.com" />
       <button id="cockpit-search-btn">Scan</button>
-      <button id="new-scan-btn">New Scan</button>
+      <button id="rescan-btn">Rescan</button>
       <div id="cockpit-error-banner" class="hidden">
         <span id="cockpit-error-message"></span>
       </div>
@@ -62,9 +62,13 @@ describe('Audit Progress Modal Overlay & New Scan Flow Suite', () => {
     expect(modal.style.display).toBe('none');
   });
 
-  it('New Scan Trigger: handleCockpitNewScan prompts for URL and executes scan with modal', async () => {
+  it('Live Search Trigger: entering URL and clicking Scan executes scan with modal', async () => {
     const mod = await import('../visualize.js?t=' + Date.now());
-    window.prompt.mockReturnValueOnce('https://apple.com');
+    mod.initCockpit();
+
+    const input = document.getElementById('target-url-input');
+    const searchBtn = document.getElementById('cockpit-search-btn');
+    input.value = 'https://apple.com';
 
     fetch.mockResolvedValueOnce({
       ok: true,
@@ -72,11 +76,14 @@ describe('Audit Progress Modal Overlay & New Scan Flow Suite', () => {
       json: async () => ({ targetUrl: 'https://apple.com', overallScore: 90, pages: [] })
     });
 
-    mod.handleCockpitNewScan();
+    searchBtn.click();
 
     const modal = document.getElementById('audit-progress-modal');
     expect(modal.style.display).toBe('flex');
-    expect(document.getElementById('target-url-input').value).toBe('https://apple.com');
-    expect(fetch).toHaveBeenCalledWith('/api/scan', expect.anything());
+    expect(document.getElementById('modal-target-display').innerText).toBe('https://apple.com');
+    expect(fetch).toHaveBeenCalledWith('/api/scan', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ targetUrl: 'https://apple.com', email: '' })
+    }));
   });
 });
