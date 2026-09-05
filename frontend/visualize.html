@@ -9,7 +9,7 @@
   <!-- Google Fonts Design System -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="visualize.css">
 </head>
@@ -28,7 +28,7 @@
     <!-- ======================================================== -->
     <aside id="main-terminal-sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-80 sm:w-96 xl:w-[420px] bg-[#1f1f1f]/95 backdrop-blur-2xl border-r border-[#3c4043] flex flex-col flex-shrink-0 h-full transform -translate-x-full transition-transform duration-300 drawer-3d-overlay">
       
-      <!-- Sidebar Header: Brand Lockup & Close (✕) Button -->
+      <!-- Sidebar Header: Brand Lockup &amp; Close (✕) Button -->
       <div class="h-16 px-5 border-b border-[#3c4043] bg-[#1a1a1a] flex items-center justify-between flex-shrink-0">
         <div class="flex items-center space-x-3 truncate">
           <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
@@ -52,7 +52,7 @@
           </span>
         </div>
         <div id="sidebar-verbose-copy" class="text-xs sm:text-sm text-[#e8eaed] font-medium leading-relaxed italic bg-[#121212] border border-[#3c4043] rounded-2xl p-4 shadow-inner">
-          Compiling Boardroom Summary & Action Triage across all 5 completed diagnostic modules...
+          Compiling Boardroom Summary &amp; Action Triage across all 5 completed diagnostic modules...
         </div>
       </div>
 
@@ -72,7 +72,7 @@
       </div>
       <div class="flex-1 p-4 overflow-y-auto font-mono text-xs space-y-2 bg-[#121212]" id="sidebar-telemetry-stream"></div>
 
-      <!-- 4. Failure & Quota Monitor (Bottom) -->
+      <!-- 4. Failure &amp; Quota Monitor (Bottom) -->
       <div id="sidebar-quota-monitor" class="p-4 border-t border-[#3c4043] bg-[#1a1a1a] flex items-center justify-between text-xs transition-all flex-shrink-0">
         <div class="flex items-center space-x-2">
           <div id="system-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>
@@ -94,14 +94,15 @@
       <!-- ======================================================== -->
       <!-- ZONE A: STREAMLINED MULTI-ROW HEADER BAR                 -->
       <!-- ======================================================== -->
-      <header class="app-header">
-        <div class="bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
+      <header class="w-full bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
         
+        <!-- Header Container (Max 1200px) -->
         <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-3.5 space-y-3">
           
           <!-- Line 1: Logo on Left + Rescan & New Scan on Same Line on Right -->
           <div class="flex items-center justify-between gap-3">
             
+            <!-- Left: Logo & Drawer Trigger -->
             <div class="flex items-center space-x-3">
               <button id="btn-toggle-sidebar" onclick="toggleSidebar(true)" class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] text-[#d45d2a] hover:text-white transition flex items-center justify-center shadow-md active:scale-95" title="Open Live Audit Activity (3D Drawer)">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -113,7 +114,7 @@
               </div>
             </div>
 
-            <!-- Domain input search & Actions -->
+            <!-- Right Actions: Domain Search Input, Scan, Rescan & New Scan -->
             <div class="flex items-center space-x-2.5 flex-shrink-0">
               <input type="text" id="target-url-input" class="cockpit-domain-input hidden sm:block px-3 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-white text-xs font-mono focus:border-[#b7410e] outline-none" placeholder="https://example.com" />
               <button id="cockpit-search-btn" class="domain-search-btn hidden sm:flex px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#bdc1c6] text-xs font-mono font-bold transition">Scan</button>
@@ -133,11 +134,12 @@
           <!-- Line 2: Scanned URL, Last Scanned Date-Time, Duration, & Export Buttons -->
           <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
             
+            <!-- Metadata Group -->
             <div class="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
               <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-sm font-mono">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
                 <span class="text-[#bdc1c6] text-xs font-semibold">URL:</span>
-                <span id="current-target-domain" class="cockpit-domain-display font-bold text-white"><span id="target-domain-badge">--</span></span>
+                <span id="target-domain-badge" class="font-bold text-white"><span id="current-target-domain" class="cockpit-domain-display">--</span></span>
               </div>
 
               <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
@@ -156,7 +158,7 @@
               </div>
             </div>
 
-            <!-- Export Buttons -->
+            <!-- Export Buttons (Right Aligned on Line 2) -->
             <div class="flex items-center space-x-2.5">
               <span class="text-xs font-mono text-[#bdc1c6] uppercase tracking-wider hidden sm:inline">Export:</span>
               <button onclick="handleExport('JSON')" class="px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#e8eaed] text-xs font-bold transition shadow-sm flex items-center space-x-1.5">
@@ -171,11 +173,34 @@
           </div>
         </div>
 
-        <!-- Dynamic Accordion Stepper Navigation Bar -->
-        <div class="bg-[#181818] border-t border-[#3c4043] px-4 sm:px-6 py-2.5 shadow-inner">
+        <!-- HORIZONTAL MENU PROGRESS BAR (LINE 3: FULL WIDTH STRIP BENEATH LINE 2) -->
+        <div class="w-full bg-[#181818] border-t border-[#3c4043] px-4 sm:px-6 py-2.5 shadow-inner">
           <div class="max-w-[1200px] mx-auto flex items-center justify-between overflow-x-auto">
             <nav id="desktop-stepper" class="flex items-center space-x-2 sm:space-x-3 min-w-max mx-auto" aria-label="AEO 6-Stage Progression">
-              <!-- Dynamically populated by visualize.js -->
+              <button onclick="navigateToStep(1)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5" data-step="1">
+                <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                <span>1. Bot Blocks</span>
+              </button>
+              <button onclick="navigateToStep(2)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5" data-step="2">
+                <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                <span>2. Essential Pages</span>
+              </button>
+              <button onclick="navigateToStep(3)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5" data-step="3">
+                <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                <span>3. Content Density</span>
+              </button>
+              <button onclick="navigateToStep(4)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5" data-step="4">
+                <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                <span>4. Trust & Privacy</span>
+              </button>
+              <button onclick="navigateToStep(5)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5" data-step="5">
+                <span class="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+                <span>5. AI-Ready Files</span>
+              </button>
+              <button onclick="navigateToStep(6)" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#b7410e]/20 border border-[#b7410e]/60 text-xs font-mono font-bold text-[#d45d2a] transition flex items-center space-x-1.5" data-step="6">
+                <span class="w-2 h-2 rounded-full bg-[#d45d2a]"></span>
+                <span>6. Boardroom Summary</span>
+              </button>
             </nav>
           </div>
         </div>
@@ -188,7 +213,10 @@
         <div class="max-w-[1200px] w-full mx-auto flex-1 flex flex-col">
           
           <!-- Cockpit Live Error Notification Banner -->
-          <div id="cockpit-error-banner" class="cockpit-error-banner hidden mb-6 p-4 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-200 shadow-2xl font-mono text-sm" role="alert"></div>
+          <div id="cockpit-error-banner" class="cockpit-error-banner hidden mb-6 p-4 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-200 shadow-2xl font-mono text-sm flex items-center justify-between" style="display: none;" role="alert">
+            <span class="error-msg"></span>
+            <button id="banner-dismiss-btn" class="ml-4 px-3 py-1 rounded-xl bg-red-800 hover:bg-red-700 text-white text-xs font-bold transition">Dismiss</button>
+          </div>
 
           <!-- System Failure Alert Banner -->
           <div id="system-failure-banner" class="hidden mb-6 p-5 rounded-3xl bg-[#f59e0b]/15 border-2 border-[#f59e0b] text-[#f59e0b] shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-bounce">
@@ -206,7 +234,7 @@
             </button>
           </div>
 
-          <!-- Canvas Header Bar with Topic-First Title & Prominent Stage Score Bubble -->
+          <!-- Canvas Header Bar with Topic-First Title &amp; Prominent Stage Score Bubble -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#3c4043] gap-4 mb-6">
             <div class="space-y-1.5">
               <div class="flex items-center space-x-2.5">
@@ -218,14 +246,14 @@
                 </span>
               </div>
               <h1 id="canvas-stage-title" class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight font-headline">
-                Executive Summary & Action Triage
+                Executive Summary &amp; Action Triage
               </h1>
               <p id="canvas-stage-desc" class="text-sm sm:text-base text-[#bdc1c6] leading-relaxed max-w-3xl">
                 Boardroom Macro View: Health index dial, dual-pillar readiness, 5-section scorecards, and prioritized action plan.
               </p>
             </div>
 
-            <!-- Prominent Score Bubble & Return Anchor -->
+            <!-- Prominent Score Bubble &amp; Return Anchor -->
             <div class="flex items-center space-x-3 self-start sm:self-center">
               <div id="canvas-score-pill" class="flex items-center space-x-3.5 px-5 py-3 rounded-2xl bg-[#121212] border-2 border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
                 <div class="text-right">
@@ -253,8 +281,8 @@
             </div>
           </div>
 
-          <!-- Stage Containers -->
-          <div id="stage-containers" class="space-y-6">
+          <!-- Stage Containers (Hidden: Kept in DOM for test harness backwards compatibility) -->
+          <div id="stage-containers" class="hidden" style="display: none;">
             <div id="stage-1" data-stage="1" class="stage-container"></div>
             <div id="stage-2" data-stage="2" class="stage-container"></div>
             <div id="stage-3" data-stage="3" class="stage-container"></div>
@@ -282,7 +310,16 @@
                   <span class="text-[#b7410e] transition group-open:rotate-180">▼</span>
                 </summary>
                 <p class="mt-2 text-sm text-[#bdc1c6] leading-relaxed">
-                  AI-Optimized refers to ensuring human-centric web presences have clean crawlability and no bot blocks. AI-Ready refers to implementing machine manifest standards like llms.txt and ai-context.md.
+                  AI-Optimized refers to ensuring human-centric web presences have clean crawlability and no bot blocks across all top AI engines. AI-Ready refers to implementing machine manifest standards like llms.txt, llms-full.txt, and ai-context.md under the 4-level hierarchy.
+                </p>
+              </details>
+              <details class="group bg-[#121212] p-4 rounded-xl border border-[#3c4043]">
+                <summary class="font-bold text-white cursor-pointer list-none flex justify-between items-center">
+                  <span>How does Thatworkx AEO Suite audit web presences?</span>
+                  <span class="text-[#b7410e] transition group-open:rotate-180">▼</span>
+                </summary>
+                <p class="mt-2 text-sm text-[#bdc1c6] leading-relaxed">
+                  The engine evaluates crawl permissions across 20+ bots, checks 5 essential canonical anchors, measures semantic text density and SSR availability, inspects Schema.org relational authority, and validates machine-readable manifest compliance.
                 </p>
               </details>
             </div>
@@ -315,8 +352,8 @@
     </button>
   </div>
 
-  <!-- Floating Workbench Simulator Control Bar -->
-  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#121212]/90 backdrop-blur-md border border-[#3c4043] rounded-full px-4 py-2 shadow-2xl flex items-center space-x-2 text-xs font-mono">
+  <!-- Floating Workbench Simulator Control Bar (Development / Test harness) -->
+  <div id="debug-simulator-bar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#121212]/90 backdrop-blur-md border border-[#3c4043] rounded-full px-4 py-2 shadow-2xl flex items-center space-x-2 text-xs font-mono">
     <span class="text-[#5f6368] font-bold px-2 hidden md:inline">SIMULATOR:</span>
     <button id="btn-sim-progress" onclick="toggleScanSimulation()" class="px-3 py-1.5 rounded-full bg-[#b7410e]/20 hover:bg-[#b7410e] text-[#d45d2a] hover:text-white border border-[#b7410e]/40 transition font-bold">
       <span id="sim-progress-label">Simulate Scan Progress</span>

@@ -273,19 +273,44 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
       htmlContent = mainRes.data;
     } catch (e) {
-      htmlContent = '';
-      result.alerts.push({
-        type: 'FETCH_ERROR',
-        severity: 'critical',
-        message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
-      });
-      if (e.response && (e.response.status === 403 || e.response.status === 429)) {
-        result.status.isWafBlocked = true;
-        result.status.wafStatusCode = e.response.status;
-        result.status.statusCode = e.response.status;
-        result.status.gateState = 'BLOCKED';
-        result.status.disallowCount = -1;
-      }
+      // ZERO-FALLBACK ENFORCEMENT:
+      // If the root domain cannot be resolved or reached, abort the entire audit immediately.
+      // Zero fabricated pages, zero default bot allowances, zero capability evaluation.
+      return {
+        url: targetUrl,
+        tier: userLimits ? userLimits.tier : 'free',
+        status: 'failed',
+        error: `HTTP fetch failed for ${targetUrl}: ${e.message}`,
+        pageDepthCrawled: 0,
+        totalPagesFound: 0,
+        pages: [],
+        discoveredRoutes: [],
+        missingEssentialPages: ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'],
+        alerts: [{
+          type: 'FETCH_ERROR',
+          severity: 'critical',
+          message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
+        }],
+        scoreCard: {
+          overallScore: 0,
+          classification: 'UNAUDITED',
+          pillars: {
+            p1: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p2: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p3: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p4: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message }
+          }
+        },
+        overallScore: 0,
+        pillarScores: { P1: 0, P2: 0, P3: 0, P4: 0 },
+        capabilities: {
+          crawlerAccess: {},
+          manifests: {},
+          schema: { detected: [], authorCredentials: false },
+          scores: { aiOptimized: 0, aiReady: 0, compositeHealth: 0 },
+          triage: [`HTTP fetch failed for ${targetUrl}: ${e.message}`]
+        }
+      };
     }
 
     // Run Level 2 Parser Service

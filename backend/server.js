@@ -157,6 +157,16 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     // Pass partialSyncLimit = 25
     const scanResults = await analyzeUrl(targetUrl, req.userLimits || { maxPages: 25 }, singlePagePath, 25);
 
+    // If the crawler failed to resolve or connect to the target domain, return HTTP 422
+    if (scanResults.status === 'failed' || scanResults.error) {
+      return res.status(422).json({
+        targetUrl,
+        status: 'failed',
+        error: scanResults.error || 'Target domain could not be resolved or reached.',
+        results: scanResults
+      });
+    }
+
     if (singlePagePath) {
       return res.status(200).json({
         success: true,

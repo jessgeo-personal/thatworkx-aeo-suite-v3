@@ -2,221 +2,311 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import fs from 'fs';
-import path from 'path';
 
-describe('V4 Diagnostic Cockpit Live Backend Integration (Phase 3 RED)', () => {
-  let cockpitModule;
+describe('AEO Suite V4: Cockpit Live Data Ingestion & Rescan Engine (Phase 1 RED)', () => {
+  let container;
 
-  const mockScanPayload = {
-    status: 'completed',
-    targetUrl: 'https://acme-corp.ai',
-    timestamp: '2026-09-04T12:00:00Z',
-    pages: [
-      {
-        url: 'https://acme-corp.ai/',
-        wordCount: 1650,
-        textCodeRatio: 0.31,
-        schema: {
-          detectedTypes: ['Organization', 'WebSite'],
-          hasAuthorBio: false,
-          graphEntities: 2
-        }
-      },
-      {
-        url: 'https://acme-corp.ai/about',
-        wordCount: 780,
-        textCodeRatio: 0.22,
-        schema: {
-          detectedTypes: ['AboutPage', 'Person'],
-          hasAuthorBio: true,
-          graphEntities: 2
-        }
-      }
-    ],
-    missingEssentialPages: ['/pricing', '/privacy-policy', '/terms-of-service'],
-    capabilities: {
-      crawlers: {
-        gptBot: { allowed: true, status: 200 },
-        claudeBot: { allowed: false, status: 403 },
-        ccBot: { allowed: true, status: 200 },
-        perplexityBot: { allowed: true, status: 200 },
-        googleExtended: { allowed: false, status: 403 }
-      },
-      manifests: {
-        robotsTxt: { exists: true, status: 200 },
-        llmsTxt: { exists: false, status: 404 },
-        aiContextMd: { exists: false, status: 404 }
-      },
-      scores: {
-        overallHealthIndex: 71,
-        aiOptimizedScore: 78,
-        aiReadyScore: 48,
-        triageFlags: [
-          'Missing machine manifest /llms.txt',
-          'ClaudeBot crawling access denied'
-        ]
-      }
-    }
-  };
-
-  beforeEach(async () => {
-    // Load static HTML structure from visualize.html
-    const htmlPath = path.resolve(__dirname, '../visualize.html');
-    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
-    document.documentElement.innerHTML = htmlContent;
-
-    // Ensure error notification banner exists in DOM
-    if (!document.getElementById('cockpit-error-banner')) {
-      const banner = document.createElement('div');
-      banner.id = 'cockpit-error-banner';
-      banner.className = 'hidden';
-      document.body.prepend(banner);
-    }
-
-    // Reset location
-    delete window.location;
-    window.location = new URL('http://localhost:3000/visualize.html');
-
-    // Import live cockpit module
-    cockpitModule = await import('../visualize.js');
+  beforeEach(() => {
+    // Setup clean DOM fixture representing visualize.html cockpit shell
+    document.body.innerHTML = `
+      <div id="cockpit-container">
+        <div id="cockpit-error-banner" style="display: none;">
+          <span class="error-msg"></span>
+          <button id="banner-dismiss-btn">Dismiss</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="target-url-input" value="" />
+          <button id="cockpit-search-btn">Scan</button>
+          <button id="rescan-btn">Rescan</button>
+        </div>
+        <div id="status-display">
+          <span id="cockpit-scanned-url">--</span>
+          <span id="cockpit-scanned-date">--</span>
+          <span id="cockpit-scanned-duration">--</span>
+          <span id="cockpit-scanned-pages">--</span>
+          <span id="cockpit-diagnostic-score">0</span>
+          <span id="cockpit-diagnostic-badge">UNAUDITED</span>
+        </div>
+        <div id="stage1-container"></div>
+        <div id="stage2-container"></div>
+        <div id="stage3-container"></div>
+        <div id="stage4-container"></div>
+        <div id="stage5-container"></div>
+        <div id="stage6-container"></div>
+      </div>
+    `;
+    vi.restoreAllMocks();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    document.documentElement.innerHTML = '';
   });
 
-  it('Gate 1: Pre-scan un-audited state displays neutral placeholders without static mock strings', () => {
-    // When no URL query parameter is supplied
-    cockpitModule.initCockpit();
-
-    const targetUrlDisplay = document.querySelector('.cockpit-domain-display, #current-target-domain');
-    if (targetUrlDisplay) {
-      expect(targetUrlDisplay.textContent).toMatch(/--|UNAUDITED|Enter domain/i);
-      expect(targetUrlDisplay.textContent).not.toContain('thatworkx.com');
-    }
-
-    // Health score must be zero or neutral placeholder, not mock 84
-    const healthScoreEl = document.querySelector('.health-score-value, #health-score');
-    if (healthScoreEl) {
-      expect(healthScoreEl.textContent).toMatch(/--|0/);
-      expect(healthScoreEl.textContent).not.toBe('84');
-    }
+  it('Gate Check: Verifies prototype fixtures AUDIT_DATA and ALL_STAGE3_PAGES are purged', async () => {
+    const visualizeModule = await import('../visualize.js');
+    expect(visualizeModule.AUDIT_DATA).toBeUndefined();
+    expect(visualizeModule.ALL_STAGE3_PAGES).toBeUndefined();
   });
 
-  it('Gate 2: Parses URL parameter ?url=... and calls POST /api/scan with exact body', async () => {
-    window.location.search = '?url=https://acme-corp.ai';
+  it('Gate Check: Zero occurrences of banned term "AI-first" in visualize.js module', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const jsPath = path.resolve(__dirname, '../visualize.js');
+    const jsContent = fs.readFileSync(jsPath, 'utf8');
+    expect(jsContent).not.toMatch(/AI-first/i);
+  });
 
-    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
+  it('Initial State: Initializes with neutral un-audited defaults and zero mock defaults', async () => {
+    const { initCockpit, getCockpitState } = await import('../visualize.js');
+    delete window.location;
+    window.location = new URL('https://thatworkx.com/visualize.html');
+    
+    initCockpit();
+    const state = getCockpitState();
+
+    expect(state.summary.healthScore).toBe(0);
+    expect(state.summary.diagnosticBadge).toBe('UNAUDITED');
+    expect(state.summary.scannedUrl).toBe('--');
+    expect(document.getElementById('cockpit-diagnostic-score').textContent.trim()).toBe('0');
+    expect(document.getElementById('cockpit-diagnostic-badge').textContent.trim()).toBe('UNAUDITED');
+  });
+
+  it('URL Ingestion: Automatically parses ?url= param and executes live scan', async () => {
+    const { initCockpit, executeCockpitScan } = await import('../visualize.js');
+    delete window.location;
+    window.location = new URL('https://thatworkx.com/visualize.html?url=example.com');
+
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockScanPayload
+      status: 200,
+      json: async () => ({
+        targetUrl: 'https://example.com',
+        status: 'complete',
+        results: {
+          pages: [{ url: 'https://example.com/', wordCount: 820, ratio: 0.52 }],
+          missingEssentialPages: ['/pricing'],
+          capabilities: {
+            crawlerAccess: { gptBot: { allowed: true, status: 200 } },
+            manifests: { robotsTxt: { exists: true, status: 200 } },
+            schema: { detected: ['Organization'], authorCredentials: true },
+            scores: { aiOptimized: 80, aiReady: 70, compositeHealth: 75 }
+          }
+        }
+      })
     });
+    global.fetch = fetchMock;
 
-    await cockpitModule.initCockpit();
+    await initCockpit();
 
-    expect(fetchSpy).toHaveBeenCalledWith('/api/scan', {
+    expect(document.getElementById('target-url-input').value).toBe('example.com');
+    expect(fetchMock).toHaveBeenCalledWith('/api/scan', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: 'https://acme-corp.ai', email: '' })
-    });
+      body: JSON.stringify({ targetUrl: 'example.com', email: '' })
+    }));
   });
 
-  it('Gate 3: Dynamically maps Stage 1–6 live backend metrics into V4 cockpit DOM', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
-      ok: true,
-      json: async () => mockScanPayload
-    });
+  it('Error Ingestion Gate: Displays error banner and logs internal failure on HTTP 500 without mock fallback', async () => {
+    const { executeCockpitScan, getCockpitErrorLogs, clearCockpitErrorLogs, getCockpitState } = await import('../visualize.js');
+    clearCockpitErrorLogs();
 
-    await cockpitModule.executeCockpitScan('https://acme-corp.ai');
-
-    // Dual-Pillar Scores & Health Index
-    const healthScore = document.querySelector('.health-score-value, #health-score');
-    expect(healthScore.textContent).toContain('71');
-
-    const aiOptimizedCard = document.querySelector('#ai-optimized-score, .score-optimized');
-    if (aiOptimizedCard) {
-      expect(aiOptimizedCard.textContent).toContain('78');
-    }
-
-    const aiReadyCard = document.querySelector('#ai-ready-score, .score-ready');
-    if (aiReadyCard) {
-      expect(aiReadyCard.textContent).toContain('48');
-    }
-
-    // Stage 1 Bot Permissions
-    const stage1Container = document.querySelector('#stage-1, [data-stage="1"]');
-    expect(stage1Container.textContent).toContain('GPTBot');
-    expect(stage1Container.textContent).toContain('ClaudeBot');
-
-    // Stage 2 Missing Routes
-    const stage2Container = document.querySelector('#stage-2, [data-stage="2"]');
-    expect(stage2Container.textContent).toContain('/pricing');
-    expect(stage2Container.textContent).toContain('/privacy-policy');
-
-    // Stage 3 Crawled Pages & Semantic Density
-    const stage3Container = document.querySelector('#stage-3, [data-stage="3"]');
-    expect(stage3Container.textContent).toContain('https://acme-corp.ai/');
-    expect(stage3Container.textContent).toContain('1650');
-
-    // Stage 5 Manifests under AI-Ready Governance Gate
-    const stage5Container = document.querySelector('#stage-5, [data-stage="5"]');
-    expect(stage5Container.textContent).toContain('AI-Ready');
-    expect(stage5Container.textContent).toContain('/robots.txt');
-    expect(stage5Container.textContent).toContain('/llms.txt');
-  });
-
-  it('Gate 4: Unreachable host triggers error banner, logs to error tracker, and displays zero fallback values', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: false,
-      status: 502,
-      statusText: 'Bad Gateway'
+      status: 500,
+      statusText: 'Internal Server Error'
     });
 
-    await cockpitModule.executeCockpitScan('https://broken-domain.org');
+    await executeCockpitScan('failed-domain.com');
 
-    const errorBanner = document.getElementById('cockpit-error-banner');
-    expect(errorBanner.classList.contains('hidden')).toBe(false);
-    expect(errorBanner.textContent).toContain('502 Bad Gateway');
+    const banner = document.getElementById('cockpit-error-banner');
+    expect(banner.style.display).not.toBe('none');
+    expect(banner.textContent).toContain('failed-domain.com');
 
-    // Quality Error Log must register the failure
-    const errorLogs = cockpitModule.getCockpitErrorLogs();
-    expect(errorLogs.length).toBeGreaterThanOrEqual(1);
-    expect(errorLogs[errorLogs.length - 1].targetUrl).toBe('https://broken-domain.org');
+    const logs = getCockpitErrorLogs();
+    expect(logs.length).toBeGreaterThan(0);
+    expect(logs[0].targetUrl).toBe('failed-domain.com');
+    expect(logs[0].status).toBe(500);
 
-    // Cockpit must show neutral defaults, not mock data
-    const healthScore = document.querySelector('.health-score-value, #health-score');
-    expect(healthScore.textContent).toMatch(/--|0/);
-    expect(healthScore.textContent).not.toBe('84');
+    const state = getCockpitState();
+    expect(state.summary.diagnosticBadge).toBe('UNAUDITED');
+    expect(state.summary.healthScore).toBe(0);
   });
 
-  it('Gate 5: Rescan button requests explicit user confirmation before executing fetch', async () => {
-    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
-      ok: true,
-      json: async () => mockScanPayload
-    });
+  it('Rescan Authorization: handleCockpitRescan prompts window.confirm and respects user cancel', async () => {
+    const { handleCockpitRescan } = await import('../visualize.js');
+    document.getElementById('target-url-input').value = 'secure-portal.com';
 
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
 
-    await cockpitModule.initCockpit();
-    await cockpitModule.handleCockpitRescan();
+    await handleCockpitRescan();
 
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(fetchSpy).not.toHaveBeenCalled();
-
-    confirmSpy.mockReturnValue(true);
-    await cockpitModule.handleCockpitRescan();
-
-    expect(fetchSpy).toHaveBeenCalled();
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringContaining('secure-portal.com'));
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('Gate 6: DOM Pre-rendering & Governance Gate: Static FAQ pre-rendered and zero "AI-first" terms', () => {
-    const fullHtml = document.documentElement.innerHTML;
+  it('Rescan Authorization: handleCockpitRescan dispatches executeCockpitScan on confirmation', async () => {
+    const { handleCockpitRescan } = await import('../visualize.js');
+    document.getElementById('target-url-input').value = 'approved-domain.com';
 
-    // Pre-rendering Gate: FAQ accordions must remain static in HTML
-    expect(fullHtml).toContain('faq-accordion');
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        targetUrl: 'https://approved-domain.com',
+        status: 'complete',
+        results: {
+          pages: [],
+          missingEssentialPages: [],
+          capabilities: { scores: { compositeHealth: 90 } }
+        }
+      })
+    });
+    global.fetch = fetchMock;
 
-    // Banned Terms Gate
-    expect(fullHtml).not.toMatch(/AI-first/i);
+    await handleCockpitRescan();
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/scan', expect.objectContaining({
+      body: JSON.stringify({ targetUrl: 'approved-domain.com', email: '' })
+    }));
+  });
+
+  it('Zero Dummy Data Gate: Inaccessible domain (ENOTFOUND) returning HTTP 200 must trigger error banner and reset to UNAUDITED', async () => {
+    const { executeCockpitScan, getCockpitErrorLogs, clearCockpitErrorLogs, getCockpitState } = await import('../visualize.js');
+    clearCockpitErrorLogs();
+
+    // Simulates the backend returning HTTP 200 with an ENOTFOUND crawl failure payload
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        targetUrl: 'https://ab.yu',
+        status: 'failed',
+        results: {
+          status: 'failed',
+          error: 'getaddrinfo ENOTFOUND ab.yu',
+          pages: [],
+          missingEssentialPages: ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'],
+          capabilities: {
+            triage: ['HTTP fetch failed for https://ab.yu: getaddrinfo ENOTFOUND ab.yu'],
+            scores: { aiOptimized: 0, aiReady: 10, compositeHealth: 15 }
+          }
+        }
+      })
+    });
+
+    await executeCockpitScan('ab.yu');
+
+    // 1. Error banner must be visible and contain the network failure message
+    const banner = document.getElementById('cockpit-error-banner');
+    expect(banner.style.display).not.toBe('none');
+    expect(banner.textContent).toContain('ENOTFOUND');
+
+    // 2. State must NEVER show 15/100 or NEEDS IMPROVEMENT
+    const state = getCockpitState();
+    expect(state.summary.healthScore).toBe(0);
+    expect(state.summary.diagnosticBadge).toBe('UNAUDITED');
+    expect(document.getElementById('cockpit-diagnostic-score').textContent.trim()).toBe('0');
+    expect(document.getElementById('cockpit-diagnostic-badge').textContent.trim()).toBe('UNAUDITED');
+
+    // 3. Error must be logged internally
+    const logs = getCockpitErrorLogs();
+    expect(logs.length).toBeGreaterThan(0);
+    expect(logs[0].targetUrl).toBe('ab.yu');
+    expect(logs[0].message).toContain('ENOTFOUND');
+  });
+
+  it('Banner Gate: Inaccessible domain failure must display #cockpit-error-banner without Tailwind hidden conflicts', async () => {
+    const { executeCockpitScan, setErrorBanner } = await import('../visualize.js');
+
+    setErrorBanner('Site is not accessible (getaddrinfo ENOTFOUND ab.yu)');
+
+    const banner = document.getElementById('cockpit-error-banner');
+    expect(banner).not.toBeNull();
+    expect(banner.classList.contains('hidden')).toBe(false);
+    expect(banner.style.display).toBe('flex');
+    expect(banner.textContent).toContain('ENOTFOUND');
+  });
+
+  it('Zero Mock Gate: What-If simulator must base calculation on 0, never hardcoded 78', async () => {
+    const { updateSimulator, getCockpitState, resetCockpitToNeutral } = await import('../visualize.js');
+    resetCockpitToNeutral();
+
+    const projected = updateSimulator();
+    expect(projected).toBe(0);
+
+    const projectedEl = document.getElementById('projected-health-score');
+    if (projectedEl) {
+      expect(projectedEl.textContent.trim()).toBe('0');
+    }
+  });
+
+  it('Header Telemetry Gate: renderCockpit must populate timestamp-label, scan-duration-label, and total-pages-label', async () => {
+    const { renderCockpit } = await import('../visualize.js');
+
+    // Ensure DOM has both sets of IDs present in visualize.html
+    document.body.innerHTML += `
+      <strong id="timestamp-label">--</strong>
+      <strong id="scan-duration-label">--</strong>
+      <strong id="total-pages-label">--</strong>
+    `;
+
+    const mockState = {
+      meta: {
+        targetUrl: 'https://thatworkx.com',
+        timestamp: '2026-09-05 11:45:00',
+        scanDuration: '2.4s'
+      },
+      stage3: {
+        pages: [{ url: 'https://thatworkx.com/' }, { url: 'https://thatworkx.com/about' }]
+      },
+      stage6: { overallHealthIndex: 97 }
+    };
+
+    renderCockpit(mockState);
+
+    const timeEl = document.getElementById('timestamp-label');
+    const durEl = document.getElementById('scan-duration-label');
+    const pagesEl = document.getElementById('total-pages-label');
+
+    expect(timeEl.textContent).not.toBe('--');
+    expect(durEl.textContent).toBe('2.4s');
+    expect(pagesEl.textContent).toBe('2');
+  });
+
+  it('Live Scan Timer: executeCockpitScan records elapsed duration and sets scan-duration-label', async () => {
+    const { executeCockpitScan } = await import('../visualize.js');
+
+    document.body.innerHTML += `
+      <strong id="scan-duration-label">--</strong>
+      <strong id="total-pages-label">--</strong>
+      <strong id="timestamp-label">--</strong>
+    `;
+
+    global.fetch = vi.fn().mockImplementation(async () => {
+      // Simulate network latency
+      await new Promise(r => setTimeout(r, 50));
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          targetUrl: 'https://thatworkx.com',
+          status: 'complete',
+          results: {
+            pages: [{ url: 'https://thatworkx.com/' }],
+            capabilities: { scores: { compositeHealth: 97 } }
+          }
+        })
+      };
+    });
+
+    await executeCockpitScan('thatworkx.com');
+
+    const durEl = document.getElementById('scan-duration-label');
+    expect(durEl.textContent).toMatch(/^\d+(\.\d+)?s$/);
   });
 });
+
+

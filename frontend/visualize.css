@@ -32,11 +32,27 @@
   --accent-indigo: #6366f1;
 }
 
+html, body {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: var(--canvas-bg);
   color: var(--text-secondary);
   overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+#visualize-app,
+.cockpit-layout,
+#app-viewport-wrapper,
+.workspace-canvas,
+#main-workspace-canvas {
+  min-height: 100vh;
+  overflow-y: auto;
 }
 .font-mono {
   font-family: 'JetBrains Mono', 'Space Mono', monospace;

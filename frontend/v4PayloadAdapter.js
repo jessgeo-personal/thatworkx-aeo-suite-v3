@@ -51,11 +51,11 @@ function extractPathname(pageItem, baseDomain) {
 
 /**
  * Maps raw backend scan response to the V4 Stage State contract.
- * @param {object|null} payload - Raw payload from POST /api/scan
+ * @param {object|null} rawPayload - Raw payload from POST /api/scan
  * @returns {object} Normalized V4 Cockpit State
  */
-export function mapBackendScanToV4State(payload) {
-  if (!payload || typeof payload !== 'object') {
+export function mapBackendScanToV4State(rawPayload) {
+  if (!rawPayload || typeof rawPayload !== 'object') {
     return {
       meta: {
         targetUrl: '--',
@@ -91,20 +91,47 @@ export function mapBackendScanToV4State(payload) {
     };
   }
 
-  // Unpack envelope wrapper if returned by backend res.json({ results: ... })
-  const data = (payload.results && typeof payload.results === 'object')
-    ? payload.results
-    : (payload.data && typeof payload.data === 'object')
-    ? payload.data
-    : payload;
+  // Support both live backend/server.js envelopes (results.*) and direct/test payloads
+  const data = (rawPayload && rawPayload.results && typeof rawPayload.results === 'object')
+    ? rawPayload.results
+    : (rawPayload.data && typeof rawPayload.data === 'object')
+    ? rawPayload.data
+    : (rawPayload || {});
 
-  const targetUrl = data.targetUrl || data.url || payload.targetUrl || payload.url || '--';
+  // Defense Gate: If crawl failed or domain is unreachable, clamp state to 0 / UNAUDITED
+  const isCrawlFailed =
+    rawPayload?.status === 'failed' ||
+    data?.status === 'failed' ||
+    Boolean(data?.error) ||
+    Boolean(rawPayload?.error) ||
+    (Array.isArray(data?.alerts) && data.alerts.some(a => a.type === 'FETCH_ERROR'));
+
+  if (isCrawlFailed) {
+    const targetUrl = data.targetUrl || data.url || rawPayload.targetUrl || rawPayload.url || '--';
+    const errorMsg = data.error || rawPayload.error || data.alerts?.[0]?.message || 'Target domain could not be resolved.';
+    return {
+      meta: {
+        targetUrl,
+        status: 'UNAUDITED',
+        timestamp: null,
+        error: errorMsg
+      },
+      stage1: { crawlers: [] },
+      stage2: { routes: [], missingCount: 0, discoveredCount: 0 },
+      stage3: { pages: [] },
+      stage4: { detectedTypes: [], hasAuthorBio: false, totalGraphEntities: 0 },
+      stage5: { governanceGate: 'AI-Ready', manifests: [] },
+      stage6: { overallHealthIndex: 0, aiOptimizedScore: 0, aiReadyScore: 0, triageFlags: [errorMsg] }
+    };
+  }
+
+  const targetUrl = data.targetUrl || data.url || rawPayload.targetUrl || rawPayload.url || '--';
   const status = (typeof data.status === 'string' && data.status)
     ? data.status
-    : (typeof payload.status === 'string' && payload.status)
-    ? payload.status
+    : (typeof rawPayload.status === 'string' && rawPayload.status)
+    ? rawPayload.status
     : (targetUrl !== '--' ? 'completed' : 'UNAUDITED');
-  const timestamp = data.timestamp || payload.timestamp || null;
+  const timestamp = data.timestamp || rawPayload.timestamp || null;
 
   // Meta & Telemetry
   const meta = {
@@ -115,12 +142,12 @@ export function mapBackendScanToV4State(payload) {
 
   // Stage 1: Bot Permissions Matrix
   const rawCrawlers =
+    data.status?.botPermissions ||
     data.capabilities?.crawlers ||
     data.capabilities?.crawlerRadar ||
     data.capabilities?.crawlerAccess ||
     data.capabilities?.bots ||
     data.capabilities?.botPermissions ||
-    data.status?.botPermissions ||
     data.crawlers ||
     data.crawlerRadar ||
     data.botPermissions ||
@@ -142,14 +169,18 @@ export function mapBackendScanToV4State(payload) {
   });
 
   // Stage 2: Canonical & Essential Routes
-  const missingPages = data.missingEssentialPages || payload.missingEssentialPages || [];
+  const missingPages = data.missingEssentialPages || rawPayload.missingEssentialPages || [];
   const rawPages = Array.isArray(data.pages)
     ? data.pages
-    : (Array.isArray(payload.pages) ? payload.pages : []);
+    : (Array.isArray(rawPayload.pages) ? rawPayload.pages : []);
+  const discoveredRoutes = data.discoveredRoutes || [];
 
-  const crawledPaths = rawPages
-    .map((p) => extractPathname(p, targetUrl))
-    .filter(Boolean);
+  const crawledPaths = [
+    ...new Set([
+      ...discoveredRoutes.map((r) => extractPathname(r, targetUrl)),
+      ...rawPages.map((p) => extractPathname(p, targetUrl))
+    ])
+  ].filter(Boolean);
 
   const routes = CANONICAL_ESSENTIAL_ROUTES.map((route) => {
     const isMissing = missingPages.includes(route);
@@ -244,12 +275,16 @@ export function mapBackendScanToV4State(payload) {
   // Stage 6: Health Index & Dual-Pillar Scores
   const rawScores = data.capabilities?.scores || data.scores || data.scoreCard || {};
   const overallHealthIndex = Number(
-    rawScores.overallHealthIndex ?? data.overallScore ?? payload.overallScore ?? rawScores.overallScore ?? 0
+    rawScores.overallHealthIndex ?? data.overallScore ?? rawPayload.overallScore ?? rawScores.overallScore ?? 0
   ) || 0;
-  const aiOptimizedScore = Number(rawScores.aiOptimizedScore ?? data.pillarScores?.P1 ?? 0) || 0;
-  const aiReadyScore = Number(rawScores.aiReadyScore ?? data.pillarScores?.P2 ?? 0) || 0;
+  const aiOptimizedScore = Number(
+    rawScores.aiOptimizedScore ?? data.pillarScores?.P1 ?? data.scoreCard?.pillars?.p1?.score ?? 0
+  ) || 0;
+  const aiReadyScore = Number(
+    rawScores.aiReadyScore ?? data.pillarScores?.P2 ?? data.pillarScores?.P4 ?? data.scoreCard?.pillars?.p4?.score ?? data.scoreCard?.pillars?.p2?.score ?? 0
+  ) || 0;
   
-  const rawFlags = rawScores.triageFlags || data.alerts?.map((a) => a.message) || [];
+  const rawFlags = rawScores.triageFlags || data.alerts?.map((a) => a.message || a.title || JSON.stringify(a)) || [];
   const triageFlags = Array.isArray(rawFlags) ? rawFlags : Object.values(rawFlags);
 
   return {

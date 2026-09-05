@@ -1,0 +1,39 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-09-05T06:48:58.678Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 12  Malformed entity: bare '&' at col 95 — use &amp; in HTML contexts
+  [ERR   2]  Line 12  Malformed entity: bare '&' at col 149 — use &amp; in HTML contexts
+  [ERR   3]  Line 12  Malformed entity: bare '&' at col 180 — use &amp; in HTML contexts
+  [ERR   4]  Line 31  Malformed entity: bare '&' at col 41 — use &amp; in HTML contexts
+  [ERR   5]  Line 55  Malformed entity: bare '&' at col 39 — use &amp; in HTML contexts
+  [ERR   6]  Line 75  Malformed entity: bare '&' at col 23 — use &amp; in HTML contexts
+  [ERR   7]  Line 98  Hierarchy violation: <div> (line 98) not closed before </header> (line 205)
+  [ERR   8]  Line 102  Malformed entity: bare '&' at col 46 — use &amp; in HTML contexts
+  [ERR   9]  Line 116  Malformed entity: bare '&' at col 38 — use &amp; in HTML contexts
+  [ERR  10]  Line 133  Malformed entity: bare '&' at col 71 — use &amp; in HTML contexts
+  [ERR  11]  Line 192  Malformed entity: bare '&' at col 32 — use &amp; in HTML contexts
+  [ERR  12]  Line 235  Malformed entity: bare '&' at col 57 — use &amp; in HTML contexts
+  [ERR  13]  Line 247  Malformed entity: bare '&' at col 35 — use &amp; in HTML contexts
+  [ERR  14]  Line 254  Malformed entity: bare '&' at col 41 — use &amp; in HTML contexts
+  14 error(s).
+
+FILE: frontend\optimize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\socialize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\index.js
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: 14 error(s) - review above.
