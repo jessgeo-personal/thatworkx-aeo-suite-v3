@@ -115,7 +115,7 @@
 
             <!-- Domain input search & Actions -->
             <div class="flex items-center space-x-2.5 flex-shrink-0">
-              <input type="text" id="cockpit-url-input" class="cockpit-domain-input hidden sm:block px-3 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-white text-xs font-mono focus:border-[#b7410e] outline-none" placeholder="https://example.com" />
+              <input type="text" id="target-url-input" class="cockpit-domain-input hidden sm:block px-3 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-white text-xs font-mono focus:border-[#b7410e] outline-none" placeholder="https://example.com" />
               <button id="cockpit-search-btn" class="domain-search-btn hidden sm:flex px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#bdc1c6] text-xs font-mono font-bold transition">Scan</button>
 
               <button id="rescan-btn" onclick="toggleScanSimulation()" class="rescan-btn px-4 py-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#e8eaed] hover:text-[#d45d2a] text-sm font-mono font-bold transition active:scale-95 flex items-center space-x-2 shadow-sm">
@@ -292,7 +292,7 @@
           <div id="details-drawer" class="hidden fixed inset-y-0 right-0 w-96 bg-[#1a1a1a] border-l border-[#3c4043] p-6 shadow-2xl z-50 overflow-y-auto">
             <div class="flex justify-between items-center pb-4 border-b border-[#3c4043]">
               <h4 class="drawer-title text-base font-bold text-white">In-Page Remediation</h4>
-              <button onclick="closeDrawer()" class="text-[#bdc1c6] hover:text-white font-bold text-lg">✕</button>
+              <button id="close-drawer-btn" onclick="closeDrawer()" class="close-drawer-btn text-[#bdc1c6] hover:text-white font-bold text-lg">✕</button>
             </div>
             <div class="drawer-body mt-4 space-y-3 text-sm text-[#bdc1c6]"></div>
           </div>

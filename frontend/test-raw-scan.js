@@ -124,7 +124,7 @@ export async function executeScan(targetUrl) {
  * Renders raw backend schema fields with explicit source path labels and per-stage JSON blocks.
  */
 function renderScanData(rawResponse, targetUrl) {
-  // Unpack envelope wrapper
+  // Dual-Envelope Resolver
   const data = (rawResponse && rawResponse.results) ? rawResponse.results : (rawResponse || {});
 
   // Complete JSON dump
@@ -203,7 +203,7 @@ function renderScanData(rawResponse, targetUrl) {
     }
 
     s1El.textContent = [
-      `[source: results.status.botPermissions / results.capabilities.crawlers]`,
+      `[source: results.capabilities.crawlers]`,
       `Evaluated Bots Count: ${count}`,
       ``,
       ...(crawlerLines.length > 0 ? crawlerLines : ['No crawler bots evaluated in payload.'])
@@ -233,7 +233,7 @@ function renderScanData(rawResponse, targetUrl) {
 
   if (s2El) {
     const lines = [
-      `[source: results.discoveredRoutes & results.missingEssentialPages]`,
+      `[source: results.missingEssentialPages]`,
       `--- Canonical Essential Routes Audit ---`,
       `Discovered Essential Routes (${discoveredEssential.length}): ${discoveredEssential.length > 0 ? discoveredEssential.join(', ') : 'None detected'}`,
       `Missing: ${missing.length > 0 ? missing.join(', ') : 'None (all essential canonical routes detected)'}`,
@@ -262,7 +262,10 @@ function renderScanData(rawResponse, targetUrl) {
     } else {
       const pageSections = crawledPages.map((p, idx) => {
         const isObj = typeof p === 'object' && p !== null;
-        const route = isObj ? (p.route || p.url || `Page ${idx + 1}`) : String(p);
+        let route = isObj ? (p.route || p.url || `Page ${idx + 1}`) : String(p);
+        if (targetUrl && route.startsWith('/')) {
+          route = `${targetUrl.replace(/\/$/, '')}${route}`;
+        }
         const words = isObj ? (p.wordCount || 0) : 0;
         const ratio = isObj ? Math.round((Number(p.textCodeRatio || data.status?.contentDensityRatio) || 0) * 100) : 0;
         const title = isObj ? (p.title || 'N/A') : 'N/A';
@@ -273,6 +276,8 @@ function renderScanData(rawResponse, targetUrl) {
           headingsStr = `H1: ${p.headingAudit.h1 ?? 0} | H2: ${p.headingAudit.h2 ?? 0} | Hierarchy Valid: ${p.headingAudit.isHierarchyValid ? 'Yes' : 'No'}`;
         } else if (isObj && Array.isArray(p.headings)) {
           headingsStr = `Headings Count: ${p.headings.length}`;
+        } else if (isObj && typeof p.headings === 'object') {
+          headingsStr = `H1: ${p.headings?.h1?.length ?? 0} | H2: ${p.headings?.h2?.length ?? 0}`;
         }
 
         const scrapedText = isObj
@@ -327,20 +332,43 @@ function renderScanData(rawResponse, targetUrl) {
       eeat.hasAuthorBio
     );
 
+    const authors = [
+      ...new Set(
+        crawledPages
+          .map((p) => {
+            if (!p || typeof p !== 'object') return null;
+            const a = p.schema?.author || p.author;
+            if (typeof a === 'string') return a;
+            if (a && typeof a === 'object') return a.name;
+            return null;
+          })
+          .filter(Boolean)
+      )
+    ];
+
+    const trustSignals = [
+      ...new Set([
+        ...(eeat.trustSignals || []),
+        ...crawledPages.flatMap((p) => (typeof p === 'object' && p?.eeat?.trustSignals) || [])
+      ])
+    ];
+
     s4El.textContent = [
-      `[source: results.status.jsonLdTypes & results.eeatMetrics]`,
+      `[source: results.pages[n].schema]`,
       `JSON-LD Structured Data: ${jsonLdExists ? 'EXISTS' : 'NOT FOUND'}`,
       `Detected Types: ${pageTypes.length > 0 ? pageTypes.join(', ') : 'None detected'}`,
       `Author Bio Entity Detected: ${hasAuthorBio ? 'true' : 'false'}`,
+      ...(authors.length > 0 ? [`Author Credentials: ${authors.join(', ')}`] : []),
       ``,
       `--- E-E-A-T Trust & Credibility Signals ---`,
-      `• SSL / Secure Protocol: ${eeat.isSecure ? 'SECURE (HTTPS)' : 'INSECURE'}`,
+      `• SSL / Secure Protocol: ${eeat.isSecure ? 'SECURE (HTTPS)' : (trustSignals.includes('SSL Enabled') ? 'SSL Enabled (HTTPS)' : 'INSECURE')}`,
       `• Contact Information Present: ${eeat.hasContactInfo ? 'YES' : 'MISSING'}`,
       `• Privacy Policy Linked: ${eeat.hasPrivacyPolicy ? 'YES' : 'MISSING'}`,
       `• Authority Status: ${eeat.authorityStatus || 'Unrated'}`,
       `• Experience Rating: ${data.status?.experienceScore ?? 'N/A'}`,
       `• Readability Rating: ${data.status?.readabilityRating || 'N/A'}`,
-      `• Content Density Ratio: ${data.status?.contentDensityRatio ?? 'N/A'}%`
+      `• Content Density Ratio: ${data.status?.contentDensityRatio ?? 'N/A'}%`,
+      ...(trustSignals.length > 0 ? [`• Trust Signals: ${trustSignals.join(', ')}`] : [])
     ].join('\n');
   }
   if (s4JsonEl) {
@@ -358,12 +386,18 @@ function renderScanData(rawResponse, targetUrl) {
 
   const statusObj = data.status || {};
   const previews = data.manifestPreviews || {};
+  const capManifests = data.capabilities?.manifests || {};
 
   const manifestMap = [
-    { path: '/robots.txt', exists: Boolean(statusObj.robotsTxtExists ?? data.capabilities?.manifests?.robotsTxt?.exists), preview: previews.robotsTxt },
-    { path: '/sitemap.xml', exists: Boolean(statusObj.sitemapExists ?? data.capabilities?.manifests?.sitemapXml?.exists), preview: previews.sitemap },
-    { path: '/llms.txt', exists: Boolean(statusObj.llmsTxtExists ?? data.capabilities?.manifests?.llmsTxt?.exists), preview: previews.llmsTxt },
-    { path: '/ai-context.md', exists: Boolean(statusObj.aiContextExists ?? data.capabilities?.manifests?.aiContextMd?.exists), preview: previews.aiContext },
+    { path: '/robots.txt', exists: Boolean(statusObj.robotsTxtExists ?? capManifests.robotsTxt?.exists), preview: previews.robotsTxt },
+    { path: '/sitemap.xml', exists: Boolean(statusObj.sitemapExists ?? capManifests.sitemapXml?.exists ?? capManifests.sitemap?.exists), preview: previews.sitemap },
+    { path: '/llms.txt', exists: Boolean(statusObj.llmsTxtExists ?? capManifests.llmsTxt?.exists), preview: previews.llmsTxt },
+    { path: '/ai-context.md', exists: Boolean(statusObj.aiContextExists ?? capManifests.aiContextMd?.exists ?? capManifests.aiContext?.exists), preview: previews.aiContext },
+    ...(capManifests.securityTxt ? [{
+      path: capManifests.securityTxt.path ? (capManifests.securityTxt.path.startsWith('/') ? capManifests.securityTxt.path : `/${capManifests.securityTxt.path}`) : '/.well-known/security.txt',
+      exists: Boolean(capManifests.securityTxt.exists),
+      preview: previews.securityTxt || null
+    }] : []),
     { path: '/about.txt', exists: Boolean(statusObj.aboutTxtExists), preview: null },
     { path: '/docs.txt', exists: Boolean(statusObj.docsTxtExists), preview: null },
     { path: '/content.txt', exists: Boolean(statusObj.contentTxtExists), preview: null }
@@ -403,6 +437,7 @@ function renderScanData(rawResponse, targetUrl) {
   const p3 = Number(pScores.P3 ?? pScores.p3?.score ?? 0);
   const p4 = Number(pScores.P4 ?? pScores.p4?.score ?? data.capabilities?.scores?.aiReadyScore ?? 0);
 
+  const crawlabilityScore = data.capabilities?.scores?.crawlabilityScore ?? scoreCard.crawlabilityScore;
   const capMatrix = Array.isArray(data.capabilityMatrix) ? data.capabilityMatrix : (rawResponse.capabilityMatrix || []);
   const alerts = data.alerts || data.capabilities?.scores?.triageFlags || [];
 
@@ -420,6 +455,7 @@ function renderScanData(rawResponse, targetUrl) {
       `Health Index: ${overall}/100`,
       `AI-Optimized (Crawlability): ${p1}/100`,
       `AI-Ready (Manifests): ${p4}/100`,
+      ...(crawlabilityScore !== undefined ? [`Crawlability Index: ${crawlabilityScore}/100`] : []),
       ``,
       `--- 4-Pillar Score Breakdown ---`,
       `• Pillar 1 (AI Crawlability & Indexing): ${p1}/100`,
