@@ -124,7 +124,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
   it('should return valid non-null Executive View extension payloads for default empty input', () => {
     const res = evaluateAllCapabilities({});
     expect(res.scanMetrics).not.toBeNull();
-    expect(typeof res.scanMetrics.scanTimeSeconds).toBe('number');
+    expect(res.scanMetrics.scanTimeSeconds).toBeNull();
     expect(typeof res.scanMetrics.lastScanned).toBe('string');
 
     expect(Array.isArray(res.scrapedContentPreview)).toBe(true);

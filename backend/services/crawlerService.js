@@ -4,6 +4,34 @@ const url = require('url');
 const { parseHtmlMetrics } = require('./parserService');
 const { evaluateCapabilities } = require('./capabilityEvaluator');
 
+const AI_CRAWLERS = [
+  { key: 'gptBot', name: 'GPTBot', pattern: /User-agent:\s*GPTBot\s*Disallow:\s*\//i },
+  { key: 'chatGptUser', name: 'ChatGPT-User', pattern: /User-agent:\s*ChatGPT-User\s*Disallow:\s*\//i },
+  { key: 'oaiSearchBot', name: 'OAI-SearchBot', pattern: /User-agent:\s*OAI-SearchBot\s*Disallow:\s*\//i },
+  { key: 'claudeBot', name: 'ClaudeBot', pattern: /User-agent:\s*(ClaudeBot|Claude-Web)\s*Disallow:\s*\//i },
+  { key: 'claudeWeb', name: 'Claude-Web', pattern: /User-agent:\s*Claude-Web\s*Disallow:\s*\//i },
+  { key: 'claudeSearchBot', name: 'Claude-SearchBot', pattern: /User-agent:\s*Claude-SearchBot\s*Disallow:\s*\//i },
+  { key: 'googleExtended', name: 'Google-Extended', pattern: /User-agent:\s*Google-Extended\s*Disallow:\s*\//i },
+  { key: 'googlebot', name: 'Googlebot', pattern: /User-agent:\s*Googlebot\s*Disallow:\s*\//i },
+  { key: 'bingbot', name: 'Bingbot', pattern: /User-agent:\s*Bingbot\s*Disallow:\s*\//i },
+  { key: 'perplexityBot', name: 'PerplexityBot', pattern: /User-agent:\s*PerplexityBot\s*Disallow:\s*\//i },
+  { key: 'applebotExtended', name: 'Applebot-Extended', pattern: /User-agent:\s*Applebot-Extended\s*Disallow:\s*\//i },
+  { key: 'metaExternalAgent', name: 'Meta-ExternalAgent', pattern: /User-agent:\s*Meta-ExternalAgent\s*Disallow:\s*\//i },
+  { key: 'metaWebIndexer', name: 'Meta-WebIndexer', pattern: /User-agent:\s*Meta-WebIndexer\s*Disallow:\s*\//i },
+  { key: 'amazonbot', name: 'Amazonbot', pattern: /User-agent:\s*Amazonbot\s*Disallow:\s*\//i },
+  { key: 'bytespider', name: 'Bytespider', pattern: /User-agent:\s*Bytespider\s*Disallow:\s*\//i },
+  { key: 'ccBot', name: 'CCBot', pattern: /User-agent:\s*CCBot\s*Disallow:\s*\//i },
+  { key: 'cohereAi', name: 'cohere-ai', pattern: /User-agent:\s*cohere-ai\s*Disallow:\s*\//i },
+  { key: 'mistralBot', name: 'MistralBot', pattern: /User-agent:\s*MistralBot\s*Disallow:\s*\//i },
+  { key: 'qwenBot', name: 'QwenBot', pattern: /User-agent:\s*QwenBot\s*Disallow:\s*\//i },
+  { key: 'baiduAnsur', name: 'Baidu-Ansur', pattern: /User-agent:\s*Baidu-Ansur\s*Disallow:\s*\//i }
+];
+
+const defaultBotPermissions = () => AI_CRAWLERS.reduce((acc, bot) => {
+  acc[bot.key] = true;
+  return acc;
+}, {});
+
 const fetchPageWithTimeout = async (pageUrl) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3500);
@@ -112,6 +140,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     };
   }
 
+  const scanStartTime = Date.now();
   const result = {
     url: targetUrl,
     tier: userLimits.tier,
@@ -119,6 +148,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     totalPagesFound: 1, // Simulated total domain size
     status: {
       robotsTxtExists: false,
+      robotsFetchMs: null,
       llmsTxtExists: false,
       aiContextExists: false,
       aboutTxtExists: false,
@@ -137,12 +167,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       jsonLdExists: false,
       jsonLdTypes: [],
       machinePreview: '',
-      botPermissions: {
-        gptBot: true,
-        perplexityBot: true,
-        claudeBot: true,
-        googleExtended: true
-      }
+      botPermissions: defaultBotPermissions()
     },
     alerts: [],
     scoreCard: {
@@ -162,9 +187,20 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     const parsedUrl = new url.URL(targetUrl);
     const domainOrigin = parsedUrl.origin;
 
-    // 1. Fetch robots.txt and machine manifests in parallel
+    // 1. Fetch robots.txt and machine manifests in parallel with socket latency measurement
+    const robotsStartTime = Date.now();
+    const robotsPromise = axios.get(`${domainOrigin}/robots.txt`, { timeout: 2500 })
+      .then(res => {
+        result.status.robotsFetchMs = Date.now() - robotsStartTime;
+        return res;
+      })
+      .catch(err => {
+        result.status.robotsFetchMs = Date.now() - robotsStartTime;
+        throw err;
+      });
+
     const [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled] = await Promise.allSettled([
-      axios.get(`${domainOrigin}/robots.txt`, { timeout: 2500 }),
+      robotsPromise,
       axios.get(`${domainOrigin}/llms.txt`, { timeout: 2000 }),
       axios.get(`${domainOrigin}/ai-context.md`, { timeout: 2000 }),
       axios.get(`${domainOrigin}/about.md`, { timeout: 2000 }),
@@ -176,7 +212,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     let robotsContent = '';
     let sitemapContent = '';
     if (robotsSettled.status === 'fulfilled' && robotsSettled.value.data) {
-      robotsContent = robotsSettled.value.data;
+      robotsContent = typeof robotsSettled.value.data === 'string' ? robotsSettled.value.data : JSON.stringify(robotsSettled.value.data);
       result.status.robotsTxtExists = true;
     }
 
@@ -236,13 +272,16 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         result.scoreCard.classification = 'Ugly';
       }
 
-      // Specific AI Bot Disallow Check
-      result.status.botPermissions = {
-        gptBot: !/User-agent:\s*GPTBot\s*Disallow:\s*\//i.test(robotsContent),
-        perplexityBot: !/User-agent:\s*PerplexityBot\s*Disallow:\s*\//i.test(robotsContent),
-        claudeBot: !/User-agent:\s*(ClaudeBot|Claude-Web)\s*Disallow:\s*\//i.test(robotsContent),
-        googleExtended: !/User-agent:\s*Google-Extended\s*Disallow:\s*\//i.test(robotsContent)
-      };
+      // Specific AI Bot Disallow Check across all 20 AI Crawlers
+      const botPermissions = {};
+      AI_CRAWLERS.forEach(bot => {
+        if (blanketDisallowMatch) {
+          botPermissions[bot.key] = false;
+        } else {
+          botPermissions[bot.key] = !bot.pattern.test(robotsContent);
+        }
+      });
+      result.status.botPermissions = botPermissions;
 
       if (!blanketDisallowMatch) {
         const blockedBots = Object.entries(result.status.botPermissions)
@@ -309,6 +348,10 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
           schema: { detected: [], authorCredentials: false },
           scores: { aiOptimized: 0, aiReady: 0, compositeHealth: 0 },
           triage: [`HTTP fetch failed for ${targetUrl}: ${e.message}`]
+        },
+        scanMetrics: {
+          scanTimeSeconds: Number(((Date.now() - scanStartTime) / 1000).toFixed(2)),
+          lastScanned: new Date().toISOString()
         }
       };
     }
@@ -473,6 +516,11 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       }
     }
 
+    result.scanMetrics = {
+      scanTimeSeconds: Number(((Date.now() - scanStartTime) / 1000).toFixed(2)),
+      lastScanned: new Date().toISOString()
+    };
+
     // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores via capabilityEvaluator
     const evaluation = evaluateCapabilities(result);
     const totalOverallScore = evaluation.overallScore;
@@ -505,4 +553,4 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
   return result;
 };
 
-module.exports = { analyzeUrl, parsePageHtml, fetchPageWithTimeout };
+module.exports = { analyzeUrl, parsePageHtml, fetchPageWithTimeout, AI_CRAWLERS };

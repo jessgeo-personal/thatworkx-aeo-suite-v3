@@ -1049,7 +1049,7 @@ function evaluateCapabilities(crawledData = {}) {
   const scanMetrics = {
     scanTimeSeconds: typeof crawledData.scanMetrics?.scanTimeSeconds === 'number'
       ? crawledData.scanMetrics.scanTimeSeconds
-      : (typeof crawledData.scanTimeSeconds === 'number' ? crawledData.scanTimeSeconds : 1.8),
+      : (typeof crawledData.scanTimeSeconds === 'number' ? crawledData.scanTimeSeconds : null),
     lastScanned: crawledData.scanMetrics?.lastScanned || crawledData.lastScanned || new Date().toISOString()
   };
 

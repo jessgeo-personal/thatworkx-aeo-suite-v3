@@ -15,10 +15,25 @@ const CANONICAL_ESSENTIAL_ROUTES = [
 
 const BOT_NAME_MAP = {
   gptBot: 'GPTBot',
+  chatGptUser: 'ChatGPT-User',
+  oaiSearchBot: 'OAI-SearchBot',
   claudeBot: 'ClaudeBot',
-  ccBot: 'CCBot',
+  claudeWeb: 'Claude-Web',
+  claudeSearchBot: 'Claude-SearchBot',
+  googleExtended: 'Google-Extended',
+  googlebot: 'Googlebot',
+  bingbot: 'Bingbot',
   perplexityBot: 'PerplexityBot',
-  googleExtended: 'Google-Extended'
+  applebotExtended: 'Applebot-Extended',
+  metaExternalAgent: 'Meta-ExternalAgent',
+  metaWebIndexer: 'Meta-WebIndexer',
+  amazonbot: 'Amazonbot',
+  bytespider: 'Bytespider',
+  ccBot: 'CCBot',
+  cohereAi: 'cohere-ai',
+  mistralBot: 'MistralBot',
+  qwenBot: 'QwenBot',
+  baiduAnsur: 'Baidu-Ansur'
 };
 
 /**

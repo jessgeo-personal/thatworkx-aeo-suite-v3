@@ -304,16 +304,6 @@ app.get('/api/scan/status/:jobId', (req, res) => {
   const job = queueService.getJobStatus(jobId);
   
   if (!job) {
-    // Fallback for tests or standard mock jobs
-    if (jobId === 'mock-job-id-123') {
-      return res.json({
-        jobId,
-        status: 'processing',
-        pagesCompleted: 30,
-        totalQueued: 40,
-        results: []
-      });
-    }
     return res.status(404).json({ error: 'Job not found' });
   }
 

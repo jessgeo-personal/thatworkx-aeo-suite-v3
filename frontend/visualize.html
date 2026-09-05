@@ -124,9 +124,9 @@
                 <span>Rescan</span>
               </button>
               
-              <button onclick="resetToUnauditedState()" class="px-4 py-2 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white text-sm font-mono font-bold transition active:scale-95 flex items-center space-x-2 shadow-[0_0_15px_rgba(183,65,14,0.35)]">
+              <button id="new-scan-btn" onclick="handleCockpitNewScan()" class="px-4 py-2 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white text-sm font-mono font-bold transition active:scale-95 flex items-center space-x-2 shadow-[0_0_15px_rgba(183,65,14,0.35)]">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>New Scan</span>
+                <span>+ New Scan</span>
               </button>
             </div>
           </div>
@@ -367,9 +367,36 @@
     <button id="btn-toggle-responsive" onclick="toggleResponsiveSimulation()" class="px-3 py-1.5 rounded-full bg-[#121212] hover:bg-[#2a2a2a] text-[#bdc1c6] hover:text-white border border-[#3c4043] transition font-bold">
       Simulate Tablet/Mobile View
     </button>
-    <button onclick="resetToUnauditedState()" class="px-3 py-1.5 rounded-full bg-[#1f1f1f] hover:bg-red-950 text-[#bdc1c6] hover:text-red-400 border border-[#3c4043] hover:border-red-500/50 transition font-bold">
-      Reset
-    </button>
+  </div>
+
+  <!-- LIVE AUDIT SCANNING MODAL OVERLAY -->
+  <div id="audit-progress-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[100] flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hidden" style="display: none;">
+    <div class="max-w-md w-full mx-4 bg-[#1f1f1f] border-2 border-[#b7410e]/60 rounded-3xl p-8 shadow-[0_0_50px_rgba(183,65,14,0.35)] text-center space-y-6">
+      <!-- Pulsing Spinner -->
+      <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border-4 border-[#b7410e]/30 animate-ping"></div>
+        <div class="absolute inset-2 rounded-full border-4 border-t-[#b7410e] border-r-transparent border-b-[#38bdf8] border-l-transparent animate-spin"></div>
+        <span class="text-2xl">🤖</span>
+      </div>
+
+      <!-- Status Headings -->
+      <div class="space-y-2">
+        <div class="text-xs font-mono font-black text-[#d45d2a] uppercase tracking-wider" id="modal-stage-counter">STAGE 1 OF 6 IN PROGRESS</div>
+        <h3 class="text-xl font-black text-white font-headline" id="modal-stage-title">Scanning AI Bot Blocks...</h3>
+        <p class="text-xs text-[#bdc1c6] leading-relaxed" id="modal-stage-desc">Evaluating target domain User-Agent permissions and WAF firewall rules across 20+ AI crawlers.</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-[#121212] rounded-full h-2.5 overflow-hidden border border-[#3c4043]">
+        <div id="modal-progress-bar" class="bg-gradient-to-r from-[#b7410e] to-[#38bdf8] h-2.5 rounded-full transition-all duration-500" style="width: 15%;"></div>
+      </div>
+
+      <!-- Live Telemetry Log Snippet -->
+      <div class="p-3 rounded-xl bg-[#121212] border border-[#3c4043] text-left font-mono text-[11px] text-[#38bdf8] space-y-1 overflow-hidden h-16 flex flex-col justify-end">
+        <div class="text-[#5f6368]">$ aio-scanner --target=<span id="modal-target-display">target</span></div>
+        <div id="modal-live-log" class="truncate">Initializing root socket handshake...</div>
+      </div>
+    </div>
   </div>
 
   <script src="visualize.js" type="module"></script>

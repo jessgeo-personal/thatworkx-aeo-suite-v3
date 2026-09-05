@@ -201,9 +201,13 @@ describe('Feature: Progressive Scan Queue (25-Page Sync Threshold)', () => {
   });
 
   it('Scenario 4: Background Job Polling returns current scan progress starting from page 26', async () => {
+    const queueService = require('../../services/queueService');
+    queueService.createJob('test-job-id-123', 40, 25, []);
+    queueService.updateJobProgress('test-job-id-123', 30, []);
+
     const req = {
       params: {
-        jobId: 'mock-job-id-123'
+        jobId: 'test-job-id-123'
       }
     };
 
