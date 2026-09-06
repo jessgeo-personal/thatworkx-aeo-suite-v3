@@ -130,18 +130,18 @@ const CAPABILITY_MATRIX = [
     sectionName: 'Presence & Hygiene',
     name: 'Essential Pages Index Coverage',
     category: 'Hygiene',
-    description: 'Verifies presence of /about, /contact, and /privacy-policy.',
+    description: 'Verifies presence of /about, /contact, /pricing, /privacy-policy, and /terms-of-service.',
     impact: 'Missing core identity pages weakens domain trust signals evaluated by AI search engines.',
     evaluate: (data = {}) => {
       const found = data.sec2?.essentialPagesFound ?? 0;
-      const score = Math.min(100, (found / 3) * 100);
+      const score = Math.min(100, (found / 5) * 100);
       return {
-        status: found >= 3 ? 'active' : 'warning',
+        status: found >= 5 ? 'active' : 'warning',
         score,
-        details: `Found ${found}/3 essential trust pages (/about, /contact, /privacy-policy)`,
-        deductionReason: found < 3 ? `Missing ${3 - found} essential trust page(s) penalizes hygiene (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
+        details: `Found ${found}/5 essential trust pages (/about, /contact, /pricing, /privacy-policy, /terms-of-service)`,
+        deductionReason: found < 5 ? `Missing ${5 - found} essential trust page(s) penalizes hygiene (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
         impact: 'Missing core identity pages weakens domain trust signals evaluated by AI search engines.',
-        recommendation: 'Publish and index dedicated /about, /contact, and /privacy-policy pages.'
+        recommendation: 'Publish and index dedicated /about, /contact, /pricing, /privacy-policy, and /terms-of-service pages.'
       };
     }
   },
@@ -1266,8 +1266,8 @@ function evaluateCapabilities(crawledData = {}) {
   }
 
   // c) Missing Essential Pages Array
-  const essentialPagesList = ['/about', '/contact', '/privacy', '/terms'];
-  const detectedRoutes = new Set(discoveredRoutes.map(r => r.path || r.route || '/'));
+  const essentialPagesList = ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'];
+  const detectedRoutes = new Set((crawledData.discoveredRoutes || []).map(r => typeof r === 'string' ? r : (r.path || r.route || '')));
   const missingEssentialPages = essentialPagesList.filter(route => !detectedRoutes.has(route));
 
   // d) Domain Trust & EEAT Payload
@@ -1275,13 +1275,11 @@ function evaluateCapabilities(crawledData = {}) {
     ? crawledData.eeatMetrics.isSecure
     : (sec2.isHttps !== false && (!targetUrl || targetUrl.startsWith('https')));
 
-  const hasContactInfo = typeof crawledData.eeatMetrics?.hasContactInfo === 'boolean'
-    ? crawledData.eeatMetrics.hasContactInfo
-    : Boolean(crawledData.eeatMetrics?.hasContactInfo ?? sec3.hasContactInfo);
+  const hasContactPage = detectedRoutes.has('/contact') || (crawledData.pages || []).some(p => p.route === '/contact' || p.path === '/contact');
+  const hasPrivacyPage = detectedRoutes.has('/privacy-policy') || detectedRoutes.has('/privacy') || (crawledData.pages || []).some(p => p.route === '/privacy-policy' || p.route === '/privacy');
 
-  const hasPrivacyPolicy = typeof crawledData.eeatMetrics?.hasPrivacyPolicy === 'boolean'
-    ? crawledData.eeatMetrics.hasPrivacyPolicy
-    : Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy ?? sec3.hasPrivacyPolicy);
+  const hasContactInfo = Boolean(crawledData.eeatMetrics?.hasContactInfo || sec3.hasContactInfo || hasContactPage || emailValue !== 'None Detected' || phoneValue !== 'None Detected');
+  const hasPrivacyPolicy = Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy || sec3.hasPrivacyPolicy || hasPrivacyPage);
 
   const results = crawledData;
   const ageEstimate = results.eeatMetrics?.ageEstimate || sec3.ageEstimate || results.domainAge || "Pending WHOIS Integration";

@@ -71,14 +71,14 @@ export const CAPABILITY_MATRIX = [
     sectionName: 'Is Your Web Presence Optimized for AI?',
     name: 'Essential Pages Index Coverage',
     category: 'Hygiene',
-    description: 'Verifies presence of /about, /contact, and /privacy-policy.',
+    description: 'Verifies presence of /about, /contact, /pricing, /privacy-policy, and /terms-of-service.',
     evaluate: (data = {}) => {
       const found = data.sec2?.essentialPagesFound ?? (data.status?.aboutTxtExists ? 2 : 1);
       return {
-        status: found >= 3 ? 'pass' : 'warning',
-        score: Math.min(100, (found / 3) * 100),
-        details: `Found ${found}/3 essential trust pages (/about, /contact, /privacy-policy)`,
-        recommendation: 'Publish and index dedicated /about, /contact, and /privacy-policy pages.'
+        status: found >= 5 ? 'pass' : 'warning',
+        score: Math.min(100, (found / 5) * 100),
+        details: `Found ${found}/5 essential trust pages (/about, /contact, /pricing, /privacy-policy, /terms-of-service)`,
+        recommendation: 'Publish and index dedicated /about, /contact, /pricing, /privacy-policy, and /terms-of-service pages.'
       };
     }
   },

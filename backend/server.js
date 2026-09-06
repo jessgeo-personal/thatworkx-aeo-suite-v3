@@ -502,6 +502,107 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
   }
 });
 
+app.post('/api/test/crawler', async (req, res) => {
+  let targetUrl = req.body?.targetUrl;
+  try {
+    if (!targetUrl) {
+      return res.status(422).json({
+        success: false,
+        service: 'crawlerService',
+        error: 'targetUrl is required',
+        data: null
+      });
+    }
+
+    targetUrl = targetUrl.trim();
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
+    const maxPages = req.body?.maxPages ? Number(req.body.maxPages) : 25;
+    const scanResults = await analyzeUrl(targetUrl, { maxPages, tier: 'test' });
+
+    if (scanResults.status === 'failed' || scanResults.error) {
+      return res.status(422).json({
+        success: false,
+        service: 'crawlerService',
+        error: scanResults.error || 'Crawler probe failed',
+        data: scanResults
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      service: 'crawlerService',
+      targetUrl,
+      data: scanResults
+    });
+  } catch (err) {
+    return res.status(422).json({
+      success: false,
+      service: 'crawlerService',
+      error: err.message || 'Internal crawler probe error',
+      data: null
+    });
+  }
+});
+
+app.post('/api/test/evaluator', async (req, res) => {
+  let targetUrl = req.body?.targetUrl;
+  const crawlPayload = req.body?.crawlPayload;
+
+  try {
+    let scanResults;
+    if (crawlPayload && typeof crawlPayload === 'object') {
+      scanResults = crawlPayload;
+      targetUrl = targetUrl || scanResults.url || 'https://example.com';
+    } else {
+      if (!targetUrl) {
+        return res.status(422).json({
+          success: false,
+          service: 'capabilityEvaluator',
+          error: 'targetUrl or crawlPayload is required',
+          data: null
+        });
+      }
+
+      targetUrl = targetUrl.trim();
+      if (!/^https?:\/\//i.test(targetUrl)) {
+        targetUrl = 'https://' + targetUrl;
+      }
+
+      const maxPages = req.body?.maxPages ? Number(req.body.maxPages) : 25;
+      scanResults = await analyzeUrl(targetUrl, { maxPages, tier: 'test' });
+
+      if (scanResults.status === 'failed' || scanResults.error) {
+        return res.status(422).json({
+          success: false,
+          service: 'capabilityEvaluator',
+          error: scanResults.error || 'Target domain could not be reached',
+          data: scanResults
+        });
+      }
+    }
+
+    const evaluation = evaluateCapabilities(scanResults);
+
+    return res.status(200).json({
+      success: true,
+      service: 'capabilityEvaluator',
+      targetUrl,
+      crawlData: scanResults,
+      evaluationData: evaluation
+    });
+  } catch (err) {
+    return res.status(422).json({
+      success: false,
+      service: 'capabilityEvaluator',
+      error: err.message || 'Capability evaluation probe failed',
+      data: null
+    });
+  }
+});
+
 // Serve frontend assets — disable cache in dev so JS/CSS changes are instant
 app.use(express.static(path.join(__dirname, '../frontend'), {
   etag: false,
@@ -510,6 +611,22 @@ app.use(express.static(path.join(__dirname, '../frontend'), {
     res.setHeader('Cache-Control', 'no-store');
   }
 }));
+
+app.get('/test-crawler', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-crawler.html'));
+});
+
+app.get('/test-evaluator', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-evaluator.html'));
+});
+
+app.get('/test-server', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-server.html'));
+});
+
+app.get('/test-adapter', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-adapter.html'));
+});
 
 app.get('/visualize', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/visualize.html'));

@@ -179,9 +179,9 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(res.emailValue).toBe('info@example.com');
     expect(res.phoneValue).toBe('1-800-555-0199');
 
-    // 3. Missing essential pages logic: '/about' is in discoveredRoutes, so only '/contact', '/privacy', and '/terms' are missing.
+    // 3. Missing essential pages logic: '/about' is in discoveredRoutes, so only '/contact', '/pricing', '/privacy-policy', and '/terms-of-service' are missing.
     expect(Array.isArray(res.missingEssentialPages)).toBe(true);
-    expect(res.missingEssentialPages).toEqual(['/contact', '/privacy', '/terms']);
+    expect(res.missingEssentialPages).toEqual(['/contact', '/pricing', '/privacy-policy', '/terms-of-service']);
   });
 
   it('should fallback to default contact values when they are not present', () => {
@@ -192,8 +192,9 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
         { path: '/' },
         { path: '/about' },
         { path: '/contact' },
-        { path: '/privacy' },
-        { path: '/terms' }
+        { path: '/pricing' },
+        { path: '/privacy-policy' },
+        { path: '/terms-of-service' }
       ]
     });
 

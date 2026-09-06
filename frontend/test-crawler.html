@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AEO Suite V3 - Crawler Service Test Harness</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --border-color: #2d2d2d;
+    }
+    body {
+      background-color: #121212;
+      color: #f3f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    }
+    .status-badge-allowed {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-badge-blocked {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-[#121212] min-h-screen text-gray-100 p-4 md:p-8">
+  <div id="crawler-harness-app" class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- Top Header & Probe Trigger Controls -->
+    <header class="border-b border-gray-800 pb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            Crawler Service Isolation Harness
+          </h1>
+          <p class="text-sm text-gray-400 mt-1">
+            Direct probe inspector for <code class="text-emerald-400 bg-gray-900 px-1.5 py-0.5 rounded">backend/services/crawlerService.js</code> (Zero Mocks, Full 20-Bot Matrix).
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-400 border border-gray-700">AEO Suite v3</span>
+          <span class="text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Crawler Engine</span>
+        </div>
+      </div>
+
+      <!-- URL Input & Run Button -->
+      <section class="mt-6 flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <input
+            type="text"
+            id="target-url-input"
+            placeholder="https://example.com"
+            class="w-full bg-[#1e1e1e] border border-gray-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-lg px-4 py-3 text-white placeholder-gray-500 text-base outline-none transition"
+          />
+        </div>
+        <button
+          id="btn-run-crawler"
+          class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-950"
+        >
+          <span id="btn-spinner" class="hidden animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></span>
+          <span id="btn-label">Run Raw Crawler Probe</span>
+        </button>
+      </section>
+    </header>
+
+    <!-- Error Banner -->
+    <div
+      id="crawler-error-banner"
+      role="alert"
+      class="hidden bg-red-950/80 border border-red-800 text-red-300 px-5 py-4 rounded-lg text-sm font-medium flex items-center justify-between"
+    >
+      <div class="flex items-center gap-3">
+        <span class="text-red-400 text-lg">⚠️</span>
+        <span id="crawler-error-message">Error executing probe</span>
+      </div>
+      <button id="btn-dismiss-error" class="text-red-400 hover:text-red-200 text-xs uppercase tracking-wider font-bold">Dismiss</button>
+    </div>
+
+    <!-- Summary Telemetry Metric Bar -->
+    <section id="telemetry-bar" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Target URL</div>
+        <div id="metric-target-url" class="text-sm font-mono text-emerald-400 truncate mt-1">--</div>
+      </div>
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Status</div>
+        <div id="metric-status-badge" class="text-sm font-semibold text-gray-300 mt-1">--</div>
+      </div>
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Socket Latency</div>
+        <div id="metric-latency" class="text-sm font-mono text-cyan-400 mt-1">--</div>
+      </div>
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Discovered URLs</div>
+        <div id="metric-total-urls" class="text-sm font-bold text-white mt-1">--</div>
+      </div>
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Page Depth Crawled</div>
+        <div id="metric-depth-crawled" class="text-sm font-bold text-white mt-1">--</div>
+      </div>
+      <div class="bg-[#1e1e1e] border border-gray-800 p-4 rounded-lg">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">WAF / Firewall</div>
+        <div id="metric-waf-status" class="text-sm font-semibold text-gray-300 mt-1">--</div>
+      </div>
+    </section>
+
+    <!-- Section 1: Manifest Probes Grid -->
+    <section class="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-5">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>📄</span> Section 1: Manifest Probes Grid
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Direct HTTP 200/404 settled probes for standard and AI-Ready machine manifests</p>
+        </div>
+        <span id="manifest-count-badge" class="text-xs bg-gray-800 text-gray-400 px-2.5 py-1 rounded border border-gray-700">7 Probes</span>
+      </div>
+      <div id="manifest-probes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div class="text-gray-500 text-sm py-4 italic">No probe executed yet. Enter URL above and run crawler.</div>
+      </div>
+    </section>
+
+    <!-- Section 2: 20 AI Bots Permissions Matrix -->
+    <section class="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-5">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🤖</span> Section 2: 20 AI Bots Permissions Matrix
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Complete Global, European, and Asian AI bot indexing permission evaluation</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="bot-allowed-count" class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800">0 Allowed</span>
+          <span id="bot-blocked-count" class="text-xs bg-red-950 text-red-400 px-2 py-0.5 rounded border border-red-800">0 Blocked</span>
+        </div>
+      </div>
+      <div id="bots-matrix-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div class="text-gray-500 text-sm py-4 italic col-span-full">No bot permissions evaluated yet.</div>
+      </div>
+    </section>
+
+    <!-- Section 3: Crawled Pages Detailed Array -->
+    <section class="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-5">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>📑</span> Section 3: Crawled Pages Detailed Array
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Itemized diagnostic cards for every crawled page with hierarchy, metrics & body snippets</p>
+        </div>
+        <span id="crawled-pages-count-badge" class="text-xs bg-gray-800 text-gray-400 px-2.5 py-1 rounded border border-gray-700">0 Pages</span>
+      </div>
+      <div id="pages-list-container" class="space-y-4">
+        <div class="text-gray-500 text-sm py-4 italic">No pages crawled yet.</div>
+      </div>
+    </section>
+
+    <!-- Section 4: Discovered Routes Pool -->
+    <section class="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🌐</span> Section 4: Discovered Routes Pool
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Unique URLs extracted from HTML <code class="text-amber-300">&lt;a href&gt;</code> tags and <code class="text-amber-300">sitemap.xml</code></p>
+        </div>
+        <span id="discovered-routes-count" class="text-xs bg-gray-800 text-gray-400 px-2.5 py-1 rounded border border-gray-700">0 Routes</span>
+      </div>
+      <div id="discovered-routes-container" class="max-h-64 overflow-y-auto bg-gray-950 p-4 rounded-lg border border-gray-900 font-mono text-xs text-gray-300 space-y-1">
+        <div class="text-gray-500 italic">No routes discovered yet.</div>
+      </div>
+    </section>
+
+    <!-- Section 5: Raw JSON Inspection Drawer -->
+    <section id="raw-json-drawer" class="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6">
+      <details class="group">
+        <summary class="cursor-pointer font-bold text-white text-base flex items-center justify-between select-none">
+          <span class="flex items-center gap-2">
+            <span>🔍</span> Section 5: Raw JSON Inspection Drawer
+          </span>
+          <span class="text-xs text-emerald-400 group-open:rotate-180 transition transform">▼</span>
+        </summary>
+        <div class="mt-4 pt-4 border-t border-gray-800">
+          <p class="text-xs text-gray-400 mb-2">Unfiltered raw response payload from <code class="text-emerald-400">POST /api/test/crawler</code>:</p>
+          <pre id="raw-json-dump" class="bg-gray-950 text-gray-200 p-4 rounded-lg border border-gray-900 text-xs font-mono overflow-x-auto max-h-96 overflow-y-auto">--</pre>
+        </div>
+      </details>
+    </section>
+
+  </div>
+
+  <script type="module" src="./test-crawler.js"></script>
+</body>
+</html>

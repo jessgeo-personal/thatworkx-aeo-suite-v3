@@ -98,7 +98,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   const words = rawText.split(/\s+/).filter(Boolean);
   const bodySnippet = words.slice(0, 180).join(' ') + (words.length > 180 ? '...' : '');
 
-  return {
+  const pageObj = {
     route: pageRoute,
     title: titleText || `Page ${pageRoute}`,
     metaDescription: descText,
@@ -121,6 +121,18 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     hasCanonical: canonicalUrl.length > 0,
     canonicalUrl
   };
+
+  if (pageRoute === '/') {
+    pageObj.inPageSections = {
+      about: $('#about, #about-us, [id*="about"]').length > 0,
+      contact: $('#contact, #contact-us, [id*="contact"]').length > 0,
+      pricing: $('#pricing, #plans, [id*="pricing"]').length > 0,
+      privacy: $('#privacy, #privacy-policy, [id*="privacy"]').length > 0,
+      terms: $('#terms, #terms-of-service, [id*="terms"]').length > 0
+    };
+  }
+
+  return pageObj;
 };
 
 const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialSyncLimit = null) => {
@@ -214,6 +226,8 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     if (robotsSettled.status === 'fulfilled' && robotsSettled.value.data) {
       robotsContent = typeof robotsSettled.value.data === 'string' ? robotsSettled.value.data : JSON.stringify(robotsSettled.value.data);
       result.status.robotsTxtExists = true;
+      result.status.robotsTxtContent = robotsContent;
+      result.status.robotsTxtStatusCode = robotsSettled.value?.status || 200;
     }
 
     if (llmsSettled.status === 'fulfilled' && llmsSettled.value.status === 200 && llmsSettled.value.data) {
@@ -239,6 +253,8 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     if (sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data) {
       result.status.sitemapExists = true;
       sitemapContent = typeof sitemapSettled.value.data === 'string' ? sitemapSettled.value.data : JSON.stringify(sitemapSettled.value.data);
+      result.status.sitemapContent = sitemapContent;
+      result.status.sitemapStatusCode = sitemapSettled.value?.status || 200;
     }
 
     const failedWithWaf = [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled].find(
@@ -513,6 +529,44 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
             status: 'failed',
             error: fetchRes.error === 'heavy_page_timeout' ? 'heavy_page_timeout' : 'fetch_error'
           });
+        }
+      }
+    }
+
+    // Check inPageSections on homepage and push available in-page sections as discovered virtual routes
+    const homepage = result.pages.find(p => p.route === '/');
+    if (homepage && homepage.inPageSections) {
+      const sectionToVirtualRoute = [
+        { key: 'about', route: '/#about', prefixes: ['/about', '/about-us'] },
+        { key: 'contact', route: '/#contact', prefixes: ['/contact', '/contact-us'] },
+        { key: 'pricing', route: '/#pricing', prefixes: ['/pricing', '/plans'] },
+        { key: 'privacy', route: '/#privacy', prefixes: ['/privacy', '/privacy-policy'] },
+        { key: 'terms', route: '/#terms', prefixes: ['/terms', '/terms-of-service'] }
+      ];
+
+      for (const { key, route, prefixes } of sectionToVirtualRoute) {
+        if (homepage.inPageSections[key]) {
+          const hasDistinct = result.pages.some(p => prefixes.includes(p.route));
+          if (!hasDistinct && !result.pages.some(p => p.route === route)) {
+            result.pages.push({
+              route,
+              url: `${targetUrl.replace(/\/$/, '')}${route}`,
+              title: `${homepage.title || 'Home'} - ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+              metaDescription: homepage.metaDescription || '',
+              wordCount: Math.round(homepage.wordCount / 4) || 100,
+              rawText: homepage.rawText || '',
+              content: homepage.content || '',
+              html: homepage.html || '',
+              bodySnippet: `In-page section ${route} detected on single-page homepage.`,
+              headings: [],
+              hasTitle: true,
+              titleLength: homepage.titleLength || 0,
+              hasDescription: homepage.hasDescription || false,
+              headingAudit: { h1: 1, h2: 1, h3: 0, h4: 0, isHierarchyValid: true },
+              hasCanonical: homepage.hasCanonical || false,
+              canonicalUrl: homepage.canonicalUrl || ''
+            });
+          }
         }
       }
     }
