@@ -158,7 +158,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       xRobotsIndexable: true,
       hasProperHierarchy: true,
       experienceScore: 0,
-      readabilityRating: 'Good',
+      readabilityRating: 'UNAUDITED',
       seoOptimalTitle: false,
       seoOptimalDesc: false,
       gatewayBadge: 'Hidden Assets',
@@ -408,7 +408,8 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     }
 
     // Ingest sitemap link
-    result.status.sitemapExists = robotsContent.toLowerCase().includes('sitemap:');
+    result.status.sitemapExists = Boolean(sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data);
+    result.status.sitemapInRobots = robotsContent.toLowerCase().includes('sitemap:');
 
     // Extract actual internal links discovered on the crawled landing page HTML
     const discoveredLinks = new Set();

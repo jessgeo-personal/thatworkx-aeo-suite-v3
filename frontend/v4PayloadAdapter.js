@@ -198,11 +198,10 @@ export function mapBackendScanToV4State(rawPayload) {
   ].filter(Boolean);
 
   const routes = CANONICAL_ESSENTIAL_ROUTES.map((route) => {
-    const isMissing = missingPages.includes(route);
     const isFound = crawledPaths.some((p) => p === route || p.endsWith(route));
     return {
       route,
-      status: isMissing ? 'missing' : (isFound ? 'discovered' : (missingPages.length > 0 ? 'missing' : 'discovered'))
+      status: isFound ? 'discovered' : 'missing'
     };
   });
   const missingCount = routes.filter((r) => r.status === 'missing').length;
@@ -296,7 +295,7 @@ export function mapBackendScanToV4State(rawPayload) {
     rawScores.aiOptimizedScore ?? data.pillarScores?.P1 ?? data.scoreCard?.pillars?.p1?.score ?? 0
   ) || 0;
   const aiReadyScore = Number(
-    rawScores.aiReadyScore ?? data.pillarScores?.P2 ?? data.pillarScores?.P4 ?? data.scoreCard?.pillars?.p4?.score ?? data.scoreCard?.pillars?.p2?.score ?? 0
+    rawScores.aiReadyScore ?? data.pillarScores?.P4 ?? data.scoreCard?.pillars?.p4?.score ?? 0
   ) || 0;
   
   const rawFlags = rawScores.triageFlags || data.alerts?.map((a) => a.message || a.title || JSON.stringify(a)) || [];

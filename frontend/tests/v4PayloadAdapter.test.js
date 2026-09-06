@@ -233,6 +233,6 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
     expect(state.stage5.manifests.find(m => m.path === '/llms.txt')?.exists).toBe(false);
     expect(state.stage6.overallHealthIndex).toBe(74);
     expect(state.stage6.aiOptimizedScore).toBe(82);
-    expect(state.stage6.aiReadyScore).toBe(46);
+    expect(state.stage6.aiReadyScore).toBe(70);
   });
 });

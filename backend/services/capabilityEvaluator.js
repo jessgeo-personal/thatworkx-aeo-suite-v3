@@ -133,7 +133,7 @@ const CAPABILITY_MATRIX = [
     description: 'Verifies presence of /about, /contact, and /privacy-policy.',
     impact: 'Missing core identity pages weakens domain trust signals evaluated by AI search engines.',
     evaluate: (data = {}) => {
-      const found = data.sec2?.essentialPagesFound ?? (data.status?.aboutTxtExists ? 3 : 2);
+      const found = data.sec2?.essentialPagesFound ?? 0;
       const score = Math.min(100, (found / 3) * 100);
       return {
         status: found >= 3 ? 'active' : 'warning',
@@ -155,7 +155,8 @@ const CAPABILITY_MATRIX = [
     impact: 'Heavy single-page app (SPA) JavaScript containers cause crawler timeouts resulting in empty page text.',
     evaluate: (data = {}) => {
       const isHeavy = data.sec2?.isHeavyJs || (data.status?.spaTrapDetected === true);
-      const isZeroText = (data.status?.wordCount ?? 500) === 0;
+      const words = data.status?.wordCount ?? data.sec2?.wordCount ?? 0;
+      const isZeroText = words === 0;
       const hasHandshake = data.status?.llmsTxtExists || data.status?.aiContextExists;
 
       if (isZeroText && hasHandshake) {
@@ -213,7 +214,7 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Ensure main content is server-side rendered as clean HTML text.'
         };
       }
-      const tokens = words ? Math.round(words * 1.3) : (data.sec2?.estimatedTokens ?? 1250);
+      const tokens = words ? Math.round(words * 1.3) : (data.sec2?.estimatedTokens ?? 0);
       const isOver = tokens > 4000;
       return {
         status: isOver ? 'warning' : 'active',
@@ -236,7 +237,7 @@ const CAPABILITY_MATRIX = [
     evaluate: (data = {}) => ({
       status: 'active',
       score: 100,
-      details: `${data.sec2?.externalLinkCount ?? 14} external outbound domain citations identified`,
+      details: `${data.sec2?.externalLinkCount ?? 0} external outbound domain citations identified`,
       deductionReason: '🟢 No deductions — All protocols clean.',
       impact: 'Authoritative outbound citations demonstrate factual verification and link graph authority.',
       recommendation: 'Maintain authoritative outbound link citations for E-E-A-T trust signals.'
@@ -336,7 +337,7 @@ const CAPABILITY_MATRIX = [
     description: 'Inbound/outbound internal linkage structure.',
     impact: 'Orphaned pages without internal links are ignored by topic-cluster AI models.',
     evaluate: (data = {}) => {
-      const linkCount = data.sec3?.internalLinkCount ?? 18;
+      const linkCount = data.sec3?.internalLinkCount ?? 0;
       const isOk = linkCount > 5;
       return {
         status: isOk ? 'active' : 'warning',
@@ -357,8 +358,8 @@ const CAPABILITY_MATRIX = [
     description: 'Title tag presence, length (30-60 chars), and meta description density.',
     impact: 'Poor metadata length causes AI models to hallucinate or summarize incorrect page titles.',
     evaluate: (data = {}) => {
-      const isOptimalTitle = data.status?.seoOptimalTitle ?? true;
-      const isOptimalDesc = data.status?.seoOptimalDesc ?? true;
+      const isOptimalTitle = data.status?.seoOptimalTitle ?? false;
+      const isOptimalDesc = data.status?.seoOptimalDesc ?? false;
       const isOk = isOptimalTitle && isOptimalDesc;
       return {
         status: isOk ? 'active' : 'warning',
@@ -403,7 +404,7 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Provide readable static text content for LLM parsing.'
         };
       }
-      const flesch = data.sec3?.fleschScore ?? 68;
+      const flesch = data.sec3?.fleschScore ?? 0;
       const isGood = flesch >= 50;
       return {
         status: isGood ? 'active' : 'warning',
@@ -448,8 +449,8 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Break content into clear paragraph blocks under 80 words.'
         };
       }
-      const avgWords = data.sec3?.avgWordsPerP ?? 54;
-      const isOk = avgWords <= 80;
+      const avgWords = data.sec3?.avgWordsPerP ?? 0;
+      const isOk = avgWords > 0 && avgWords <= 80;
       return {
         status: isOk ? 'active' : 'warning',
         score: isOk ? 100 : 60,
@@ -469,9 +470,9 @@ const CAPABILITY_MATRIX = [
     description: 'JSON-LD FAQ validation, Question Count, Answer Count, and 1:1 Parity Ratio.',
     impact: 'Structured FAQ schema allows AI engines to quote direct answers to user queries.',
     evaluate: (data = {}) => {
-      const q = data.sec3?.faqQuestions ?? 4;
-      const a = data.sec3?.faqAnswers ?? 4;
-      const hasSchema = data.status?.jsonLdExists ?? data.sec3?.hasFaqSchema ?? true;
+      const q = data.sec3?.faqQuestions ?? 0;
+      const a = data.sec3?.faqAnswers ?? 0;
+      const hasSchema = data.status?.jsonLdExists ?? data.sec3?.hasFaqSchema ?? false;
       const isParity = q > 0 && q === a;
       const isOk = isParity && hasSchema;
       return {
@@ -493,7 +494,7 @@ const CAPABILITY_MATRIX = [
     description: 'Presence of <article>, <section>, <header>, <nav>, <main>.',
     impact: 'Semantic tags guide LLM parsers to identify primary body content vs navigation noise.',
     evaluate: (data = {}) => {
-      const count = data.sec3?.semanticCount ?? 4;
+      const count = data.sec3?.semanticCount ?? 0;
       const score = Math.min(100, count * 20);
       return {
         status: count >= 4 ? 'active' : 'warning',
@@ -514,7 +515,7 @@ const CAPABILITY_MATRIX = [
     description: 'Single H1 enforcement flag, H2 / H3 sequential hierarchy check.',
     impact: 'Broken heading hierarchies cause LLMs to fail outline parsing and topic chunk extraction.',
     evaluate: (data = {}) => {
-      const isProper = data.status?.hasProperHierarchy ?? true;
+      const isProper = data.status?.hasProperHierarchy ?? false;
       return {
         status: isProper ? 'active' : 'warning',
         score: isProper ? 100 : 50,
@@ -535,11 +536,12 @@ const CAPABILITY_MATRIX = [
     impact: 'Missing alt text prevents multimodal vision AI models from understanding page graphics.',
     evaluate: (data = {}) => {
       const missingCount = data.sec3?.missingAltCount ?? 0;
-      const score = Math.max(0, 100 - missingCount * 15);
+      const totalImages = data.sec3?.totalImages ?? 0;
+      const score = totalImages === 0 ? 100 : Math.max(0, 100 - missingCount * 15);
       return {
         status: missingCount === 0 ? 'active' : 'warning',
         score,
-        details: `Total images: ${data.sec3?.totalImages ?? 8} | Missing alt attribute: ${missingCount}`,
+        details: `Total images: ${totalImages} | Missing alt attribute: ${missingCount}`,
         deductionReason: missingCount > 0 ? `${missingCount} image(s) missing descriptive alt attributes (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
         impact: 'Missing alt text prevents multimodal vision AI models from understanding page graphics.',
         recommendation: 'Add descriptive alt text attributes to all content images for vision & multi-modal AI models.'
@@ -581,7 +583,7 @@ const CAPABILITY_MATRIX = [
     description: 'Availability, bot directive review, sample template generator.',
     impact: 'Root /robots.txt defines legal and procedural crawling boundaries for AI bots.',
     evaluate: (data = {}) => {
-      const exists = data.status?.robotsTxtExists ?? data.sec4?.robotsTxtFound ?? true;
+      const exists = data.status?.robotsTxtExists ?? data.sec4?.robotsTxtFound ?? false;
       return {
         status: exists ? 'active' : 'critical',
         score: exists ? 100 : 0,
@@ -661,7 +663,7 @@ const CAPABILITY_MATRIX = [
     description: 'Per-page availability and missing schema warning.',
     impact: 'Structured entity schemas allow LLMs to build knowledge graph nodes for your brand.',
     evaluate: (data = {}) => {
-      const exists = data.status?.jsonLdExists ?? data.sec4?.jsonLdFound ?? true;
+      const exists = data.status?.jsonLdExists ?? data.sec4?.jsonLdFound ?? false;
       return {
         status: exists ? 'active' : 'warning',
         score: exists ? 100 : 40,
@@ -800,14 +802,21 @@ const CAPABILITY_MATRIX = [
     category: 'Manifests',
     description: 'Page path coverage comparison against discovered routes.',
     impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
-    evaluate: (data = {}) => ({
-      status: 'active',
-      score: 95,
-      details: 'Discovered routes match sitemap index entries',
-      deductionReason: '🟢 No deductions — All protocols clean.',
-      impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
-      recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
-    })
+    evaluate: (data = {}) => {
+      const discovered = data.discoveredRoutes || data.pages || [];
+      const totalDiscovered = discovered.length;
+      const matched = discovered.filter(r => r.inSitemap === true).length;
+      const score = totalDiscovered > 0 ? Math.round((matched / totalDiscovered) * 100) : 0;
+      const isOk = score >= 80;
+      return {
+        status: isOk ? 'active' : 'warning',
+        score,
+        details: totalDiscovered > 0 ? `${matched}/${totalDiscovered} discovered routes indexed in sitemap.xml` : 'No discovered routes matched in sitemap index',
+        deductionReason: isOk ? '🟢 No deductions — All protocols clean.' : `Sitemap path coverage (${score}%) below target (-${100 - score} pts)`,
+        impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
+        recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
+      };
+    }
   }
 ];
 
@@ -836,7 +845,7 @@ function evaluateCapabilities(crawledData = {}) {
   // Evaluate ONLY robots.txt, WAF/CDN blocks, and X-Robots-Tag headers. NO sitemap penalties!
   let p1Score = 25;
   let p1Deductions = [];
-  const robotsTxtExists = status.robotsTxtExists ?? sec1.robotsTxtExists ?? sec4.robotsTxtFound ?? true;
+  const robotsTxtExists = status.robotsTxtExists ?? sec1.robotsTxtExists ?? sec4.robotsTxtFound ?? false;
   const isDisallowed = status.xRobotsIndexable === false || sec1.disallowAll === true || (!robotsTxtExists);
   const cdnBlocked = sec1.cdnBlocked === true;
   const botPermissions = status.botPermissions || {};
@@ -892,7 +901,7 @@ function evaluateCapabilities(crawledData = {}) {
     p2Deductions.push('Heavy Client-Side SPA JS trap detected (-5 pts)');
   }
 
-  const essentialPagesFound = sec2.essentialPagesFound ?? (status.aboutTxtExists ? 3 : 2);
+  const essentialPagesFound = sec2.essentialPagesFound ?? 0;
   if (essentialPagesFound < 3) {
     p2Score -= 5;
     p2Deductions.push(`Missing ${3 - essentialPagesFound} essential trust page(s) (-5 pts)`);
@@ -904,26 +913,26 @@ function evaluateCapabilities(crawledData = {}) {
   // Evaluate title tag length, meta descriptions, heading trees, Flesch readability.
   let p3Score = 25;
   let p3Deductions = [];
-  const seoOptimalTitle = status.seoOptimalTitle ?? sec3.seoOptimalTitle ?? true;
+  const seoOptimalTitle = status.seoOptimalTitle ?? sec3.seoOptimalTitle ?? false;
   if (!seoOptimalTitle) {
     p3Score -= 5;
     p3Deductions.push('Title tag outside optimal recommended character length (-5 pts)');
   }
 
-  const seoOptimalDesc = status.seoOptimalDesc ?? sec3.seoOptimalDesc ?? true;
+  const seoOptimalDesc = status.seoOptimalDesc ?? sec3.seoOptimalDesc ?? false;
   if (!seoOptimalDesc) {
     p3Score -= 5;
     p3Deductions.push('Meta description outside optimal recommended character length (-5 pts)');
   }
 
-  const hasProperHierarchy = status.hasProperHierarchy ?? sec3.hasProperHierarchy ?? true;
+  const hasProperHierarchy = status.hasProperHierarchy ?? sec3.hasProperHierarchy ?? false;
   if (!hasProperHierarchy) {
     p3Score -= 10;
     p3Deductions.push('Heading hierarchy violated (Multiple H1s or skipped sub-heading levels) (-10 pts)');
   }
 
-  const wordCount = status.wordCount ?? sec3.wordCount ?? 800;
-  const fleschScore = sec3.fleschScore ?? 68;
+  const wordCount = status.wordCount ?? sec3.wordCount ?? 0;
+  const fleschScore = sec3.fleschScore ?? 0;
   if (wordCount < 500) {
     p3Score -= 5;
     p3Deductions.push('Page word count under 500 words data starvation risk (-5 pts)');
@@ -1253,42 +1262,7 @@ function evaluateCapabilities(crawledData = {}) {
       };
     });
   } else {
-    const rootWords = status.wordCount ?? sec2.wordCount ?? 205;
-    const baseUrl = crawledData.url ? crawledData.url.replace(/\/$/, '') : '';
-    discoveredRoutes = [
-      {
-        path: '/',
-        wordCount: rootWords,
-        tokenLoad: Math.round(rootWords / 2),
-        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
-        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
-        isEssential: true,
-        missingStatus: rootWords === 0 ? 'Missing' : 'Active',
-        actionUrl: baseUrl ? `${baseUrl}/` : '/',
-        canonicalTag: false,
-        headingHierarchy: false,
-        isMobileFriendly: false,
-        hasSemanticTags: false,
-        imagesWithoutAlt: 0,
-        lastUpdated: "Unknown"
-      },
-      {
-        path: '/about',
-        wordCount: status.aboutTxtExists ? 350 : 0,
-        tokenLoad: status.aboutTxtExists ? Math.round(350 / 2) : 0,
-        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
-        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
-        isEssential: true,
-        missingStatus: status.aboutTxtExists ? 'Active' : 'Missing',
-        actionUrl: baseUrl ? `${baseUrl}/about` : '/about',
-        canonicalTag: false,
-        headingHierarchy: false,
-        isMobileFriendly: false,
-        hasSemanticTags: false,
-        imagesWithoutAlt: 0,
-        lastUpdated: "Unknown"
-      }
-    ];
+    discoveredRoutes = [];
   }
 
   // c) Missing Essential Pages Array
@@ -1303,11 +1277,11 @@ function evaluateCapabilities(crawledData = {}) {
 
   const hasContactInfo = typeof crawledData.eeatMetrics?.hasContactInfo === 'boolean'
     ? crawledData.eeatMetrics.hasContactInfo
-    : (sec3.hasContactInfo !== false);
+    : Boolean(crawledData.eeatMetrics?.hasContactInfo ?? sec3.hasContactInfo);
 
   const hasPrivacyPolicy = typeof crawledData.eeatMetrics?.hasPrivacyPolicy === 'boolean'
     ? crawledData.eeatMetrics.hasPrivacyPolicy
-    : (sec3.hasPrivacyPolicy !== false);
+    : Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy ?? sec3.hasPrivacyPolicy);
 
   const results = crawledData;
   const ageEstimate = results.eeatMetrics?.ageEstimate || sec3.ageEstimate || results.domainAge || "Pending WHOIS Integration";
