@@ -228,9 +228,15 @@ export function mapBackendScanToV4State(rawPayload) {
         schemaTypes: [],
         extractedContent: '',
         headings: { h1: [], h2: [] },
+        headingAudit: {},
+        headingCounts: { h1: 0, h2: 0, h3: 0, h4: 0 },
         missingAltCount: 0,
         missingAltList: [],
         lastUpdated: null,
+        isSchema: true,
+        status: 'WARNING (SPA)',
+        color: 'bg-red-500',
+        gain: '0.15',
         isCrawled: true,
         schema: {}
       };
@@ -239,93 +245,137 @@ export function mapBackendScanToV4State(rawPayload) {
     const pageUrl = p.url || (p.route ? `${targetUrl.replace(/\/$/, '')}${p.route}` : (p.path || `Page ${idx + 1}`));
     const wordCount = p.wordCount ?? p.words ?? 0;
 
-    // 1. Thorough Ratio Normalization
+    // ---------------------------------------------------------------------------
+    // 1. RATIO NORMALIZATION (Always convert <= 1 decimals to percentage)
+    // ---------------------------------------------------------------------------
     let rawRatio = p.contentDensityRatio ?? p.textCodeRatio ?? p.textToHtmlRatio ?? p.textRatio ?? p.ratio ?? 0;
     let ratio = rawRatio;
-    if (typeof ratio === 'string') ratio = parseFloat(ratio.replace('%', ''));
+
+    if (typeof ratio === 'string') {
+      ratio = parseFloat(ratio.replace('%', ''));
+    }
     if (isNaN(ratio)) ratio = 0;
-    if (ratio > 0 && ratio <= 1 && p.contentDensityRatio === undefined) {
+
+    // Catch all decimal representations (e.g., 0.0588 -> 5.9%)
+    if (ratio > 0 && ratio <= 1) {
       ratio = Number((ratio * 100).toFixed(1));
     } else {
       ratio = Number(Number(ratio).toFixed(1));
     }
 
-    // 2. Schema Normalization
+    // ---------------------------------------------------------------------------
+    // 2. HEADING COUNTS MAPPING (Bridge headingAudit -> headingCounts)
+    // ---------------------------------------------------------------------------
+    const headingAudit = p.headingAudit || {};
+    const headingCounts = p.headingCounts || {
+      h1: headingAudit.h1 ?? (Array.isArray(p.headings) ? p.headings.filter(h => h.tag === 'h1').length : (typeof p.h1 === 'number' ? p.h1 : 0)),
+      h2: headingAudit.h2 ?? (Array.isArray(p.headings) ? p.headings.filter(h => h.tag === 'h2').length : (typeof p.h2 === 'number' ? p.h2 : 0)),
+      h3: headingAudit.h3 ?? (Array.isArray(p.headings) ? p.headings.filter(h => h.tag === 'h3').length : (typeof p.h3 === 'number' ? p.h3 : 0)),
+      h4: headingAudit.h4 ?? (Array.isArray(p.headings) ? p.headings.filter(h => h.tag === 'h4').length : (typeof p.h4 === 'number' ? p.h4 : 0))
+    };
+
+    // ---------------------------------------------------------------------------
+    // 3. SCHEMA ISSUE FLAG (Legacy prototype expects isSchema=true when missing)
+    // ---------------------------------------------------------------------------
     const schemasList = Array.isArray(p.schemas) ? p.schemas : (Array.isArray(p.schema) ? p.schema : (Array.isArray(p.jsonLd) ? p.jsonLd : (p.schema && typeof p.schema === 'object' ? [p.schema] : [])));
-    const hasSchema = p.hasSchema === true || schemasList.length > 0 || Boolean(p.schema && Object.keys(p.schema).length > 0 && (p.schema.detectedTypes?.length || p.schema.rawJsonLd?.length || p.schema.graphEntities));
+    const pageHasSchema = Boolean(
+      p.hasSchema || 
+      schemasList.length > 0 ||
+      (Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0) ||
+      Boolean(p.schema && Object.keys(p.schema).length > 0 && (p.schema.detectedTypes?.length || p.schema.rawJsonLd?.length || p.schema.graphEntities))
+    );
+    const isMissingSchema = !pageHasSchema;
     const schemaTypes = Array.isArray(p.schema?.detectedTypes)
       ? p.schema.detectedTypes
-      : schemasList.map(s => s['@type'] || s.type).filter(Boolean);
+      : (Array.isArray(p.schemaTypes) ? p.schemaTypes : schemasList.map(s => s['@type'] || s.type).filter(Boolean));
 
-    // 3. Canonical Normalization
+    // Canonical Normalization
     const canonicalUrl = p.canonicalTag || p.canonical || p.canonicalUrl || '';
-    const hasCanonical = p.hasCanonical === true || Boolean(canonicalUrl);
+    const hasCanonical = typeof p.canonicalTag === 'boolean' ? p.canonicalTag : Boolean(p.hasCanonical || canonicalUrl);
 
-    // 4. Safely Parse Headings (Arrays vs Numeric Counts)
+    // Headings Structure Normalization
     let h1List = [];
     let h2List = [];
     if (p.headings) {
-      if (Array.isArray(p.headings.h1)) h1List = p.headings.h1;
-      else if (Array.isArray(p.headings.H1)) h1List = p.headings.H1;
-      else if (typeof p.headings.H1 !== 'undefined') h1List = [`Count: ${p.headings.H1}`];
-      else if (typeof p.headings.h1 !== 'undefined') h1List = [`Count: ${p.headings.h1}`];
+      if (Array.isArray(p.headings)) {
+        h1List = p.headings.filter(h => h.tag === 'h1').map(h => h.text || `Count: ${headingCounts.h1}`);
+        if (h1List.length === 0 && headingCounts.h1 > 0) h1List = [`Count: ${headingCounts.h1}`];
+        h2List = p.headings.filter(h => h.tag === 'h2').map(h => h.text || `Count: ${headingCounts.h2}`);
+        if (h2List.length === 0 && headingCounts.h2 > 0) h2List = [`Count: ${headingCounts.h2}`];
+      } else {
+        if (Array.isArray(p.headings.h1)) h1List = p.headings.h1;
+        else if (Array.isArray(p.headings.H1)) h1List = p.headings.H1;
+        else if (typeof p.headings.H1 !== 'undefined') h1List = [`Count: ${p.headings.H1}`];
+        else if (typeof p.headings.h1 !== 'undefined') h1List = [`Count: ${p.headings.h1}`];
 
-      if (Array.isArray(p.headings.h2)) h2List = p.headings.h2;
-      else if (Array.isArray(p.headings.H2)) h2List = p.headings.H2;
-      else if (typeof p.headings.H2 !== 'undefined') h2List = [`Count: ${p.headings.H2}`];
-      else if (typeof p.headings.h2 !== 'undefined') h2List = [`Count: ${p.headings.h2}`];
+        if (Array.isArray(p.headings.h2)) h2List = p.headings.h2;
+        else if (Array.isArray(p.headings.H2)) h2List = p.headings.H2;
+        else if (typeof p.headings.H2 !== 'undefined') h2List = [`Count: ${p.headings.H2}`];
+        else if (typeof p.headings.h2 !== 'undefined') h2List = [`Count: ${p.headings.h2}`];
+      }
     } else {
       if (Array.isArray(p.h1)) h1List = p.h1;
       else if (p.h1) h1List = [p.h1];
+      else if (headingCounts.h1 > 0) h1List = [`Count: ${headingCounts.h1}`];
+
       if (Array.isArray(p.h2)) h2List = p.h2;
       else if (p.h2) h2List = [p.h2];
+      else if (headingCounts.h2 > 0) h2List = [`Count: ${headingCounts.h2}`];
     }
     const headings = { h1: h1List, h2: h2List };
 
-    // 5. Secure Extracted Content
+    // Extracted Content
     const extractedContent = p.bodyTextSnippet ?? p.markdown ?? p.extractedText ?? p.snippet ?? p.content ?? p.text ?? '';
 
-    // 6. Alts & Semantic Tags
-    let missingAltList = Array.isArray(p.missingAltList) ? p.missingAltList : [];
+    // Alts & Semantic Tags
+    let missingAltList = p.missingAltList || [];
     if (missingAltList.length === 0 && Array.isArray(p.images)) {
       missingAltList = p.images.filter(img => !img.alt || img.alt.trim() === '').map(img => ({
         src: img.src,
         suggestedAlt: `${p.title || 'Page'} visual element`
       }));
     }
-    const missingAltCount = p.missingAltCount ?? missingAltList.length;
+    const missingAltCount = p.imagesWithoutAlt ?? p.missingAltCount ?? missingAltList.length;
 
-    let missingRequired = Array.isArray(p.missingRequired) ? p.missingRequired : [];
+    let missingRequired = p.missingSemanticTags || (Array.isArray(p.missingRequired) ? p.missingRequired : []);
     if (missingRequired.length === 0 && p.semanticTags) {
       if (!p.semanticTags.main) missingRequired.push('main');
       if (!p.semanticTags.footer) missingRequired.push('footer');
     }
-    const hasAllRequired = p.hasAllRequired !== undefined ? p.hasAllRequired : (missingRequired.length === 0);
+    const hasAllRequired = typeof p.hasSemanticTags === 'boolean' 
+      ? p.hasSemanticTags 
+      : (typeof p.semanticTagsCount === 'number' ? (p.semanticTagsCount >= 3) : (p.hasAllRequired !== undefined ? p.hasAllRequired : (missingRequired.length === 0)));
 
     const isThin = p.isThin !== undefined ? p.isThin : (wordCount < 250);
     const isHeavySpa = p.isHeavySpa !== undefined ? p.isHeavySpa : (p.isSpa === true || (ratio < 15 && wordCount < 300));
 
     return {
       ...p,
-      url: pageUrl,
-      wordCount,
+      url: p.url || p.route || p.path || pageUrl,
       ratio,
+      wordCount,
+      headingAudit,
+      headingCounts,
+      lastUpdated: p.lastUpdated || p.lastModified || null,
+      hasCanonical,
+      canonicalUrl,
+      hasAllRequired,
+      missingRequired,
+      missingAltCount,
+      missingAltList,
+      isSchema: isMissingSchema,
+      status: ratio >= 25 ? 'EXCELLENT' : (ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)'),
+      color: ratio >= 25 ? 'bg-[#10b981]' : (ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500'),
+      gain: (Math.min(0.99, Math.max(0.15, ratio / 50))).toFixed(2),
       textToHtmlRatio: ratio,
       textCodeRatioPercent: Math.round(ratio),
       densityRating: evaluateDensityRating(wordCount),
       isThin,
       isHeavySpa,
-      hasCanonical,
-      canonicalUrl,
-      hasAllRequired,
-      missingRequired,
-      hasSchema,
+      hasSchema: pageHasSchema,
       schemaTypes,
       extractedContent,
       headings,
-      missingAltCount,
-      missingAltList,
-      lastUpdated: p.lastUpdated || p.lastModified || null,
       isCrawled: p.isCrawled ?? (p.status ? p.status === 200 : true),
       schema: p.schema || {}
     };

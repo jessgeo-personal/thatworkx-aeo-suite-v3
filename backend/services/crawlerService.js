@@ -41,7 +41,7 @@ const fetchPageWithTimeout = async (pageUrl) => {
       timeout: 3500
     });
     clearTimeout(timeoutId);
-    return { success: true, data: pageRes.data };
+    return { success: true, data: pageRes.data, headers: pageRes.headers };
   } catch (error) {
     clearTimeout(timeoutId);
     const isTimeout = error.name === 'AbortError' || error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'));
@@ -52,7 +52,7 @@ const fetchPageWithTimeout = async (pageUrl) => {
   }
 };
 
-const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
+const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) => {
   if (!htmlContent) {
     return {
       route: pageRoute,
@@ -125,28 +125,61 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   const words = rawText.split(/\s+/).filter(Boolean);
   const bodySnippet = words.slice(0, 180).join(' ') + (words.length > 180 ? '...' : '');
 
-  // 5. JSON-LD Schemas Extraction
+  // ---------------------------------------------------------------------------
+  // 1. ROBUST JSON-LD & @graph SCHEMA EXTRACTION
+  // ---------------------------------------------------------------------------
   const schemas = [];
-  $('script[type="application/ld+json"]').each((_, el) => {
+  $('script[type*="ld+json"]').each((_, el) => {
     try {
-      const parsed = JSON.parse($(el).html());
+      const raw = $(el).text() || $(el).html();
+      if (!raw || !raw.trim()) return;
+      const parsed = JSON.parse(raw.trim());
+
       if (Array.isArray(parsed)) {
         schemas.push(...parsed);
       } else if (parsed && typeof parsed === 'object') {
-        schemas.push(parsed);
+        // Unpack modern WordPress / Yoast / Next.js @graph wrappers
+        if (Array.isArray(parsed['@graph'])) {
+          schemas.push(...parsed['@graph']);
+        } else {
+          schemas.push(parsed);
+        }
       }
     } catch (_) {}
   });
-  const schemaTypes = schemas.map(s => s['@type'] || s.type).filter(Boolean);
 
-  // 6. Revision / Freshness Date Extraction
-  const lastUpdated = $('meta[property="article:modified_time"]').attr('content')
+  const schemaTypes = schemas
+    .map(s => s && s['@type'])
+    .filter(Boolean)
+    .flatMap(t => Array.isArray(t) ? t : [t]);
+
+  const hasSchema = schemaTypes.length > 0;
+
+  // ---------------------------------------------------------------------------
+  // 2. FRESHNESS / REVISION DATE EXTRACTION (META + SCHEMA + HEADERS)
+  // ---------------------------------------------------------------------------
+  let lastUpdated = $('meta[property="article:modified_time"]').attr('content')
     || $('meta[property="og:updated_time"]').attr('content')
     || $('meta[name="last-modified"]').attr('content')
     || $('meta[name="date"]').attr('content')
     || $('time[datetime]').attr('datetime')
     || $('time').first().text().trim()
     || null;
+
+  // Fallback to JSON-LD dateModified / datePublished if meta tags are absent
+  if (!lastUpdated && schemas.length > 0) {
+    for (const s of schemas) {
+      if (s && (s.dateModified || s.datePublished)) {
+        lastUpdated = s.dateModified || s.datePublished;
+        break;
+      }
+    }
+  }
+
+  // Fallback to HTTP response headers if available in scope
+  if (!lastUpdated && typeof responseHeaders === 'object' && responseHeaders) {
+    lastUpdated = responseHeaders['last-modified'] || null;
+  }
 
   // 7. Image Alt Audit
   const missingAltList = [];
@@ -195,7 +228,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     textCodeRatio,
     contentDensityRatio: textCodeRatio,
     textDensityRatio,
-    hasSchema: schemas.length > 0,
+    hasSchema: hasSchema,
     schemas,
     schemaTypes,
     lastUpdated,
@@ -407,9 +440,11 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
 
     // 3. Fetch targetUrl HTML content & parse Level 2 Metrics
     let htmlContent = '';
+    let mainHeaders = null;
     try {
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
       htmlContent = mainRes.data;
+      mainHeaders = mainRes.headers;
     } catch (e) {
       // ZERO-FALLBACK ENFORCEMENT:
       // If the root domain cannot be resolved or reached, abort the entire audit immediately.
@@ -595,7 +630,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       let pageHtml = '';
       if (i === 0) {
         pageHtml = htmlContent;
-        const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
+        const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute, mainHeaders);
         result.pages.push(parsedPage);
       } else {
         if (process.env.NODE_ENV !== 'test') {
@@ -603,7 +638,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         }
         const fetchRes = await fetchPageWithTimeout(pageUrl);
         if (fetchRes.success) {
-          const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute);
+          const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute, fetchRes.headers);
           result.pages.push(parsedPage);
         } else {
           result.pages.push({

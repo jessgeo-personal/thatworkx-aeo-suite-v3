@@ -235,4 +235,44 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
     expect(state.stage6.aiOptimizedScore).toBe(82);
     expect(state.stage6.aiReadyScore).toBe(70);
   });
+
+  it('Gate 10: Normalizes decimal ratios, bridges headingAudit -> headingCounts, and sets isSchema issue flag', () => {
+    const payloadWithDecimals = {
+      status: 'completed',
+      targetUrl: 'https://acme-analytics.io',
+      pages: [
+        {
+          url: 'https://acme-analytics.io/',
+          wordCount: 500,
+          textCodeRatio: 0.0588,
+          headingAudit: { h1: 1, h2: 3, h3: 2, h4: 0 },
+          hasSchema: true,
+          schemas: [{ '@type': 'Organization' }]
+        },
+        {
+          url: 'https://acme-analytics.io/sparse',
+          wordCount: 150,
+          textCodeRatio: 0.02,
+          headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0 },
+          hasSchema: false,
+          schemas: []
+        }
+      ]
+    };
+
+    const state = mapBackendScanToV4State(payloadWithDecimals);
+    expect(state.stage3.pages).toHaveLength(2);
+
+    const page1 = state.stage3.pages[0];
+    expect(page1.ratio).toBe(5.9);
+    expect(page1.headingCounts).toEqual({ h1: 1, h2: 3, h3: 2, h4: 0 });
+    expect(page1.isSchema).toBe(false); // Schema exists, so isSchema (missing issue) is false
+    expect(page1.status).toBe('WARNING (SPA)');
+    expect(page1.color).toBe('bg-red-500');
+
+    const page2 = state.stage3.pages[1];
+    expect(page2.ratio).toBe(2);
+    expect(page2.headingCounts).toEqual({ h1: 0, h2: 0, h3: 0, h4: 0 });
+    expect(page2.isSchema).toBe(true); // Missing schema, so issue flag is true
+  });
 });

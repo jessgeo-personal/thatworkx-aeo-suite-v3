@@ -75,4 +75,31 @@ describe('backend/services/crawlerService - parsePageHtml Contract Audit', () =>
     expect(emptyPage.lastUpdated).toBeNull();
     expect(emptyPage.missingAltCount).toBe(0);
   });
+
+  it('3. Robustly unpacks @graph JSON-LD and falls back to schema dates / HTTP headers', () => {
+    const graphHtml = `
+      <html>
+      <head>
+        <script type="application/ld+json">
+          {
+            "@context": "https://schema.org",
+            "@graph": [
+              { "@type": "WebSite", "name": "Site Graph" },
+              { "@type": "Article", "datePublished": "2026-05-10T08:00:00Z" }
+            ]
+          }
+        </script>
+      </head>
+      <body><h1>Title</h1><p>Body</p></body>
+      </html>
+    `;
+    const graphPage = parsePageHtml(graphHtml, 'https://example.com', '/');
+    expect(graphPage.hasSchema).toBe(true);
+    expect(graphPage.schemaTypes).toEqual(expect.arrayContaining(['WebSite', 'Article']));
+    expect(graphPage.lastUpdated).toBe('2026-05-10T08:00:00Z');
+
+    const noDateHtml = `<html><body><h1>No Date Page</h1></body></html>`;
+    const headerPage = parsePageHtml(noDateHtml, 'https://example.com', '/', { 'last-modified': 'Wed, 21 Oct 2026 07:28:00 GMT' });
+    expect(headerPage.lastUpdated).toBe('Wed, 21 Oct 2026 07:28:00 GMT');
+  });
 });
