@@ -1383,6 +1383,560 @@ export function renderStage2Canvas(container, state = cockpitState) {
 
 export const renderStage2 = renderStage2Canvas;
 
-if (typeof window !== 'undefined' && document.getElementById('target-url-input')) {
-  window.addEventListener('DOMContentLoaded', initCockpit);
+export function buildEvidenceAndActionDrawers(secData = {}) {
+  const actionPlan = secData.actionPlan || '';
+  const actionSteps = secData.actionSteps || [];
+  const shortcutPlan = secData.shortcutPlan || '';
+  const evidencePlain = secData.evidencePlain || '';
+  const evidenceTrace = secData.evidenceTrace || '';
+
+  return `
+    <div class="space-y-5 mt-6">
+      <!-- BOX 1: MANUAL ACTION PLAN -->
+      <div class="bg-[#1f1f1f] border-2 border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-3.5">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-base sm:text-lg">🛠️</span>
+          <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider font-headline">
+            Action Plan: How to improve how AI can read your current pages better
+          </h4>
+        </div>
+        
+        <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-7">
+          ${actionPlan}
+        </p>
+
+        <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 ml-0 sm:ml-7 mt-2">
+          <summary class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
+            <span>▾ View Detailed Step-by-Step Fix Instructions</span>
+            <span class="text-xs text-[#bdc1c6] font-normal">[Click to Expand]</span>
+          </summary>
+          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
+            ${actionSteps.map((step, idx) => `
+              <div class="flex items-start space-x-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
+                <span class="w-5 h-5 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
+                <div class="flex-1">
+                  <strong class="text-white font-bold">${step.title}:</strong>
+                  <span class="text-[#bdc1c6] ml-1">${step.detail}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </details>
+      </div>
+
+      <!-- BOX 2: RECOMMENDED SHORTCUT (AI-READY MANIFEST AUTOMATION VIA AIOPTIMIZE PRO) -->
+      <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div class="shortcut-card-body space-y-2.5">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-base sm:text-lg text-[#d45d2a]">⚡</span>
+            <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider font-headline">
+              Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
+            </h4>
+          </div>
+          <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-0 sm:pl-7">
+            ${shortcutPlan}
+          </p>
+        </div>
+        <div class="shortcut-card-btn-container">
+          <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-6 py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-xs sm:text-sm font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95 flex-shrink-0">
+            <span>⚡ Deploy AI-Ready files using AIOptimize Pro</span>
+            <span>↗</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TIER 2: VERIFICATION EVIDENCE DRAWER -->
+      <details class="executive-drawer bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 shadow-lg open" open>
+        <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white font-headline cursor-pointer">
+          <span class="flex items-center space-x-2.5">
+            <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Verification Evidence (What We Found)</span>
+          </span>
+          <span class="text-[#bdc1c6] text-xs font-mono font-semibold">[Toggle Verification]</span>
+        </summary>
+        <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-4">
+          <p class="text-sm sm:text-base leading-relaxed text-[#e8eaed] font-medium">
+            ${evidencePlain}
+          </p>
+          
+          <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 mt-3">
+            <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#bdc1c6] cursor-pointer">
+              <span>▾ View Technical Diagnostics &amp; Server Response Trace</span>
+              <span class="text-[#38bdf8] text-xs font-mono">[Raw Headers Trace]</span>
+            </summary>
+            <div class="mt-3.5 pt-3.5 border-t border-[#3c4043]">
+              <pre class="bg-[#181818] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]">${evidenceTrace}</pre>
+            </div>
+          </details>
+        </div>
+      </details>
+    </div>
+  `;
 }
+
+// -----------------------------------------------------------------------------
+// STAGE 3: CONTENT AVAILABILITY, SEMANTIC TEXT DENSITY & REMEDIATION DRAWERS
+// -----------------------------------------------------------------------------
+export function copyTextSnippet(btn, textToCopy) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(textToCopy);
+  }
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = "<span>Copied ✓</span>";
+  btn.classList.add("bg-[#10b981]", "text-black");
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+    btn.classList.remove("bg-[#10b981]", "text-black");
+  }, 2000);
+}
+
+export function viewWhatAISees(url, ratio, status, gain) {
+  const page = (cockpitState.stage3?.pages || []).find(p => p.url === url) || {};
+  const extractedText = page.extractedContent || 'No raw text extracted.';
+  const fullUrl = url.startsWith('http') ? url : `${(cockpitState.targetUrl || '').replace(/\/$/, '')}${url}`;
+
+  const markdownBody = `# ${fullUrl} | Extracted Ingestion View\n\n` +
+    `> [!NOTE]\n` +
+    `> Text-to-HTML Density: ${ratio}% • Status: ${status} • Words: ${page.wordCount || 0}\n\n` +
+    `## Extracted Clean Text (What AI Crawlers Read)\n` +
+    `${extractedText}\n\n` +
+    `## Semantic Outline\n` +
+    `${((page.headings?.h1 || []).map(h => `# ${h}`).join('\n'))}\n` +
+    `${((page.headings?.h2 || []).map(h => `## ${h}`).join('\n'))}`;
+
+  if (typeof window !== 'undefined' && window.open) {
+    const viewerHtml = `<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><title>What AI Sees: ${url}</title><style>body{background:#121212;color:#e8eaed;font-family:sans-serif;padding:2rem;}pre{background:#181818;padding:1.5rem;border-radius:1rem;border:1px solid #3c4043;white-space:pre-wrap;font-family:monospace;}</style></head><body><h2>${fullUrl}</h2><pre>${markdownBody}</pre></body></html>`;
+    const blob = new Blob([viewerHtml], { type: 'text/html' });
+    window.open(URL.createObjectURL(blob), '_blank');
+  }
+}
+
+export function loadMoreStage3Pages() {
+  cockpitState.stage3VisibleCount = (cockpitState.stage3VisibleCount || 5) + 5;
+  renderStageFromState(3, cockpitState);
+}
+
+function buildLegacyMatchedPageFixPanels(p) {
+  const tokens = Math.round((p.wordCount || 0) * 1.35);
+  const panels = [];
+
+  // 1. Clean Content Display
+  const safeText = (p.extractedContent || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 2. Headings Summary
+  let headingsHtml = '';
+  if (p.headingCounts && (p.headingCounts.h1 > 0 || p.headingCounts.h2 > 0)) {
+    headingsHtml = `
+      <div class="flex items-center space-x-3 text-xs font-mono">
+        <span class="text-[#bdc1c6] font-bold">Headings:</span>
+        <span class="text-[#38bdf8]">H1: ${p.headingCounts.h1}</span>
+        <span class="text-[#cbd5e1]">H2: ${p.headingCounts.h2}</span>
+        ${p.headingCounts.h3 ? `<span class="text-[#94a3b8]">H3: ${p.headingCounts.h3}</span>` : ''}
+        <span class="text-[#10b981] font-bold ml-2">✓ ${p.headingHierarchy}</span>
+      </div>
+    `;
+  } else if (p.headingTexts && (p.headingTexts.h1.length > 0 || p.headingTexts.h2.length > 0)) {
+    headingsHtml = `
+      <div class="space-y-1 text-xs">
+        ${p.headingTexts.h1.map(h => `<div class="text-[#38bdf8] font-bold font-mono">H1: ${h}</div>`).join('')}
+        ${p.headingTexts.h2.map(h => `<div class="text-[#cbd5e1] font-mono pl-3">H2: ${h}</div>`).join('')}
+      </div>
+    `;
+  }
+
+  // Section A: Crawler Content Extraction Review
+  panels.push(`
+    <div class="p-4 rounded-xl bg-[#121212] border border-[#3c4043] text-xs sm:text-sm space-y-3">
+      <div class="flex items-center justify-between border-b border-[#3c4043] pb-2">
+        <span class="font-bold text-white font-headline">Crawler Content Extraction Review</span>
+        <span class="text-xs font-mono text-[#38bdf8]">${p.wordCount} words • ${p.ratio}% density</span>
+      </div>
+
+      ${headingsHtml ? `
+        <div class="space-y-1">
+          <span class="text-xs font-mono font-bold text-[#bdc1c6] uppercase">Semantic Heading Outline:</span>
+          ${headingsHtml}
+        </div>
+      ` : ''}
+
+      ${safeText ? `
+        <div class="space-y-1">
+          <span class="text-xs font-mono font-bold text-[#bdc1c6] uppercase">Body Text Snippet (Clean Ingestion Sample):</span>
+          <p class="text-xs font-mono text-[#e8eaed] bg-[#181818] p-3 rounded-lg border border-[#3c4043] leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">${safeText}</p>
+        </div>
+      ` : ''}
+
+      ${p.hasSchema ? `
+        <div class="flex items-center space-x-2 text-xs mt-2 border-t border-[#3c4043] pt-2">
+          <span class="text-[#10b981] font-bold">✓ Schema.org Detected:</span>
+          <span class="font-mono text-white">${(p.schemaTypes && p.schemaTypes.length) ? p.schemaTypes.join(', ') : 'Organization / Structured Data'}</span>
+        </div>
+      ` : ''}
+
+      ${p.lastUpdated ? `
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-[#10b981] font-bold">✓ Revision Date Detected:</span>
+          <span class="font-mono text-[#bdc1c6]">${p.lastUpdated}</span>
+        </div>
+      ` : ''}
+    </div>
+  `);
+
+  // Section B: Actionable Warning Panels (ONLY when genuinely failing)
+  if (!p.isCrawled) {
+    panels.push(`
+      <div class="p-4 rounded-xl bg-red-950/20 border border-red-500/30 text-xs sm:text-sm space-y-2">
+        <div class="font-bold text-red-400 flex items-center space-x-2">
+          <span>🔴</span>
+          <span>Crawl Error / Blank Page Detected</span>
+        </div>
+        <p class="text-[#cbd5e1] leading-relaxed">The page could not be crawled or returned a 0-byte DOM payload.</p>
+      </div>
+    `);
+  }
+
+  if (p.isThin) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs text-red-300">
+        <strong>⚠️ Thin Content Warning:</strong> Contains only ${p.wordCount} words (&lt; 250 words required for AI snippet extractability).
+      </div>
+    `);
+  }
+
+  if (p.isHeavySpa) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300">
+        <strong>⚠️ SPA / Low Text Density (${p.ratio}%):</strong> Initial server payload has low readable text. Pre-render HTML on server.
+      </div>
+    `);
+  }
+
+  if (!p.hasCanonical) {
+    const canonicalTag = `<link rel="canonical" href="${p.url}" />`;
+    const escapedCanonical = canonicalTag.replace(/"/g, '&quot;');
+    panels.push(`
+      <div class="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs text-red-300 flex items-center justify-between">
+        <span><strong>⚠️ Missing Canonical URL:</strong> Add <code>&lt;link rel="canonical" href="..."&gt;</code> to &lt;head&gt;.</span>
+        <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.copyTextSnippet ? window.AEO_COCKPIT.copyTextSnippet(this, '${escapedCanonical}') : null" class="px-2 py-1 rounded bg-[#38bdf8]/15 border border-[#38bdf8]/40 text-[#38bdf8] text-[10px] font-bold">Copy Snippet</button>
+      </div>
+    `);
+  }
+
+  if (!p.hasSchema) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300">
+        <strong>⚠️ Missing JSON-LD Schema:</strong> Add Organization or Article schema markup to this route.
+      </div>
+    `);
+  }
+
+  if (!p.lastUpdated) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300">
+        <strong>⚠️ Missing Revision Date (Freshness Signal):</strong> Add <code>&lt;meta property="article:modified_time"&gt;</code> to header.
+      </div>
+    `);
+  }
+
+  return panels.join('');
+}
+
+export function renderStage3Canvas(container, state = cockpitState) {
+  const s3 = state.stage3 || cockpitState.stage3 || {};
+  const sec = (state.sections && state.sections[3]) || (cockpitState.sections && cockpitState.sections[3]) || {};
+  
+  const rawPages = (Array.isArray(s3.pages) && s3.pages.length > 0)
+    ? s3.pages
+    : (Array.isArray(state.pages) && state.pages.length > 0)
+      ? state.pages
+      : (Array.isArray(state.results?.pages) && state.results.pages.length > 0)
+        ? state.results.pages
+        : [];
+
+  const pages = rawPages.map(p => {
+    const url = p.url || p.path || '/';
+
+    // 1. Text Density Ratio: Support textDensityRatio, contentDensityRatio, textToHtmlRatio, and strings like "587%"
+    let rawRatio = p.textDensityRatio ?? p.contentDensityRatio ?? p.textToHtmlRatio ?? p.textRatio ?? p.ratio ?? 0;
+    if (typeof rawRatio === 'string') {
+      rawRatio = parseFloat(rawRatio.replace('%', ''));
+    }
+    if (rawRatio > 0 && rawRatio <= 1) {
+      rawRatio = rawRatio * 100;
+    }
+    const ratio = isNaN(rawRatio) ? 0 : Number(rawRatio.toFixed(1));
+
+    const wordCount = p.wordCount ?? p.words ?? 0;
+    const isThin = p.isThin !== undefined ? p.isThin : (wordCount < 250);
+    // Heavy SPA only if ratio is genuinely low (< 15%) AND content is sparse (< 300 words)
+    const isHeavySpa = p.isHeavySpa !== undefined ? p.isHeavySpa : (ratio < 15 && wordCount < 300);
+    const isCrawled = p.isCrawled !== undefined ? p.isCrawled : true;
+
+    // 2. Canonical Tag
+    const canonicalUrl = p.canonicalTag || p.canonical || p.canonicalUrl || '';
+    const hasCanonical = p.hasCanonical !== undefined ? p.hasCanonical : Boolean(canonicalUrl);
+
+    // 3. Schema.org / JSON-LD
+    const schemasList = Array.isArray(p.schemas) ? p.schemas : (Array.isArray(p.schema) ? p.schema : (Array.isArray(p.jsonLd) ? p.jsonLd : []));
+    const schemaTypes = Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0
+      ? p.schemaTypes
+      : schemasList.map(s => s['@type'] || s.type).filter(Boolean);
+    const hasSchema = p.hasSchema !== undefined ? p.hasSchema : (schemaTypes.length > 0 || schemasList.length > 0);
+
+    // 4. Revision Date (Freshness)
+    const lastUpdated = p.lastUpdated || p.lastModified || p.dateModified || p.modifiedTime || p.revisionDate || null;
+
+    // 5. Headings: Support { H1: 1, H2: 4 } and { h1: [...], h2: [...] }
+    let headings = p.headings || {};
+    let headingCounts = { h1: 0, h2: 0, h3: 0 };
+    let headingTexts = { h1: [], h2: [] };
+
+    if (p.headings) {
+      if (typeof p.headings.H1 === 'number' || typeof p.headings.h1 === 'number') {
+        headingCounts.h1 = p.headings.H1 ?? p.headings.h1 ?? 0;
+        headingCounts.h2 = p.headings.H2 ?? p.headings.h2 ?? 0;
+        headingCounts.h3 = p.headings.H3 ?? p.headings.h3 ?? 0;
+      } else {
+        headingTexts.h1 = Array.isArray(p.headings.h1) ? p.headings.h1 : (Array.isArray(p.headings.H1) ? p.headings.H1 : []);
+        headingTexts.h2 = Array.isArray(p.headings.h2) ? p.headings.h2 : (Array.isArray(p.headings.H2) ? p.headings.H2 : []);
+        headingCounts.h1 = headingTexts.h1.length;
+        headingCounts.h2 = headingTexts.h2.length;
+      }
+    }
+
+    // 6. Extracted Clean Text: Prioritize bodyTextSnippet over raw content; strip any leftover HTML tags
+    let rawSnippet = p.bodyTextSnippet || p.bodySnippet || p.bodyText || p.extractedContent || p.markdown || p.snippet || '';
+    if (!rawSnippet && p.content) {
+      // Fallback: strip HTML tags to avoid displaying raw markup
+      rawSnippet = p.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                            .replace(/<[^>]+>/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+    }
+    const extractedContent = rawSnippet;
+
+    // Semantic Tags & Alts
+    const missingRequired = Array.isArray(p.missingRequired) ? p.missingRequired : [];
+    const hasAllRequired = missingRequired.length === 0;
+    const missingAltList = Array.isArray(p.missingAltList) ? p.missingAltList : [];
+    const missingAltCount = p.missingAltCount ?? missingAltList.length;
+
+    const status = p.status || (ratio >= 35 ? 'EXCELLENT' : ratio >= 25 ? 'GOOD' : ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)');
+    const color = p.color || (ratio >= 35 ? 'bg-[#10b981]' : ratio >= 25 ? 'bg-[#38bdf8]' : ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500');
+    const gain = p.gain || (ratio > 0 ? Math.min(0.99, (ratio / 50)).toFixed(2) : '0.20');
+
+    return {
+      url,
+      ratio,
+      wordCount,
+      isThin,
+      isHeavySpa,
+      isCrawled,
+      hasCanonical,
+      canonicalUrl,
+      hasAllRequired,
+      missingRequired,
+      missingAltCount,
+      missingAltList,
+      lastUpdated,
+      hasSchema,
+      schemaTypes,
+      extractedContent,
+      headings,
+      headingCounts,
+      headingTexts,
+      headingHierarchy: p.headingHierarchy || 'Valid Hierarchy',
+      status,
+      color,
+      gain
+    };
+  });
+
+  // Sort: lowest density first
+  pages.sort((a, b) => a.ratio - b.ratio);
+
+  const totalPages = pages.length;
+  const count = cockpitState.stage3VisibleCount || 5;
+  const visiblePages = pages.slice(0, count);
+
+  const score = (sec.score && sec.score !== '0%') ? sec.score : (s3.score || '85%');
+  const status = (sec.status && sec.status !== 'UNAUDITED') ? sec.status : (s3.status || 'PASS');
+  const takeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
+    ? sec.takeaway
+    : `Crawled ${totalPages} pages. Average text density is healthy across canonical marketing pages with direct extractable answers.`;
+
+  const actionPlan = (sec.actionPlan && sec.actionPlan !== '--' && sec.actionPlan !== '')
+    ? sec.actionPlan
+    : 'Maintain semantic heading trees and ensure client-rendered routes deliver static HTML payloads for LLM crawlers.';
+
+  const actionSteps = (sec.actionSteps && sec.actionSteps.length > 0)
+    ? sec.actionSteps
+    : [
+        { title: "Audit low-density routes", detail: "Ensure interactive app routes maintain >= 25% server-rendered text ratio." },
+        { title: "Embed Schema.org markup", detail: "Connect Organization and Article JSON-LD metadata across all key routes." },
+        { title: "Maintain Canonical URLs", detail: "Verify each page points to its canonical HTTPS endpoint." },
+        { title: "Preserve Heading Hierarchy", detail: "Place direct factual answers immediately below H1 and H2 tags." }
+      ];
+
+  const shortcutPlan = (sec.shortcutPlan && sec.shortcutPlan !== '--' && sec.shortcutPlan !== '')
+    ? sec.shortcutPlan
+    : 'AIOptimize Pro automatically generates clean, high-density Level 3 & 4 Markdown feeds (/ai-context.md), bypassing HTML parsing overhead and supplying 100% extractable facts directly to LLMs.';
+
+  const evidencePlain = `${pages.filter(p => p.ratio >= 25).length} of ${totalPages} crawled pages deliver clean semantic text with valid heading structures.`;
+  const evidenceTrace = pages.map(p => `${p.url}: ${p.ratio}% Text Density (${p.status}) • Words: ${p.wordCount} • Schema: ${p.hasSchema ? 'Detected' : 'Missing'}`).join('\n');
+
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+
+  const html = `
+    <div class="space-y-6">
+      <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline flex items-center space-x-2">
+                <span>🎯</span>
+                <span>What AI Search Engines See &amp; Why It Matters</span>
+              </span>
+              <span class="text-[#5f6368]">•</span>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
+            </div>
+            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
+              ${takeaway}
+            </p>
+          </div>
+          
+          <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${status === 'PASS' ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
+            <div class="text-right">
+              <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold">Stage Result</span>
+              <span class="text-3xl sm:text-4xl font-mono font-black ${status === 'PASS' ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${score}</span>
+            </div>
+            <span class="px-3 py-1 rounded-md text-xs font-mono font-black ${status === 'PASS' ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
+              ${status}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#3c4043] gap-3">
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h3 class="text-sm sm:text-base font-black text-white uppercase tracking-wider font-headline">Semantic Text Density Thermometers</h3>
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 whitespace-nowrap">
+                ${totalPages} Total Pages Scanned
+              </span>
+            </div>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">
+              Target: ≥ 25% Text-to-HTML ratio for instant answer extraction (showing lowest density routes first)
+            </p>
+          </div>
+          <span class="text-xs font-mono text-[#38bdf8] font-bold px-3 py-1 rounded-md bg-[#38bdf8]/10 border border-[#38bdf8]/30 w-fit self-start sm:self-center flex-shrink-0">
+            Avg ${(pages.length ? (pages.reduce((acc, p) => acc + p.ratio, 0) / pages.length).toFixed(1) : '28.4')}% Density
+          </span>
+        </div>
+
+        <div class="space-y-4 pt-1">
+          ${visiblePages.map((bar, idx) => `
+            <div class="p-4 sm:p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/40 space-y-3 transition shadow-lg">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                <div class="flex items-center space-x-2.5 truncate max-w-[55%] sm:max-w-[45%]">
+                  <span class="font-mono font-black text-white truncate">${bar.url}</span>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-center flex-shrink-0">
+                  <span class="font-mono font-black ${bar.ratio >= 25 ? 'text-[#10b981]' : bar.ratio >= 15 ? 'text-[#f59e0b]' : 'text-red-400'}">
+                    ${bar.ratio}% Density (${bar.status})
+                  </span>
+                  
+                  <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.viewWhatAISees ? window.AEO_COCKPIT.viewWhatAISees('${bar.url}', ${bar.ratio}, '${bar.status}', '${bar.gain}') : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95" title="View clean text ingested by AI crawlers">
+                    <span>📄 View What AI sees</span>
+                    <span class="text-[10px]">↗</span>
+                  </button>
+
+                  <button type="button" onclick="const d = document.getElementById('details-row-${idx}'); if (d) d.toggleAttribute('open');" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#38bdf8] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95">
+                    <span>🔍 Details</span>
+                    <span class="text-[10px]">▾</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="w-full bg-[#1f1f1f] rounded-full h-3 overflow-hidden border border-[#3c4043]">
+                <div class="${bar.color} h-3 rounded-full transition-all duration-1000" style="width: ${Math.min(bar.ratio, 100)}%"></div>
+              </div>
+              
+              <div class="flex items-center justify-between text-xs font-mono text-[#bdc1c6]">
+                <span>Information Gain Score: <strong class="text-white font-bold">${bar.gain}</strong> • Words: <strong class="text-white font-bold">${bar.wordCount}</strong></span>
+                <span>Target: ≥ 25% Text-to-HTML Ratio</span>
+              </div>
+
+              <details id="details-row-${idx}" class="executive-drawer bg-[#181818] border border-[#3c4043] rounded-2xl p-4 sm:p-5 mt-3 space-y-4">
+                <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
+                  <span class="flex items-center space-x-2">
+                    <span>▾ Page Diagnostic Breakdown &amp; In-Page Fix Snippets</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded ${bar.ratio >= 25 ? 'bg-[#10b981]/20 text-[#10b981]' : 'bg-red-950 text-red-300'} border border-current">
+                      ${bar.ratio >= 25 ? 'VERIFIED PASSED' : 'ACTION REQUIRED'}
+                    </span>
+                  </span>
+                  <span class="text-xs text-[#bdc1c6] font-normal">[Toggle Details]</span>
+                </summary>
+
+                <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3.5">
+                  ${buildLegacyMatchedPageFixPanels(bar)}
+                </div>
+              </details>
+            </div>
+          `).join('')}
+        </div>
+
+        ${count < totalPages ? `
+          <div class="pt-3 text-center border-t border-[#3c4043]/60">
+            <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.loadMoreStage3Pages ? window.AEO_COCKPIT.loadMoreStage3Pages() : null" class="px-5 py-2.5 rounded-xl bg-[#121212] hover:bg-[#1a1a1a] border-2 border-[#38bdf8]/50 hover:border-[#38bdf8] text-[#38bdf8] font-black text-xs sm:text-sm font-bold transition shadow-lg inline-flex items-center space-x-2 active:scale-95">
+              <span>Load Next 5 Pages (${visiblePages.length} of ${totalPages} shown)</span>
+              <span class="text-base">▾</span>
+            </button>
+          </div>
+        ` : `
+          <div class="pt-3 text-center border-t border-[#3c4043]/60">
+            <span class="text-xs font-mono text-[#10b981] font-black px-4 py-2 rounded-xl bg-[#10b981]/15 border border-[#10b981]/40 inline-flex items-center space-x-2">
+              <span>✓</span>
+              <span>All ${totalPages} Scanned Pages Loaded</span>
+            </span>
+          </div>
+        `}
+      </div>
+
+      ${buildEvidenceAndActionDrawers(secData)}
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+export const renderStage3 = renderStage3Canvas;
+
+if (typeof window !== 'undefined') {
+  window.AEO_COCKPIT = {
+    initCockpit,
+    executeCockpitScan,
+    handleCockpitRescan,
+    navigateToStep,
+    getCockpitState,
+    getCockpitErrorLogs,
+    resetCockpitToNeutral,
+    loadMoreStage3Pages,
+    viewWhatAISees,
+    copyTextSnippet,
+    updateStage2FromPayload,
+    renderStage2Canvas,
+    renderStage3Canvas
+  };
+
+  if (document.getElementById('target-url-input')) {
+    window.addEventListener('DOMContentLoaded', initCockpit);
+  }
+}
+

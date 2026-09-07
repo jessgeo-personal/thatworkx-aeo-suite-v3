@@ -208,30 +208,126 @@ export function mapBackendScanToV4State(rawPayload) {
   const discoveredCount = routes.filter((r) => r.status === 'discovered').length;
 
   // Stage 3: Crawled Pages & Semantic Density
-  const pages = rawPages.map((page, idx) => {
-    const isObj = typeof page === 'object' && page !== null;
-    const pageUrl = isObj
-      ? (page.url || (page.route ? `${targetUrl.replace(/\/$/, '')}${page.route}` : `Page ${idx + 1}`))
-      : String(page);
-    const wordCount = isObj ? (Number(page.wordCount) || 0) : 0;
-    
-    let ratioPercent = 0;
-    if (isObj) {
-      if (page.textCodeRatio !== undefined) {
-        ratioPercent = Math.round((Number(page.textCodeRatio) || 0) * 100);
-      } else if (page.textToCodeRatio !== undefined) {
-        ratioPercent = Math.round((Number(page.textToCodeRatio) || 0) * 100);
-      } else if (page.contentDensityRatio !== undefined) {
-        ratioPercent = Math.round(Number(page.contentDensityRatio) || 0);
-      }
+  const pages = rawPages.map((p, idx) => {
+    const isObj = typeof p === 'object' && p !== null;
+    if (!isObj) {
+      return {
+        url: String(p),
+        wordCount: 0,
+        ratio: 0,
+        textToHtmlRatio: 0,
+        textCodeRatioPercent: 0,
+        densityRating: 'Thin',
+        isThin: true,
+        isHeavySpa: false,
+        hasCanonical: false,
+        canonicalUrl: '',
+        hasAllRequired: true,
+        missingRequired: [],
+        hasSchema: false,
+        schemaTypes: [],
+        extractedContent: '',
+        headings: { h1: [], h2: [] },
+        missingAltCount: 0,
+        missingAltList: [],
+        lastUpdated: null,
+        isCrawled: true,
+        schema: {}
+      };
     }
 
+    const pageUrl = p.url || (p.route ? `${targetUrl.replace(/\/$/, '')}${p.route}` : (p.path || `Page ${idx + 1}`));
+    const wordCount = p.wordCount ?? p.words ?? 0;
+
+    // 1. Thorough Ratio Normalization
+    let rawRatio = p.contentDensityRatio ?? p.textCodeRatio ?? p.textToHtmlRatio ?? p.textRatio ?? p.ratio ?? 0;
+    let ratio = rawRatio;
+    if (typeof ratio === 'string') ratio = parseFloat(ratio.replace('%', ''));
+    if (isNaN(ratio)) ratio = 0;
+    if (ratio > 0 && ratio <= 1 && p.contentDensityRatio === undefined) {
+      ratio = Number((ratio * 100).toFixed(1));
+    } else {
+      ratio = Number(Number(ratio).toFixed(1));
+    }
+
+    // 2. Schema Normalization
+    const schemasList = Array.isArray(p.schemas) ? p.schemas : (Array.isArray(p.schema) ? p.schema : (Array.isArray(p.jsonLd) ? p.jsonLd : (p.schema && typeof p.schema === 'object' ? [p.schema] : [])));
+    const hasSchema = p.hasSchema === true || schemasList.length > 0 || Boolean(p.schema && Object.keys(p.schema).length > 0 && (p.schema.detectedTypes?.length || p.schema.rawJsonLd?.length || p.schema.graphEntities));
+    const schemaTypes = Array.isArray(p.schema?.detectedTypes)
+      ? p.schema.detectedTypes
+      : schemasList.map(s => s['@type'] || s.type).filter(Boolean);
+
+    // 3. Canonical Normalization
+    const canonicalUrl = p.canonicalTag || p.canonical || p.canonicalUrl || '';
+    const hasCanonical = p.hasCanonical === true || Boolean(canonicalUrl);
+
+    // 4. Safely Parse Headings (Arrays vs Numeric Counts)
+    let h1List = [];
+    let h2List = [];
+    if (p.headings) {
+      if (Array.isArray(p.headings.h1)) h1List = p.headings.h1;
+      else if (Array.isArray(p.headings.H1)) h1List = p.headings.H1;
+      else if (typeof p.headings.H1 !== 'undefined') h1List = [`Count: ${p.headings.H1}`];
+      else if (typeof p.headings.h1 !== 'undefined') h1List = [`Count: ${p.headings.h1}`];
+
+      if (Array.isArray(p.headings.h2)) h2List = p.headings.h2;
+      else if (Array.isArray(p.headings.H2)) h2List = p.headings.H2;
+      else if (typeof p.headings.H2 !== 'undefined') h2List = [`Count: ${p.headings.H2}`];
+      else if (typeof p.headings.h2 !== 'undefined') h2List = [`Count: ${p.headings.h2}`];
+    } else {
+      if (Array.isArray(p.h1)) h1List = p.h1;
+      else if (p.h1) h1List = [p.h1];
+      if (Array.isArray(p.h2)) h2List = p.h2;
+      else if (p.h2) h2List = [p.h2];
+    }
+    const headings = { h1: h1List, h2: h2List };
+
+    // 5. Secure Extracted Content
+    const extractedContent = p.bodyTextSnippet ?? p.markdown ?? p.extractedText ?? p.snippet ?? p.content ?? p.text ?? '';
+
+    // 6. Alts & Semantic Tags
+    let missingAltList = Array.isArray(p.missingAltList) ? p.missingAltList : [];
+    if (missingAltList.length === 0 && Array.isArray(p.images)) {
+      missingAltList = p.images.filter(img => !img.alt || img.alt.trim() === '').map(img => ({
+        src: img.src,
+        suggestedAlt: `${p.title || 'Page'} visual element`
+      }));
+    }
+    const missingAltCount = p.missingAltCount ?? missingAltList.length;
+
+    let missingRequired = Array.isArray(p.missingRequired) ? p.missingRequired : [];
+    if (missingRequired.length === 0 && p.semanticTags) {
+      if (!p.semanticTags.main) missingRequired.push('main');
+      if (!p.semanticTags.footer) missingRequired.push('footer');
+    }
+    const hasAllRequired = p.hasAllRequired !== undefined ? p.hasAllRequired : (missingRequired.length === 0);
+
+    const isThin = p.isThin !== undefined ? p.isThin : (wordCount < 250);
+    const isHeavySpa = p.isHeavySpa !== undefined ? p.isHeavySpa : (p.isSpa === true || (ratio < 15 && wordCount < 300));
+
     return {
+      ...p,
       url: pageUrl,
       wordCount,
-      textCodeRatioPercent: ratioPercent,
+      ratio,
+      textToHtmlRatio: ratio,
+      textCodeRatioPercent: Math.round(ratio),
       densityRating: evaluateDensityRating(wordCount),
-      schema: isObj ? (page.schema || {}) : {}
+      isThin,
+      isHeavySpa,
+      hasCanonical,
+      canonicalUrl,
+      hasAllRequired,
+      missingRequired,
+      hasSchema,
+      schemaTypes,
+      extractedContent,
+      headings,
+      missingAltCount,
+      missingAltList,
+      lastUpdated: p.lastUpdated || p.lastModified || null,
+      isCrawled: p.isCrawled ?? (p.status ? p.status === 200 : true),
+      schema: p.schema || {}
     };
   });
 

@@ -57,12 +57,30 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     return {
       route: pageRoute,
       wordCount: 0,
+      rawText: '',
+      content: '',
+      html: '',
+      bodySnippet: '',
+      bodyTextSnippet: '',
+      headings: [],
       hasTitle: false,
       titleLength: 0,
       hasDescription: false,
       headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false },
       hasCanonical: false,
-      canonicalUrl: ''
+      canonicalUrl: '',
+      canonicalTag: '',
+      textCodeRatio: 0,
+      contentDensityRatio: 0,
+      textDensityRatio: 0,
+      hasSchema: false,
+      schemas: [],
+      schemaTypes: [],
+      lastUpdated: null,
+      lastModified: null,
+      semanticTags: { header: false, nav: false, main: false, footer: false, article: false, section: false },
+      missingAltCount: 0,
+      missingAltList: []
     };
   }
 
@@ -77,6 +95,13 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   const cleanHtml = ($clean('body').length > 0 ? $clean('body').html() : $clean.html()) || '';
   const wordCount = rawText ? rawText.split(/\s+/).filter(Boolean).length : 0;
 
+  // 1. Text Density Calculations
+  const textCodeRatio = cleanHtml.length > 0 
+    ? Number((rawText.length / cleanHtml.length).toFixed(4)) 
+    : 0;
+  const textDensityRatio = Math.round(textCodeRatio * 100);
+
+  // 2. Headings Parsing
   const headings = [];
   $('h1, h2, h3, h4').each((_, el) => {
     const tag = el.tagName.toLowerCase();
@@ -93,10 +118,55 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
                            (h3Count === 0 || h2Count > 0) && 
                            (h4Count === 0 || h3Count > 0);
 
+  // 3. Canonical URL
   const canonicalUrl = $('link[rel="canonical"]').attr('href') || '';
 
+  // 4. Clean Body Snippet
   const words = rawText.split(/\s+/).filter(Boolean);
   const bodySnippet = words.slice(0, 180).join(' ') + (words.length > 180 ? '...' : '');
+
+  // 5. JSON-LD Schemas Extraction
+  const schemas = [];
+  $('script[type="application/ld+json"]').each((_, el) => {
+    try {
+      const parsed = JSON.parse($(el).html());
+      if (Array.isArray(parsed)) {
+        schemas.push(...parsed);
+      } else if (parsed && typeof parsed === 'object') {
+        schemas.push(parsed);
+      }
+    } catch (_) {}
+  });
+  const schemaTypes = schemas.map(s => s['@type'] || s.type).filter(Boolean);
+
+  // 6. Revision / Freshness Date Extraction
+  const lastUpdated = $('meta[property="article:modified_time"]').attr('content')
+    || $('meta[property="og:updated_time"]').attr('content')
+    || $('meta[name="last-modified"]').attr('content')
+    || $('meta[name="date"]').attr('content')
+    || $('time[datetime]').attr('datetime')
+    || $('time').first().text().trim()
+    || null;
+
+  // 7. Image Alt Audit
+  const missingAltList = [];
+  $('img').each((_, el) => {
+    const src = $(el).attr('src') || '';
+    const alt = $(el).attr('alt');
+    if ((alt === undefined || alt.trim() === '') && src) {
+      missingAltList.push({ src, suggestedAlt: `${titleText || 'Page'} visual asset` });
+    }
+  });
+
+  // 8. Semantic HTML5 Tags Verification
+  const semanticTags = {
+    header: $('header').length > 0,
+    nav: $('nav').length > 0,
+    main: $('main').length > 0,
+    footer: $('footer').length > 0,
+    article: $('article').length > 0,
+    section: $('section').length > 0
+  };
 
   const pageObj = {
     route: pageRoute,
@@ -107,6 +177,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     content: cleanHtml,
     html: cleanHtml,
     bodySnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
+    bodyTextSnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
     headings,
     hasTitle: titleText.length > 0,
     titleLength: titleText.length,
@@ -119,7 +190,19 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
       isHierarchyValid
     },
     hasCanonical: canonicalUrl.length > 0,
-    canonicalUrl
+    canonicalUrl,
+    canonicalTag: canonicalUrl,
+    textCodeRatio,
+    contentDensityRatio: textCodeRatio,
+    textDensityRatio,
+    hasSchema: schemas.length > 0,
+    schemas,
+    schemaTypes,
+    lastUpdated,
+    lastModified: lastUpdated,
+    semanticTags,
+    missingAltCount: missingAltList.length,
+    missingAltList
   };
 
   if (pageRoute === '/') {
@@ -558,13 +641,26 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
               content: homepage.content || '',
               html: homepage.html || '',
               bodySnippet: `In-page section ${route} detected on single-page homepage.`,
+              bodyTextSnippet: `In-page section ${route} detected on single-page homepage.`,
               headings: [],
               hasTitle: true,
               titleLength: homepage.titleLength || 0,
               hasDescription: homepage.hasDescription || false,
               headingAudit: { h1: 1, h2: 1, h3: 0, h4: 0, isHierarchyValid: true },
               hasCanonical: homepage.hasCanonical || false,
-              canonicalUrl: homepage.canonicalUrl || ''
+              canonicalUrl: homepage.canonicalUrl || '',
+              canonicalTag: homepage.canonicalUrl || '',
+              textCodeRatio: homepage.textCodeRatio || 0,
+              contentDensityRatio: homepage.contentDensityRatio || 0,
+              textDensityRatio: homepage.textDensityRatio || 0,
+              hasSchema: homepage.hasSchema || false,
+              schemas: homepage.schemas || [],
+              schemaTypes: homepage.schemaTypes || [],
+              lastUpdated: homepage.lastUpdated || null,
+              lastModified: homepage.lastModified || null,
+              semanticTags: homepage.semanticTags || { header: true, nav: true, main: true, footer: true, article: false, section: true },
+              missingAltCount: 0,
+              missingAltList: []
             });
           }
         }
