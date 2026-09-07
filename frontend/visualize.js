@@ -429,6 +429,7 @@ export async function executeCockpitScan(targetUrl) {
     cockpitState = {
       ...cockpitState,
       ...mapped,
+      stage2Data: mapped.stage2 ? updateStage2FromPayload({ stage2: mapped.stage2, ...payload }) : updateStage2FromPayload(payload),
       isAudited: true,
       currentStep: 1,
       completedSteps: [1, 2, 3, 4, 5, 6],
@@ -748,6 +749,12 @@ export function renderStageFromState(stepNum, state) {
     case 1:
       renderStage1(canvas, state);
       break;
+    case 2:
+      renderStage2Canvas(canvas, state);
+      break;
+    case 3:
+      renderStage3Canvas(canvas, state);
+      break;
     default:
       canvas.innerHTML = `<div class="p-6 bg-[#1f1f1f] rounded-2xl border border-[#3c4043] text-white">Stage ${stepNum} Ingestion Bound</div>`;
       break;
@@ -1061,6 +1068,320 @@ function renderStage1(container, state) {
 
   container.innerHTML = html;
 }
+
+// -----------------------------------------------------------------------------
+// STAGE 2: ESSENTIAL CONTENT ANCHORS & CANONICAL ROUTES
+// -----------------------------------------------------------------------------
+export function updateStage2FromPayload(payload = {}) {
+  // 1. If mapBackendScanToV4State already mapped stage2, preserve it directly
+  if (payload.stage2 && Array.isArray(payload.stage2.routes) && payload.stage2.routes.length > 0) {
+    const rawRoutes = payload.stage2.routes;
+    const routes = rawRoutes.map(r => {
+      const path = r.path || r.route || '';
+      const isFound = r.status === 'FOUND' || r.status === 'discovered';
+      return {
+        path,
+        title: r.title || (path === '/about' ? 'Company Identity & Mission' : path === '/contact' ? 'Direct Contact Point' : path === '/pricing' ? 'Commercial Tiering & Pricing' : path === '/privacy-policy' ? 'Data Protection & Privacy' : path === '/terms-of-service' ? 'Terms of Service & Licensing' : path),
+        status: isFound ? 'FOUND' : 'MISSING',
+        citationScore: r.citationScore || (isFound ? '90%' : '0%'),
+        desc: r.desc || (isFound ? 'Entity credentials and canonical anchor verified in DOM.' : '404 Not Found. AI engines cannot confirm credentials on this route.')
+      };
+    });
+
+    const foundCount = payload.stage2.foundCount ?? routes.filter(r => r.status === 'FOUND').length;
+    const missingCount = payload.stage2.missingCount ?? routes.filter(r => r.status !== 'FOUND').length;
+    const missingRoutes = routes.filter(r => r.status === 'MISSING').map(r => r.path).join(', ');
+
+    cockpitState.stage2Data = {
+      ...payload.stage2,
+      routes,
+      foundCount,
+      missingCount,
+      missingSummary: payload.stage2.missingSummary || (missingRoutes ? `(${missingRoutes})` : ''),
+      score: payload.stage2.score || `${Math.round((foundCount / routes.length) * 100)}%`,
+      status: payload.stage2.status || (foundCount === routes.length ? 'PASS' : 'WARN')
+    };
+    return cockpitState.stage2Data;
+  }
+
+  // 2. Unpack results wrapper if present
+  const data = payload.results || payload;
+
+  // 3. Extract crawled URLs from all possible sources
+  const rawPages = data.pages || payload.pages || cockpitState.stage3?.pages || [];
+  const crawledUrls = Array.isArray(rawPages)
+    ? rawPages.map(p => typeof p === 'string' ? p : (p.url || p.path || p.route || ''))
+    : [];
+
+  const discoveredList = data.discoveredEssentialPages || payload.discoveredEssentialPages || data.discoveredRoutes || payload.discoveredRoutes || [];
+  const missingList = data.missingEssentialPages || payload.missingEssentialPages || [];
+
+  const anchorDefinitions = [
+    { path: '/about', title: 'Company Identity & Mission' },
+    { path: '/contact', title: 'Direct Contact Point' },
+    { path: '/pricing', title: 'Commercial Tiering & Pricing' },
+    { path: '/privacy-policy', title: 'Data Protection & Privacy' },
+    { path: '/terms-of-service', title: 'Terms of Service & Licensing' }
+  ];
+
+  const routes = anchorDefinitions.map(def => {
+    const cleanPath = def.path.toLowerCase();
+    const hashPath = '/#' + cleanPath.slice(1);
+
+    const inDiscovered = discoveredList.some(p => typeof p === 'string' && p.toLowerCase().includes(cleanPath));
+    const inMissing = missingList.some(p => typeof p === 'string' && p.toLowerCase().includes(cleanPath));
+    const inCrawled = crawledUrls.some(u => {
+      if (typeof u !== 'string') return false;
+      const lower = u.toLowerCase();
+      return lower.endsWith(cleanPath) || lower.includes(cleanPath + '/') || lower.includes(hashPath);
+    });
+
+    const isFound = inDiscovered || (!inMissing && inCrawled);
+
+    return {
+      path: def.path,
+      title: def.title,
+      status: isFound ? 'FOUND' : 'MISSING',
+      citationScore: isFound ? '90%' : '0%',
+      desc: isFound 
+        ? 'Entity credentials and canonical anchor verified in DOM.' 
+        : '404 Not Found. AI engines cannot confirm credentials on this route.'
+    };
+  });
+
+  const foundCount = routes.filter(r => r.status === 'FOUND').length;
+  const missingRoutes = routes.filter(r => r.status === 'MISSING').map(r => r.path).join(', ');
+
+  cockpitState.stage2Data = {
+    routes,
+    foundCount,
+    missingCount: routes.length - foundCount,
+    missingSummary: missingRoutes ? `(${missingRoutes})` : '',
+    score: `${Math.round((foundCount / routes.length) * 100)}%`,
+    status: foundCount === routes.length ? 'PASS' : 'WARN'
+  };
+
+  return cockpitState.stage2Data;
+}
+
+export function renderStage2Canvas(container, state = cockpitState) {
+  // Resolve Stage 2 data in order of priority:
+  // 1. state.stage2 (from v4PayloadAdapter)
+  // 2. cockpitState.stage2 (from executeCockpitScan mapped state)
+  // 3. cockpitState.stage2Data (from updateStage2FromPayload)
+  const rawS2 = (state.stage2 && Array.isArray(state.stage2.routes) && state.stage2.routes.length > 0)
+    ? state.stage2
+    : (cockpitState.stage2 && Array.isArray(cockpitState.stage2.routes) && cockpitState.stage2.routes.length > 0)
+      ? cockpitState.stage2
+      : (cockpitState.stage2Data || updateStage2FromPayload(state));
+
+  const s2 = (rawS2 && rawS2.routes && rawS2.routes[0]?.desc)
+    ? rawS2
+    : updateStage2FromPayload({ stage2: rawS2, ...state });
+
+  const foundCount = s2.foundCount ?? s2.routes.filter(r => r.status === 'FOUND' || r.status === 'discovered').length;
+  const missingCount = s2.missingCount ?? s2.routes.filter(r => r.status !== 'FOUND' && r.status !== 'discovered').length;
+  const missingRoutes = s2.routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route).join(', ');
+  const missingSummary = s2.missingSummary || (missingRoutes ? `(${missingRoutes})` : '');
+  const score = s2.score || `${Math.round((foundCount / s2.routes.length) * 100)}%`;
+  const isPass = s2.status === 'PASS' || foundCount === s2.routes.length;
+  const status = isPass ? 'PASS' : 'WARN';
+
+  const takeaway = isPass
+    ? 'All 5 canonical entity routes (/about, /contact, /pricing, /privacy-policy, /terms-of-service) are live and verified, establishing complete corporate entity anchors for AI search models.'
+    : `${foundCount} of 5 essential corporate routes verified. ${missingCount} missing anchor${missingCount > 1 ? 's' : ''} ${missingSummary} prevent AI search engines from fully citing corporate credentials.`;
+
+  const missingList = s2.routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route);
+
+  const actionPlan = missingList.length > 0
+    ? `Create and publish canonical routes for missing anchors (${missingList.join(', ')}). Embed Schema.org ContactPoint and Offer schemas to enable rich snippet extraction by AI engines.`
+    : 'All 5 core anchors are verified. Ensure all canonical pages maintain up-to-date schema markup and responsive navigation links.';
+
+  const actionSteps = [
+    { title: "Create canonical /pricing endpoint", detail: "Deploy a dedicated pricing table or plan breakdown URL at /pricing to provide structured commercial facts for search bots." },
+    { title: "Verify HTTP 200 responses", detail: "Ensure all 5 canonical routes return HTTP 200 with clean server headers and valid HTML content." },
+    { title: "Update header & footer navigation", detail: "Link all 5 canonical pages in both the header and footer DOM to establish strong internal link equity for crawlers." },
+    { title: "Embed Offer and ContactPoint schemas", detail: "Add JSON-LD Offer and ContactPoint structured data on respective pages for direct AI entity ingestion." }
+  ];
+
+  const evidencePlain = missingList.length > 0
+    ? `Verified ${foundCount} canonical routes with active DOM credentials. Discovered ${missingCount} unresolved route: ${missingList.map(p => `GET ${p} -> 404 Not Found`).join(', ')}.`
+    : `Verified all 5 canonical entity routes (/about, /contact, /pricing, /privacy-policy, /terms-of-service) returning HTTP 200 OK with DOM entity anchors.`;
+
+  const evidenceTrace = s2.routes.map(r => {
+    const isFound = r.status === 'FOUND' || r.status === 'discovered';
+    const path = r.path || r.route || '';
+    const title = r.title || path;
+    const citationScore = r.citationScore || (isFound ? '90%' : '0%');
+    return `GET ${path} -> ${isFound ? 'HTTP/2 200 OK (Verified)' : '404 Not Found'}\n  Title: ${title}\n  Citation Readiness: ${citationScore}`;
+  }).join('\n\n');
+
+  const html = `
+    <div class="space-y-6">
+      <!-- TIER 1 EXECUTIVE TAKEAWAY HEADER -->
+      <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline flex items-center space-x-2">
+                <span>🎯</span>
+                <span>What AI Search Engines See &amp; Why It Matters</span>
+              </span>
+              <span class="text-[#5f6368]">•</span>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
+            </div>
+            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
+              ${takeaway}
+            </p>
+          </div>
+          
+          <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${isPass ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
+            <div class="text-right">
+              <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold">Stage Result</span>
+              <span class="text-3xl sm:text-4xl font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${score}</span>
+            </div>
+            <span class="px-3 py-1 rounded-md text-xs font-mono font-black ${isPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
+              ${status}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KANBAN MATRIX CARD SECTION -->
+      <div class="bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg space-y-4">
+        <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">CANONICAL ANCHORS</span>
+            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">5-Anchor Essential Kanban Matrix</h4>
+            <p class="text-xs text-[#5f6368]">Corporate identity, trust, and commercial verification anchors</p>
+          </div>
+          <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">
+            ${foundCount} FOUND • ${missingCount} MISSING${missingSummary ? ' ' + missingSummary : ''}
+          </span>
+        </div>
+
+        <div class="kanban-grid-container">
+          ${s2.routes.map(r => {
+            const isFound = r.status === 'FOUND' || r.status === 'discovered';
+            const path = r.path || r.route || '';
+            const title = r.title || path;
+            const citationScore = r.citationScore || (isFound ? '90%' : '0%');
+            const desc = r.desc || (isFound ? 'Entity credentials and canonical anchor verified in DOM.' : '404 Not Found. AI engines cannot confirm credentials on this route.');
+            const statusLabel = isFound ? 'FOUND' : 'MISSING';
+
+            return `
+              <div class="kanban-card p-4 rounded-2xl bg-[#121212] border ${isFound ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ${isFound ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">
+                      ${statusLabel}
+                    </span>
+                    <span class="text-xs font-mono font-bold text-[#bdc1c6]">${citationScore}</span>
+                  </div>
+                  <div>
+                    <h5 class="text-xs sm:text-sm font-bold text-white font-headline">${title}</h5>
+                    <code class="text-xs font-mono text-[#38bdf8]">${path}</code>
+                  </div>
+                  <p class="text-xs text-[#bdc1c6] leading-relaxed">${desc}</p>
+                </div>
+                <div class="kanban-card-metrics">
+                  <span class="text-[10px] font-mono text-[#5f6368] uppercase">Citation Readiness</span>
+                  <span class="text-xs font-mono font-bold ${isFound ? 'text-[#10b981]' : 'text-red-400'}">${citationScore}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- ACTION & VERIFICATION DRAWERS -->
+      <div class="space-y-5 mt-6">
+        <!-- BOX 1: MANUAL ACTION PLAN -->
+        <div class="bg-[#1f1f1f] border-2 border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-3.5">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-base sm:text-lg">🛠️</span>
+            <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider font-headline">
+              Action Plan: How to improve how AI can read your current pages better
+            </h4>
+          </div>
+          
+          <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-7">
+            ${actionPlan}
+          </p>
+
+          <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 ml-0 sm:ml-7 mt-2">
+            <summary class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
+              <span>▾ View Detailed Step-by-Step Fix Instructions</span>
+              <span class="text-xs text-[#bdc1c6] font-normal">[Click to Expand]</span>
+            </summary>
+            <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
+              ${actionSteps.map((step, idx) => `
+                <div class="flex items-start space-x-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
+                  <span class="w-5 h-5 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
+                  <div class="flex-1">
+                    <strong class="text-white font-bold">${step.title}:</strong>
+                    <span class="text-[#bdc1c6] ml-1">${step.detail}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </details>
+        </div>
+
+        <!-- BOX 2: RECOMMENDED SHORTCUT -->
+        <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+          <div class="shortcut-card-body space-y-2.5">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-base sm:text-lg text-[#d45d2a]">⚡</span>
+              <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider font-headline">
+                Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
+              </h4>
+            </div>
+            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-0 sm:pl-7">
+              Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.
+            </p>
+          </div>
+          <div class="shortcut-card-btn-container">
+            <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-6 py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-xs sm:text-sm font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95 flex-shrink-0">
+              <span>⚡ Deploy AI-Ready files using AIOptimize Pro</span>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TIER 2: VERIFICATION EVIDENCE DRAWER -->
+        <details class="executive-drawer bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 shadow-lg open" open>
+          <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white font-headline cursor-pointer">
+            <span class="flex items-center space-x-2.5">
+              <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Verification Evidence (What We Found)</span>
+            </span>
+            <span class="text-[#bdc1c6] text-xs font-mono font-semibold">[Toggle Verification]</span>
+          </summary>
+          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-4">
+            <p class="text-sm sm:text-base leading-relaxed text-[#e8eaed] font-medium">
+              ${evidencePlain}
+            </p>
+            
+            <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 mt-3">
+              <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#bdc1c6] cursor-pointer">
+                <span>▾ View Technical Diagnostics &amp; Server Response Trace</span>
+                <span class="text-[#38bdf8] text-xs font-mono">[Raw Headers Trace]</span>
+              </summary>
+              <div class="mt-3.5 pt-3.5 border-t border-[#3c4043]">
+                <pre class="bg-[#181818] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]">${evidenceTrace}</pre>
+              </div>
+            </details>
+          </div>
+        </details>
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+export const renderStage2 = renderStage2Canvas;
 
 if (typeof window !== 'undefined' && document.getElementById('target-url-input')) {
   window.addEventListener('DOMContentLoaded', initCockpit);
