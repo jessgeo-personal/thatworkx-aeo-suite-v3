@@ -275,4 +275,32 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
     expect(page2.headingCounts).toEqual({ h1: 0, h2: 0, h3: 0, h4: 0 });
     expect(page2.isSchema).toBe(true); // Missing schema, so issue flag is true
   });
+
+  it('Gate 11: Suppresses false-positive SPA/DOM warnings and assigns 404 NOT FOUND status on missing routes', () => {
+    const payloadWith404 = {
+      status: 'completed',
+      targetUrl: 'https://thatworkx.com',
+      pages: [
+        {
+          url: 'https://thatworkx.com/terms',
+          statusCode: 404,
+          is404: true,
+          wordCount: 0,
+          textCodeRatio: 0
+        }
+      ]
+    };
+
+    const state = mapBackendScanToV4State(payloadWith404);
+    expect(state.stage3.pages).toHaveLength(1);
+
+    const page = state.stage3.pages[0];
+    expect(page.is404).toBe(true);
+    expect(page.status).toBe('404 NOT FOUND');
+    expect(page.color).toBe('bg-red-500');
+    expect(page.isThin).toBe(false);
+    expect(page.isHeavySpa).toBe(false);
+    expect(page.isSchema).toBe(false);
+    expect(page.gain).toBe('0.00');
+  });
 });

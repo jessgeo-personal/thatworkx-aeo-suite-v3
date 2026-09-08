@@ -41,12 +41,15 @@ const fetchPageWithTimeout = async (pageUrl) => {
       timeout: 3500
     });
     clearTimeout(timeoutId);
-    return { success: true, data: pageRes.data, headers: pageRes.headers };
+    return { success: true, data: pageRes.data, headers: pageRes.headers, status: pageRes.status, statusCode: pageRes.status };
   } catch (error) {
     clearTimeout(timeoutId);
     const isTimeout = error.name === 'AbortError' || error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'));
+    const status = error.response ? error.response.status : (isTimeout ? 408 : null);
     return {
       success: false,
+      status,
+      statusCode: status,
       error: isTimeout ? 'heavy_page_timeout' : error.message
     };
   }
@@ -640,11 +643,41 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         if (fetchRes.success) {
           const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute, fetchRes.headers);
           result.pages.push(parsedPage);
+        } else if (fetchRes.status === 404 || fetchRes.statusCode === 404) {
+          result.pages.push({
+            url: pageUrl,
+            route: pageRoute,
+            statusCode: 404,
+            status: 404,
+            isCrawled: false,
+            is404: true,
+            isMissing: true,
+            wordCount: 0,
+            textCodeRatio: 0,
+            contentDensityRatio: 0,
+            textDensityRatio: 0,
+            cleanHtml: '',
+            rawText: '',
+            schemas: [],
+            schemaTypes: [],
+            headings: [],
+            headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false },
+            hasCanonical: false,
+            canonicalUrl: '',
+            hasSchema: false,
+            lastUpdated: null,
+            semanticTags: { header: false, nav: false, main: false, footer: false, article: false, section: false },
+            missingAltCount: 0,
+            missingAltList: []
+          });
         } else {
           result.pages.push({
             url: pageUrl,
             route: pageRoute,
+            statusCode: fetchRes.status || 500,
             status: 'failed',
+            isCrawled: false,
+            is404: false,
             error: fetchRes.error === 'heavy_page_timeout' ? 'heavy_page_timeout' : 'fetch_error'
           });
         }

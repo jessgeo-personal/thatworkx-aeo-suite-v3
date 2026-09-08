@@ -1516,7 +1516,27 @@ export function loadMoreStage3Pages() {
   renderStageFromState(3, cockpitState);
 }
 
-function buildLegacyMatchedPageFixPanels(p) {
+function buildLegacyMatchedPageFixPanels(p, idx) {
+  // 1. EARLY EXIT: 404 / Missing Page Handler
+  if (p.is404 || p.statusCode === 404) {
+    return `
+      <div class="p-4 rounded-xl bg-red-950/30 border border-red-500/50 text-xs sm:text-sm space-y-3">
+        <div class="font-bold text-red-400 flex items-center space-x-2 text-sm">
+          <span>🚫</span>
+          <span>HTTP 404 Not Found — Page Does Not Exist</span>
+        </div>
+        <p class="text-[#cbd5e1] leading-relaxed">
+          AI search crawlers encountered a <strong>404 Not Found</strong> error when attempting to fetch <code>${p.url}</code>. This route contains no indexable content.
+        </p>
+        <div class="text-[#bdc1c6] space-y-1.5 pl-3 border-l-2 border-red-500/40">
+          <div><strong>• Canonical Redirect (Recommended):</strong> If this is an alternative alias (e.g. <code>/terms</code>), implement a permanent <strong>301 Redirect</strong> to the canonical destination (e.g. <code>/terms-of-service</code>).</div>
+          <div><strong>• Broken Internal Links:</strong> If this URL was discovered via site navigation, inspect your header and footer links to correct or remove the broken reference.</div>
+          <div><strong>• Restore Endpoint:</strong> If this is a required company anchor, publish the HTML page with a direct 200 OK status code.</div>
+        </div>
+      </div>
+    `;
+  }
+
   const tokens = Math.round((p.wordCount || 0) * 1.35);
   const panels = [];
 
@@ -1670,24 +1690,31 @@ export function renderStage3Canvas(container, state = cockpitState) {
     const ratio = isNaN(rawRatio) ? 0 : Number(rawRatio.toFixed(1));
 
     const wordCount = p.wordCount ?? p.words ?? 0;
-    const isThin = p.isThin !== undefined ? p.isThin : (wordCount < 250);
+    const is404 = p.statusCode === 404 || 
+                  p.is404 === true || 
+                  p.isMissing === true || 
+                  p.status === '404 NOT FOUND' ||
+                  p.missingStatus === 'Missing' ||
+                  (p.isCrawled === false && wordCount === 0);
+
+    const isThin = !is404 && (p.isThin !== undefined ? p.isThin : (wordCount < 250));
     // Heavy SPA only if ratio is genuinely low (< 15%) AND content is sparse (< 300 words)
-    const isHeavySpa = p.isHeavySpa !== undefined ? p.isHeavySpa : (ratio < 15 && wordCount < 300);
-    const isCrawled = p.isCrawled !== undefined ? p.isCrawled : true;
+    const isHeavySpa = !is404 && (p.isHeavySpa !== undefined ? p.isHeavySpa : (ratio < 15 && wordCount < 300));
+    const isCrawled = !is404 && (p.isCrawled !== undefined ? p.isCrawled : true);
 
     // 2. Canonical Tag
     const canonicalUrl = p.canonicalTag || p.canonical || p.canonicalUrl || '';
-    const hasCanonical = p.hasCanonical !== undefined ? p.hasCanonical : Boolean(canonicalUrl);
+    const hasCanonical = is404 ? true : (p.hasCanonical !== undefined ? p.hasCanonical : Boolean(canonicalUrl));
 
     // 3. Schema.org / JSON-LD
     const schemasList = Array.isArray(p.schemas) ? p.schemas : (Array.isArray(p.schema) ? p.schema : (Array.isArray(p.jsonLd) ? p.jsonLd : []));
     const schemaTypes = Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0
       ? p.schemaTypes
       : schemasList.map(s => s['@type'] || s.type).filter(Boolean);
-    const hasSchema = p.hasSchema !== undefined ? p.hasSchema : (schemaTypes.length > 0 || schemasList.length > 0);
+    const hasSchema = is404 ? false : (p.hasSchema !== undefined ? p.hasSchema : (schemaTypes.length > 0 || schemasList.length > 0));
 
     // 4. Revision Date (Freshness)
-    const lastUpdated = p.lastUpdated || p.lastModified || p.dateModified || p.modifiedTime || p.revisionDate || null;
+    const lastUpdated = is404 ? null : (p.lastUpdated || p.lastModified || p.dateModified || p.modifiedTime || p.revisionDate || null);
 
     // 5. Headings: Support { H1: 1, H2: 4 } and { h1: [...], h2: [...] }
     let headings = p.headings || {};
@@ -1717,22 +1744,24 @@ export function renderStage3Canvas(container, state = cockpitState) {
                             .replace(/\s+/g, ' ')
                             .trim();
     }
-    const extractedContent = rawSnippet;
+    const extractedContent = is404 ? '' : rawSnippet;
 
     // Semantic Tags & Alts
-    const missingRequired = Array.isArray(p.missingRequired) ? p.missingRequired : [];
-    const hasAllRequired = missingRequired.length === 0;
-    const missingAltList = Array.isArray(p.missingAltList) ? p.missingAltList : [];
-    const missingAltCount = p.missingAltCount ?? missingAltList.length;
+    const missingRequired = is404 ? [] : (Array.isArray(p.missingRequired) ? p.missingRequired : []);
+    const hasAllRequired = is404 ? true : (missingRequired.length === 0);
+    const missingAltList = is404 ? [] : (Array.isArray(p.missingAltList) ? p.missingAltList : []);
+    const missingAltCount = is404 ? 0 : (p.missingAltCount ?? missingAltList.length);
 
-    const status = p.status || (ratio >= 35 ? 'EXCELLENT' : ratio >= 25 ? 'GOOD' : ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)');
-    const color = p.color || (ratio >= 35 ? 'bg-[#10b981]' : ratio >= 25 ? 'bg-[#38bdf8]' : ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500');
-    const gain = p.gain || (ratio > 0 ? Math.min(0.99, (ratio / 50)).toFixed(2) : '0.20');
+    const status = p.status || (is404 ? '404 NOT FOUND' : (ratio >= 35 ? 'EXCELLENT' : ratio >= 25 ? 'GOOD' : ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)'));
+    const color = p.color || (is404 ? 'bg-red-500' : (ratio >= 35 ? 'bg-[#10b981]' : ratio >= 25 ? 'bg-[#38bdf8]' : ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500'));
+    const gain = p.gain || (is404 ? '0.00' : (ratio > 0 ? Math.min(0.99, (ratio / 50)).toFixed(2) : '0.20'));
 
     return {
       url,
-      ratio,
+      ratio: is404 ? 0 : ratio,
       wordCount,
+      is404,
+      statusCode: p.statusCode || (is404 ? 404 : 200),
       isThin,
       isHeavySpa,
       isCrawled,
@@ -1848,9 +1877,9 @@ export function renderStage3Canvas(container, state = cockpitState) {
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-center flex-shrink-0">
-                  <span class="font-mono font-black ${bar.ratio >= 25 ? 'text-[#10b981]' : bar.ratio >= 15 ? 'text-[#f59e0b]' : 'text-red-400'}">
-                    ${bar.ratio}% Density (${bar.status})
-                  </span>
+                  ${bar.is404 
+                    ? `<span class="text-red-400 font-mono font-black">404 NOT FOUND (PAGE MISSING)</span>`
+                    : `<span class="font-mono font-black ${bar.ratio >= 25 ? 'text-[#10b981]' : bar.ratio >= 15 ? 'text-[#f59e0b]' : 'text-red-400'}">${bar.ratio}% Density (${bar.status})</span>`}
                   
                   <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.viewWhatAISees ? window.AEO_COCKPIT.viewWhatAISees('${bar.url}', ${bar.ratio}, '${bar.status}', '${bar.gain}') : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95" title="View clean text ingested by AI crawlers">
                     <span>📄 View What AI sees</span>

@@ -342,41 +342,61 @@ export function mapBackendScanToV4State(rawPayload) {
       if (!p.semanticTags.main) missingRequired.push('main');
       if (!p.semanticTags.footer) missingRequired.push('footer');
     }
-    const hasAllRequired = typeof p.hasSemanticTags === 'boolean' 
-      ? p.hasSemanticTags 
-      : (typeof p.semanticTagsCount === 'number' ? (p.semanticTagsCount >= 3) : (p.hasAllRequired !== undefined ? p.hasAllRequired : (missingRequired.length === 0)));
+    // Detect if the route is a 404 / Missing endpoint
+    const is404 = p.statusCode === 404 || 
+                  p.is404 === true || 
+                  p.isMissing === true || 
+                  p.missingStatus === 'Missing' ||
+                  (p.isCrawled === false && wordCount === 0);
 
-    const isThin = p.isThin !== undefined ? p.isThin : (wordCount < 250);
-    const isHeavySpa = p.isHeavySpa !== undefined ? p.isHeavySpa : (p.isSpa === true || (ratio < 15 && wordCount < 300));
+    // Set badge status and styling
+    let statusText = 'EXCELLENT';
+    let statusColor = 'bg-[#10b981]';
+
+    if (is404) {
+      statusText = '404 NOT FOUND';
+      statusColor = 'bg-red-500';
+    } else if (ratio < 15) {
+      statusText = 'WARNING (SPA)';
+      statusColor = 'bg-red-500';
+    } else if (ratio < 25) {
+      statusText = 'MODERATE';
+      statusColor = 'bg-[#f59e0b]';
+    }
+
+    const isThin = !is404 && (p.isThin !== undefined ? p.isThin : (wordCount < 250));
+    const isHeavySpa = !is404 && (p.isHeavySpa !== undefined ? p.isHeavySpa : (p.isSpa === true || (ratio < 15 && wordCount < 300)));
 
     return {
       ...p,
       url: p.url || p.route || p.path || pageUrl,
-      ratio,
-      wordCount,
-      headingAudit,
-      headingCounts,
-      lastUpdated: p.lastUpdated || p.lastModified || null,
-      hasCanonical,
-      canonicalUrl,
-      hasAllRequired,
-      missingRequired,
-      missingAltCount,
-      missingAltList,
-      isSchema: isMissingSchema,
-      status: ratio >= 25 ? 'EXCELLENT' : (ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)'),
-      color: ratio >= 25 ? 'bg-[#10b981]' : (ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500'),
-      gain: (Math.min(0.99, Math.max(0.15, ratio / 50))).toFixed(2),
-      textToHtmlRatio: ratio,
-      textCodeRatioPercent: Math.round(ratio),
-      densityRating: evaluateDensityRating(wordCount),
+      ratio: is404 ? 0 : ratio,
+      wordCount: p.wordCount || 0,
+      statusCode: p.statusCode || (is404 ? 404 : 200),
+      is404,
+      isCrawled: !is404 && p.isCrawled !== false,
       isThin,
       isHeavySpa,
-      hasSchema: pageHasSchema,
-      schemaTypes,
-      extractedContent,
-      headings,
-      isCrawled: p.isCrawled ?? (p.status ? p.status === 200 : true),
+      headingAudit,
+      headingCounts,
+      lastUpdated: is404 ? null : (p.lastUpdated || p.lastModified || null),
+      hasCanonical: is404 ? true : (typeof p.canonicalTag === 'boolean' ? p.canonicalTag : Boolean(p.hasCanonical || canonicalUrl)),
+      canonicalUrl,
+      hasAllRequired: is404 ? true : (typeof p.hasSemanticTags === 'boolean' ? p.hasSemanticTags : (typeof p.semanticTagsCount === 'number' ? (p.semanticTagsCount >= 3) : (p.hasAllRequired !== undefined ? p.hasAllRequired : (missingRequired.length === 0)))),
+      missingRequired: is404 ? [] : missingRequired,
+      missingAltCount: is404 ? 0 : (p.imagesWithoutAlt ?? p.missingAltCount ?? missingAltList.length),
+      missingAltList: is404 ? [] : missingAltList,
+      isSchema: is404 ? false : isMissingSchema,
+      status: statusText,
+      color: statusColor,
+      gain: is404 ? '0.00' : (Math.min(0.99, Math.max(0.15, ratio / 50))).toFixed(2),
+      textToHtmlRatio: is404 ? 0 : ratio,
+      textCodeRatioPercent: is404 ? 0 : Math.round(ratio),
+      densityRating: is404 ? 'Thin' : evaluateDensityRating(wordCount),
+      hasSchema: is404 ? false : pageHasSchema,
+      schemaTypes: is404 ? [] : schemaTypes,
+      extractedContent: is404 ? '' : extractedContent,
+      headings: is404 ? { h1: [], h2: [] } : headings,
       schema: p.schema || {}
     };
   });
