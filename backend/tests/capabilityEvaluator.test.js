@@ -1,4 +1,4 @@
-const { CAPABILITY_MATRIX, evaluateAllCapabilities } = require('../services/capabilityEvaluator.js');
+const { CAPABILITY_MATRIX, evaluateCapabilities, evaluateAllCapabilities } = require('../services/capabilityEvaluator.js');
 
 describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View Payload)', () => {
   it('should contain exactly 32 distinct capabilities in the capability matrix', () => {
@@ -284,3 +284,166 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(jsonStr).not.toContain('ai-first');
   });
 });
+
+describe('Canonical 6-Stage Diagnostic Pipeline Contract (BDD-TDD Red Phase)', () => {
+  const sampleCrawlPayload = {
+    url: 'https://example.com',
+    status: {
+      botPermissions: {
+        'GPTBot': 'Allowed',
+        'ClaudeBot': 'Allowed',
+        'PerplexityBot': 'Allowed',
+        'Google-Extended': 'Allowed',
+        'Applebot-Extended': 'Allowed'
+      },
+      isWafBlocked: false,
+      robotsTxtExists: true,
+      sitemapExists: true,
+      llmsTxtExists: true,
+      aiContextExists: true,
+      aboutTxtExists: true,
+      docsTxtExists: true,
+      contentTxtExists: true,
+      jsonLdExists: true,
+      jsonLdTypes: ['Organization', 'WebSite'],
+      seoOptimalTitle: true,
+      seoOptimalDesc: true,
+      hasProperHierarchy: true,
+      wordCount: 1500
+    },
+    discoveredRoutes: [
+      { path: '/', wordCount: 500, textDensityRatio: 0.35, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/about', wordCount: 300, textDensityRatio: 0.28, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/contact', wordCount: 200, textDensityRatio: 0.20, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/privacy-policy', wordCount: 450, textDensityRatio: 0.40, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/terms-of-service', wordCount: 600, textDensityRatio: 0.42, isCrawled: true, is404: false, statusCode: 200 }
+    ],
+    pages: [
+      { url: 'https://example.com/', wordCount: 500, textRatio: 35, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/about', wordCount: 300, textRatio: 28, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/contact', wordCount: 200, textRatio: 20, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/privacy-policy', wordCount: 450, textRatio: 40, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/terms-of-service', wordCount: 600, textRatio: 42, isCrawled: true, is404: false, statusCode: 200 }
+    ],
+    eeatMetrics: {
+      isSecure: true,
+      hasContactInfo: true,
+      hasPrivacyPolicy: true,
+      hasAuthorBio: true,
+      hasOrgSchema: true,
+      authorityStatus: 'Optimized Anchor'
+    },
+    sec1: { blocked: false },
+    sec2: { isHttps: true, essentialPagesFound: 4 },
+    sec3: { hasContactInfo: true, hasPrivacyPolicy: true, seoOptimalTitle: true, seoOptimalDesc: true, hasProperHierarchy: true, wordCount: 1500, fleschScore: 70 },
+    sec4: {
+      robotsTxtFound: true,
+      sitemapFound: true,
+      llmsTxtFound: true,
+      aiContextFound: true,
+      aboutMdFound: true,
+      docsMdFound: true,
+      contentMdFound: true
+    }
+  };
+
+  it('1. Contract Schema & Property Existence: evaluateCapabilities and evaluateAllCapabilities return stages with stage1..stage6', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    expect(res).toHaveProperty('stages');
+    expect(res.stages).toHaveProperty('stage1');
+    expect(res.stages).toHaveProperty('stage2');
+    expect(res.stages).toHaveProperty('stage3');
+    expect(res.stages).toHaveProperty('stage4');
+    expect(res.stages).toHaveProperty('stage5');
+    expect(res.stages).toHaveProperty('stage6');
+
+    const wrapperRes = evaluateAllCapabilities(sampleCrawlPayload);
+    expect(wrapperRes).toHaveProperty('stages');
+    expect(wrapperRes.stages).toHaveProperty('stage1');
+    expect(wrapperRes.stages).toHaveProperty('stage6');
+  });
+
+  it('2. Stage 1 (Bot Blocks & Gateway): computes allowedCount, totalCount, score string, status, and summaryText from botPermissions', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage1 = res.stages.stage1;
+    expect(stage1.allowedCount).toBe(5);
+    expect(stage1.totalCount).toBe(5);
+    expect(stage1.score).toBe('100%');
+    expect(stage1.status).toBe('PASS');
+    expect(stage1.summaryText).toBe('Bot Access: 5/5 Verified Unblocked');
+  });
+
+  it('3. Stage 2 (Essential Content Anchors): evaluates 5-anchor matrix, calculates score, status, and dynamic missing summaryText', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage2 = res.stages.stage2;
+    expect(stage2.foundCount).toBe(4);
+    expect(stage2.missingCount).toBe(1);
+    expect(stage2.score).toBe('80%');
+    expect(stage2.status).toBe('WARN');
+    expect(stage2.summaryText).toContain('Essential Pages: 4 Found, 1 Missing (/pricing)');
+  });
+
+  it('4. Stage 3 (Content Availability & Density): computes non-hardcoded score based on high extractability threshold and valid pages', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage3 = res.stages.stage3;
+    expect(stage3.totalValidPages).toBe(5);
+    expect(stage3.highExtractabilityCount).toBe(4);
+    expect(stage3.score).toBe('80%');
+    expect(stage3.score).not.toBe('85%');
+    expect(stage3.status).toBe('PASS');
+    expect(stage3.summaryText).toBe('Citation Readability: 4/5 High Extractability');
+  });
+
+  it('5. Stage 4 (Trust & E-E-A-T): evaluates trust metrics, returns score, PASS/WARN status, and summaryText', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage4 = res.stages.stage4;
+    expect(typeof stage4.score).toBe('string');
+    expect(stage4.score.endsWith('%')).toBe(true);
+    expect(['PASS', 'WARN']).toContain(stage4.status);
+    expect(stage4.summaryText).toBeDefined();
+  });
+
+  it('6. Stage 5 (Machine Manifest Protocols): enforces governanceGate "AI-Ready", tracks 4-level machine hierarchy, computes score & status', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage5 = res.stages.stage5;
+    expect(stage5.governanceGate).toBe('AI-Ready');
+    expect(stage5.manifestsFound).toBe(7);
+    expect(stage5.totalManifests).toBe(7);
+    expect(stage5.score).toBe('100%');
+    expect(stage5.status).toBe('PASS');
+  });
+
+  it('7. Stage 6 (Executive Boardroom & Action Triage): healthIndex equals overallScore, status categorized, human/machine readiness exposed', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage6 = res.stages.stage6;
+    expect(stage6.healthIndex).toBe(res.overallScore);
+    expect(stage6.score).toBe(`${res.overallScore}%`);
+    const expectedStatus = res.overallScore >= 80 ? 'OPTIMIZED' : (res.overallScore >= 50 ? 'NEEDS IMPROVEMENT' : 'CRITICAL');
+    expect(stage6.status).toBe(expectedStatus);
+    expect(typeof stage6.humanWebReadiness).toBe('number');
+    expect(typeof stage6.machineWebReadiness).toBe('number');
+  });
+
+  it('8. Empty / Un-scanned State: resolves all stages to safe neutral values without mock strings or fallbacks', () => {
+    const res = evaluateCapabilities({});
+    expect(res).toHaveProperty('stages');
+    const { stage1, stage2, stage3, stage4, stage5, stage6 } = res.stages;
+    expect(stage1.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage1.status);
+    expect(stage2.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage2.status);
+    expect(stage3.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage3.status);
+    expect(stage4.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage4.status);
+    expect(stage5.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage5.status);
+    expect(stage6.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL', 'CRITICAL']).toContain(stage6.status);
+
+    const jsonStr = JSON.stringify(res.stages);
+    expect(jsonStr).not.toContain('Mock');
+    expect(jsonStr).not.toContain('AI-first');
+  });
+});
+

@@ -982,6 +982,15 @@ function evaluateCapabilities(crawledData = {}) {
     p4Score = 0;
   }
 
+  // Unscanned / empty crawl handling
+  const isUnscanned = !crawledData || Object.keys(crawledData).length === 0 || (!crawledData.url && (!crawledData.status || Object.keys(crawledData.status).length === 0) && (!crawledData.pages || crawledData.pages.length === 0) && (!crawledData.discoveredRoutes || crawledData.discoveredRoutes.length === 0));
+  if (isUnscanned) {
+    p1Score = 0;
+    p2Score = 0;
+    p3Score = 0;
+    p4Score = 0;
+  }
+
   // overallScore is exact sum of P1 + P2 + P3 + P4
   const overallScore = p1Score + p2Score + p3Score + p4Score;
 
@@ -1309,6 +1318,132 @@ function evaluateCapabilities(crawledData = {}) {
     diagnosticSummary
   };
 
+  // Canonical 6-Stage Diagnostic Pipeline Calculation
+  const botPermissionsMap = status.botPermissions || {};
+  const stage1TotalCount = Object.keys(botPermissionsMap).length || 20;
+  const stage1AllowedCount = isWafBlocked ? 0 : Object.values(botPermissionsMap).filter(v => v === true || v === 'Allowed' || v === 'PASS' || v === 'allowed' || v === 'pass').length;
+  const stage1ScoreNum = isWafBlocked ? 0 : Math.round((stage1AllowedCount / stage1TotalCount) * 100);
+  const stage1Score = `${stage1ScoreNum}%`;
+  const stage1Status = isWafBlocked || stage1ScoreNum < 70 ? 'FAIL' : (stage1ScoreNum === 100 ? 'PASS' : 'WARN');
+  const stage1Summary = `Bot Access: ${stage1AllowedCount}/${stage1TotalCount} Verified Unblocked`;
+  const stage1Obj = {
+    title: 'AI Bot Blocks & Gateway Permissions',
+    allowedCount: stage1AllowedCount,
+    totalCount: stage1TotalCount,
+    score: stage1Score,
+    scoreNum: stage1ScoreNum,
+    status: stage1Status,
+    summaryText: stage1Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const stage2FoundCount = 5 - missingEssentialPages.length;
+  const stage2MissingCount = missingEssentialPages.length;
+  const stage2ScoreNum = Math.round((stage2FoundCount / 5) * 100);
+  const stage2Score = `${stage2ScoreNum}%`;
+  const stage2Status = stage2FoundCount === 5 ? 'PASS' : (stage2FoundCount >= 3 ? 'WARN' : 'FAIL');
+  const stage2Summary = stage2FoundCount === 5
+    ? 'All 5 Essential Content Pages Discovered'
+    : `Essential Pages: ${stage2FoundCount} Found, ${stage2MissingCount} Missing (${missingEssentialPages.join(', ')})`;
+  const stage2Obj = {
+    title: 'Identifiable Essential Pages & Anchors',
+    foundCount: stage2FoundCount,
+    missingCount: stage2MissingCount,
+    missingRoutes: missingEssentialPages,
+    score: stage2Score,
+    scoreNum: stage2ScoreNum,
+    status: stage2Status,
+    summaryText: stage2Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const validPages = (crawledData.pages || []).filter(p => p && typeof p === 'object' && p.statusCode !== 404 && p.status !== 404 && p.is404 !== true && p.isMissing !== true && p.isCrawled !== false);
+  const highExtractabilityPages = validPages.filter(p => {
+    const rawR = p.contentDensityRatio ?? p.textDensityRatio ?? p.textCodeRatio ?? p.ratio ?? p.textRatio ?? 0;
+    const ratio = (rawR > 0 && rawR <= 1) ? rawR * 100 : Number(rawR);
+    const wc = p.wordCount ?? p.words ?? 0;
+    return ratio >= 25 && wc >= 250;
+  }).length;
+  const totalValidPages = validPages.length;
+  const stage3ScoreNum = totalValidPages > 0 ? Math.round((highExtractabilityPages / totalValidPages) * 100) : 0;
+  const stage3Score = `${stage3ScoreNum}%`;
+  const stage3Status = totalValidPages === 0 ? 'FAIL' : (stage3ScoreNum >= 75 ? 'PASS' : (stage3ScoreNum >= 50 ? 'WARN' : 'FAIL'));
+  const stage3Summary = `Citation Readability: ${highExtractabilityPages}/${totalValidPages} High Extractability`;
+  const stage3Obj = {
+    title: 'Content Availability & Semantic Text Density',
+    totalValidPages,
+    highExtractabilityCount: highExtractabilityPages,
+    score: stage3Score,
+    scoreNum: stage3ScoreNum,
+    status: stage3Status,
+    summaryText: stage3Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const stage4ScoreNum = Math.round((p3Score / 25) * 100);
+  const stage4Score = `${stage4ScoreNum}%`;
+  const stage4Status = stage4ScoreNum >= 80 ? 'PASS' : (stage4ScoreNum >= 50 ? 'WARN' : 'FAIL');
+  const stage4Summary = stage4ScoreNum >= 80 ? 'Trust & E-E-A-T: Schema & Entity Validated' : 'Trust & E-E-A-T: Entity Authority Gaps Detected';
+  const stage4Obj = {
+    title: 'Trust & E-E-A-T',
+    score: stage4Score,
+    scoreNum: stage4ScoreNum,
+    status: stage4Status,
+    summaryText: stage4Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const manifestChecks = {
+    robotsTxt: Boolean(status.robotsTxtExists ?? sec4.robotsTxtFound),
+    sitemapXml: Boolean(status.sitemapExists ?? sec4.sitemapFound),
+    llmsTxt: Boolean(status.llmsTxtExists ?? sec4.llmsTxtFound),
+    aiContextMd: Boolean(status.aiContextExists ?? sec4.aiContextFound),
+    aboutMd: Boolean(status.aboutTxtExists ?? sec4.aboutMdFound),
+    docsMd: Boolean(status.docsTxtExists ?? sec4.docsMdFound),
+    contentMd: Boolean(status.contentTxtExists ?? sec4.contentMdFound)
+  };
+  const totalManifests = 7;
+  const manifestsFound = Object.values(manifestChecks).filter(Boolean).length;
+  const stage5ScoreNum = Math.round((manifestsFound / 7) * 100);
+  const stage5Score = `${stage5ScoreNum}%`;
+  const stage5Status = manifestsFound === 7 ? 'PASS' : (manifestsFound >= 3 ? 'WARN' : 'FAIL');
+  const stage5Summary = `AI-Ready Files: ${manifestsFound}/7 Manifests Active`;
+  const stage5Obj = {
+    title: 'Machine Manifest Protocols',
+    governanceGate: 'AI-Ready',
+    manifestsFound,
+    totalManifests,
+    manifestChecks,
+    score: stage5Score,
+    scoreNum: stage5ScoreNum,
+    status: stage5Status,
+    summaryText: stage5Summary,
+    classification: 'AI-Ready'
+  };
+
+  const humanWebReadiness = Math.round(((p1Score + p2Score + p3Score) / 75) * 100);
+  const machineWebReadiness = Math.round((p4Score / 25) * 100);
+  const stage6Status = overallScore >= 80 ? 'OPTIMIZED' : (overallScore >= 50 ? 'NEEDS IMPROVEMENT' : 'CRITICAL');
+  const stage6Obj = {
+    title: 'Executive Boardroom & Action Triage',
+    score: `${overallScore}%`,
+    healthIndex: overallScore,
+    status: stage6Status,
+    humanWebReadiness,
+    machineWebReadiness,
+    summaryText: `Boardroom Summary: Overall AEO Health Index ${overallScore}/100`,
+    classification: 'Executive Boardroom'
+  };
+
+  const stages = {
+    stage1: stage1Obj,
+    stage2: stage2Obj,
+    stage3: stage3Obj,
+    stage4: stage4Obj,
+    stage5: stage5Obj,
+    stage6: stage6Obj
+  };
+
   // Mutate crawledData in place to ensure these fields get returned in response JSON
   crawledData.discoveredRoutes = discoveredRoutes;
   crawledData.eeatMetrics = eeatMetrics;
@@ -1316,6 +1451,7 @@ function evaluateCapabilities(crawledData = {}) {
   crawledData.phoneValue = phoneValue;
   crawledData.missingEssentialPages = missingEssentialPages;
   crawledData.scrapedContentPreview = scrapedContentPreview;
+  crawledData.stages = stages;
 
   // Map trust and E-E-A-T metrics into executiveSections.section3 and executiveSections[2] (Section 3)
   if (executiveSections && executiveSections.section3) {
@@ -1346,6 +1482,7 @@ function evaluateCapabilities(crawledData = {}) {
     },
     executiveSections,
     capabilityMatrix,
+    stages,
     scanMetrics,
     scrapedContentPreview,
     manifestPreviews,
@@ -1367,6 +1504,7 @@ function evaluateAllCapabilities(scanData = {}) {
     overallScore: evalResult.overallScore,
     pillarScores: evalResult.pillarScores,
     executiveSections: evalResult.executiveSections,
+    stages: evalResult.stages,
     totalCapabilities: evalResult.capabilityMatrix.length,
     sectionScores: {
       section1: evalResult.pillarScores.P1,

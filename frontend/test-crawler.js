@@ -279,18 +279,29 @@ export function renderCrawlerData(responsePayload, targetUrlInput = '') {
       pagesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic">No pages crawled or target domain returned zero readable HTML pages.</div>';
     } else {
       pagesContainer.innerHTML = pagesList.map((p, idx) => {
-        const route = p.route || p.url || `Page ${idx + 1}`;
-        const isFailed = p.status === 'failed';
-        const wordCount = p.wordCount ?? 0;
-        const textDensity = Math.round((Number(p.textCodeRatio || statusObj.contentDensityRatio) || 0) * 100);
+        const route = p.route || p.url || p.path || `Page ${idx + 1}`;
+        const statusCode = p.statusCode || (p.is404 ? 404 : (p.status === 'failed' ? 500 : 200));
+        const statusText = statusCode === 200 ? '200 OK' : (statusCode === 404 ? '404 NOT FOUND' : `HTTP ${statusCode}`);
+        const isStatusSuccess = statusCode === 200;
+        const wordCount = p.wordCount ?? p.words ?? 0;
+        const rawDensity = Number(p.contentDensityRatio ?? p.textDensityRatio ?? p.textCodeRatio ?? p.ratio ?? p.textRatio ?? 0);
+        const densityPercent = (rawDensity > 0 && rawDensity <= 1) ? (rawDensity * 100).toFixed(1) + '%' : Number(rawDensity).toFixed(1) + '%';
+        const densityDecimal = (rawDensity > 0 && rawDensity <= 1) ? rawDensity.toFixed(3) : (rawDensity / 100).toFixed(3);
+        const densityDisplay = `${densityPercent} (${densityDecimal})`;
         const title = p.title || 'N/A';
         const titleLen = p.titleLength ?? (p.title ? p.title.length : 0);
-        const isOptimalTitle = (titleLen >= 75 && titleLen <= 125);
+        const isOptimalTitle = (titleLen >= 30 && titleLen <= 60) || (titleLen >= 75 && titleLen <= 125);
         const metaDesc = p.metaDescription || p.description || 'N/A';
         const hAudit = p.headingAudit || { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false };
+        const h1 = p.h1Count ?? hAudit.h1 ?? 0;
+        const h2 = p.h2Count ?? hAudit.h2 ?? 0;
+        const h3 = p.h3Count ?? hAudit.h3 ?? 0;
+        const h4 = p.h4Count ?? hAudit.h4 ?? 0;
         const isHierarchyValid = Boolean(hAudit.isHierarchyValid);
         const hasCanonical = Boolean(p.hasCanonical);
         const canonicalUrl = p.canonicalUrl || 'None';
+        const schemaTypes = Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0 ? p.schemaTypes.join(', ') : (p.jsonLdTypes && p.jsonLdTypes.length > 0 ? p.jsonLdTypes.join(', ') : 'None');
+        const lastUpdated = p.lastUpdated || p.lastModified || p.dateModified || 'None';
         const snippet = p.bodySnippet || p.rawText || p.content || 'No body text extracted.';
 
         return `
@@ -301,22 +312,22 @@ export function renderCrawlerData(responsePayload, targetUrlInput = '') {
                 <span class="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded font-mono font-bold">#${idx + 1}</span>
                 <span class="font-mono text-sm md:text-base font-bold text-white truncate max-w-xl">${route}</span>
               </div>
-              <div>
-                <span class="text-xs px-2.5 py-1 rounded font-bold uppercase ${isFailed ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800'}">
-                  ${isFailed ? 'FAILED' : '200 OK'}
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-2.5 py-1 rounded font-bold uppercase ${isStatusSuccess ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'}">
+                  ${statusText}
                 </span>
               </div>
             </div>
 
             <!-- Page Metrics Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
               <div class="bg-[#1e1e1e] p-3 rounded border border-gray-800">
                 <div class="text-gray-400 uppercase tracking-wider text-[10px]">Word Count</div>
                 <div class="text-base font-bold text-white mt-0.5">${wordCount.toLocaleString()} words</div>
               </div>
               <div class="bg-[#1e1e1e] p-3 rounded border border-gray-800">
-                <div class="text-gray-400 uppercase tracking-wider text-[10px]">Text Density Ratio</div>
-                <div class="text-base font-bold text-emerald-400 mt-0.5">${textDensity}%</div>
+                <div class="text-gray-400 uppercase tracking-wider text-[10px]">Text Density %</div>
+                <div class="text-base font-bold text-emerald-400 mt-0.5 font-mono">${densityDisplay}</div>
               </div>
               <div class="bg-[#1e1e1e] p-3 rounded border border-gray-800">
                 <div class="text-gray-400 uppercase tracking-wider text-[10px]">Title Length</div>
@@ -324,6 +335,10 @@ export function renderCrawlerData(responsePayload, targetUrlInput = '') {
                   <span>${titleLen} chars</span>
                   <span class="text-[10px] px-1.5 py-0.2 rounded ${isOptimalTitle ? 'bg-emerald-950 text-emerald-400' : 'bg-gray-800 text-gray-400'}">${isOptimalTitle ? 'Optimal' : 'Standard'}</span>
                 </div>
+              </div>
+              <div class="bg-[#1e1e1e] p-3 rounded border border-gray-800">
+                <div class="text-gray-400 uppercase tracking-wider text-[10px]">Freshness Date</div>
+                <div class="text-sm font-semibold text-amber-300 mt-0.5 truncate" title="${lastUpdated}">${lastUpdated}</div>
               </div>
               <div class="bg-[#1e1e1e] p-3 rounded border border-gray-800">
                 <div class="text-gray-400 uppercase tracking-wider text-[10px]">Heading Hierarchy</div>
@@ -343,19 +358,25 @@ export function renderCrawlerData(responsePayload, targetUrlInput = '') {
                 <span class="text-gray-400 font-semibold">Meta Description:</span>
                 <span class="text-gray-300 ml-1">${metaDesc}</span>
               </div>
-              <div>
-                <span class="text-gray-400 font-semibold">Canonical Tag:</span>
-                <span class="font-mono text-cyan-400 ml-1">${hasCanonical ? canonicalUrl : '<span class="text-gray-500">None</span>'}</span>
+              <div class="flex flex-wrap gap-4">
+                <div>
+                  <span class="text-gray-400 font-semibold">Canonical:</span>
+                  <span class="font-mono text-cyan-400 ml-1">${hasCanonical ? canonicalUrl : '<span class="text-gray-500">None</span>'}</span>
+                </div>
+                <div>
+                  <span class="text-gray-400 font-semibold">Schema.org Types:</span>
+                  <span class="font-mono text-purple-400 ml-1">${schemaTypes}</span>
+                </div>
               </div>
             </div>
 
             <!-- Heading Counts Tree -->
             <div class="flex items-center gap-4 text-xs font-mono bg-gray-900/60 p-2.5 rounded border border-gray-800">
               <span class="text-gray-400 font-sans font-bold">Headings:</span>
-              <span class="text-emerald-400">H1: <strong class="text-white">${hAudit.h1 ?? 0}</strong></span>
-              <span class="text-cyan-400">H2: <strong class="text-white">${hAudit.h2 ?? 0}</strong></span>
-              <span class="text-purple-400">H3: <strong class="text-white">${hAudit.h3 ?? 0}</strong></span>
-              <span class="text-amber-400">H4: <strong class="text-white">${hAudit.h4 ?? 0}</strong></span>
+              <span class="text-emerald-400">H1: <strong class="text-white">${h1}</strong></span>
+              <span class="text-cyan-400">H2: <strong class="text-white">${h2}</strong></span>
+              <span class="text-purple-400">H3: <strong class="text-white">${h3}</strong></span>
+              <span class="text-amber-400">H4: <strong class="text-white">${h4}</strong></span>
             </div>
 
             <!-- Body Snippet -->

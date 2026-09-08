@@ -55,6 +55,14 @@ export function resetView() {
     routesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic">No routes evaluated yet.</div>';
   }
 
+  const stagesContainer = document.getElementById('stages-cards-container');
+  if (stagesContainer) {
+    stagesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic col-span-full">No stages evaluated yet. Enter URL above and run probe.</div>';
+  }
+
+  const stagesDumpEl = document.getElementById('stages-json-dump');
+  if (stagesDumpEl) stagesDumpEl.textContent = '--';
+
   const previewAiContext = document.getElementById('preview-ai-context');
   if (previewAiContext) previewAiContext.textContent = '--';
 
@@ -118,6 +126,20 @@ function getStatusBadgeClass(status) {
 }
 
 /**
+ * Helper to get stage status badge class.
+ */
+function getStageBadgeClass(status) {
+  const s = String(status || '').toUpperCase();
+  if (s === 'PASS' || s === 'OPTIMIZED' || s === 'ACTIVE') {
+    return 'bg-emerald-950 text-emerald-400 border border-emerald-800';
+  }
+  if (s === 'WARN' || s === 'NEEDS IMPROVEMENT' || s === 'WARNING') {
+    return 'bg-amber-950 text-amber-400 border border-amber-800';
+  }
+  return 'bg-red-950 text-red-400 border border-red-800';
+}
+
+/**
  * Helper to get score color class.
  */
 function getScoreColorClass(score) {
@@ -152,6 +174,64 @@ export function renderEvaluatorData(responsePayload, targetUrlInput = '') {
 
   const p4El = document.getElementById('metric-p4-score');
   if (p4El) p4El.textContent = String(pScores.P4 ?? pScores.section4 ?? 0);
+
+  // 1.5. Canonical 6-Stage Diagnostic Pipeline Scores
+  const stagesContainer = document.getElementById('stages-cards-container');
+  const stagesData = evaluationData.stages || crawlData.stages || {};
+  const stageKeys = ['stage1', 'stage2', 'stage3', 'stage4', 'stage5', 'stage6'];
+  const stageTitles = {
+    stage1: 'Stage 1: Bot Blocks & Gateway',
+    stage2: 'Stage 2: Essential Content Anchors',
+    stage3: 'Stage 3: Content Availability & Density',
+    stage4: 'Stage 4: Trust & E-E-A-T',
+    stage5: 'Stage 5: Machine Manifest Protocols',
+    stage6: 'Stage 6: Executive Boardroom & Action Triage'
+  };
+
+  if (stagesContainer) {
+    const hasStages = stageKeys.some(k => stagesData[k]);
+    if (!hasStages) {
+      stagesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic col-span-full">No canonical stages evaluated.</div>';
+    } else {
+      stagesContainer.innerHTML = stageKeys.map(k => {
+        const stage = stagesData[k] || {};
+        const title = stage.title ? `${k.toUpperCase().replace('STAGE', 'Stage ')}: ${stage.title}` : (stageTitles[k] || k);
+        const score = stage.score || '0%';
+        const status = stage.status || 'UNAUDITED';
+        const summaryText = stage.summaryText || 'No diagnostic summary.';
+        const classification = stage.classification || (k === 'stage5' ? 'AI-Ready' : (k === 'stage6' ? 'Executive Boardroom' : 'AI-Optimized'));
+        const badgeClass = getStageBadgeClass(status);
+
+        return `
+          <div class="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-cyan-700 transition" data-stage-key="${k}">
+            <div>
+              <div class="flex items-start justify-between gap-2 border-b border-gray-800 pb-2.5 mb-2.5">
+                <div>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-gray-800 text-gray-400">${classification}</span>
+                  <h4 class="text-sm font-bold text-white mt-1">${title}</h4>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                  <span class="text-lg font-extrabold text-cyan-400 font-mono">${score}</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase ${badgeClass}">${status}</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed font-sans">${summaryText}</p>
+            </div>
+            ${stage.missingRoutes && stage.missingRoutes.length > 0 ? `
+              <div class="mt-3 pt-2 border-t border-gray-900 text-[11px] text-amber-300 font-mono truncate">
+                Missing: ${stage.missingRoutes.join(', ')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  const stagesDumpEl = document.getElementById('stages-json-dump');
+  if (stagesDumpEl) {
+    stagesDumpEl.textContent = JSON.stringify(stagesData, null, 2);
+  }
 
   // 2. Section 1: 4 Executive Inquiry Cards
   const execContainer = document.getElementById('executive-inquiries-container');
