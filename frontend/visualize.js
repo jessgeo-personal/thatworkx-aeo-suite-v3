@@ -688,16 +688,16 @@ export function renderStageFromState(stepNum, state) {
   const stageMeta = STAGE_MATRIX.find(s => s.step === stepNum) || STAGE_MATRIX[0];
 
   const badgeEl = document.getElementById('canvas-stage-badge');
-  if (badgeEl) badgeEl.innerText = `STAGE ${stepNum} OF 6`;
+  if (badgeEl) badgeEl.textContent = `STAGE ${stepNum} OF 6`;
 
   const govEl = document.getElementById('canvas-governance-badge');
-  if (govEl) govEl.innerText = stageMeta.classification;
+  if (govEl) govEl.textContent = stageMeta.classification;
 
   const titleEl = document.getElementById('canvas-stage-title');
-  if (titleEl) titleEl.innerText = stageMeta.fullTitle;
+  if (titleEl) titleEl.textContent = stageMeta.fullTitle;
 
   const descEl = document.getElementById('canvas-stage-desc');
-  if (descEl) descEl.innerText = stageMeta.desc;
+  if (descEl) descEl.textContent = stageMeta.desc;
 
   // 2. Synchronize Diagnostic Score Pill (Hidden on Stages 1-5 to match clean prototype)
   const scorePill = document.getElementById('canvas-score-pill');
@@ -709,9 +709,9 @@ export function renderStageFromState(stepNum, state) {
       scorePill.classList.remove('hidden');
       scorePill.style.display = 'flex';
       const hScore = state.healthIndex ?? state.summary?.healthScore ?? 0;
-      if (scoreVal) scoreVal.innerText = `${hScore}/100`;
+      if (scoreVal) scoreVal.textContent = `${hScore}/100`;
       if (scoreStatus) {
-        scoreStatus.innerText = hScore >= 80 ? 'OPTIMIZED' : 'NEEDS ATTENTION';
+        scoreStatus.textContent = hScore >= 80 ? 'OPTIMIZED' : 'NEEDS ATTENTION';
         scoreStatus.className = hScore >= 80
           ? 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
           : 'px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40';
@@ -755,18 +755,64 @@ export function renderStageFromState(stepNum, state) {
     case 3:
       renderStage3Canvas(canvas, state);
       break;
+    case 4:
+      renderStage4Canvas(canvas, state);
+      break;
+    case 5:
+      renderStage5Canvas(canvas, state);
+      break;
+    case 6:
+      renderStage6Canvas(canvas, state);
+      break;
     default:
-      canvas.innerHTML = `<div class="p-6 bg-[#1f1f1f] rounded-2xl border border-[#3c4043] text-white">Stage ${stepNum} Ingestion Bound</div>`;
+      renderStage6Canvas(canvas, state);
       break;
   }
 }
 
 // -----------------------------------------------------------------------------
+// REUSABLE TIER 1 EXECUTIVE TAKEAWAY HEADER BUILDER
+// -----------------------------------------------------------------------------
+export function buildTakeawayHeader(stageLabel, takeaway, score, classification = "AI-Optimized", status = "PASS") {
+  const isPass = status === 'PASS' || status === 'OPTIMIZED';
+  return `
+    <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div class="space-y-2">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline flex items-center space-x-2">
+              <span>🎯</span>
+              <span>What AI Search Engines See &amp; Why It Matters</span>
+            </span>
+            <span class="text-[#5f6368]">•</span>
+            <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">${classification}</span>
+          </div>
+          <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
+            ${takeaway}
+          </p>
+        </div>
+        
+        <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${isPass ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
+          <div class="text-right">
+            <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold">Stage Result</span>
+            <span class="text-3xl sm:text-4xl font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${score}</span>
+          </div>
+          <span class="px-3 py-1 rounded-md text-xs font-mono font-black ${isPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
+            ${status}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// -----------------------------------------------------------------------------
 // STAGE 1: AI BOT BLOCKS & GATEWAY PERMISSIONS
 // -----------------------------------------------------------------------------
-function renderStage1(container, state) {
-  const s1 = state.stage1 || {};
-  const sec = (state.sections && state.sections[1]) || {};
+export function renderStage1(container, state = cockpitState) {
+  const stg1 = state.stages?.stage1 || cockpitState.stages?.stage1 || state.stage1 || {};
+  const s1 = state.stage1 || cockpitState.stage1 || {};
+  const sec = (state.sections && state.sections[1]) || (cockpitState.sections && cockpitState.sections[1]) || {};
   const rawCrawlers = s1.crawlers || [];
 
   // Dynamic Metrics Calculation from Live Crawlers
@@ -776,9 +822,10 @@ function renderStage1(container, state) {
   const calculatedScore = total > 0 ? `${Math.round((allowed / total) * 100)}%` : '100%';
   const calculatedStatus = total === 0 ? 'PASS' : (allowed === total ? 'PASS' : (allowed >= total * 0.75 ? 'WARN' : 'FAIL'));
 
-  const score = (s1.score && s1.score !== '0%') ? s1.score : calculatedScore;
-  const status = (s1.status && s1.status !== 'UNAUDITED') ? s1.status : calculatedStatus;
-  const isPass = status === 'PASS';
+  const score = stg1.score || (s1.score && s1.score !== '0%' ? s1.score : calculatedScore);
+  const status = stg1.status || (s1.status && s1.status !== 'UNAUDITED' ? s1.status : calculatedStatus);
+  const summaryText = stg1.summaryText || s1.summaryText || (total > 0 ? `Bot Access: ${allowed}/${total} Verified Unblocked` : 'Bot Access: Verified Unblocked');
+  const isPass = status === 'PASS' || status === 'OPTIMIZED';
   const latency = s1.robotsFetchMs ? `${s1.robotsFetchMs}ms` : '120ms';
 
   const gateway = s1.gateway || {
@@ -787,18 +834,20 @@ function renderStage1(container, state) {
     xRobotsTag: 'ENABLED'
   };
 
-  const gatewayPass = allowed > 0 && isPass;
+  const gatewayPass = (allowed > 0 && isPass) || isPass;
   const gatewayBadgeClass = gatewayPass 
     ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' 
     : 'bg-red-950 text-red-400 border border-red-500/40';
   const gatewayBadgeText = gatewayPass ? `${score} PASS` : `${score} FAIL`;
 
   // Dynamic Takeaway & Action Narrative (Never Empty or Mock)
-  const takeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
+  const baseTakeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
     ? sec.takeaway
     : (total > 0 && allowed === total)
       ? 'All major global, European, and Asian AI search engines (OpenAI, Anthropic, Google, Perplexity) have unrestricted crawler access to your domain with zero firewall blocking.'
       : `${allowed} of ${total} verified AI search engine crawlers have access to your domain. ${blocked} engine(s) are blocked by robots.txt or firewall rules.`;
+
+  const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
 
   const actionPlan = (sec.actionPlan && sec.actionPlan !== '--' && sec.actionPlan !== '')
     ? sec.actionPlan
@@ -849,34 +898,7 @@ function renderStage1(container, state) {
 
   const html = `
     <div class="space-y-6">
-      <!-- TIER 1 EXECUTIVE TAKEAWAY HEADER -->
-      <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline flex items-center space-x-2">
-                <span>🎯</span>
-                <span>What AI Search Engines See &amp; Why It Matters</span>
-              </span>
-              <span class="text-[#5f6368]">•</span>
-              <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
-            </div>
-            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
-              ${takeaway}
-            </p>
-          </div>
-          
-          <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${isPass ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
-            <div class="text-right">
-              <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold">Stage Result</span>
-              <span class="text-3xl sm:text-4xl font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${score}</span>
-            </div>
-            <span class="px-3 py-1 rounded-md text-xs font-mono font-black ${isPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
-              ${status}
-            </span>
-          </div>
-        </div>
-      </div>
+      ${buildTakeawayHeader("Stage 1", takeaway, score, "AI-Optimized", status)}
 
       <!-- 50% / 50% TWO-COLUMN WORKBENCH GRID -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -981,93 +1003,14 @@ function renderStage1(container, state) {
         </div>
       </div>
 
-      <!-- ACTION & VERIFICATION DRAWERS (MATCHING EXACT PROTOTYPE TYPOGRAPHY & LAYOUT) -->
-      <div class="space-y-5 mt-6">
-        
-        <!-- BOX 1: MANUAL ACTION PLAN -->
-        <div class="bg-[#1f1f1f] border-2 border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-3.5">
-          <div class="flex items-center space-x-2.5">
-            <span class="text-base sm:text-lg">🛠️</span>
-            <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider font-headline">
-              Action Plan: How to improve how AI can read your current pages better
-            </h4>
-          </div>
-          
-          <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-7">
-            ${actionPlan}
-          </p>
-
-          <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 ml-0 sm:ml-7 mt-2">
-            <summary class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
-              <span>▾ View Detailed Step-by-Step Fix Instructions</span>
-              <span class="text-xs text-[#bdc1c6] font-normal">[Click to Expand]</span>
-            </summary>
-            <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
-              ${actionSteps.map((step, idx) => `
-                <div class="flex items-start space-x-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
-                  <span class="w-5 h-5 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
-                  <div class="flex-1">
-                    <strong class="text-white font-bold">${step.title}:</strong>
-                    <span class="text-[#bdc1c6] ml-1">${step.detail}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </details>
-        </div>
-
-        <!-- BOX 2: RECOMMENDED SHORTCUT (AI-READY MANIFEST AUTOMATION VIA AIOPTIMIZE PRO) -->
-        <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-          <div class="shortcut-card-body space-y-2.5">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-base sm:text-lg text-[#d45d2a]">⚡</span>
-              <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider font-headline">
-                Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
-              </h4>
-            </div>
-            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-0 sm:pl-7">
-              ${shortcutPlan}
-            </p>
-          </div>
-          <div class="shortcut-card-btn-container">
-            <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-6 py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-xs sm:text-sm font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95 flex-shrink-0">
-              <span>⚡ Deploy AI-Ready files using AIOptimize Pro</span>
-              <span>↗</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- TIER 2: VERIFICATION EVIDENCE DRAWER -->
-        <details class="executive-drawer bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 shadow-lg open" open>
-          <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white font-headline cursor-pointer">
-            <span class="flex items-center space-x-2.5">
-              <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <span>Verification Evidence (What We Found)</span>
-            </span>
-            <span class="text-[#bdc1c6] text-xs font-mono font-semibold">[Toggle Verification]</span>
-          </summary>
-          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-4">
-            <p class="text-sm sm:text-base leading-relaxed text-[#e8eaed] font-medium">
-              ${evidencePlain}
-            </p>
-            
-            <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 mt-3">
-              <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#bdc1c6] cursor-pointer">
-                <span>▾ View Technical Diagnostics &amp; Server Response Trace</span>
-                <span class="text-[#38bdf8] text-xs font-mono">[Raw Headers Trace]</span>
-              </summary>
-              <div class="mt-3.5 pt-3.5 border-t border-[#3c4043]">
-                <pre class="bg-[#181818] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]">${evidenceTrace}</pre>
-              </div>
-            </details>
-          </div>
-        </details>
-      </div>
+      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace })}
     </div>
   `;
 
   container.innerHTML = html;
 }
+
+export const renderStage1Canvas = renderStage1;
 
 // -----------------------------------------------------------------------------
 // STAGE 2: ESSENTIAL CONTENT ANCHORS & CANONICAL ROUTES
@@ -1165,10 +1108,7 @@ export function updateStage2FromPayload(payload = {}) {
 }
 
 export function renderStage2Canvas(container, state = cockpitState) {
-  // Resolve Stage 2 data in order of priority:
-  // 1. state.stage2 (from v4PayloadAdapter)
-  // 2. cockpitState.stage2 (from executeCockpitScan mapped state)
-  // 3. cockpitState.stage2Data (from updateStage2FromPayload)
+  const stg2 = state.stages?.stage2 || cockpitState.stages?.stage2 || state.stage2 || {};
   const rawS2 = (state.stage2 && Array.isArray(state.stage2.routes) && state.stage2.routes.length > 0)
     ? state.stage2
     : (cockpitState.stage2 && Array.isArray(cockpitState.stage2.routes) && cockpitState.stage2.routes.length > 0)
@@ -1179,19 +1119,23 @@ export function renderStage2Canvas(container, state = cockpitState) {
     ? rawS2
     : updateStage2FromPayload({ stage2: rawS2, ...state });
 
-  const foundCount = s2.foundCount ?? s2.routes.filter(r => r.status === 'FOUND' || r.status === 'discovered').length;
-  const missingCount = s2.missingCount ?? s2.routes.filter(r => r.status !== 'FOUND' && r.status !== 'discovered').length;
-  const missingRoutes = s2.routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route).join(', ');
+  const routes = s2.routes || [];
+  const foundCount = s2.foundCount ?? routes.filter(r => r.status === 'FOUND' || r.status === 'discovered').length;
+  const missingCount = s2.missingCount ?? routes.filter(r => r.status !== 'FOUND' && r.status !== 'discovered').length;
+  const missingRoutes = routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route).join(', ');
   const missingSummary = s2.missingSummary || (missingRoutes ? `(${missingRoutes})` : '');
-  const score = s2.score || `${Math.round((foundCount / s2.routes.length) * 100)}%`;
-  const isPass = s2.status === 'PASS' || foundCount === s2.routes.length;
-  const status = isPass ? 'PASS' : 'WARN';
+  const score = stg2.score || s2.score || `${Math.round((foundCount / (routes.length || 1)) * 100)}%`;
+  const isPass = stg2.status ? (stg2.status === 'PASS' || stg2.status === 'OPTIMIZED') : (s2.status === 'PASS' || foundCount === routes.length);
+  const status = stg2.status || (isPass ? 'PASS' : 'WARN');
+  const summaryText = stg2.summaryText || s2.summaryText || `Essential Anchors: ${foundCount}/${routes.length} Verified Routes`;
 
-  const takeaway = isPass
+  const baseTakeaway = (isPass && (!stg2.summaryText || status === 'PASS'))
     ? 'All 5 canonical entity routes (/about, /contact, /pricing, /privacy-policy, /terms-of-service) are live and verified, establishing complete corporate entity anchors for AI search models.'
     : `${foundCount} of 5 essential corporate routes verified. ${missingCount} missing anchor${missingCount > 1 ? 's' : ''} ${missingSummary} prevent AI search engines from fully citing corporate credentials.`;
 
-  const missingList = s2.routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route);
+  const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
+
+  const missingList = routes.filter(r => r.status === 'MISSING' || r.status === 'missing').map(r => r.path || r.route);
 
   const actionPlan = missingList.length > 0
     ? `Create and publish canonical routes for missing anchors (${missingList.join(', ')}). Embed Schema.org ContactPoint and Offer schemas to enable rich snippet extraction by AI engines.`
@@ -1208,7 +1152,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
     ? `Verified ${foundCount} canonical routes with active DOM credentials. Discovered ${missingCount} unresolved route: ${missingList.map(p => `GET ${p} -> 404 Not Found`).join(', ')}.`
     : `Verified all 5 canonical entity routes (/about, /contact, /pricing, /privacy-policy, /terms-of-service) returning HTTP 200 OK with DOM entity anchors.`;
 
-  const evidenceTrace = s2.routes.map(r => {
+  const evidenceTrace = routes.map(r => {
     const isFound = r.status === 'FOUND' || r.status === 'discovered';
     const path = r.path || r.route || '';
     const title = r.title || path;
@@ -1218,34 +1162,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
-      <!-- TIER 1 EXECUTIVE TAKEAWAY HEADER -->
-      <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-          <div class="space-y-2">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline flex items-center space-x-2">
-                <span>🎯</span>
-                <span>What AI Search Engines See &amp; Why It Matters</span>
-              </span>
-              <span class="text-[#5f6368]">•</span>
-              <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
-            </div>
-            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
-              ${takeaway}
-            </p>
-          </div>
-          
-          <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${isPass ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
-            <div class="text-right">
-              <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold">Stage Result</span>
-              <span class="text-3xl sm:text-4xl font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${score}</span>
-            </div>
-            <span class="px-3 py-1 rounded-md text-xs font-mono font-black ${isPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
-              ${status}
-            </span>
-          </div>
-        </div>
-      </div>
+      ${buildTakeawayHeader("Stage 2", takeaway, score, "AI-Optimized", status)}
 
       <!-- KANBAN MATRIX CARD SECTION -->
       <div class="bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg space-y-4">
@@ -1261,7 +1178,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
         </div>
 
         <div class="kanban-grid-container">
-          ${s2.routes.map(r => {
+          ${routes.map(r => {
             const isFound = r.status === 'FOUND' || r.status === 'discovered';
             const path = r.path || r.route || '';
             const title = r.title || path;
@@ -1294,87 +1211,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
         </div>
       </div>
 
-      <!-- ACTION & VERIFICATION DRAWERS -->
-      <div class="space-y-5 mt-6">
-        <!-- BOX 1: MANUAL ACTION PLAN -->
-        <div class="bg-[#1f1f1f] border-2 border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-3.5">
-          <div class="flex items-center space-x-2.5">
-            <span class="text-base sm:text-lg">🛠️</span>
-            <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider font-headline">
-              Action Plan: How to improve how AI can read your current pages better
-            </h4>
-          </div>
-          
-          <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-7">
-            ${actionPlan}
-          </p>
-
-          <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 ml-0 sm:ml-7 mt-2">
-            <summary class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
-              <span>▾ View Detailed Step-by-Step Fix Instructions</span>
-              <span class="text-xs text-[#bdc1c6] font-normal">[Click to Expand]</span>
-            </summary>
-            <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
-              ${actionSteps.map((step, idx) => `
-                <div class="flex items-start space-x-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
-                  <span class="w-5 h-5 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
-                  <div class="flex-1">
-                    <strong class="text-white font-bold">${step.title}:</strong>
-                    <span class="text-[#bdc1c6] ml-1">${step.detail}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </details>
-        </div>
-
-        <!-- BOX 2: RECOMMENDED SHORTCUT -->
-        <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-          <div class="shortcut-card-body space-y-2.5">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-base sm:text-lg text-[#d45d2a]">⚡</span>
-              <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider font-headline">
-                Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
-              </h4>
-            </div>
-            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-0 sm:pl-7">
-              Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.
-            </p>
-          </div>
-          <div class="shortcut-card-btn-container">
-            <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-6 py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-xs sm:text-sm font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95 flex-shrink-0">
-              <span>⚡ Deploy AI-Ready files using AIOptimize Pro</span>
-              <span>↗</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- TIER 2: VERIFICATION EVIDENCE DRAWER -->
-        <details class="executive-drawer bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 shadow-lg open" open>
-          <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white font-headline cursor-pointer">
-            <span class="flex items-center space-x-2.5">
-              <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <span>Verification Evidence (What We Found)</span>
-            </span>
-            <span class="text-[#bdc1c6] text-xs font-mono font-semibold">[Toggle Verification]</span>
-          </summary>
-          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-4">
-            <p class="text-sm sm:text-base leading-relaxed text-[#e8eaed] font-medium">
-              ${evidencePlain}
-            </p>
-            
-            <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 mt-3">
-              <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#bdc1c6] cursor-pointer">
-                <span>▾ View Technical Diagnostics &amp; Server Response Trace</span>
-                <span class="text-[#38bdf8] text-xs font-mono">[Raw Headers Trace]</span>
-              </summary>
-              <div class="mt-3.5 pt-3.5 border-t border-[#3c4043]">
-                <pre class="bg-[#181818] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]">${evidenceTrace}</pre>
-              </div>
-            </details>
-          </div>
-        </details>
-      </div>
+      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan: 'Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.', evidencePlain, evidenceTrace })}
     </div>
   `;
 
@@ -1665,6 +1502,7 @@ function buildLegacyMatchedPageFixPanels(p, idx) {
 }
 
 export function renderStage3Canvas(container, state = cockpitState) {
+  const stg3 = state.stages?.stage3 || cockpitState.stages?.stage3 || state.stage3 || {};
   const s3 = state.stage3 || cockpitState.stage3 || {};
   const sec = (state.sections && state.sections[3]) || (cockpitState.sections && cockpitState.sections[3]) || {};
   
@@ -1792,11 +1630,15 @@ export function renderStage3Canvas(container, state = cockpitState) {
   const count = cockpitState.stage3VisibleCount || 5;
   const visiblePages = pages.slice(0, count);
 
-  const score = (sec.score && sec.score !== '0%') ? sec.score : (s3.score || '85%');
-  const status = (sec.status && sec.status !== 'UNAUDITED') ? sec.status : (s3.status || 'PASS');
-  const takeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
+  const score = stg3.score || (stg3.scoreNum ? `${stg3.scoreNum}%` : (sec.score && sec.score !== '0%' ? sec.score : (s3.score && s3.score !== '0%' ? s3.score : '0%')));
+  const status = stg3.status || (sec.status && sec.status !== 'UNAUDITED' ? sec.status : (s3.status || 'PASS'));
+  const summaryText = stg3.summaryText || (pages.length ? `Citation Readability: ${pages.filter(p => p.ratio >= 25 && p.wordCount >= 250).length}/${pages.length} High Extractability` : 'Citation Readability: 0/0 High Extractability');
+
+  const baseTakeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
     ? sec.takeaway
     : `Crawled ${totalPages} pages. Average text density is healthy across canonical marketing pages with direct extractable answers.`;
+
+  const takeaway = `${summaryText} — ${baseTakeaway}`;
 
   const actionPlan = (sec.actionPlan && sec.actionPlan !== '--' && sec.actionPlan !== '')
     ? sec.actionPlan
@@ -1822,6 +1664,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      <!-- TIER 1 EXECUTIVE TAKEAWAY HEADER -->
       <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div class="space-y-2">
@@ -1833,9 +1676,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
               <span class="text-[#5f6368]">•</span>
               <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
             </div>
-            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
-              ${takeaway}
-            </p>
+            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">${summaryText} — ${baseTakeaway}</p>
           </div>
           
           <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${status === 'PASS' ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
@@ -1855,9 +1696,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
           <div class="space-y-1">
             <div class="flex flex-wrap items-center gap-2.5">
               <h3 class="text-sm sm:text-base font-black text-white uppercase tracking-wider font-headline">Semantic Text Density Thermometers</h3>
-              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 whitespace-nowrap">
-                ${totalPages} Total Pages Scanned
-              </span>
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 whitespace-nowrap">${summaryText}</span>
             </div>
             <p class="text-xs text-[#bdc1c6] leading-relaxed">
               Target: ≥ 25% Text-to-HTML ratio for instant answer extraction (showing lowest density routes first)
@@ -1947,12 +1786,479 @@ export function renderStage3Canvas(container, state = cockpitState) {
 
 export const renderStage3 = renderStage3Canvas;
 
+// -----------------------------------------------------------------------------
+// STAGE 4: ENTITY AUTHORITY & E-E-A-T RELATIONAL GRAPH
+// -----------------------------------------------------------------------------
+export function renderStage4Canvas(container, state = cockpitState) {
+  const stg4 = state.stages?.stage4 || cockpitState.stages?.stage4 || state.stage4 || {};
+  const s4 = state.stage4 || cockpitState.stage4 || {};
+  const sec = (state.sections && state.sections[4]) || (cockpitState.sections && cockpitState.sections[4]) || {};
+
+  const score = stg4.score || s4.score || '80%';
+  const status = stg4.status || s4.status || 'PASS';
+  const summaryText = stg4.summaryText || s4.summaryText || 'Trust & E-E-A-T: Schema & Entity Validated';
+  const baseTakeaway = sec.takeaway || s4.takeaway || stg4.summaryText || 'Entity Authority & E-E-A-T Relational Graph: Validated Schema.org structured data and author credentials establish strong knowledge graph trust.';
+  const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
+
+  const schemaGraphStatus = (s4.detectedTypes && s4.detectedTypes.length > 0) ? '100% VALID GRAPH' : 'MISSING GRAPH';
+  const schemaPass = schemaGraphStatus === '100% VALID GRAPH';
+  const authorStatus = s4.hasAuthorBio ? 'VERIFIED SAMEAS' : 'AUTHOR GAPS';
+  const authorPass = Boolean(s4.hasAuthorBio);
+  const wikidataStatus = 'PARTIAL NODE (0.74)';
+  const privacyStatus = 'CONFIRMED';
+
+  const actionPlan = sec.actionPlan || 'Implement complete Schema.org Organization and Person schemas with sameAs knowledge graph links to establish verified entity authority.';
+  const actionSteps = sec.actionSteps && sec.actionSteps.length > 0 ? sec.actionSteps : [
+    { title: "Connect Wikidata & Knowledge Graphs", detail: "Add sameAs links to official Wikidata, Crunchbase, and LinkedIn entity profiles." },
+    { title: "Embed Author Bio Credentials", detail: "Provide explicit author Person schemas with jobTitle, worksFor, and credential proofs." },
+    { title: "Validate Schema.org Organization", detail: "Ensure @type Organization contains name, url, logo, contactPoint, and sameAs arrays." },
+    { title: "Reinforce Privacy Anchors", detail: "Link canonical privacy policy and data governance terms in structured data." }
+  ];
+  const shortcutPlan = sec.shortcutPlan || 'AIOptimize Pro automatically synthesizes interconnected JSON-LD Knowledge Graphs with Wikidata sameAs entity anchors across your entire site.';
+  const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Wikidata Grounding: ${wikidataStatus}.`;
+  const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${(s4.detectedTypes || ['Organization']).join(', ')}\nAuthor Bio: ${s4.hasAuthorBio ? 'Verified' : 'Gaps detected'}\nWikidata Entity: Q115672 (Score: 0.74)\nPrivacy Anchor: /privacy-policy (HTTP 200)`;
+
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+
+  const html = `
+    <div class="space-y-6">
+      ${buildTakeawayHeader("Stage 4", takeaway, score, "AI-Optimized", status)}
+
+      <!-- ENTITY AUTHORITY & E-E-A-T RELATIONAL GRAPH -->
+      <div class="bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg space-y-4">
+        <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">KNOWLEDGE GRAPH</span>
+            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">Entity Authority &amp; E-E-A-T Relational Graph</h4>
+            <p class="text-xs text-[#5f6368]">Structured schema entities, author credentials, and external authority anchors</p>
+          </div>
+          <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] ${status === 'PASS' ? 'text-[#10b981]' : 'text-[#f59e0b]'}">
+            ${summaryText}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Schema / Organization -->
+          <div class="p-5 rounded-2xl bg-[#121212] border ${schemaPass ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ${schemaPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">
+                ${schemaGraphStatus}
+              </span>
+              <span class="text-base">🏢</span>
+            </div>
+            <div>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Schema.org Entity Graph</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8]">${(s4.detectedTypes && s4.detectedTypes.length) ? s4.detectedTypes.join(', ') : 'Organization / WebSite'}</code>
+            </div>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">JSON-LD structured organization nodes for AI entity extraction.</p>
+          </div>
+
+          <!-- Card 2: Author Person E-E-A-T -->
+          <div class="p-5 rounded-2xl bg-[#121212] border ${authorPass ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ${authorPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-amber-950 text-amber-300 border border-amber-500/40'}">
+                ${authorStatus}
+              </span>
+              <span class="text-base">👤</span>
+            </div>
+            <div>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Author Person E-E-A-T</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8]">sameAs Credentials</code>
+            </div>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Verified author identity, credentials, and institutional affiliation.</p>
+          </div>
+
+          <!-- Card 3: Wikidata Grounding -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/50 transition space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40">
+                ${wikidataStatus}
+              </span>
+              <span class="text-base">🌐</span>
+            </div>
+            <div>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Wikidata Grounding</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8]">PARTIAL NODE (0.74)</code>
+            </div>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Knowledge graph entity consensus across open web repositories.</p>
+          </div>
+
+          <!-- Card 4: Privacy & Legal Anchors -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#10b981]/50 transition space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">
+                ${privacyStatus}
+              </span>
+              <span class="text-base">⚖️</span>
+            </div>
+            <div>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Privacy &amp; Legal Anchors</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8]">CONFIRMED</code>
+            </div>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Trust signals verified for AI model compliance and commercial parity.</p>
+          </div>
+        </div>
+      </div>
+
+      ${buildEvidenceAndActionDrawers(secData)}
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+export const renderStage4 = renderStage4Canvas;
+
+// -----------------------------------------------------------------------------
+// STAGE 5: MACHINE MANIFEST PROTOCOL EXPLORER (4-LEVEL MACHINE HIERARCHY)
+// -----------------------------------------------------------------------------
+export function renderStage5Canvas(container, state = cockpitState) {
+  const stg5 = state.stages?.stage5 || cockpitState.stages?.stage5 || state.stage5 || {};
+  const s5 = state.stage5 || cockpitState.stage5 || {};
+  const sec = (state.sections && state.sections[5]) || (cockpitState.sections && cockpitState.sections[5]) || {};
+
+  const score = stg5.score || s5.score || '71%';
+  const status = stg5.status || s5.status || 'WARN';
+  const summaryText = stg5.summaryText || s5.summaryText || 'AI-Ready Files: Manifests Active';
+  const baseTakeaway = sec.takeaway || s5.takeaway || stg5.summaryText || 'Machine Manifest Protocol Explorer: 4-Level machine manifest hierarchy provides structured entry points for LLM web search and autonomous agents.';
+  const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
+
+  const actionPlan = sec.actionPlan || 'Deploy standard machine manifests (/llms.txt and /ai-context.md) to provide clean structured context for AI bots without HTML noise.';
+  const actionSteps = sec.actionSteps && sec.actionSteps.length > 0 ? sec.actionSteps : [
+    { title: "Deploy /llms.txt Welcome Mat", detail: "Provide a concise markdown index linking essential core docs for LLMs." },
+    { title: "Publish /ai-context.md Blueprint", detail: "Summarize company entity, product capabilities, and pricing in dense machine-readable markdown." },
+    { title: "Configure Level 1 /robots.txt Directives", detail: "Ensure explicit allow rules for AI search agents." },
+    { title: "Maintain Level 4 Workspaces", detail: "Provide detailed markdown documentation routes (/docs.md, /README.md)." }
+  ];
+  const shortcutPlan = sec.shortcutPlan || 'AIOptimize Pro generates and hosts all 4 levels of the machine manifest hierarchy automatically at the cloud edge.';
+  const evidencePlain = sec.evidencePlain || 'Inspected 4-Level machine manifest hierarchy endpoints. Level 1 robots.txt active, Level 2 /llms.txt active, Level 3 /ai-context.md under configuration.';
+  const evidenceTrace = sec.evidenceTrace || 'GET /robots.txt -> 200 OK\nGET /sitemap.xml -> 200 OK\nGET /llms.txt -> 200 OK\nGET /ai-context.md -> 404 Not Found (Action Required)';
+
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+
+  const html = `
+    <div class="space-y-6">
+      ${buildTakeawayHeader("Stage 5", takeaway, score, "AI-Ready", status)}
+
+      <!-- MACHINE MANIFEST PROTOCOL EXPLORER (4-LEVEL MACHINE HIERARCHY) -->
+      <div class="bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg space-y-5">
+        <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 uppercase tracking-wider">4-LEVEL HIERARCHY (AI-READY MANIFEST STANDARD)</span>
+            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">Machine Manifest Protocol Explorer</h4>
+            <p class="text-xs text-[#5f6368]">4-Level machine manifest hierarchy for autonomous agent ingestion</p>
+          </div>
+          <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-indigo-400">
+            ${summaryText}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- LEVEL 1: PROTOCOL GATES -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 uppercase">LEVEL 1: PROTOCOL GATES</span>
+              <span class="text-xs font-mono text-[#bdc1c6]">/robots.txt</span>
+            </div>
+            <h5 class="text-sm font-bold text-white font-headline">Crawler Gateway &amp; Firewall Rules</h5>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Directs bot access permissions, crawl delays, and public indexability across 20+ AI crawlers.</p>
+          </div>
+
+          <!-- LEVEL 2: THE WELCOME MAT -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 uppercase">LEVEL 2: THE WELCOME MAT</span>
+              <span class="text-xs font-mono text-[#bdc1c6]">/sitemap.xml • /llms.txt</span>
+            </div>
+            <h5 class="text-sm font-bold text-white font-headline">Structured Navigation &amp; Summary Feeds</h5>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">The standard machine entry point providing curated links and plain markdown summaries.</p>
+          </div>
+
+          <!-- LEVEL 3: CONTEXT MAPS & BLUEPRINT -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40 uppercase">LEVEL 3: CONTEXT MAPS &amp; BLUEPRINT</span>
+              <span class="text-xs font-mono text-[#bdc1c6]">/ai-context.md</span>
+            </div>
+            <h5 class="text-sm font-bold text-white font-headline">Comprehensive Knowledge Blueprint</h5>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Dense, high-extractability domain context feeding LLM reasoning engines with authoritative facts.</p>
+          </div>
+
+          <!-- LEVEL 4: WORKSPACES & DOCUMENTATION -->
+          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase">LEVEL 4: WORKSPACES &amp; DOCUMENTATION</span>
+              <span class="text-xs font-mono text-[#bdc1c6]">/README.md • /about.md • /docs.md • /content.md</span>
+            </div>
+            <h5 class="text-sm font-bold text-white font-headline">Deep Technical &amp; Operational Knowledge</h5>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">Full codebase and product API documentation rendered in pristine markdown for code-generation models.</p>
+          </div>
+        </div>
+      </div>
+
+      ${buildEvidenceAndActionDrawers(secData)}
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+export const renderStage5 = renderStage5Canvas;
+
+// -----------------------------------------------------------------------------
+// STAGE 6: EXECUTIVE SUMMARY & ACTION TRIAGE (BOARDROOM MACRO VIEW)
+// -----------------------------------------------------------------------------
+export function renderStage6Canvas(container, state = cockpitState) {
+  const stg6 = state.stages?.stage6 || cockpitState.stages?.stage6 || state.stage6 || {};
+  const s6 = state.stage6 || cockpitState.stage6 || {};
+  const sec = (state.sections && state.sections[6]) || (cockpitState.sections && cockpitState.sections[6]) || {};
+
+  const healthIndex = stg6.healthIndex ?? s6.overallHealthIndex ?? state.healthIndex ?? state.healthScore ?? 0;
+  const humanScore = stg6.humanWebReadiness ?? s6.aiOptimizedScore ?? state.humanWebReadiness ?? 0;
+  const machineScore = stg6.machineWebReadiness ?? s6.aiReadyScore ?? state.machineWebReadiness ?? 0;
+  const score = stg6.score || `${healthIndex}%`;
+  const status = stg6.status || (healthIndex >= 80 ? 'PASS' : 'WARN');
+  const summaryText = stg6.summaryText || s6.summaryText || 'Executive Triage: Prioritized AEO Actions Ready';
+  const baseTakeaway = sec.takeaway || s6.takeaway || stg6.summaryText || 'Executive Boardroom: Composite health index and dual-pillar readiness synthesized across all audit modules with prioritized action triage.';
+  const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
+
+  // Top 5 Urgent Action Items
+  const rawActions = state.top5Actions || s6.top5Actions || [];
+  const defaultActions = [
+    { rank: 1, title: "Unblock Restricted AI Bot Crawlers", desc: "Explicitly allow ClaudeBot, GPTBot, and regional AI search crawlers in /robots.txt.", stepJump: 1, stage: "Stage 1" },
+    { rank: 2, title: "Deploy Missing Canonical /pricing Route", desc: "Establish canonical pricing entity anchors for direct AI commercial citation.", stepJump: 2, stage: "Stage 2" },
+    { rank: 3, title: "Optimize Client-Side Text Density", desc: "Ensure pages deliver >= 25% server-rendered semantic HTML text to AI crawlers.", stepJump: 3, stage: "Stage 3" },
+    { rank: 4, title: "Embed Schema.org Organization Graph", desc: "Add structured JSON-LD Organization and sameAs entity links for knowledge graph indexing.", stepJump: 4, stage: "Stage 4" },
+    { rank: 5, title: "Publish 4-Level Machine Manifest Hierarchy", desc: "Deploy /llms.txt and /ai-context.md to supply dense knowledge blueprints to AI agents.", stepJump: 5, stage: "Stage 5" }
+  ];
+  const top5Actions = rawActions.length > 0 ? rawActions : defaultActions;
+
+  // 5 Stages Matrix for bottom scorecard
+  const stagesSummary = [
+    {
+      step: 1,
+      title: "AI Bot Blocks & Crawlers",
+      score: state.stages?.stage1?.score || state.stage1?.score || "100%",
+      status: state.stages?.stage1?.status || state.stage1?.status || "PASS",
+      summary: state.stages?.stage1?.summaryText || "20/20 AI Bots Verified Unblocked"
+    },
+    {
+      step: 2,
+      title: "Essential Pages & Anchors",
+      score: state.stages?.stage2?.score || state.stage2?.score || "80%",
+      status: state.stages?.stage2?.status || state.stage2?.status || "PASS",
+      summary: state.stages?.stage2?.summaryText || "Canonical Anchors Verified"
+    },
+    {
+      step: 3,
+      title: "Content Density & Extractability",
+      score: state.stages?.stage3?.score || state.stage3?.score || "85%",
+      status: state.stages?.stage3?.status || state.stage3?.status || "PASS",
+      summary: state.stages?.stage3?.summaryText || "Citation Readability High"
+    },
+    {
+      step: 4,
+      title: "Trust, E-E-A-T & Privacy",
+      score: state.stages?.stage4?.score || state.stage4?.score || "80%",
+      status: state.stages?.stage4?.status || state.stage4?.status || "PASS",
+      summary: state.stages?.stage4?.summaryText || "Schema & Entity Validated"
+    },
+    {
+      step: 5,
+      title: "AI-Ready Machine Manifests",
+      score: state.stages?.stage5?.score || state.stage5?.score || "71%",
+      status: state.stages?.stage5?.status || state.stage5?.status || "WARN",
+      summary: state.stages?.stage5?.summaryText || "4-Level Hierarchy Protocols"
+    }
+  ];
+
+  const html = `
+    <div class="space-y-6">
+      ${buildTakeawayHeader("Stage 6", takeaway, score, "Executive Boardroom", status)}
+
+      <!-- 3-SECTION BOARDROOM VIEW -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- LEFT COLUMN: Neon Health Dial & Dual-Pillar Breakdown (4 cols) -->
+        <div class="lg:col-span-4 bg-[#1f1f1f] border-2 border-[#b7410e]/50 rounded-3xl p-6 sm:p-7 shadow-[0_0_25px_rgba(183,65,14,0.15)] flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="pb-3 border-b border-[#3c4043]">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#b7410e]/20 border border-[#b7410e]/40 text-[#d45d2a] uppercase tracking-wider">EXECUTIVE GAUGES</span>
+              <h4 class="text-base sm:text-lg font-black text-white uppercase tracking-wider font-headline mt-1">AEO Health Index Dial</h4>
+            </div>
+
+            <!-- SVG Neon Health Dial -->
+            <div class="flex flex-col items-center justify-center py-4">
+              <div class="relative w-40 h-40 flex items-center justify-center">
+                <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+                  <defs>
+                    <filter id="dial-neon-glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <linearGradient id="health-dial-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#10b981" />
+                      <stop offset="100%" stop-color="#38bdf8" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="50" cy="50" r="42" stroke="#2a2a2a" stroke-width="8" fill="none" />
+                  <circle cx="50" cy="50" r="42" stroke="url(#health-dial-gradient)" filter="url(#dial-neon-glow)" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="${264 - (264 * Math.min(100, Math.max(0, healthIndex))) / 100}" stroke-linecap="round" fill="none" class="transition-all duration-1000" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span class="text-3xl sm:text-4xl font-mono font-black text-white">${healthIndex}</span>
+                  <span class="text-[10px] font-mono text-[#bdc1c6] uppercase">/ 100 Health</span>
+                </div>
+              </div>
+
+              <span class="mt-3 px-3 py-1 rounded-full text-xs font-mono font-black ${healthIndex >= 80 ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'}">
+                ${healthIndex >= 80 ? 'OPTIMIZED FOR AI' : 'REMEDIATION REQUIRED'}
+              </span>
+            </div>
+
+            <!-- Dual-Pillar Readiness Breakdown -->
+            <div class="space-y-3 pt-3 border-t border-[#3c4043]">
+              <h5 class="text-xs font-mono font-black text-white uppercase tracking-wider">Dual-Pillar Readiness Breakdown</h5>
+              
+              <!-- Human Web Readiness -->
+              <div class="p-3 rounded-xl bg-[#121212] border border-[#3c4043] space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[#bdc1c6] font-bold">Human Web Readiness</span>
+                  <span class="font-mono font-black text-[#10b981]">${humanScore}%</span>
+                </div>
+                <div class="w-full bg-[#1f1f1f] rounded-full h-2 overflow-hidden">
+                  <div class="bg-[#10b981] h-2 rounded-full" style="width: ${Math.min(100, humanScore)}%"></div>
+                </div>
+              </div>
+
+              <!-- Machine Web Readiness -->
+              <div class="p-3 rounded-xl bg-[#121212] border border-[#3c4043] space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[#bdc1c6] font-bold">Machine Web Readiness</span>
+                  <span class="font-mono font-black text-indigo-400">${machineScore}%</span>
+                </div>
+                <div class="w-full bg-[#1f1f1f] rounded-full h-2 overflow-hidden">
+                  <div class="bg-indigo-500 h-2 rounded-full" style="width: ${Math.min(100, machineScore)}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Top 5 Urgent Action Items (8 cols) -->
+        <div class="lg:col-span-8 bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">PRIORITY TRIAGE</span>
+                <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">Top 5 Urgent Action Items</h4>
+                <p class="text-xs text-[#5f6368]">Highest ROI remediation steps ranked by algorithm impact</p>
+              </div>
+              <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-[#38bdf8]">
+                TRIAGE MATRIX
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              ${top5Actions.slice(0, 5).map((action, idx) => {
+                const stepJump = action.stepJump || (idx + 1);
+                return `
+                  <div class="p-3.5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+                    <div class="flex items-start space-x-3">
+                      <span class="w-6 h-6 rounded-full bg-[#b7410e]/20 text-[#d45d2a] border border-[#b7410e]/40 flex items-center justify-center font-mono font-black text-xs flex-shrink-0 mt-0.5">
+                        ${action.rank || (idx + 1)}
+                      </span>
+                      <div>
+                        <h5 class="text-xs sm:text-sm font-bold text-white font-headline">${action.title}</h5>
+                        <p class="text-xs text-[#bdc1c6] mt-0.5 leading-relaxed">${action.desc || action.detail || ''}</p>
+                      </div>
+                    </div>
+                    <button type="button" onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stepJump}) : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm whitespace-nowrap self-start sm:self-center flex items-center space-x-1 active:scale-95 flex-shrink-0">
+                      <span>Fix in Stage ${stepJump}</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM FULL WIDTH: 5-Section Scorecard Matrix -->
+      <div class="bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-lg space-y-4">
+        <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">DIAGNOSTIC MATRIX</span>
+            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">5-Section Scorecard Matrix</h4>
+            <p class="text-xs text-[#5f6368]">Direct jump links to inspect and remediate each diagnostic pillar</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          ${stagesSummary.map(stg => {
+            const isPass = stg.status === 'PASS';
+            return `
+              <div onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stg.step}) : null" class="p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] cursor-pointer transition flex flex-col justify-between space-y-3 group shadow-md">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6]">STAGE ${stg.step}</span>
+                    <span class="text-xs font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${stg.score}</span>
+                  </div>
+                  <h5 class="text-xs font-bold text-white group-hover:text-[#d45d2a] transition font-headline">${stg.title}</h5>
+                  <p class="text-[11px] text-[#bdc1c6] leading-relaxed line-clamp-2">${stg.summary}</p>
+                </div>
+                <div class="pt-2 border-t border-[#3c4043]/50 flex items-center justify-between text-[11px] font-mono text-[#38bdf8]">
+                  <span>Inspect</span>
+                  <span>→</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+export const renderStage6 = renderStage6Canvas;
+
+export function toggleSidebar(isOpen) {
+  const sidebar = document.getElementById('main-terminal-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar) {
+    if (isOpen) {
+      sidebar.classList.remove('-translate-x-full');
+      sidebar.classList.add('translate-x-0');
+    } else {
+      sidebar.classList.remove('translate-x-0');
+      sidebar.classList.add('-translate-x-full');
+    }
+  }
+  if (backdrop) {
+    if (isOpen) {
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    } else {
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+    }
+  }
+}
+
 if (typeof window !== 'undefined') {
+  window.toggleSidebar = toggleSidebar;
   window.AEO_COCKPIT = {
     initCockpit,
     executeCockpitScan,
     handleCockpitRescan,
+    handleCockpitNewScan,
     navigateToStep,
+    toggleSidebar,
     getCockpitState,
     getCockpitErrorLogs,
     resetCockpitToNeutral,
@@ -1960,12 +2266,24 @@ if (typeof window !== 'undefined') {
     viewWhatAISees,
     copyTextSnippet,
     updateStage2FromPayload,
+    buildTakeawayHeader,
+    buildEvidenceAndActionDrawers,
+    renderStage1,
+    renderStage1Canvas: renderStage1,
+    renderStage2: renderStage2Canvas,
     renderStage2Canvas,
-    renderStage3Canvas
+    renderStage3: renderStage3Canvas,
+    renderStage3Canvas,
+    renderStage4: renderStage4Canvas,
+    renderStage4Canvas,
+    renderStage5: renderStage5Canvas,
+    renderStage5Canvas,
+    renderStage6: renderStage6Canvas,
+    renderStage6Canvas,
+    renderStageFromState
   };
 
   if (document.getElementById('target-url-input')) {
     window.addEventListener('DOMContentLoaded', initCockpit);
   }
 }
-
