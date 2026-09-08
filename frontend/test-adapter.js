@@ -34,6 +34,124 @@ export function setLoading(isLoading) {
 }
 
 /**
+ * Helper to get stage status badge class.
+ */
+function getStageBadgeClass(status) {
+  const s = String(status || '').toUpperCase();
+  if (s === 'PASS' || s === 'OPTIMIZED' || s === 'ACTIVE') {
+    return 'bg-emerald-950 text-emerald-400 border border-emerald-800';
+  }
+  if (s === 'WARN' || s === 'NEEDS IMPROVEMENT' || s === 'WARNING') {
+    return 'bg-amber-950 text-amber-400 border border-amber-800';
+  }
+  return 'bg-red-950 text-red-400 border border-red-800';
+}
+
+/**
+ * Updates an assertion check pill.
+ */
+function setAssertionPill(id, isValid, verifiedText = 'VERIFIED', failedText = 'FAILED') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const pill = el.querySelector('.assertion-pill');
+  if (!pill) return;
+
+  if (isValid) {
+    pill.textContent = verifiedText;
+    pill.className = 'assertion-pill font-bold text-emerald-400';
+  } else {
+    pill.textContent = failedText;
+    pill.className = 'assertion-pill font-bold text-red-400';
+  }
+}
+
+/**
+ * Renders Section 1.5: Canonical 6-Stage Adapter Mapping Verification & Assertions
+ */
+export function renderStages(state, inputPayload) {
+  const stages = state?.stages || {};
+  const stageKeys = ['stage1', 'stage2', 'stage3', 'stage4', 'stage5', 'stage6'];
+  const stageTitles = {
+    stage1: 'Stage 1: Bot Blocks & Gateway',
+    stage2: 'Stage 2: Essential Content Anchors',
+    stage3: 'Stage 3: Content Availability & Density',
+    stage4: 'Stage 4: Trust & E-E-A-T',
+    stage5: 'Stage 5: Machine Manifest Protocols',
+    stage6: 'Stage 6: Executive Boardroom & Action Triage'
+  };
+
+  const container = document.getElementById('stages-cards-container');
+  if (container) {
+    const hasStages = stageKeys.some(k => stages[k] && stages[k].status !== 'UNAUDITED');
+    if (!hasStages && !inputPayload) {
+      container.innerHTML = '<div class="text-xs text-gray-500 italic col-span-full py-4 text-center bg-[#121212] rounded-xl border border-gray-800">No canonical stages mapped yet.</div>';
+    } else {
+      container.innerHTML = stageKeys.map(k => {
+        const stage = stages[k] || {};
+        const title = stage.title ? `${k.toUpperCase().replace('STAGE', 'Stage ')}: ${stage.title}` : (stageTitles[k] || k);
+        const score = stage.score || '0%';
+        const status = stage.status || 'UNAUDITED';
+        const summaryText = stage.summaryText || '--';
+        const classification = stage.classification || (k === 'stage5' ? 'AI-Ready' : (k === 'stage6' ? 'Executive Boardroom' : 'AI-Optimized'));
+        const badgeClass = getStageBadgeClass(status);
+
+        return `
+          <div class="stage-card bg-[#121212] border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-emerald-700 transition" data-stage-key="${k}">
+            <div>
+              <div class="flex items-start justify-between gap-2 border-b border-gray-800 pb-2.5 mb-2.5">
+                <div>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-gray-800 text-gray-400">${classification}</span>
+                  <h4 class="text-xs font-bold text-white mt-1">${title}</h4>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                  <span class="text-base font-extrabold text-emerald-400 font-mono">${score}</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase ${badgeClass}">${status}</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed font-sans">${summaryText}</p>
+            </div>
+            ${stage.missingRoutes && stage.missingRoutes.length > 0 ? `
+              <div class="mt-2.5 pt-2 border-t border-gray-900 text-[10px] text-amber-300 font-mono truncate">
+                Missing: ${stage.missingRoutes.join(', ')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Render Assertions
+  if (!inputPayload) {
+    setAssertionPill('assertion-root-stages', false, 'UNCHECKED', 'UNCHECKED');
+    setAssertionPill('assertion-stage3-passthrough', false, 'UNCHECKED', 'UNCHECKED');
+    setAssertionPill('assertion-pages-coexistence', false, 'UNCHECKED', 'UNCHECKED');
+  } else {
+    // 1. Root state.stages check
+    const hasRootStages = Boolean(state && state.stages && typeof state.stages === 'object' && stageKeys.every(k => state.stages[k]));
+    setAssertionPill('assertion-root-stages', hasRootStages, 'VERIFIED', 'MISSING');
+
+    // 2. Stage 3 Dynamic Score Pass-Through check
+    const stage3Score = state?.stage3?.score;
+    const hasValidScore = typeof stage3Score === 'string' && stage3Score.endsWith('%') && stage3Score !== '85%';
+    const expectedScore = inputPayload?.stages?.stage3?.score || inputPayload?.results?.stages?.stage3?.score;
+    const isStage3Passed = expectedScore ? (state?.stage3?.score === expectedScore) : Boolean(hasValidScore);
+    setAssertionPill('assertion-stage3-passthrough', isStage3Passed, 'VERIFIED', 'MISSING');
+
+    // 3. Per-page rich objects coexistence check
+    const pages = state?.stage3?.pages || [];
+    const hasPages = Array.isArray(pages) && (pages.length === 0 || pages.every(p => typeof p.ratio === 'number' && typeof p.wordCount === 'number' && p.headingCounts));
+    setAssertionPill('assertion-pages-coexistence', hasPages, 'VERIFIED', 'FAILED');
+  }
+
+  // Dump JSON
+  const stagesDumpEl = document.getElementById('stages-json-dump');
+  if (stagesDumpEl) {
+    stagesDumpEl.textContent = state?.stages ? JSON.stringify(state.stages, null, 2) : '--';
+  }
+}
+
+/**
  * Renders Section 1: Meta & Failure State
  */
 export function renderMeta(state) {
@@ -351,6 +469,7 @@ export function renderJsonInspector(inputPayload, state) {
  */
 export function renderAll(inputPayload, state) {
   renderMeta(state);
+  renderStages(state, inputPayload);
   renderStage1(state);
   renderStage2(state);
   renderStage3(state);

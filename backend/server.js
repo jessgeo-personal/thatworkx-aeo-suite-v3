@@ -180,6 +180,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     user.daily_scans_performed += 1;
 
@@ -269,6 +270,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
           tier: user.subscription_tier
         },
         results: scanResults,
+        stages: evaluation.stages,
         overallScore: evaluation.overallScore,
         pillarScores: evaluation.pillarScores,
         executiveSections: evaluation.executiveSections,
@@ -286,6 +288,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
         tier: user.subscription_tier
       },
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,
@@ -451,12 +454,14 @@ app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     res.json({
       success: true,
       api_version: 'v1',
       target_url: targetUrl,
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,
@@ -485,12 +490,14 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     res.json({
       success: true,
       api_version: 'v1',
       target_url: target,
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,

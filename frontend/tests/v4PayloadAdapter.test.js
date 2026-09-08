@@ -303,4 +303,145 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
     expect(page.isSchema).toBe(false);
     expect(page.gain).toBe('0.00');
   });
+
+  it('Gate 12: Direct Stages Pass-Through - exposes root state.stages and binds stage1-stage6 scores & statuses', () => {
+    const mockCanonicalStages = {
+      stage1: { score: '100%', status: 'PASS', summaryText: 'Bot Access: 20/20 Verified Unblocked', classification: 'AI-Optimized', allowedCount: 20, totalCount: 20, isWafBlocked: false },
+      stage2: { score: '80%', status: 'PASS', summaryText: 'Essential Anchors: 4/5 Verified Routes', classification: 'AI-Optimized', missingRoutes: ['/pricing'] },
+      stage3: { score: '50%', status: 'WARN', summaryText: 'Citation Readability: 5/10 High Extractability', classification: 'AI-Optimized', highDensityCount: 5, totalPages: 10, lowRatioCount: 2, thinCount: 3 },
+      stage4: { score: '75%', status: 'PASS', summaryText: 'Entity Trust: High Authority & Verified Credentials', classification: 'AI-Optimized', hasAuthorBio: true, hasContactInfo: true, hasPrivacyPolicy: true, isSecure: true },
+      stage5: { score: '67%', status: 'WARN', summaryText: 'Machine Manifests: 2/3 Valid Protocols', classification: 'AI-Ready', governanceGate: 'AI-Ready', manifestsFound: 2, totalManifests: 3 },
+      stage6: { score: '85%', status: 'PASS', summaryText: 'Executive Triage: 3 Actionable Priorities Identified', classification: 'Executive Boardroom', healthIndex: 85, humanWebReadiness: 23, machineWebReadiness: 21, priorityCount: 3 }
+    };
+
+    const payloadWithStages = {
+      status: 'complete',
+      targetUrl: 'https://acme-analytics.io',
+      stages: mockCanonicalStages,
+      results: {
+        url: 'https://acme-analytics.io',
+        stages: mockCanonicalStages,
+        pages: [{ url: 'https://acme-analytics.io/', wordCount: 1500 }]
+      }
+    };
+
+    const state = mapBackendScanToV4State(payloadWithStages);
+
+    // 1. Root state.stages exposure
+    expect(state.stages).toBeDefined();
+    expect(state.stages.stage1).toEqual(mockCanonicalStages.stage1);
+    expect(state.stages.stage2).toEqual(mockCanonicalStages.stage2);
+    expect(state.stages.stage3).toEqual(mockCanonicalStages.stage3);
+    expect(state.stages.stage4).toEqual(mockCanonicalStages.stage4);
+    expect(state.stages.stage5).toEqual(mockCanonicalStages.stage5);
+    expect(state.stages.stage6).toEqual(mockCanonicalStages.stage6);
+
+    // 2. Direct binding to state.stage1 .. state.stage6
+    expect(state.stage1.score).toBe('100%');
+    expect(state.stage1.status).toBe('PASS');
+    expect(state.stage1.summaryText).toBe('Bot Access: 20/20 Verified Unblocked');
+
+    expect(state.stage2.score).toBe('80%');
+    expect(state.stage2.status).toBe('PASS');
+    expect(state.stage2.summaryText).toBe('Essential Anchors: 4/5 Verified Routes');
+
+    // Strict assertion: Stage 3 score MUST match dynamic backend percentage ('50%') and not be undefined, 0%, or hardcoded '85%'
+    expect(state.stage3.score).toBe('50%');
+    expect(state.stage3.status).toBe('WARN');
+    expect(state.stage3.summaryText).toBe('Citation Readability: 5/10 High Extractability');
+
+    expect(state.stage4.score).toBe('75%');
+    expect(state.stage4.status).toBe('PASS');
+    expect(state.stage4.summaryText).toBe('Entity Trust: High Authority & Verified Credentials');
+
+    expect(state.stage5.score).toBe('67%');
+    expect(state.stage5.status).toBe('WARN');
+    expect(state.stage5.summaryText).toBe('Machine Manifests: 2/3 Valid Protocols');
+
+    expect(state.stage6.score).toBe('85%');
+    expect(state.stage6.status).toBe('PASS');
+    expect(state.stage6.summaryText).toBe('Executive Triage: 3 Actionable Priorities Identified');
+  });
+
+  it('Gate 13: Coexistence - rich per-page objects, crawlers, and route records are preserved alongside stages', () => {
+    const payloadWithPagesAndStages = {
+      status: 'complete',
+      targetUrl: 'https://thatworkx.com',
+      stages: {
+        stage1: { score: '95%', status: 'PASS', summaryText: 'Bot Access: 19/20 Verified' },
+        stage2: { score: '100%', status: 'PASS', summaryText: 'Essential Anchors: 5/5 Found' },
+        stage3: { score: '60%', status: 'WARN', summaryText: 'Citation Readability: 6/10 High Extractability' },
+        stage4: { score: '80%', status: 'PASS', summaryText: 'Entity Trust: Strong Authority' },
+        stage5: { score: '100%', status: 'PASS', summaryText: 'Machine Manifests: 3/3 Valid' },
+        stage6: { score: '90%', status: 'PASS', summaryText: 'Executive Triage: 2 Priorities' }
+      },
+      results: {
+        url: 'https://thatworkx.com',
+        status: {
+          botPermissions: {
+            gptBot: true,
+            claudeBot: true,
+            ccBot: true,
+            perplexityBot: true
+          }
+        },
+        discoveredRoutes: ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'],
+        pages: [
+          {
+            url: 'https://thatworkx.com/',
+            wordCount: 1200,
+            textCodeRatio: 0.28,
+            canonicalTag: 'https://thatworkx.com/',
+            headingAudit: { h1: 1, h2: 4, h3: 2, h4: 1 },
+            lastModified: '2026-09-01T00:00:00Z',
+            statusCode: 200,
+            is404: false
+          }
+        ]
+      }
+    };
+
+    const state = mapBackendScanToV4State(payloadWithPagesAndStages);
+
+    // Verify stage scores
+    expect(state.stage3.score).toBe('60%');
+    expect(state.stage3.status).toBe('WARN');
+
+    // Verify rich per-page objects are preserved intact
+    expect(state.stage3.pages).toHaveLength(1);
+    const p = state.stage3.pages[0];
+    expect(p.ratio).toBe(28);
+    expect(p.wordCount).toBe(1200);
+    expect(p.is404).toBe(false);
+    expect(p.hasCanonical).toBe(true);
+    expect(p.headingCounts).toEqual({ h1: 1, h2: 4, h3: 2, h4: 1 });
+    expect(p.lastUpdated).toBe('2026-09-01T00:00:00Z');
+
+    // Verify crawlers and canonical routes are preserved
+    expect(state.stage1.crawlers.length).toBeGreaterThanOrEqual(4);
+    expect(state.stage2.routes).toHaveLength(5);
+    expect(state.stage2.discoveredCount).toBe(5);
+    expect(state.stage2.missingCount).toBe(0);
+  });
+
+  it('Gate 14: Graceful neutral state when un-audited or failed - stages exist with safe defaults and 0% score', () => {
+    const unAuditedNull = mapBackendScanToV4State(null);
+    expect(unAuditedNull.stages).toBeDefined();
+    expect(unAuditedNull.stages.stage1.score).toBe('0%');
+    expect(unAuditedNull.stages.stage1.status).toBe('UNAUDITED');
+    expect(unAuditedNull.stages.stage3.score).toBe('0%');
+    expect(unAuditedNull.stage3.score).toBe('0%');
+    expect(unAuditedNull.stage3.status).toBe('UNAUDITED');
+
+    const unAuditedEmpty = mapBackendScanToV4State({});
+    expect(unAuditedEmpty.stages).toBeDefined();
+    expect(unAuditedEmpty.stage3.score).toBe('0%');
+    expect(unAuditedEmpty.stage3.status).toBe('UNAUDITED');
+
+    const failedCrawl = mapBackendScanToV4State({ status: 'failed', error: 'Domain DNS lookup failed' });
+    expect(failedCrawl.stages).toBeDefined();
+    expect(failedCrawl.stages.stage3.score).toBe('0%');
+    expect(failedCrawl.stage3.score).toBe('0%');
+    expect(failedCrawl.stage3.status).toBe('UNAUDITED');
+  });
 });

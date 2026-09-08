@@ -50,8 +50,18 @@ describe('V4 Server Scan Pipeline Test Harness (frontend/test-server.html)', () 
       name: `Capability ${i + 1}`,
       score: 85,
       status: 'active'
-    }))
+    })),
+    stages: {
+      stage1: { score: '100%', status: 'PASS', summaryText: 'Bot Access: 20/20 Verified' },
+      stage2: { score: '80%', status: 'PASS', summaryText: 'Essential Anchors: 4/5 Found' },
+      stage3: { score: '75%', status: 'WARN', summaryText: 'Content Availability: 75% Coverage' },
+      stage4: { score: '90%', status: 'PASS', summaryText: 'Entity Trust: High Authority' },
+      stage5: { score: '60%', status: 'WARN', summaryText: 'Manifest Hierarchy: Partial' },
+      stage6: { score: '85%', status: 'PASS', summaryText: 'Action Plan: 3 Priorities' }
+    }
   };
+
+  mockStandard200Payload.results.stages = mockStandard200Payload.stages;
 
   const mockQueued202Payload = {
     status: 'queued',
@@ -137,6 +147,14 @@ describe('V4 Server Scan Pipeline Test Harness (frontend/test-server.html)', () 
     expect(document.querySelector('#contract-executive-sections .status-pill').textContent).toBe('VALID');
     expect(document.querySelector('#contract-capability-matrix .status-pill').textContent).toBe('VALID');
     expect(document.querySelector('#contract-results-object .status-pill').textContent).toBe('VALID');
+    expect(document.querySelector('#contract-root-stages .status-pill').textContent).toBe('VERIFIED');
+    expect(document.querySelector('#contract-envelope-stages .status-pill').textContent).toBe('VERIFIED');
+    expect(document.querySelector('#contract-stage3-score .status-pill').textContent).toBe('75%');
+
+    // Transmitted stage cards assertions
+    const stageCards = document.querySelectorAll('#stages-cards-container [data-stage-key]');
+    expect(stageCards.length).toBe(6);
+    expect(document.getElementById('stages-json-dump').textContent).toContain('100%');
   });
 
   it('Gate 3: Handles 202 Accepted queued job response and triggers polling cycle', async () => {

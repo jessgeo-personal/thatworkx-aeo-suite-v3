@@ -38,7 +38,10 @@ export function resetView() {
     'contract-executive-sections',
     'contract-capability-matrix',
     'contract-results-object',
-    'contract-single-page'
+    'contract-single-page',
+    'contract-root-stages',
+    'contract-envelope-stages',
+    'contract-stage3-score'
   ];
 
   checklistItems.forEach(id => {
@@ -51,6 +54,14 @@ export function resetView() {
       }
     }
   });
+
+  const stagesContainer = document.getElementById('stages-cards-container');
+  if (stagesContainer) {
+    stagesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic col-span-full">No canonical stages evaluated yet. Execute scan above to inspect.</div>';
+  }
+
+  const stagesDumpEl = document.getElementById('stages-json-dump');
+  if (stagesDumpEl) stagesDumpEl.textContent = '--';
 
   const rawJsonEl = document.getElementById('raw-json-dump');
   if (rawJsonEl) rawJsonEl.textContent = '--';
@@ -98,7 +109,7 @@ export function hideError() {
 /**
  * Updates a specific checklist item pill.
  */
-function setChecklistItem(id, isValid, isNA = false) {
+function setChecklistItem(id, isValid, isNA = false, customText = null) {
   const el = document.getElementById(id);
   if (!el) return;
   const pill = el.querySelector('.status-pill');
@@ -111,16 +122,92 @@ function setChecklistItem(id, isValid, isNA = false) {
   }
 
   if (isValid) {
-    pill.textContent = 'VALID';
+    pill.textContent = customText || 'VALID';
     pill.className = 'text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 status-pill';
   } else {
-    pill.textContent = 'INVALID';
+    pill.textContent = customText || 'INVALID';
     pill.className = 'text-xs font-bold px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 status-pill';
   }
 }
 
 /**
- * Validates the response payload against the 5 core contract criteria.
+ * Helper to get stage status badge class.
+ */
+function getStageBadgeClass(status) {
+  const s = String(status || '').toUpperCase();
+  if (s === 'PASS' || s === 'OPTIMIZED' || s === 'ACTIVE') {
+    return 'bg-emerald-950 text-emerald-400 border border-emerald-800';
+  }
+  if (s === 'WARN' || s === 'NEEDS IMPROVEMENT' || s === 'WARNING') {
+    return 'bg-amber-950 text-amber-400 border border-amber-800';
+  }
+  return 'bg-red-950 text-red-400 border border-red-800';
+}
+
+/**
+ * Renders transmitted 6-stage cards and stages JSON dump.
+ */
+export function renderStages(payload) {
+  const stagesContainer = document.getElementById('stages-cards-container');
+  const stagesData = payload?.stages || payload?.results?.stages || {};
+  const stageKeys = ['stage1', 'stage2', 'stage3', 'stage4', 'stage5', 'stage6'];
+  const stageTitles = {
+    stage1: 'Stage 1: Bot Blocks & Gateway',
+    stage2: 'Stage 2: Essential Content Anchors',
+    stage3: 'Stage 3: Content Availability & Density',
+    stage4: 'Stage 4: Trust & E-E-A-T',
+    stage5: 'Stage 5: Machine Manifest Protocols',
+    stage6: 'Stage 6: Executive Boardroom & Action Triage'
+  };
+
+  if (stagesContainer) {
+    const hasStages = stageKeys.some(k => stagesData[k]);
+    if (!hasStages) {
+      stagesContainer.innerHTML = '<div class="text-gray-500 text-sm py-4 italic col-span-full">No canonical stages transmitted in response.</div>';
+    } else {
+      stagesContainer.innerHTML = stageKeys.map(k => {
+        const stage = stagesData[k] || {};
+        const title = stage.title ? `${k.toUpperCase().replace('STAGE', 'Stage ')}: ${stage.title}` : (stageTitles[k] || k);
+        const score = stage.score || '0%';
+        const status = stage.status || 'UNAUDITED';
+        const summaryText = stage.summaryText || 'No diagnostic summary.';
+        const classification = stage.classification || (k === 'stage5' ? 'AI-Ready' : (k === 'stage6' ? 'Executive Boardroom' : 'AI-Optimized'));
+        const badgeClass = getStageBadgeClass(status);
+
+        return `
+          <div class="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-purple-700 transition" data-stage-key="${k}">
+            <div>
+              <div class="flex items-start justify-between gap-2 border-b border-gray-800 pb-2.5 mb-2.5">
+                <div>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-gray-800 text-gray-400">${classification}</span>
+                  <h4 class="text-sm font-bold text-white mt-1">${title}</h4>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                  <span class="text-lg font-extrabold text-purple-400 font-mono">${score}</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase ${badgeClass}">${status}</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed font-sans">${summaryText}</p>
+            </div>
+            ${stage.missingRoutes && stage.missingRoutes.length > 0 ? `
+              <div class="mt-3 pt-2 border-t border-gray-900 text-[11px] text-amber-300 font-mono truncate">
+                Missing: ${stage.missingRoutes.join(', ')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  const stagesDumpEl = document.getElementById('stages-json-dump');
+  if (stagesDumpEl) {
+    stagesDumpEl.textContent = JSON.stringify(stagesData, null, 2);
+  }
+}
+
+/**
+ * Validates the response payload against the core contract criteria.
  */
 export function validateContractChecklist(payload, isSinglePageMode = false) {
   if (!payload || typeof payload !== 'object') {
@@ -130,6 +217,9 @@ export function validateContractChecklist(payload, isSinglePageMode = false) {
     setChecklistItem('contract-capability-matrix', false);
     setChecklistItem('contract-results-object', false);
     setChecklistItem('contract-single-page', false, !isSinglePageMode);
+    setChecklistItem('contract-root-stages', false, false, 'MISSING');
+    setChecklistItem('contract-envelope-stages', false, false, 'MISSING');
+    setChecklistItem('contract-stage3-score', false, false, 'MISSING');
     return;
   }
 
@@ -162,10 +252,24 @@ export function validateContractChecklist(payload, isSinglePageMode = false) {
   } else {
     setChecklistItem('contract-single-page', false, true);
   }
+
+  // 7. Root payload.stages
+  const stageKeys = ['stage1', 'stage2', 'stage3', 'stage4', 'stage5', 'stage6'];
+  const hasRootStages = Boolean(payload.stages && typeof payload.stages === 'object' && stageKeys.every(k => payload.stages[k]));
+  setChecklistItem('contract-root-stages', hasRootStages, false, hasRootStages ? 'VERIFIED' : 'MISSING');
+
+  // 8. Envelope results.stages
+  const hasEnvelopeStages = Boolean(payload.results && payload.results.stages && typeof payload.results.stages === 'object' && stageKeys.every(k => payload.results.stages[k]));
+  setChecklistItem('contract-envelope-stages', hasEnvelopeStages, false, hasEnvelopeStages ? 'VERIFIED' : 'MISSING');
+
+  // 9. Stage 3 Dynamic Score
+  const stage3Score = payload?.stages?.stage3?.score || payload?.results?.stages?.stage3?.score;
+  const hasStage3Score = typeof stage3Score === 'string' && stage3Score.endsWith('%');
+  setChecklistItem('contract-stage3-score', hasStage3Score, false, hasStage3Score ? stage3Score : 'MISSING');
 }
 
 /**
- * Renders telemetry bar and JSON dump.
+ * Renders telemetry bar, stage cards, and JSON dump.
  */
 export function renderTelemetry(payload, statusCode, targetUrl) {
   const httpStatusEl = document.getElementById('metric-http-status');
@@ -201,6 +305,8 @@ export function renderTelemetry(payload, statusCode, targetUrl) {
   if (userTierEl) {
     userTierEl.textContent = payload?.stats?.tier || payload?.tier || '--';
   }
+
+  renderStages(payload);
 
   const rawJsonEl = document.getElementById('raw-json-dump');
   if (rawJsonEl) {

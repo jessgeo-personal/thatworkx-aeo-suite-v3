@@ -95,6 +95,14 @@ describe('V4 Payload Adapter Test Harness (frontend/test-adapter.html & test-ada
           'Missing Essential Routes: /privacy-policy, /terms-of-service'
         ]
       }
+    },
+    stages: {
+      stage1: { score: '80%', status: 'PASS', summaryText: 'Bot Access: 16/20 Verified', classification: 'AI-Optimized' },
+      stage2: { score: '60%', status: 'WARN', summaryText: 'Essential Anchors: 3/5 Found', classification: 'AI-Optimized' },
+      stage3: { score: '75%', status: 'PASS', summaryText: 'Content Availability: 75% Optimal', classification: 'AI-Optimized' },
+      stage4: { score: '90%', status: 'PASS', summaryText: 'Entity Trust: High Authority', classification: 'AI-Optimized' },
+      stage5: { score: '67%', status: 'WARN', summaryText: 'Machine Manifests: 2/3 Valid', classification: 'AI-Ready', governanceGate: 'AI-Ready' },
+      stage6: { score: '84%', status: 'PASS', summaryText: 'Executive Triage: 3 Priorities', classification: 'Executive Boardroom', healthIndex: 84, humanWebReadiness: 23, machineWebReadiness: 21, priorityCount: 3 }
     }
   };
 
@@ -311,6 +319,34 @@ describe('V4 Payload Adapter Test Harness (frontend/test-adapter.html & test-ada
     adapterHarnessModule.setMode('scan');
     expect(scanPanel.classList.contains('hidden')).toBe(false);
     expect(jsonPanel.classList.contains('hidden')).toBe(true);
+  });
+
+  it('Requirement 13: Renders Canonical 6-Stage Adapter Mapping Verification cards and assertion pills', () => {
+    const state = adapterHarnessModule.mapBackendScanToV4State(mockFull20BotBackendPayload);
+    adapterHarnessModule.renderAll(mockFull20BotBackendPayload, state);
+
+    // 1. Stage Cards
+    const stageCards = document.querySelectorAll('.stage-card');
+    expect(stageCards.length).toBe(6);
+
+    const stage1Card = Array.from(stageCards).find(c => c.dataset.stageKey === 'stage1');
+    expect(stage1Card).toBeDefined();
+    expect(stage1Card.textContent).toContain('80%');
+    expect(stage1Card.textContent).toContain('PASS');
+
+    const stage3Card = Array.from(stageCards).find(c => c.dataset.stageKey === 'stage3');
+    expect(stage3Card).toBeDefined();
+    expect(stage3Card.textContent).toContain('75%');
+
+    // 2. Assertion check pills
+    expect(document.querySelector('#assertion-root-stages .assertion-pill').textContent).toBe('VERIFIED');
+    expect(document.querySelector('#assertion-stage3-passthrough .assertion-pill').textContent).toBe('VERIFIED');
+    expect(document.querySelector('#assertion-pages-coexistence .assertion-pill').textContent).toBe('VERIFIED');
+
+    // 3. JSON dump
+    const dumpText = document.getElementById('stages-json-dump').textContent;
+    expect(dumpText).toContain('"score": "80%"');
+    expect(dumpText).toContain('"score": "75%"');
   });
 
   it('Requirement 12: Strict Governance Rule: Zero occurrences of banned term "AI-first"', () => {

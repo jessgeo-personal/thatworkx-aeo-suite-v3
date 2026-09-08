@@ -36,6 +36,15 @@ const BOT_NAME_MAP = {
   baiduAnsur: 'Baidu-Ansur'
 };
 
+const DEFAULT_STAGES = {
+  stage1: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
+  stage2: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
+  stage3: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
+  stage4: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
+  stage5: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Ready', governanceGate: 'AI-Ready' },
+  stage6: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'Executive Boardroom', healthIndex: 0, humanWebReadiness: 0, machineWebReadiness: 0 }
+};
+
 /**
  * Calculates semantic content density rating based on word count.
  * @param {number} wordCount
@@ -77,31 +86,56 @@ export function mapBackendScanToV4State(rawPayload) {
         status: 'UNAUDITED',
         timestamp: null
       },
+      stages: DEFAULT_STAGES,
       stage1: {
-        crawlers: []
+        crawlers: [],
+        score: DEFAULT_STAGES.stage1.score,
+        status: DEFAULT_STAGES.stage1.status,
+        summaryText: DEFAULT_STAGES.stage1.summaryText,
+        ...DEFAULT_STAGES.stage1
       },
       stage2: {
         routes: [],
         missingCount: 0,
-        discoveredCount: 0
+        discoveredCount: 0,
+        score: DEFAULT_STAGES.stage2.score,
+        status: DEFAULT_STAGES.stage2.status,
+        summaryText: DEFAULT_STAGES.stage2.summaryText,
+        ...DEFAULT_STAGES.stage2
       },
       stage3: {
-        pages: []
+        pages: [],
+        score: DEFAULT_STAGES.stage3.score,
+        status: DEFAULT_STAGES.stage3.status,
+        summaryText: DEFAULT_STAGES.stage3.summaryText,
+        ...DEFAULT_STAGES.stage3
       },
       stage4: {
         detectedTypes: [],
         hasAuthorBio: false,
-        totalGraphEntities: 0
+        totalGraphEntities: 0,
+        score: DEFAULT_STAGES.stage4.score,
+        status: DEFAULT_STAGES.stage4.status,
+        summaryText: DEFAULT_STAGES.stage4.summaryText,
+        ...DEFAULT_STAGES.stage4
       },
       stage5: {
         governanceGate: 'AI-Ready',
-        manifests: []
+        manifests: [],
+        score: DEFAULT_STAGES.stage5.score,
+        status: DEFAULT_STAGES.stage5.status,
+        summaryText: DEFAULT_STAGES.stage5.summaryText,
+        ...DEFAULT_STAGES.stage5
       },
       stage6: {
         overallHealthIndex: 0,
         aiOptimizedScore: 0,
         aiReadyScore: 0,
-        triageFlags: []
+        triageFlags: [],
+        score: DEFAULT_STAGES.stage6.score,
+        status: DEFAULT_STAGES.stage6.status,
+        summaryText: DEFAULT_STAGES.stage6.summaryText,
+        ...DEFAULT_STAGES.stage6
       }
     };
   }
@@ -131,12 +165,57 @@ export function mapBackendScanToV4State(rawPayload) {
         timestamp: null,
         error: errorMsg
       },
-      stage1: { crawlers: [] },
-      stage2: { routes: [], missingCount: 0, discoveredCount: 0 },
-      stage3: { pages: [] },
-      stage4: { detectedTypes: [], hasAuthorBio: false, totalGraphEntities: 0 },
-      stage5: { governanceGate: 'AI-Ready', manifests: [] },
-      stage6: { overallHealthIndex: 0, aiOptimizedScore: 0, aiReadyScore: 0, triageFlags: [errorMsg] }
+      stages: DEFAULT_STAGES,
+      stage1: {
+        crawlers: [],
+        score: DEFAULT_STAGES.stage1.score,
+        status: DEFAULT_STAGES.stage1.status,
+        summaryText: DEFAULT_STAGES.stage1.summaryText,
+        ...DEFAULT_STAGES.stage1
+      },
+      stage2: {
+        routes: [],
+        missingCount: 0,
+        discoveredCount: 0,
+        score: DEFAULT_STAGES.stage2.score,
+        status: DEFAULT_STAGES.stage2.status,
+        summaryText: DEFAULT_STAGES.stage2.summaryText,
+        ...DEFAULT_STAGES.stage2
+      },
+      stage3: {
+        pages: [],
+        score: DEFAULT_STAGES.stage3.score,
+        status: DEFAULT_STAGES.stage3.status,
+        summaryText: DEFAULT_STAGES.stage3.summaryText,
+        ...DEFAULT_STAGES.stage3
+      },
+      stage4: {
+        detectedTypes: [],
+        hasAuthorBio: false,
+        totalGraphEntities: 0,
+        score: DEFAULT_STAGES.stage4.score,
+        status: DEFAULT_STAGES.stage4.status,
+        summaryText: DEFAULT_STAGES.stage4.summaryText,
+        ...DEFAULT_STAGES.stage4
+      },
+      stage5: {
+        governanceGate: 'AI-Ready',
+        manifests: [],
+        score: DEFAULT_STAGES.stage5.score,
+        status: DEFAULT_STAGES.stage5.status,
+        summaryText: DEFAULT_STAGES.stage5.summaryText,
+        ...DEFAULT_STAGES.stage5
+      },
+      stage6: {
+        overallHealthIndex: 0,
+        aiOptimizedScore: 0,
+        aiReadyScore: 0,
+        triageFlags: [errorMsg],
+        score: DEFAULT_STAGES.stage6.score,
+        status: DEFAULT_STAGES.stage6.status,
+        summaryText: DEFAULT_STAGES.stage6.summaryText,
+        ...DEFAULT_STAGES.stage6
+      }
     };
   }
 
@@ -467,13 +546,25 @@ export function mapBackendScanToV4State(rawPayload) {
   const rawFlags = rawScores.triageFlags || data.alerts?.map((a) => a.message || a.title || JSON.stringify(a)) || [];
   const triageFlags = Array.isArray(rawFlags) ? rawFlags : Object.values(rawFlags);
 
+  // Canonical 6-Stage Diagnostic Pipeline Scores
+  const rawStages = data.stages || rawPayload.stages || {};
+  const stages = {
+    stage1: { ...DEFAULT_STAGES.stage1, ...(rawStages.stage1 || {}) },
+    stage2: { ...DEFAULT_STAGES.stage2, ...(rawStages.stage2 || {}) },
+    stage3: { ...DEFAULT_STAGES.stage3, ...(rawStages.stage3 || {}) },
+    stage4: { ...DEFAULT_STAGES.stage4, ...(rawStages.stage4 || {}) },
+    stage5: { ...DEFAULT_STAGES.stage5, ...(rawStages.stage5 || {}) },
+    stage6: { ...DEFAULT_STAGES.stage6, ...(rawStages.stage6 || {}) }
+  };
+
   return {
     meta,
-    stage1: { crawlers },
-    stage2: { routes, missingCount, discoveredCount },
-    stage3: { pages },
-    stage4: { detectedTypes, hasAuthorBio, totalGraphEntities },
-    stage5: { governanceGate: 'AI-Ready', manifests },
-    stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags }
+    stages,
+    stage1: { crawlers, score: stages.stage1.score, status: stages.stage1.status, summaryText: stages.stage1.summaryText, ...stages.stage1 },
+    stage2: { routes, missingCount, discoveredCount, score: stages.stage2.score, status: stages.stage2.status, summaryText: stages.stage2.summaryText, ...stages.stage2 },
+    stage3: { pages, score: stages.stage3.score, status: stages.stage3.status, summaryText: stages.stage3.summaryText, ...stages.stage3 },
+    stage4: { detectedTypes, hasAuthorBio, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, ...stages.stage4 },
+    stage5: { governanceGate: 'AI-Ready', manifests, score: stages.stage5.score, status: stages.stage5.status, summaryText: stages.stage5.summaryText, ...stages.stage5 },
+    stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags, score: stages.stage6.score, status: stages.stage6.status, summaryText: stages.stage6.summaryText, ...stages.stage6 }
   };
 }

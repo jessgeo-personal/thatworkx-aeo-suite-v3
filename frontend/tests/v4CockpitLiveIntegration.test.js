@@ -307,6 +307,239 @@ describe('AEO Suite V4: Cockpit Live Data Ingestion & Rescan Engine (Phase 1 RED
     const durEl = document.getElementById('scan-duration-label');
     expect(durEl.textContent).toMatch(/^\d+(\.\d+)?s$/);
   });
+
+  describe('Step 4 Canonical 6-Stage End-to-End Contract Integration (RED Phase)', () => {
+    it('1. Stage 1 to 3 Contract Binding & Zero Hardcoded Fallbacks: renders dynamic backend stages and never 85%', async () => {
+      const { renderStageFromState } = await import('../visualize.js');
+      const fs = await import('fs');
+      const path = await import('path');
+      const htmlPath = path.resolve(__dirname, '../visualize.html');
+      document.body.innerHTML = fs.readFileSync(htmlPath, 'utf8');
+
+      const mockState = {
+        isAudited: true,
+        currentStep: 3,
+        completedSteps: [1, 2, 3, 4, 5, 6],
+        targetUrl: 'https://thatworkx.com',
+        stages: {
+          stage1: { score: '95%', status: 'PASS', summaryText: 'Bot Access: 19/20 Verified Unblocked' },
+          stage2: { score: '80%', status: 'PASS', summaryText: 'Essential Anchors: 4/5 Verified Routes' },
+          stage3: { score: '50%', status: 'WARN', summaryText: 'Citation Readability: 5/10 High Extractability' },
+          stage4: { score: '75%', status: 'PASS', summaryText: 'Entity Trust: High Authority & Verified Credentials' },
+          stage5: { score: '67%', status: 'WARN', summaryText: 'Machine Manifests: 2/3 Valid Protocols' },
+          stage6: { score: '85%', status: 'PASS', summaryText: 'Executive Triage: 3 Actionable Priorities Identified' }
+        },
+        stage1: { score: '95%', status: 'PASS', summaryText: 'Bot Access: 19/20 Verified Unblocked', crawlers: [] },
+        stage2: { score: '80%', status: 'PASS', summaryText: 'Essential Anchors: 4/5 Verified Routes', routes: [] },
+        stage3: {
+          score: '50%',
+          status: 'WARN',
+          summaryText: 'Citation Readability: 5/10 High Extractability',
+          pages: [
+            {
+              url: 'https://thatworkx.com/',
+              ratio: 28,
+              wordCount: 1200,
+              densityRating: 'Moderate',
+              textCodeRatioPercent: 28,
+              is404: false,
+              headingCounts: { h1: 1, h2: 3, h3: 2, h4: 0 }
+            },
+            {
+              url: 'https://thatworkx.com/terms',
+              ratio: 0,
+              wordCount: 0,
+              densityRating: 'Thin',
+              textCodeRatioPercent: 0,
+              is404: true,
+              status: '404 NOT FOUND',
+              headingCounts: { h1: 0, h2: 0, h3: 0, h4: 0 }
+            }
+          ]
+        },
+        stage4: { score: '75%', status: 'PASS', summaryText: 'Entity Trust: High Authority & Verified Credentials' },
+        stage5: { score: '67%', status: 'WARN', summaryText: 'Machine Manifests: 2/3 Valid Protocols' },
+        stage6: { score: '85%', status: 'PASS', summaryText: 'Executive Triage: 3 Actionable Priorities Identified', healthIndex: 85 }
+      };
+
+      // Render Stage 3
+      renderStageFromState(3, mockState);
+      const canvasBody3 = document.getElementById('canvas-body');
+      const stage3Text = canvasBody3.textContent;
+
+      expect(stage3Text).toContain('50%');
+      expect(stage3Text).toContain('WARN');
+      expect(stage3Text).toContain('Citation Readability: 5/10 High Extractability');
+      expect(stage3Text).not.toContain('85%');
+
+      // Render Stage 1
+      renderStageFromState(1, mockState);
+      const canvasBody1 = document.getElementById('canvas-body');
+      expect(canvasBody1.textContent).toContain('95%');
+      expect(canvasBody1.textContent).toContain('PASS');
+
+      // Render Stage 2
+      renderStageFromState(2, mockState);
+      const canvasBody2 = document.getElementById('canvas-body');
+      expect(canvasBody2.textContent).toContain('80%');
+      expect(canvasBody2.textContent).toContain('PASS');
+    });
+
+    it('2. Stages 4, 5, and 6 Full Production Rendering: does NOT render placeholder "Ingestion Bound" strings', async () => {
+      const { renderStageFromState } = await import('../visualize.js');
+      const fs = await import('fs');
+      const path = await import('path');
+      const htmlPath = path.resolve(__dirname, '../visualize.html');
+      document.body.innerHTML = fs.readFileSync(htmlPath, 'utf8');
+
+      const mockState = {
+        isAudited: true,
+        currentStep: 4,
+        completedSteps: [1, 2, 3, 4, 5, 6],
+        targetUrl: 'https://thatworkx.com',
+        stages: {
+          stage4: { score: '75%', status: 'PASS', summaryText: 'Entity Trust: High Authority & Verified Credentials' },
+          stage5: { score: '67%', status: 'WARN', summaryText: 'Machine Manifests: 2/3 Valid Protocols' },
+          stage6: { score: '85%', status: 'PASS', summaryText: 'Executive Triage: 3 Actionable Priorities Identified', healthIndex: 85, humanWebReadiness: 92, machineWebReadiness: 54 }
+        },
+        stage4: {
+          score: '75%',
+          status: 'PASS',
+          summaryText: 'Entity Trust: High Authority & Verified Credentials',
+          detectedTypes: ['Organization', 'Person', 'WebSite'],
+          hasAuthorBio: true
+        },
+        stage5: {
+          score: '67%',
+          status: 'WARN',
+          summaryText: 'Machine Manifests: 2/3 Valid Protocols',
+          manifests: [
+            { path: '/robots.txt', exists: true, status: 200 },
+            { path: '/llms.txt', exists: true, status: 200 },
+            { path: '/ai-context.md', exists: false, status: 404 }
+          ]
+        },
+        stage6: {
+          score: '85%',
+          status: 'PASS',
+          summaryText: 'Executive Triage: 3 Actionable Priorities Identified',
+          healthIndex: 85,
+          humanWebReadiness: 92,
+          machineWebReadiness: 54,
+          triageFlags: [
+            'Blocked ClaudeBot crawl permissions',
+            'Missing machine manifest: /ai-context.md'
+          ]
+        }
+      };
+
+      // Stage 4 assertions
+      renderStageFromState(4, mockState);
+      const canvasBody4 = document.getElementById('canvas-body');
+      expect(canvasBody4.textContent).not.toContain('Stage 4 Ingestion Bound');
+      expect(canvasBody4.textContent).toContain('Entity Authority & E-E-A-T Relational Graph');
+      expect(canvasBody4.textContent).toContain('75%');
+
+      // Stage 5 assertions
+      renderStageFromState(5, mockState);
+      const canvasBody5 = document.getElementById('canvas-body');
+      expect(canvasBody5.textContent).not.toContain('Stage 5 Ingestion Bound');
+      expect(canvasBody5.textContent).toContain('LEVEL 1: PROTOCOL GATES');
+      expect(canvasBody5.textContent).toContain('67%');
+      expect(document.getElementById('canvas-governance-badge').textContent).toContain('AI-Ready');
+
+      // Stage 6 assertions
+      renderStageFromState(6, mockState);
+      const canvasBody6 = document.getElementById('canvas-body');
+      expect(canvasBody6.textContent).not.toContain('Stage 6 Ingestion Bound');
+      expect(canvasBody6.textContent).toContain('AEO Health Index Dial');
+      expect(canvasBody6.textContent).toContain('Dual-Pillar Readiness Breakdown');
+      expect(canvasBody6.textContent).toContain('Top 5 Urgent Action Items');
+    });
+
+    it('3. Interactive Features & Drawers Integrity: Stage 3 renders individual pages with drawers and handles 404 routes', async () => {
+      const { renderStageFromState } = await import('../visualize.js');
+      const fs = await import('fs');
+      const path = await import('path');
+      const htmlPath = path.resolve(__dirname, '../visualize.html');
+      document.body.innerHTML = fs.readFileSync(htmlPath, 'utf8');
+
+      const mockState = {
+        isAudited: true,
+        currentStep: 3,
+        completedSteps: [1, 2, 3],
+        targetUrl: 'https://thatworkx.com',
+        stages: {
+          stage3: { score: '60%', status: 'WARN', summaryText: 'Citation Readability: 6/10 High Extractability' }
+        },
+        stage3: {
+          score: '60%',
+          status: 'WARN',
+          pages: [
+            {
+              url: 'https://thatworkx.com/',
+              ratio: 32,
+              wordCount: 1500,
+              densityRating: 'Optimal',
+              textCodeRatioPercent: 32,
+              is404: false,
+              headingCounts: { h1: 1, h2: 3, h3: 2, h4: 0 }
+            },
+            {
+              url: 'https://thatworkx.com/terms',
+              ratio: 0,
+              wordCount: 0,
+              densityRating: 'Thin',
+              textCodeRatioPercent: 0,
+              is404: true,
+              status: '404 NOT FOUND',
+              headingCounts: { h1: 0, h2: 0, h3: 0, h4: 0 }
+            }
+          ]
+        }
+      };
+
+      renderStageFromState(3, mockState);
+      const canvasBody = document.getElementById('canvas-body');
+
+      // Check page action buttons and drawers
+      expect(canvasBody.textContent).toContain('View What AI sees');
+      expect(canvasBody.textContent).toContain('Details');
+
+      // Check 404 route handling: suppresses false-positive SPA/Thin warnings and renders 404 NOT FOUND
+      expect(canvasBody.textContent).toContain('404 NOT FOUND');
+      expect(canvasBody.textContent).toContain('/terms');
+    });
+
+    it('4. Un-audited State & Governance: shows neutral empty states and zero occurrences of banned term "AI-first"', async () => {
+      const { renderStageFromState } = await import('../visualize.js');
+      const fs = await import('fs');
+      const path = await import('path');
+      const htmlPath = path.resolve(__dirname, '../visualize.html');
+      document.body.innerHTML = fs.readFileSync(htmlPath, 'utf8');
+
+      const unAuditedState = {
+        isAudited: false,
+        completedSteps: [],
+        currentStep: 1,
+        targetUrl: '--',
+        healthIndex: 0,
+        statusLabel: 'UNAUDITED'
+      };
+
+      [1, 2, 3, 4, 5, 6].forEach(step => {
+        renderStageFromState(step, unAuditedState);
+        const canvasBody = document.getElementById('canvas-body');
+        expect(canvasBody.textContent).toContain('Awaiting Audit');
+        expect(canvasBody.textContent).toContain('UNAUDITED');
+      });
+
+      const jsContent = fs.readFileSync(path.resolve(__dirname, '../visualize.js'), 'utf8');
+      const htmlContent = fs.readFileSync(path.resolve(__dirname, '../visualize.html'), 'utf8');
+      expect(jsContent).not.toMatch(/AI-first/i);
+      expect(htmlContent).not.toMatch(/AI-first/i);
+    });
+  });
 });
 
 
