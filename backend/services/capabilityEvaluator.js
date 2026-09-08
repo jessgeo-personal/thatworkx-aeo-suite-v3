@@ -1290,10 +1290,7 @@ function evaluateCapabilities(crawledData = {}) {
   const hasContactInfo = Boolean(crawledData.eeatMetrics?.hasContactInfo || sec3.hasContactInfo || hasContactPage || emailValue !== 'None Detected' || phoneValue !== 'None Detected');
   const hasPrivacyPolicy = Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy || sec3.hasPrivacyPolicy || hasPrivacyPage);
 
-  const results = crawledData;
-  const ageEstimate = results.eeatMetrics?.ageEstimate || sec3.ageEstimate || results.domainAge || "Pending WHOIS Integration";
-
-  let authorityStatus = results.eeatMetrics?.authorityStatus || results.authorityStatus || "Requires Ahrefs/Moz API";
+  let authorityStatus = crawledData.eeatMetrics?.authorityStatus || crawledData.authorityStatus || "Free Third-Party Check Available";
 
   let diagnosticSummary = crawledData.eeatMetrics?.diagnosticSummary;
   if (!diagnosticSummary) {
@@ -1301,13 +1298,18 @@ function evaluateCapabilities(crawledData = {}) {
       diagnosticSummary = 'Domain exhibits strong E-E-A-T trust signals with valid SSL security, verified contact information, active privacy policy, and established domain age authority.';
     } else if (authorityStatus === 'Information Isolation') {
       diagnosticSummary = 'Domain shows partial E-E-A-T trust credentials. Essential contact or privacy policies are partially isolated from search AI crawlers.';
-    } else if (authorityStatus === 'Requires Ahrefs/Moz API') {
-      diagnosticSummary = 'Domain authority status evaluation is pending Ahrefs/Moz API integration.';
+    } else if (authorityStatus === 'Free Third-Party Check Available') {
+      diagnosticSummary = 'Domain authority status evaluation is available via free third-party checks.';
     } else {
       diagnosticSummary = 'Domain presents E-E-A-T abstention risk. Security protocols or total AI disallow rules prevent LLMs from trusting entity authority.';
     }
   }
 
+
+  const ageEstimate = crawledData.domainAge || 
+    crawledData.eeatMetrics?.domainAge || 
+    crawledData.eeatMetrics?.ageEstimate || 
+    (crawledData.registrationDate ? 'Verified Domain Age' : '--');
 
   const eeatMetrics = {
     isSecure,
@@ -1511,6 +1513,37 @@ function evaluateCapabilities(crawledData = {}) {
     severityBadge: authorSeverityBadge
   };
 
+  // Card 3: Authority & Domain Age Details Calculation
+  let targetDomain = '';
+  try {
+    const rawUrl = crawledData.url || crawledData.targetUrl || '';
+    if (rawUrl) {
+      targetDomain = new URL(rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`).hostname.replace(/^www\./i, '');
+    }
+  } catch (_) {
+    targetDomain = '';
+  }
+
+  const domainAge = crawledData.domainAge || 
+                    crawledData.eeatMetrics?.domainAge || 
+                    crawledData.eeatMetrics?.ageEstimate || 
+                    (crawledData.registrationDate ? 'Verified Domain Age' : '--');
+
+  const registrationDate = crawledData.registrationDate || crawledData.eeatMetrics?.registrationDate || null;
+  const isAgeVerified = Boolean(registrationDate || (domainAge && domainAge !== '--' && !domainAge.includes('Unresolved') && !domainAge.includes('Pending')));
+
+  const externalCheckerUrl = targetDomain
+    ? `https://ahrefs.com/website-authority-checker/?input=${encodeURIComponent(targetDomain)}`
+    : null;
+
+  const authorityDetails = {
+    domainAge: isAgeVerified ? domainAge : (domainAge.includes('Pending') ? domainAge : '--'),
+    registrationDate,
+    externalCheckerUrl,
+    authorityStatus: "Free Third-Party Check Available",
+    status: isAgeVerified ? 'PASS' : 'PENDING'
+  };
+
   const stage4ScoreNum = Math.round((p3Score / 25) * 100);
   const stage4Score = `${stage4ScoreNum}%`;
   const stage4Status = stage4ScoreNum >= 80 ? 'PASS' : (stage4ScoreNum >= 50 ? 'WARN' : 'FAIL');
@@ -1523,7 +1556,8 @@ function evaluateCapabilities(crawledData = {}) {
     summaryText: stage4Summary,
     classification: 'AI-Optimized',
     schemaDetails,
-    authorDetails
+    authorDetails,
+    authorityDetails
   };
 
   const manifestChecks = {

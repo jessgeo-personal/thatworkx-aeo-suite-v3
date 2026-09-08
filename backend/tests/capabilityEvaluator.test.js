@@ -117,7 +117,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Free Third-Party Check Available', 'Verified Domain Profile', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
   });
 
@@ -144,7 +144,7 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Free Third-Party Check Available', 'Verified Domain Profile', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
 
     expect(res).toHaveProperty('emailValue');
@@ -625,6 +625,59 @@ describe('Card 2 Author Person E-E-A-T Contract (BDD-TDD Red Phase)', () => {
     expect(authorDetails.severityBadge).toBe('CRITICAL: 0 AUTHORS DETECTED');
   });
 });
+
+describe('Card 3 Domain Age & External Authority Contract (BDD-TDD Red Phase)', () => {
+  it('1. Card 3 Authority Details Contract & Verified Domain: resolves domainAge, registrationDate, externalCheckerUrl, and PASS status when domain age is verified', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      domainAge: '3 Years, 2 Months',
+      registrationDate: '2023-07-01T00:00:00Z',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.domainAge).toContain('3 Years, 2 Months');
+    expect(authorityDetails.registrationDate).toBe('2023-07-01T00:00:00Z');
+    expect(authorityDetails.externalCheckerUrl).toBe('https://ahrefs.com/website-authority-checker/?input=example.com');
+    expect(authorityDetails.status).toBe('PASS');
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+
+  it('2. Zero-Paid-API Enforcement & Pending Resolution: handles unverified domain age without referencing paid APIs', () => {
+    const crawledData = {
+      url: 'https://thatworkx.com',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.status).toBe('PENDING');
+    expect(authorityDetails.externalCheckerUrl).toBe('https://ahrefs.com/website-authority-checker/?input=thatworkx.com');
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+
+  it('3. Empty / Un-scanned State: safely resolves when crawledData is empty or un-audited', () => {
+    const res = evaluateCapabilities({});
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.status).toBe('PENDING');
+    expect(authorityDetails.domainAge).toBe('--');
+    expect(authorityDetails.registrationDate).toBeNull();
+    expect(authorityDetails.externalCheckerUrl).toBeNull();
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+});
+
 
 
 

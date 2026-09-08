@@ -4,6 +4,13 @@ const url = require('url');
 const { parseHtmlMetrics } = require('./parserService');
 const { evaluateCapabilities } = require('./capabilityEvaluator');
 
+let whois;
+try {
+  whois = require('whois-json');
+} catch (_) {
+  whois = null;
+}
+
 const AI_CRAWLERS = [
   { key: 'gptBot', name: 'GPTBot', pattern: /User-agent:\s*GPTBot\s*Disallow:\s*\//i },
   { key: 'chatGptUser', name: 'ChatGPT-User', pattern: /User-agent:\s*ChatGPT-User\s*Disallow:\s*\//i },
@@ -53,6 +60,93 @@ const fetchPageWithTimeout = async (pageUrl) => {
       error: isTimeout ? 'heavy_page_timeout' : error.message
     };
   }
+};
+
+function formatDomainAgeResult(createdDate) {
+  if (!createdDate || isNaN(createdDate.getTime())) {
+    return {
+      registrationDate: null,
+      domainAge: 'Lookup Pending / Unresolved',
+      ageEstimate: 'Lookup Pending / Unresolved'
+    };
+  }
+  const now = new Date();
+  const diffYears = (now - createdDate) / (1000 * 60 * 60 * 24 * 365.25);
+  const ageYears = Math.floor(diffYears);
+  const ageMonths = Math.floor((diffYears - ageYears) * 12);
+
+  let ageString = `${ageYears} Year${ageYears === 1 ? '' : 's'}`;
+  if (ageMonths > 0) ageString += `, ${ageMonths} Month${ageMonths === 1 ? '' : 's'}`;
+
+  const isoDate = createdDate.toISOString().split('T')[0];
+  return {
+    registrationDate: isoDate,
+    domainAge: ageString,
+    ageEstimate: ageString
+  };
+}
+
+const fetchDomainAge = async (targetUrl) => {
+  let hostname = '';
+  try {
+    const parsed = new url.URL(targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`);
+    hostname = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+  } catch (_) {
+    return {
+      registrationDate: null,
+      domainAge: 'Lookup Pending / Unresolved',
+      ageEstimate: 'Lookup Pending / Unresolved'
+    };
+  }
+
+  // 1. Primary Strategy: Fast RDAP HTTP Query
+  try {
+    const rdapRes = await axios.get(`https://rdap.org/domain/${hostname}`, { timeout: 2500 });
+    const events = rdapRes.data?.events || [];
+    const regEvent = events.find(e => e.eventAction === 'registration');
+    if (regEvent && regEvent.eventDate) {
+      const regDate = new Date(regEvent.eventDate);
+      const res = formatDomainAgeResult(regDate);
+      if (res.registrationDate) return res;
+    }
+  } catch (_) {
+    // Proceed to WHOIS fallback
+  }
+
+  // 2. Fallback Strategy: whois-json (from siteLevelEEAT.js pattern)
+  let whoisClient = whois;
+  if (!whoisClient) {
+    try {
+      whoisClient = require('whois-json');
+    } catch (_) {
+      whoisClient = null;
+    }
+  }
+
+  if (whoisClient) {
+    try {
+      const fn = typeof whoisClient === 'function' ? whoisClient : (whoisClient.default || whoisClient);
+      const whoisData = await Promise.race([
+        fn(hostname),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 4000))
+      ]);
+
+      const rawDate = whoisData?.creationDate || whoisData?.created || whoisData?.registered;
+      if (rawDate) {
+        const createdDate = new Date(rawDate);
+        const res = formatDomainAgeResult(createdDate);
+        if (res.registrationDate) return res;
+      }
+    } catch (_) {
+      // Lookup unresolved
+    }
+  }
+
+  return {
+    registrationDate: null,
+    domainAge: 'Lookup Pending / Unresolved',
+    ageEstimate: 'Lookup Pending / Unresolved'
+  };
 };
 
 const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) => {
@@ -815,6 +909,18 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       lastScanned: new Date().toISOString()
     };
 
+    // Fetch verified domain age via RDAP
+    const domainAgeInfo = await fetchDomainAge(targetUrl);
+    result.registrationDate = domainAgeInfo.registrationDate;
+    result.domainAge = domainAgeInfo.domainAge;
+    result.ageEstimate = domainAgeInfo.ageEstimate;
+    result.eeatMetrics = {
+      ...(result.eeatMetrics || {}),
+      registrationDate: domainAgeInfo.registrationDate,
+      domainAge: domainAgeInfo.domainAge,
+      ageEstimate: domainAgeInfo.ageEstimate
+    };
+
     // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores via capabilityEvaluator
     const evaluation = evaluateCapabilities(result);
     const totalOverallScore = evaluation.overallScore;
@@ -827,7 +933,13 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     result.scrapedContentPreview = evaluation.scrapedContentPreview;
     result.manifestPreviews = evaluation.manifestPreviews;
     result.discoveredRoutes = evaluation.discoveredRoutes;
-    result.eeatMetrics = evaluation.eeatMetrics;
+    result.eeatMetrics = {
+      ...(result.eeatMetrics || {}),
+      ...(evaluation.eeatMetrics || {}),
+      registrationDate: domainAgeInfo.registrationDate,
+      domainAge: domainAgeInfo.domainAge,
+      ageEstimate: domainAgeInfo.ageEstimate
+    };
 
     result.scoreCard = {
       overallScore: totalOverallScore,
@@ -847,4 +959,12 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
   return result;
 };
 
-module.exports = { analyzeUrl, parsePageHtml, fetchPageWithTimeout, AI_CRAWLERS };
+module.exports = {
+  analyzeUrl,
+  parsePageHtml,
+  fetchPageWithTimeout,
+  fetchDomainAge,
+  formatDomainAgeResult,
+  AI_CRAWLERS
+};
+

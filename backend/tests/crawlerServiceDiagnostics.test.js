@@ -1,4 +1,26 @@
-const { parsePageHtml } = require('../services/crawlerService');
+const { mockWhois } = vi.hoisted(() => {
+  const mock = vi.fn().mockResolvedValue({
+    creationDate: '2020-05-15T00:00:00Z',
+    domainName: 'thatworkx.com'
+  });
+  return { mockWhois: mock };
+});
+
+vi.mock('whois-json', () => ({
+  default: mockWhois
+}));
+
+try {
+  const whoisPath = require.resolve('whois-json');
+  require.cache[whoisPath] = {
+    id: whoisPath,
+    filename: whoisPath,
+    loaded: true,
+    exports: mockWhois
+  };
+} catch (_) {}
+
+const { parsePageHtml, analyzeUrl, fetchDomainAge } = require('../services/crawlerService');
 
 describe('backend/services/crawlerService - parsePageHtml Contract Audit', () => {
   const sampleHtml = `
@@ -101,5 +123,33 @@ describe('backend/services/crawlerService - parsePageHtml Contract Audit', () =>
     const noDateHtml = `<html><body><h1>No Date Page</h1></body></html>`;
     const headerPage = parsePageHtml(noDateHtml, 'https://example.com', '/', { 'last-modified': 'Wed, 21 Oct 2026 07:28:00 GMT' });
     expect(headerPage.lastUpdated).toBe('Wed, 21 Oct 2026 07:28:00 GMT');
+  });
+});
+
+describe('backend/services/crawlerService - Domain Age Resolution', () => {
+  it('Crawler Domain Age - falls back to whois-json when RDAP fails', async () => {
+    const axios = require('axios');
+    vi.spyOn(axios, 'get').mockImplementation(async (reqUrl) => {
+      if (typeof reqUrl === 'string' && reqUrl.includes('rdap.org')) {
+        const err = new Error('RDAP 404 Not Found');
+        err.response = { status: 404, data: 'Not found' };
+        throw err;
+      }
+      if (typeof reqUrl === 'string' && reqUrl.includes('robots.txt')) {
+        return { status: 200, data: 'User-agent: *\nAllow: /' };
+      }
+      return {
+        status: 200,
+        data: '<!DOCTYPE html><html><head><title>Thatworkx Solutions</title></head><body><h1>AI-Readiness Tools</h1><p>Body content description.</p></body></html>',
+        headers: {}
+      };
+    });
+
+    const result = await analyzeUrl('https://thatworkx.com', { tier: 'free', maxPages: 1 });
+
+    expect(result.eeatMetrics).toBeDefined();
+    expect(result.eeatMetrics.registrationDate).toBe('2020-05-15');
+    expect(result.eeatMetrics.domainAge).toContain('Years');
+    expect(result.eeatMetrics.ageEstimate).toBe(result.eeatMetrics.domainAge);
   });
 });

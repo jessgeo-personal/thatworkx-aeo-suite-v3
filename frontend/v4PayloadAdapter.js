@@ -60,6 +60,13 @@ const DEFAULT_STAGES = {
       authorCount: 0,
       status: 'CRITICAL',
       severityBadge: 'CRITICAL: 0 AUTHORS DETECTED'
+    },
+    authorityDetails: {
+      domainAge: '--',
+      registrationDate: null,
+      externalCheckerUrl: null,
+      authorityStatus: 'Free Third-Party Check Available',
+      status: 'PENDING'
     }
   },
   stage5: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Ready', governanceGate: 'AI-Ready' },
@@ -618,7 +625,7 @@ export function mapBackendScanToV4State(rawPayload) {
     stage1: { crawlers, score: stages.stage1.score, status: stages.stage1.status, summaryText: stages.stage1.summaryText, ...stages.stage1 },
     stage2: { routes, missingCount, discoveredCount, score: stages.stage2.score, status: stages.stage2.status, summaryText: stages.stage2.summaryText, ...stages.stage2 },
     stage3: { pages, score: stages.stage3.score, status: stages.stage3.status, summaryText: stages.stage3.summaryText, ...stages.stage3 },
-    stage4: { detectedTypes, hasAuthorBio, emailValue, phoneValue, authorityStatus, ageEstimate, contactDetails, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, schemaDetails: stages.stage4.schemaDetails || DEFAULT_STAGES.stage4.schemaDetails, authorDetails: stages.stage4.authorDetails || DEFAULT_STAGES.stage4.authorDetails, ...stages.stage4 },
+    stage4: { detectedTypes, hasAuthorBio, emailValue, phoneValue, authorityStatus, ageEstimate, contactDetails, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, schemaDetails: stages.stage4.schemaDetails || DEFAULT_STAGES.stage4.schemaDetails, authorDetails: stages.stage4.authorDetails || DEFAULT_STAGES.stage4.authorDetails, authorityDetails: stages.stage4.authorityDetails || DEFAULT_STAGES.stage4.authorityDetails, ...stages.stage4 },
     stage5: { governanceGate: 'AI-Ready', manifests, level1Status, level2Status, level3Status, level4Status, score: stages.stage5.score, status: stages.stage5.status, summaryText: stages.stage5.summaryText, ...stages.stage5 },
     stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags, score: stages.stage6.score, status: stages.stage6.status, summaryText: stages.stage6.summaryText, ...stages.stage6 }
   };

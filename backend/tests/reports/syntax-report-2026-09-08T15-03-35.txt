@@ -1,0 +1,36 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-09-08T15:03:35.715Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 102  Malformed entity: bare '&' at col 46 — use &amp; in HTML contexts
+  [ERR   2]  Line 105  Malformed entity: bare '&' at col 29 — use &amp; in HTML contexts
+  [ERR   3]  Line 117  Malformed entity: bare '&' at col 67 — use &amp; in HTML contexts
+  [ERR   4]  Line 133  Malformed entity: bare '&' at col 71 — use &amp; in HTML contexts
+  [ERR   5]  Line 193  Malformed entity: bare '&' at col 32 — use &amp; in HTML contexts
+  [ERR   6]  Line 375  Hierarchy violation: <div> (line 375) not closed before </body> (line 449)
+  [ERR   7]  Line 376  Hierarchy violation: <div> (line 376) not closed before </body> (line 449)
+  [ERR   8]  Line 409  Malformed entity: bare '&' at col 59 — use &amp; in HTML contexts
+  [ERR   9]  Line 409  Malformed entity: bare '&' at col 60 — use &amp; in HTML contexts
+  [ERR  10]  Line 422  Malformed entity: bare '&' at col 61 — use &amp; in HTML contexts
+  [ERR  11]  Line 422  Malformed entity: bare '&' at col 62 — use &amp; in HTML contexts
+  11 error(s).
+
+FILE: frontend\optimize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\socialize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\index.js
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: 11 error(s) - review above.

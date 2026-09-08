@@ -1852,12 +1852,18 @@ export function renderStage4Canvas(container, state = cockpitState) {
   const authorStatus = authorPass ? 'VERIFIED SAMEAS' : 'AUTHOR GAPS';
 
   // 3. Card 3 (Authority) Details & Indicator
-  const authorityStatus = s4.authorityStatus || 'Optimized Anchor';
-  const ageEstimate = s4.ageEstimate || 'Domain Established';
-  const isAuthorityWarning = authorityStatus === 'Requires Ahrefs/Moz API' || authorityStatus === 'Abstention Risk' || authorityStatus === 'Information Isolation';
-  const authorityPillText = isAuthorityWarning ? 'WARNING' : 'PENDING';
-  const authorityPillClass = isAuthorityWarning
-    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+  const authorityDetails = s4.authorityDetails || stg4.authorityDetails || {
+    domainAge: s4.ageEstimate || s4.domainAge || '--',
+    registrationDate: s4.registrationDate || null,
+    externalCheckerUrl: null,
+    authorityStatus: 'Free Third-Party Check Available',
+    status: (s4.domainAge && s4.domainAge !== '--' && !s4.domainAge.includes('Pending')) ? 'PASS' : 'PENDING'
+  };
+
+  const isAuthorityPass = authorityDetails.status === 'PASS';
+  const authorityPillText = isAuthorityPass ? 'CONFIRMED' : 'PENDING';
+  const authorityPillClass = isAuthorityPass
+    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
     : 'bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40';
 
   // 4. Card 4 (Privacy & Contact) Details & Indicator
@@ -1876,8 +1882,8 @@ export function renderStage4Canvas(container, state = cockpitState) {
     { title: "Reinforce Privacy Anchors", detail: "Link canonical privacy policy and data governance terms in structured data." }
   ];
   const shortcutPlan = sec.shortcutPlan || 'AIOptimize Pro automatically synthesizes interconnected JSON-LD Knowledge Graphs with Wikidata sameAs entity anchors across your entire site.';
-  const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Authority Grounding: ${authorityStatus}.`;
-  const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${detectedTypesString || 'None'}\nAuthor Bio: ${authorPass ? 'Verified' : 'Gaps detected'}\nAuthority Status: ${authorityStatus}\nContact Email: ${contactEmail}\nContact Phone: ${contactPhone}`;
+  const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Authority Grounding: ${authorityDetails.domainAge}.`;
+  const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${detectedTypesString || 'None'}\nAuthor Bio: ${authorPass ? 'Verified' : 'Gaps detected'}\nDomain Age: ${authorityDetails.domainAge}\nContact Email: ${contactEmail}\nContact Phone: ${contactPhone}`;
 
   const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
 
@@ -1973,7 +1979,7 @@ export function renderStage4Canvas(container, state = cockpitState) {
             </button>
           </div>
 
-          <!-- Card 3: Wikidata Grounding / Authority -->
+          <!-- Card 3: Domain Age & External Authority -->
           <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/50 transition space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${authorityPillClass}">
@@ -1982,11 +1988,17 @@ export function renderStage4Canvas(container, state = cockpitState) {
               <span class="text-base">🌐</span>
             </div>
             <div>
-              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Authority &amp; Grounding</h5>
-              <code class="text-[11px] font-mono text-[#38bdf8] block truncate mt-1">${authorityStatus}</code>
-              <code class="text-[11px] font-mono text-[#bdc1c6] block truncate mt-0.5">${ageEstimate}</code>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Domain Age &amp; External Authority</h5>
+              <div class="text-sm font-mono font-bold text-white mt-1">Age: ${authorityDetails.domainAge}</div>
+              ${authorityDetails.registrationDate ? `<div class="text-xs text-[#bdc1c6] mt-0.5">Registered: ${authorityDetails.registrationDate}</div>` : ''}
+              <p class="text-xs text-[#bdc1c6] leading-relaxed mt-1">Verify third-party Domain Rating (DR) and backlink profile with zero paid API overhead.</p>
+              ${authorityDetails.externalCheckerUrl ? `
+                <a href="${authorityDetails.externalCheckerUrl}" target="_blank" rel="noopener noreferrer" class="mt-2.5 inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#38bdf8]/40 hover:border-[#38bdf8] text-[#38bdf8] hover:text-white text-xs font-bold font-mono transition shadow-sm active:scale-95">
+                  <span>⚡ Check Domain Rating on Ahrefs (Free)</span>
+                  <span class="text-[10px]">↗</span>
+                </a>
+              ` : ''}
             </div>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Knowledge graph entity consensus across open web repositories.</p>
           </div>
 
           <!-- Card 4: Privacy & Contact / Legal Anchors -->
