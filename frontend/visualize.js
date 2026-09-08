@@ -1787,6 +1787,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
 export const renderStage3 = renderStage3Canvas;
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // STAGE 4: ENTITY AUTHORITY & E-E-A-T RELATIONAL GRAPH
 // -----------------------------------------------------------------------------
 export function renderStage4Canvas(container, state = cockpitState) {
@@ -1800,12 +1801,72 @@ export function renderStage4Canvas(container, state = cockpitState) {
   const baseTakeaway = sec.takeaway || s4.takeaway || stg4.summaryText || 'Entity Authority & E-E-A-T Relational Graph: Validated Schema.org structured data and author credentials establish strong knowledge graph trust.';
   const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
 
-  const schemaGraphStatus = (s4.detectedTypes && s4.detectedTypes.length > 0) ? '100% VALID GRAPH' : 'MISSING GRAPH';
-  const schemaPass = schemaGraphStatus === '100% VALID GRAPH';
-  const authorStatus = s4.hasAuthorBio ? 'VERIFIED SAMEAS' : 'AUTHOR GAPS';
-  const authorPass = Boolean(s4.hasAuthorBio);
-  const wikidataStatus = 'PARTIAL NODE (0.74)';
-  const privacyStatus = 'CONFIRMED';
+  // 1. Card 1 (Schema) Details & Indicator
+  const detectedTypes = Array.isArray(s4.detectedTypes) ? s4.detectedTypes : [];
+  const schemaDetails = s4.schemaDetails || stg4.schemaDetails || {
+    detectedTypes: detectedTypes,
+    totalPages: s4.totalPages || (detectedTypes.length > 0 ? 1 : 0),
+    pagesWithSchemaCount: s4.pagesWithSchemaCount || (detectedTypes.length > 0 ? 1 : 0),
+    pagesMissingSchemaCount: s4.pagesMissingSchemaCount || 0,
+    missingRoutes: s4.missingRoutes || [],
+    coveragePercent: s4.coveragePercent || (detectedTypes.length > 0 ? 100 : 0),
+    status: (detectedTypes.length > 0 ? 'PASS' : 'CRITICAL'),
+    severityBadge: (detectedTypes.length > 0 ? '100% COVERAGE (PASS)' : 'CRITICAL: 0% COVERAGE')
+  };
+
+  const schemaTypesList = (schemaDetails.detectedTypes && schemaDetails.detectedTypes.length > 0)
+    ? schemaDetails.detectedTypes
+    : detectedTypes;
+  const detectedTypesString = schemaTypesList.length > 0 ? schemaTypesList.join(', ') : '';
+  const schemaGraphStatus = schemaDetails.status === 'PASS' ? '100% VALID GRAPH' : (schemaDetails.status === 'WARN' ? 'PARTIAL GRAPH' : 'MISSING GRAPH');
+
+  const filteredMissingRoutes = (schemaDetails.missingRoutes || []).filter(r => {
+    if (!r || typeof r !== 'string') return false;
+    const clean = r.split('?')[0].split('#')[0].toLowerCase();
+    return !/\.(txt|md|xml|json|png|jpg|jpeg|gif|svg|pdf|css|js|woff|woff2)$/i.test(clean);
+  });
+
+  const schemaPillText = schemaDetails.status === 'PASS' ? 'CONFIRMED' : (schemaDetails.status === 'WARN' ? 'WARNING' : 'CRITICAL');
+  const schemaPillClass = schemaDetails.status === 'PASS'
+    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
+    : (schemaDetails.status === 'WARN'
+      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+      : 'bg-red-950 text-red-400 border border-red-500/40');
+  const schemaCardBorder = schemaDetails.status === 'PASS'
+    ? 'border-[#3c4043] hover:border-[#10b981]/50'
+    : (schemaDetails.status === 'WARN' ? 'border-amber-500/40 bg-amber-950/10' : 'border-red-500/40 bg-red-950/10');
+
+  // 2. Card 2 (Author) Details & Indicator
+  const authorDetails = s4.authorDetails || stg4.authorDetails || {
+    authors: [],
+    authorCount: 0,
+    status: 'CRITICAL',
+    severityBadge: 'CRITICAL: 0 AUTHORS DETECTED'
+  };
+
+  const authorCount = authorDetails.authorCount || (Array.isArray(authorDetails.authors) ? authorDetails.authors.length : 0);
+  const authorPass = Boolean(authorCount > 0 || s4.hasAuthorBio || s4.authorCredentialsVerified);
+  const authorPillText = authorPass ? 'CONFIRMED' : 'CRITICAL';
+  const authorPillClass = authorPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40';
+  const authorCardBorder = authorPass ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-red-500/40 bg-red-950/10';
+  const authorStatus = authorPass ? 'VERIFIED SAMEAS' : 'AUTHOR GAPS';
+
+  // 3. Card 3 (Authority) Details & Indicator
+  const authorityStatus = s4.authorityStatus || 'Optimized Anchor';
+  const ageEstimate = s4.ageEstimate || 'Domain Established';
+  const isAuthorityWarning = authorityStatus === 'Requires Ahrefs/Moz API' || authorityStatus === 'Abstention Risk' || authorityStatus === 'Information Isolation';
+  const authorityPillText = isAuthorityWarning ? 'WARNING' : 'PENDING';
+  const authorityPillClass = isAuthorityWarning
+    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+    : 'bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40';
+
+  // 4. Card 4 (Privacy & Contact) Details & Indicator
+  const contactEmail = s4.contactDetails?.email || s4.emailValue || '--';
+  const contactPhone = s4.contactDetails?.phone || s4.phoneValue || '--';
+  const hasContact = Boolean(s4.contactDetails?.isConfirmed || (contactEmail !== '--' && contactEmail !== '') || (contactPhone !== '--' && contactPhone !== ''));
+  const privacyPillText = hasContact ? 'CONFIRMED' : 'WARNING';
+  const privacyPillClass = hasContact ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-amber-950 text-amber-300 border border-amber-500/40';
+  const privacyStatus = hasContact ? 'CONFIRMED' : 'MISSING';
 
   const actionPlan = sec.actionPlan || 'Implement complete Schema.org Organization and Person schemas with sameAs knowledge graph links to establish verified entity authority.';
   const actionSteps = sec.actionSteps && sec.actionSteps.length > 0 ? sec.actionSteps : [
@@ -1815,8 +1876,8 @@ export function renderStage4Canvas(container, state = cockpitState) {
     { title: "Reinforce Privacy Anchors", detail: "Link canonical privacy policy and data governance terms in structured data." }
   ];
   const shortcutPlan = sec.shortcutPlan || 'AIOptimize Pro automatically synthesizes interconnected JSON-LD Knowledge Graphs with Wikidata sameAs entity anchors across your entire site.';
-  const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Wikidata Grounding: ${wikidataStatus}.`;
-  const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${(s4.detectedTypes || ['Organization']).join(', ')}\nAuthor Bio: ${s4.hasAuthorBio ? 'Verified' : 'Gaps detected'}\nWikidata Entity: Q115672 (Score: 0.74)\nPrivacy Anchor: /privacy-policy (HTTP 200)`;
+  const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Authority Grounding: ${authorityStatus}.`;
+  const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${detectedTypesString || 'None'}\nAuthor Bio: ${authorPass ? 'Verified' : 'Gaps detected'}\nAuthority Status: ${authorityStatus}\nContact Email: ${contactEmail}\nContact Phone: ${contactPhone}`;
 
   const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
 
@@ -1839,63 +1900,109 @@ export function renderStage4Canvas(container, state = cockpitState) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Card 1: Schema / Organization -->
-          <div class="p-5 rounded-2xl bg-[#121212] border ${schemaPass ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition space-y-3">
+          <div class="p-5 rounded-2xl bg-[#121212] border ${schemaCardBorder} transition space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ${schemaPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">
-                ${schemaGraphStatus}
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${schemaPillClass}">
+                ${schemaPillText}
               </span>
               <span class="text-base">🏢</span>
             </div>
             <div>
               <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Schema.org Entity Graph</h5>
-              <code class="text-[11px] font-mono text-[#38bdf8]">${(s4.detectedTypes && s4.detectedTypes.length) ? s4.detectedTypes.join(', ') : 'Organization / WebSite'}</code>
+              <div class="text-[11px] font-mono text-[#38bdf8] mt-1">
+                ${schemaDetails.status === 'PASS' 
+                  ? `${schemaDetails.pagesWithSchemaCount}/${schemaDetails.totalPages} HTML Pages with Schema` 
+                  : (schemaDetails.status === 'WARN' 
+                    ? `${schemaDetails.pagesWithSchemaCount}/${schemaDetails.totalPages} HTML Pages with Schema` 
+                    : '0% Coverage — 0 HTML Pages with Schema')}
+              </div>
+              <div class="flex flex-wrap gap-1.5 pt-2">
+                ${schemaTypesList.length > 0
+                  ? schemaTypesList.map(type => `<span class="px-2 py-0.5 rounded bg-[#1f1f1f] text-[#38bdf8] font-mono text-xs border border-[#3c4043]">${type}</span>`).join('')
+                  : '<span class="text-red-400 text-xs font-mono">None Detected</span>'}
+              </div>
+              ${schemaDetails.pagesMissingSchemaCount > 0 ? `
+                <p class="text-xs font-mono text-[#f59e0b] mt-2">⚠️ Missing Schema on ${schemaDetails.pagesMissingSchemaCount} of ${schemaDetails.totalPages} HTML pages.</p>
+              ` : ''}
             </div>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">JSON-LD structured organization nodes for AI entity extraction.</p>
+            ${schemaDetails.status === 'CRITICAL' ? `
+              <p class="text-xs text-red-400 leading-relaxed font-mono">No JSON-LD schema detected across any crawled page.</p>
+            ` : (schemaDetails.status === 'WARN' && filteredMissingRoutes.length > 0 ? `
+              <details class="mt-2 text-xs"><summary class="cursor-pointer text-[#38bdf8]">▾ Missing Schema on ${filteredMissingRoutes.length} routes</summary><p class="text-[#bdc1c6] mt-1 font-mono">${filteredMissingRoutes.join(', ')}</p></details>
+            ` : `
+              <p class="text-xs text-[#bdc1c6] leading-relaxed">JSON-LD structured organization nodes for AI entity extraction.</p>
+            `)}
           </div>
 
           <!-- Card 2: Author Person E-E-A-T -->
-          <div class="p-5 rounded-2xl bg-[#121212] border ${authorPass ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition space-y-3">
+          <div class="p-5 rounded-2xl bg-[#121212] border ${authorCardBorder} transition space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ${authorPass ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-amber-950 text-amber-300 border border-amber-500/40'}">
-                ${authorStatus}
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${authorPillClass}">
+                ${authorPillText}
               </span>
               <span class="text-base">👤</span>
             </div>
             <div>
               <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Author Person E-E-A-T</h5>
-              <code class="text-[11px] font-mono text-[#38bdf8]">sameAs Credentials</code>
+              <div class="text-[11px] font-mono ${authorCount > 0 ? 'text-[#38bdf8]' : 'text-red-400'} mt-1">
+                ${authorCount > 0 ? `${authorCount} Author(s) Verified` : '0 Authors Detected'}
+              </div>
+              <div class="text-[11px] font-mono text-[#bdc1c6] mt-0.5">sameAs Credentials</div>
             </div>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Verified author identity, credentials, and institutional affiliation.</p>
+            ${authorCount > 0 ? `
+              <div class="space-y-2 pt-1 max-h-36 overflow-y-auto">
+                ${authorDetails.authors.map(a => `
+                  <div class="p-2 rounded-lg bg-[#181818] border border-[#3c4043] space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-white">${a.name}</span>
+                      ${a.jobTitle ? `<span class="text-[11px] text-[#bdc1c6] font-mono">${a.jobTitle}</span>` : ''}
+                    </div>
+                    ${Array.isArray(a.sameAs) && a.sameAs.length > 0 ? `
+                      <div class="flex flex-wrap gap-1">
+                        ${a.sameAs.map(link => `<a href="${link}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-[#38bdf8] hover:underline bg-[#121212] px-1.5 py-0.5 rounded border border-[#3c4043] truncate max-w-[200px]">🔗 ${link.replace(/^https?:\/\/(www\.)?/, '')}</a>`).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <p class="text-xs text-red-400 font-mono leading-relaxed">0 Author / Person E-E-A-T credentials discovered.</p>
+            `}
+            <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.openAuthorModal ? window.AEO_COCKPIT.openAuthorModal() : null" class="mt-2 text-xs font-mono text-[#38bdf8] hover:underline flex items-center space-x-1">
+              <span>ℹ️ Author E-E-A-T Guide</span>
+            </button>
           </div>
 
-          <!-- Card 3: Wikidata Grounding -->
+          <!-- Card 3: Wikidata Grounding / Authority -->
           <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/50 transition space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40">
-                ${wikidataStatus}
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${authorityPillClass}">
+                ${authorityPillText}
               </span>
               <span class="text-base">🌐</span>
             </div>
             <div>
-              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Wikidata Grounding</h5>
-              <code class="text-[11px] font-mono text-[#38bdf8]">PARTIAL NODE (0.74)</code>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Authority &amp; Grounding</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8] block truncate mt-1">${authorityStatus}</code>
+              <code class="text-[11px] font-mono text-[#bdc1c6] block truncate mt-0.5">${ageEstimate}</code>
             </div>
             <p class="text-xs text-[#bdc1c6] leading-relaxed">Knowledge graph entity consensus across open web repositories.</p>
           </div>
 
-          <!-- Card 4: Privacy & Legal Anchors -->
-          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#10b981]/50 transition space-y-3">
+          <!-- Card 4: Privacy & Contact / Legal Anchors -->
+          <div class="p-5 rounded-2xl bg-[#121212] border ${hasContact ? 'border-[#3c4043] hover:border-[#10b981]/50' : 'border-amber-500/40 bg-amber-950/10'} transition space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">
-                ${privacyStatus}
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded ${privacyPillClass}">
+                ${privacyPillText}
               </span>
               <span class="text-base">⚖️</span>
             </div>
             <div>
-              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Privacy &amp; Legal Anchors</h5>
-              <code class="text-[11px] font-mono text-[#38bdf8]">CONFIRMED</code>
+              <h5 class="text-xs sm:text-sm font-bold text-white font-headline">Privacy &amp; Contact Anchors</h5>
+              <code class="text-[11px] font-mono text-[#38bdf8] block truncate mt-1">${contactEmail !== '--' ? contactEmail : 'No Email Found'}</code>
+              ${contactPhone !== '--' ? `<code class="text-[11px] font-mono text-[#bdc1c6] block truncate mt-0.5">${contactPhone}</code>` : ''}
             </div>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Trust signals verified for AI model compliance and commercial parity.</p>
+            <p class="text-xs text-[#bdc1c6] leading-relaxed">${hasContact ? 'Direct contact details and privacy signals verified for AI model compliance.' : 'Missing verified corporate contact or privacy policy signals.'}</p>
           </div>
         </div>
       </div>
@@ -1923,6 +2030,41 @@ export function renderStage5Canvas(container, state = cockpitState) {
   const baseTakeaway = sec.takeaway || s5.takeaway || stg5.summaryText || 'Machine Manifest Protocol Explorer: 4-Level machine manifest hierarchy provides structured entry points for LLM web search and autonomous agents.';
   const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
 
+  const manifests = Array.isArray(s5.manifests) ? s5.manifests : [];
+  const mRobots = manifests.find(m => m.path === '/robots.txt') || { path: '/robots.txt', name: 'robots.txt', exists: false, status: 404 };
+  const mSitemap = manifests.find(m => m.path === '/sitemap.xml') || { path: '/sitemap.xml', name: 'sitemap.xml', exists: false, status: 404 };
+  const mLlms = manifests.find(m => m.path === '/llms.txt') || { path: '/llms.txt', name: 'llms.txt', exists: false, status: 404 };
+  const mAiContext = manifests.find(m => m.path === '/ai-context.md') || { path: '/ai-context.md', name: 'ai-context.md', exists: false, status: 404 };
+  const mReadme = manifests.find(m => m.path === '/README.md') || { path: '/README.md', name: 'README.md', exists: false, status: 404 };
+  const mAbout = manifests.find(m => m.path === '/about.md') || { path: '/about.md', name: 'about.md', exists: false, status: 404 };
+  const mDocs = manifests.find(m => m.path === '/docs.md') || { path: '/docs.md', name: 'docs.md', exists: false, status: 404 };
+  const mContent = manifests.find(m => m.path === '/content.md') || { path: '/content.md', name: 'content.md', exists: false, status: 404 };
+
+  const level1Status = s5.level1Status || (mRobots.exists ? 'AVAILABLE' : 'MISSING');
+  const level2Status = s5.level2Status || ((mSitemap.exists && mLlms.exists) ? 'AVAILABLE' : ((mSitemap.exists || mLlms.exists) ? 'PARTIAL' : 'MISSING'));
+  const level3Status = s5.level3Status || (mAiContext.exists ? 'AVAILABLE' : 'MISSING');
+
+  const l4Items = [mReadme, mAbout, mDocs, mContent];
+  const l4Count = l4Items.filter(m => m.exists).length;
+  const level4Status = s5.level4Status || (l4Count === 4 ? 'AVAILABLE' : (l4Count > 0 ? 'PARTIAL' : 'MISSING'));
+
+  const getLevelBadgeClass = (lvlStatus) => {
+    if (lvlStatus === 'AVAILABLE') return 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40';
+    if (lvlStatus === 'PARTIAL') return 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40';
+    return 'bg-red-950/40 text-red-400 border border-red-500/40';
+  };
+
+  const getEndpointBadgeHtml = (exists, level = 2) => {
+    if (level === 1) {
+      return exists
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">200 OK • AVAILABLE</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-950/40 text-red-400 border border-red-500/40">404 • MISSING</span>`;
+    }
+    return exists
+      ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">AVAILABLE</span>`
+      : `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-950/40 text-red-400 border border-red-500/40">MISSING</span>`;
+  };
+
   const actionPlan = sec.actionPlan || 'Deploy standard machine manifests (/llms.txt and /ai-context.md) to provide clean structured context for AI bots without HTML noise.';
   const actionSteps = sec.actionSteps && sec.actionSteps.length > 0 ? sec.actionSteps : [
     { title: "Deploy /llms.txt Welcome Mat", detail: "Provide a concise markdown index linking essential core docs for LLMs." },
@@ -1932,7 +2074,7 @@ export function renderStage5Canvas(container, state = cockpitState) {
   ];
   const shortcutPlan = sec.shortcutPlan || 'AIOptimize Pro generates and hosts all 4 levels of the machine manifest hierarchy automatically at the cloud edge.';
   const evidencePlain = sec.evidencePlain || 'Inspected 4-Level machine manifest hierarchy endpoints. Level 1 robots.txt active, Level 2 /llms.txt active, Level 3 /ai-context.md under configuration.';
-  const evidenceTrace = sec.evidenceTrace || 'GET /robots.txt -> 200 OK\nGET /sitemap.xml -> 200 OK\nGET /llms.txt -> 200 OK\nGET /ai-context.md -> 404 Not Found (Action Required)';
+  const evidenceTrace = sec.evidenceTrace || `GET /robots.txt -> ${mRobots.exists ? '200 OK' : '404 Not Found'}\nGET /sitemap.xml -> ${mSitemap.exists ? '200 OK' : '404 Not Found'}\nGET /llms.txt -> ${mLlms.exists ? '200 OK' : '404 Not Found'}\nGET /ai-context.md -> ${mAiContext.exists ? '200 OK' : '404 Not Found'}\nGET /README.md -> ${mReadme.exists ? '200 OK' : '404 Not Found'}\nGET /about.md -> ${mAbout.exists ? '200 OK' : '404 Not Found'}\nGET /docs.md -> ${mDocs.exists ? '200 OK' : '404 Not Found'}\nGET /content.md -> ${mContent.exists ? '200 OK' : '404 Not Found'}`;
 
   const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
 
@@ -1955,43 +2097,91 @@ export function renderStage5Canvas(container, state = cockpitState) {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- LEVEL 1: PROTOCOL GATES -->
-          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+          <div class="level-card p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3.5 transition hover:border-[#38bdf8]/40 shadow-md" data-level-card="1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 uppercase">LEVEL 1: PROTOCOL GATES</span>
-              <span class="text-xs font-mono text-[#bdc1c6]">/robots.txt</span>
+              <span class="text-[10px] font-mono font-black px-2.5 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6] uppercase tracking-wider">LEVEL 1: PROTOCOL GATES</span>
+              <span class="level-header-badge text-[10px] font-mono font-black px-2.5 py-0.5 rounded ${getLevelBadgeClass(level1Status)}" data-level-badge>${level1Status}</span>
             </div>
-            <h5 class="text-sm font-bold text-white font-headline">Crawler Gateway &amp; Firewall Rules</h5>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Directs bot access permissions, crawl delays, and public indexability across 20+ AI crawlers.</p>
+            <div>
+              <h5 class="text-sm font-bold text-white font-headline">Crawler Gateway &amp; Firewall Rules</h5>
+              <p class="text-xs text-[#bdc1c6] mt-1 leading-relaxed">Directs bot access permissions, crawl delays, and public indexability across 20+ AI crawlers.</p>
+            </div>
+            <div class="pt-2 border-t border-[#3c4043]/60 space-y-2">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-xs font-bold text-[#38bdf8]">/robots.txt</span>
+                ${getEndpointBadgeHtml(mRobots.exists, 1)}
+              </div>
+            </div>
           </div>
 
           <!-- LEVEL 2: THE WELCOME MAT -->
-          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+          <div class="level-card p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3.5 transition hover:border-[#38bdf8]/40 shadow-md" data-level-card="2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 uppercase">LEVEL 2: THE WELCOME MAT</span>
-              <span class="text-xs font-mono text-[#bdc1c6]">/sitemap.xml • /llms.txt</span>
+              <span class="text-[10px] font-mono font-black px-2.5 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6] uppercase tracking-wider">LEVEL 2: THE WELCOME MAT</span>
+              <span class="level-header-badge text-[10px] font-mono font-black px-2.5 py-0.5 rounded ${getLevelBadgeClass(level2Status)}" data-level-badge>${level2Status}</span>
             </div>
-            <h5 class="text-sm font-bold text-white font-headline">Structured Navigation &amp; Summary Feeds</h5>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">The standard machine entry point providing curated links and plain markdown summaries.</p>
+            <div>
+              <h5 class="text-sm font-bold text-white font-headline">Structured Navigation &amp; Summary Feeds</h5>
+              <p class="text-xs text-[#bdc1c6] mt-1 leading-relaxed">The standard machine entry point providing curated links and plain markdown summaries.</p>
+            </div>
+            <div class="pt-2 border-t border-[#3c4043]/60 space-y-2">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-xs font-bold text-[#38bdf8]">/sitemap.xml</span>
+                ${getEndpointBadgeHtml(mSitemap.exists, 2)}
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-xs font-bold text-[#38bdf8]">/llms.txt</span>
+                ${getEndpointBadgeHtml(mLlms.exists, 2)}
+              </div>
+            </div>
           </div>
 
           <!-- LEVEL 3: CONTEXT MAPS & BLUEPRINT -->
-          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+          <div class="level-card p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3.5 transition hover:border-[#38bdf8]/40 shadow-md" data-level-card="3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40 uppercase">LEVEL 3: CONTEXT MAPS &amp; BLUEPRINT</span>
-              <span class="text-xs font-mono text-[#bdc1c6]">/ai-context.md</span>
+              <span class="text-[10px] font-mono font-black px-2.5 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6] uppercase tracking-wider">LEVEL 3: CONTEXT MAPS &amp; BLUEPRINT</span>
+              <span class="level-header-badge text-[10px] font-mono font-black px-2.5 py-0.5 rounded ${getLevelBadgeClass(level3Status)}" data-level-badge>${level3Status}</span>
             </div>
-            <h5 class="text-sm font-bold text-white font-headline">Comprehensive Knowledge Blueprint</h5>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Dense, high-extractability domain context feeding LLM reasoning engines with authoritative facts.</p>
+            <div>
+              <h5 class="text-sm font-bold text-white font-headline">Comprehensive Knowledge Blueprint</h5>
+              <p class="text-xs text-[#bdc1c6] mt-1 leading-relaxed">Dense, high-extractability domain context feeding LLM reasoning engines with authoritative facts.</p>
+            </div>
+            <div class="pt-2 border-t border-[#3c4043]/60 space-y-2">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-xs font-bold text-[#38bdf8]">/ai-context.md</span>
+                ${getEndpointBadgeHtml(mAiContext.exists, 3)}
+              </div>
+            </div>
           </div>
 
           <!-- LEVEL 4: WORKSPACES & DOCUMENTATION -->
-          <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3">
+          <div class="level-card p-5 rounded-2xl bg-[#121212] border border-[#3c4043] space-y-3.5 transition hover:border-[#38bdf8]/40 shadow-md" data-level-card="4">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase">LEVEL 4: WORKSPACES &amp; DOCUMENTATION</span>
-              <span class="text-xs font-mono text-[#bdc1c6]">/README.md • /about.md • /docs.md • /content.md</span>
+              <span class="text-[10px] font-mono font-black px-2.5 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6] uppercase tracking-wider">LEVEL 4: WORKSPACES &amp; DOCUMENTATION</span>
+              <span class="level-header-badge text-[10px] font-mono font-black px-2.5 py-0.5 rounded ${getLevelBadgeClass(level4Status)}" data-level-badge>${level4Status}</span>
             </div>
-            <h5 class="text-sm font-bold text-white font-headline">Deep Technical &amp; Operational Knowledge</h5>
-            <p class="text-xs text-[#bdc1c6] leading-relaxed">Full codebase and product API documentation rendered in pristine markdown for code-generation models.</p>
+            <div>
+              <h5 class="text-sm font-bold text-white font-headline">Deep Technical &amp; Operational Knowledge</h5>
+              <p class="text-xs text-[#bdc1c6] mt-1 leading-relaxed">Full codebase and product documentation rendered in pristine markdown for code-generation models.</p>
+            </div>
+            <div class="pt-2 border-t border-[#3c4043]/60 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-[11px] font-bold text-[#38bdf8]">/README.md</span>
+                ${getEndpointBadgeHtml(mReadme.exists, 4)}
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-[11px] font-bold text-[#38bdf8]">/about.md</span>
+                ${getEndpointBadgeHtml(mAbout.exists, 4)}
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-[11px] font-bold text-[#38bdf8]">/docs.md</span>
+                ${getEndpointBadgeHtml(mDocs.exists, 4)}
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-[#181818] border border-[#3c4043]">
+                <span class="font-mono text-[11px] font-bold text-[#38bdf8]">/content.md</span>
+                ${getEndpointBadgeHtml(mContent.exists, 4)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2163,12 +2353,13 @@ export function renderStage6Canvas(container, state = cockpitState) {
 
             <div class="space-y-3">
               ${top5Actions.slice(0, 5).map((action, idx) => {
+                const rankNum = action.rank || (idx + 1);
                 const stepJump = action.stepJump || (idx + 1);
                 return `
-                  <div class="p-3.5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+                  <div class="action-item-card p-3.5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition" data-action-item="${rankNum}">
                     <div class="flex items-start space-x-3">
                       <span class="w-6 h-6 rounded-full bg-[#b7410e]/20 text-[#d45d2a] border border-[#b7410e]/40 flex items-center justify-center font-mono font-black text-xs flex-shrink-0 mt-0.5">
-                        ${action.rank || (idx + 1)}
+                        ${rankNum}
                       </span>
                       <div>
                         <h5 class="text-xs sm:text-sm font-bold text-white font-headline">${action.title}</h5>
@@ -2201,11 +2392,11 @@ export function renderStage6Canvas(container, state = cockpitState) {
           ${stagesSummary.map(stg => {
             const isPass = stg.status === 'PASS';
             return `
-              <div onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stg.step}) : null" class="p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] cursor-pointer transition flex flex-col justify-between space-y-3 group shadow-md">
+              <div onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stg.step}) : null" class="scorecard-matrix-card p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] cursor-pointer transition flex flex-col justify-between space-y-3 group shadow-md" data-stage-card="${stg.step}">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6]">STAGE ${stg.step}</span>
-                    <span class="text-xs font-mono font-black ${isPass ? 'text-[#10b981]' : 'text-[#f59e0b]'}">${stg.score}</span>
+                    <span class="text-xs font-mono font-black ${isPass ? 'text-[#10b981]' : (stg.status === 'WARN' ? 'text-[#f59e0b]' : 'text-red-400')}">${stg.score}</span>
                   </div>
                   <h5 class="text-xs font-bold text-white group-hover:text-[#d45d2a] transition font-headline">${stg.title}</h5>
                   <p class="text-[11px] text-[#bdc1c6] leading-relaxed line-clamp-2">${stg.summary}</p>
@@ -2250,6 +2441,40 @@ export function toggleSidebar(isOpen) {
   }
 }
 
+export function openAuthorModal() {
+  const modal = document.getElementById('author-eeat-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+  modal.classList.add('opacity-100', 'pointer-events-auto');
+  modal.style.display = 'flex';
+}
+
+export function closeAuthorModal() {
+  const modal = document.getElementById('author-eeat-modal');
+  if (!modal) return;
+  modal.classList.remove('opacity-100', 'pointer-events-auto');
+  modal.classList.add('opacity-0', 'pointer-events-none');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }, 200);
+}
+
+export function copyAuthorSnippet(btn) {
+  const snippetEl = document.getElementById('author-schema-snippet');
+  const text = snippetEl ? snippetEl.innerText : '';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(() => {});
+  }
+  if (btn) {
+    const orig = btn.innerText;
+    btn.innerText = '✓ Copied!';
+    setTimeout(() => {
+      btn.innerText = orig;
+    }, 2000);
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.toggleSidebar = toggleSidebar;
   window.AEO_COCKPIT = {
@@ -2265,6 +2490,9 @@ if (typeof window !== 'undefined') {
     loadMoreStage3Pages,
     viewWhatAISees,
     copyTextSnippet,
+    openAuthorModal,
+    closeAuthorModal,
+    copyAuthorSnippet,
     updateStage2FromPayload,
     buildTakeawayHeader,
     buildEvidenceAndActionDrawers,
@@ -2287,3 +2515,4 @@ if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', initCockpit);
   }
 }
+

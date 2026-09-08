@@ -1357,7 +1357,15 @@ function evaluateCapabilities(crawledData = {}) {
     classification: 'AI-Optimized'
   };
 
-  const validPages = (crawledData.pages || []).filter(p => p && typeof p === 'object' && p.statusCode !== 404 && p.status !== 404 && p.is404 !== true && p.isMissing !== true && p.isCrawled !== false);
+  const rawPagesList = Array.isArray(crawledData.pages) ? crawledData.pages : [];
+  const validPages = rawPagesList.filter(p => 
+    p && typeof p === 'object' && 
+    p.statusCode !== 404 && 
+    p.status !== 404 && 
+    p.is404 !== true && 
+    p.isMissing !== true && 
+    p.isCrawled !== false
+  );
   const highExtractabilityPages = validPages.filter(p => {
     const rawR = p.contentDensityRatio ?? p.textDensityRatio ?? p.textCodeRatio ?? p.ratio ?? p.textRatio ?? 0;
     const ratio = (rawR > 0 && rawR <= 1) ? rawR * 100 : Number(rawR);
@@ -1380,6 +1388,129 @@ function evaluateCapabilities(crawledData = {}) {
     classification: 'AI-Optimized'
   };
 
+  const isHtmlRoute = (routeOrUrl) => {
+    if (!routeOrUrl || typeof routeOrUrl !== 'string') return false;
+    const clean = routeOrUrl.split('?')[0].split('#')[0].toLowerCase();
+    if (/\.(txt|md|xml|json|png|jpg|jpeg|gif|svg|pdf|css|js|woff|woff2)$/i.test(clean)) return false;
+    if (['/robots.txt', '/llms.txt', '/llms-full.txt', '/ai-context.md', '/about.md', '/docs.md', '/content.md', '/sitemap.xml'].includes(clean)) return false;
+    return true;
+  };
+
+  const validHtmlPages = validPages.filter(p => isHtmlRoute(p.route || p.path || p.url || ''));
+
+  // Card 1: Schema Details Calculation
+  const detectedSchemaTypesSet = new Set();
+  let pagesWithSchema = 0;
+  const missingRoutes = [];
+
+  validHtmlPages.forEach(p => {
+    const schemas = Array.isArray(p.schemas) 
+      ? p.schemas 
+      : (p.schema && Array.isArray(p.schema.rawJsonLd) ? p.schema.rawJsonLd : []);
+
+    const typesFromP = (Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0)
+      ? p.schemaTypes
+      : (Array.isArray(p.schema?.detectedTypes) 
+          ? p.schema.detectedTypes 
+          : schemas.map(s => s && (s['@type'] || s.type)).filter(Boolean));
+
+    typesFromP.forEach(t => {
+      if (Array.isArray(t)) t.forEach(sub => sub && detectedSchemaTypesSet.add(sub));
+      else if (t) detectedSchemaTypesSet.add(t);
+    });
+
+    const hasPageSchema = Boolean(
+      p.hasSchema === true || 
+      typesFromP.length > 0 || 
+      schemas.length > 0 ||
+      (p.schema && Object.keys(p.schema).length > 0 && p.schema.detectedTypes?.length)
+    );
+
+    if (hasPageSchema) {
+      pagesWithSchema++;
+    } else {
+      missingRoutes.push(p.route || p.path || p.url || '/');
+    }
+  });
+
+  // Fallback to top-level status.jsonLdTypes if present
+  if (Array.isArray(status.jsonLdTypes)) {
+    status.jsonLdTypes.forEach(t => t && detectedSchemaTypesSet.add(t));
+  }
+
+  if (pagesWithSchema === 0 && (status.jsonLdExists || (Array.isArray(status.jsonLdTypes) && status.jsonLdTypes.length > 0))) {
+    pagesWithSchema = 1;
+    // remove homepage from missingRoutes if present
+    const homeIdx = missingRoutes.indexOf('/');
+    if (homeIdx !== -1) missingRoutes.splice(homeIdx, 1);
+  }
+
+  const detectedTypes = Array.from(detectedSchemaTypesSet);
+  const totalPages = validHtmlPages.length;
+  const pagesWithSchemaCount = pagesWithSchema;
+  const pagesMissingSchemaCount = Math.max(0, totalPages - pagesWithSchemaCount);
+  const coveragePercent = totalPages > 0 ? Math.round((pagesWithSchemaCount / totalPages) * 100) : 0;
+
+  let schemaStatus = 'PASS';
+  let severityBadge = '100% COVERAGE (PASS)';
+  if (detectedTypes.length === 0 && pagesWithSchemaCount === 0) {
+    schemaStatus = 'CRITICAL';
+    severityBadge = 'CRITICAL: 0% COVERAGE';
+  } else if (pagesWithSchemaCount > 0 && pagesMissingSchemaCount > 0) {
+    schemaStatus = 'WARN';
+    severityBadge = `${pagesWithSchemaCount}/${totalPages} PAGES WITH SCHEMA (${coveragePercent}%)`;
+  } else if (pagesMissingSchemaCount === 0 && totalPages > 0) {
+    schemaStatus = 'PASS';
+    severityBadge = '100% COVERAGE (PASS)';
+  } else {
+    schemaStatus = 'CRITICAL';
+    severityBadge = 'CRITICAL: 0% COVERAGE';
+  }
+
+  const schemaDetails = {
+    detectedTypes,
+    totalPages,
+    pagesWithSchemaCount,
+    pagesMissingSchemaCount,
+    missingRoutes,
+    coveragePercent,
+    status: schemaStatus,
+    severityBadge
+  };
+
+  // Card 2: Author Person E-E-A-T Calculation
+  const uniqueAuthorsMap = new Map();
+  validPages.forEach(p => {
+    if (Array.isArray(p.authors)) {
+      p.authors.forEach(a => {
+        if (a && a.name) {
+          const key = a.name.toLowerCase().trim();
+          if (!uniqueAuthorsMap.has(key)) {
+            uniqueAuthorsMap.set(key, { ...a });
+          } else {
+            // Merge sameAs links
+            const existing = uniqueAuthorsMap.get(key);
+            if (Array.isArray(a.sameAs)) {
+              existing.sameAs = [...new Set([...(existing.sameAs || []), ...a.sameAs])];
+            }
+          }
+        }
+      });
+    }
+  });
+
+  const authors = Array.from(uniqueAuthorsMap.values());
+  const authorCount = authors.length;
+  const authorStatus = authorCount > 0 ? 'PASS' : 'CRITICAL';
+  const authorSeverityBadge = authorCount > 0 ? `${authorCount} AUTHOR(S) VERIFIED` : 'CRITICAL: 0 AUTHORS DETECTED';
+
+  const authorDetails = {
+    authors,
+    authorCount,
+    status: authorStatus,
+    severityBadge: authorSeverityBadge
+  };
+
   const stage4ScoreNum = Math.round((p3Score / 25) * 100);
   const stage4Score = `${stage4ScoreNum}%`;
   const stage4Status = stage4ScoreNum >= 80 ? 'PASS' : (stage4ScoreNum >= 50 ? 'WARN' : 'FAIL');
@@ -1390,7 +1521,9 @@ function evaluateCapabilities(crawledData = {}) {
     scoreNum: stage4ScoreNum,
     status: stage4Status,
     summaryText: stage4Summary,
-    classification: 'AI-Optimized'
+    classification: 'AI-Optimized',
+    schemaDetails,
+    authorDetails
   };
 
   const manifestChecks = {

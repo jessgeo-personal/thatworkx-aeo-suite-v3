@@ -145,11 +145,14 @@ describe('V4 Payload Normalizer & Stage Adapter (Phase 2 RED)', () => {
     const state = mapBackendScanToV4State(mockBackendPayload);
 
     expect(state.stage5.governanceGate).toBe('AI-Ready');
-    expect(state.stage5.manifests).toEqual([
-      { path: '/robots.txt', exists: true, status: 200, label: 'Robots Directive' },
-      { path: '/llms.txt', exists: false, status: 404, label: 'LLM Manifest' },
-      { path: '/ai-context.md', exists: false, status: 404, label: 'AI Context Spec' }
-    ]);
+    expect(state.stage5.manifests).toHaveLength(8);
+    expect(state.stage5.manifests.find(m => m.path === '/robots.txt')?.exists).toBe(true);
+    expect(state.stage5.manifests.find(m => m.path === '/llms.txt')?.exists).toBe(false);
+    expect(state.stage5.manifests.find(m => m.path === '/ai-context.md')?.exists).toBe(false);
+    expect(state.stage5.level1Status).toBe('AVAILABLE');
+    expect(state.stage5.level2Status).toBe('MISSING');
+    expect(state.stage5.level3Status).toBe('MISSING');
+    expect(state.stage5.level4Status).toBe('MISSING');
   });
 
   it('Gate 7: Stage 6 enforces Dual-Pillar scoring ("AI-Optimized" vs "AI-Ready") and triage flags', () => {

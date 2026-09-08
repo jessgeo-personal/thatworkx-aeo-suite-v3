@@ -40,7 +40,28 @@ const DEFAULT_STAGES = {
   stage1: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
   stage2: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
   stage3: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
-  stage4: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Optimized' },
+  stage4: {
+    score: '0%',
+    status: 'UNAUDITED',
+    summaryText: '--',
+    classification: 'AI-Optimized',
+    schemaDetails: {
+      detectedTypes: [],
+      totalPages: 0,
+      pagesWithSchemaCount: 0,
+      pagesMissingSchemaCount: 0,
+      missingRoutes: [],
+      coveragePercent: 0,
+      status: 'CRITICAL',
+      severityBadge: 'CRITICAL: 0% COVERAGE'
+    },
+    authorDetails: {
+      authors: [],
+      authorCount: 0,
+      status: 'CRITICAL',
+      severityBadge: 'CRITICAL: 0 AUTHORS DETECTED'
+    }
+  },
   stage5: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'AI-Ready', governanceGate: 'AI-Ready' },
   stage6: { score: '0%', status: 'UNAUDITED', summaryText: '--', classification: 'Executive Boardroom', healthIndex: 0, humanWebReadiness: 0, machineWebReadiness: 0 }
 };
@@ -485,11 +506,31 @@ export function mapBackendScanToV4State(rawPayload) {
     (typeof page === 'object' && page?.schema?.detectedTypes) ? page.schema.detectedTypes : []
   );
   const detectedTypesFromStatus = Array.isArray(data.status?.jsonLdTypes) ? data.status.jsonLdTypes : [];
-  const detectedTypes = [...new Set([...detectedTypesFromPages, ...detectedTypesFromStatus])];
+  const detectedTypesFromStage4 = Array.isArray(data.stage4?.detectedTypes) ? data.stage4.detectedTypes : [];
+  const detectedTypesFromSchemaDetails = Array.isArray(data.stages?.stage4?.schemaDetails?.detectedTypes)
+    ? data.stages.stage4.schemaDetails.detectedTypes
+    : (Array.isArray(rawPayload?.stages?.stage4?.schemaDetails?.detectedTypes)
+      ? rawPayload.stages.stage4.schemaDetails.detectedTypes
+      : (Array.isArray(data.stage4?.schemaDetails?.detectedTypes) ? data.stage4.schemaDetails.detectedTypes : []));
+  const detectedTypes = [...new Set([...detectedTypesFromPages, ...detectedTypesFromStatus, ...detectedTypesFromStage4, ...detectedTypesFromSchemaDetails])];
 
-  const hasAuthorBio = rawPages.some(
-    (page) => typeof page === 'object' && (page?.schema?.hasAuthorBio === true || page?.eeat?.hasAuthorBio === true)
+  const eeat = data.eeatMetrics || data.eeat || data.stage4?.eeat || {};
+  const hasAuthorBio = Boolean(
+    data.stage4?.hasAuthorBio ??
+    (rawPages.some((page) => typeof page === 'object' && (page?.schema?.hasAuthorBio === true || page?.eeat?.hasAuthorBio === true)) ||
+    eeat.hasAuthorBio)
   );
+
+  const emailValue = data.emailValue || eeat.emailValue || data.status?.emailValue || data.contactDetails?.email || data.stage4?.emailValue || data.stage4?.contactDetails?.email || rawPayload.emailValue || '--';
+  const phoneValue = data.phoneValue || eeat.phoneValue || data.status?.phoneValue || data.contactDetails?.phone || data.stage4?.phoneValue || data.stage4?.contactDetails?.phone || rawPayload.phoneValue || '--';
+  const authorityStatus = eeat.authorityStatus || data.authorityStatus || data.stage4?.authorityStatus || 'Optimized Anchor';
+  const ageEstimate = eeat.ageEstimate || data.ageEstimate || data.stage4?.ageEstimate || 'Domain Established';
+  const hasContactInfo = Boolean(eeat.hasContactInfo || (emailValue !== '--' && phoneValue !== '--') || data.hasContactInfo || data.stage4?.contactDetails?.isConfirmed);
+  const contactDetails = {
+    email: emailValue,
+    phone: phoneValue,
+    isConfirmed: hasContactInfo || (emailValue !== '--' || phoneValue !== '--')
+  };
 
   let totalGraphEntities = rawPages.reduce((sum, page) => {
     if (typeof page === 'object' && page?.schema) {
@@ -508,28 +549,42 @@ export function mapBackendScanToV4State(rawPayload) {
   }
 
   // Stage 5: Machine Manifests (AI-Ready Gate)
-  const rawManifests = data.capabilities?.manifests || data.manifests || {};
+  const rawManifests = data.capabilities?.manifests || data.manifests || data.stage5?.manifests || {};
   const statusObj = data.status || {};
-  const manifests = [
-    {
-      path: '/robots.txt',
-      exists: Boolean(rawManifests.robotsTxt?.exists ?? statusObj.robotsTxtExists),
-      status: rawManifests.robotsTxt?.status || (rawManifests.robotsTxt?.exists || statusObj.robotsTxtExists ? 200 : 404),
-      label: 'Robots Directive'
-    },
-    {
-      path: '/llms.txt',
-      exists: Boolean(rawManifests.llmsTxt?.exists ?? statusObj.llmsTxtExists),
-      status: rawManifests.llmsTxt?.status || (rawManifests.llmsTxt?.exists || statusObj.llmsTxtExists ? 200 : 404),
-      label: 'LLM Manifest'
-    },
-    {
-      path: '/ai-context.md',
-      exists: Boolean(rawManifests.aiContextMd?.exists ?? statusObj.aiContextExists),
-      status: rawManifests.aiContextMd?.status || (rawManifests.aiContextMd?.exists || statusObj.aiContextExists ? 200 : 404),
-      label: 'AI Context Spec'
-    }
-  ];
+  const sec4 = data.sec4 || {};
+
+  const manifestsList = [
+    { level: 1, path: '/robots.txt', name: 'robots.txt', exists: Boolean(statusObj.robotsTxtExists ?? sec4.robotsTxtFound ?? rawManifests.robotsTxt?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/robots.txt')?.exists)), desc: 'Crawler Gateway & Firewall Rules' },
+    { level: 2, path: '/sitemap.xml', name: 'sitemap.xml', exists: Boolean(statusObj.sitemapExists ?? sec4.sitemapFound ?? rawManifests.sitemapXml?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/sitemap.xml')?.exists)), desc: 'Search Index Roadmap' },
+    { level: 2, path: '/llms.txt', name: 'llms.txt', exists: Boolean(statusObj.llmsTxtExists ?? sec4.llmsTxtFound ?? rawManifests.llmsTxt?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/llms.txt')?.exists)), desc: 'Machine Welcome Directory' },
+    { level: 3, path: '/ai-context.md', name: 'ai-context.md', exists: Boolean(statusObj.aiContextExists ?? sec4.aiContextFound ?? rawManifests.aiContextMd?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/ai-context.md')?.exists)), desc: 'Knowledge & System Blueprint' },
+    { level: 4, path: '/README.md', name: 'README.md', exists: Boolean(sec4.readmeFound ?? rawManifests.readmeMd?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/README.md')?.exists)), desc: 'Architecture & Developer Guide' },
+    { level: 4, path: '/about.md', name: 'about.md', exists: Boolean(statusObj.aboutTxtExists ?? sec4.aboutMdFound ?? rawManifests.aboutMd?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/about.md')?.exists)), desc: 'Corporate Entity Manifest' },
+    { level: 4, path: '/docs.md', name: 'docs.md', exists: Boolean(statusObj.docsTxtExists ?? sec4.docsMdFound ?? rawManifests.docsMd?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/docs.md')?.exists)), desc: 'Technical Integration Manual' },
+    { level: 4, path: '/content.md', name: 'content.md', exists: Boolean(statusObj.contentTxtExists ?? sec4.contentMdFound ?? rawManifests.contentMd?.exists ?? (Array.isArray(rawManifests) && rawManifests.find(m => m.path === '/content.md')?.exists)), desc: 'Flat Content Ingestion Stream' }
+  ].map(m => ({
+    ...m,
+    status: m.exists ? 200 : 404,
+    statusBadge: m.level === 1 
+      ? (m.exists ? '200 OK • AVAILABLE' : '404 • MISSING')
+      : (m.exists ? 'AVAILABLE' : 'MISSING')
+  }));
+
+  const l1Exists = Boolean(manifestsList.find(m => m.level === 1)?.exists);
+  const level1Status = l1Exists ? 'AVAILABLE' : 'MISSING';
+
+  const l2Items = manifestsList.filter(m => m.level === 2);
+  const l2Count = l2Items.filter(m => m.exists).length;
+  const level2Status = l2Count === l2Items.length ? 'AVAILABLE' : (l2Count > 0 ? 'PARTIAL' : 'MISSING');
+
+  const l3Exists = Boolean(manifestsList.find(m => m.level === 3)?.exists);
+  const level3Status = l3Exists ? 'AVAILABLE' : 'MISSING';
+
+  const l4Items = manifestsList.filter(m => m.level === 4);
+  const l4Count = l4Items.filter(m => m.exists).length;
+  const level4Status = l4Count === l4Items.length ? 'AVAILABLE' : (l4Count > 0 ? 'PARTIAL' : 'MISSING');
+
+  const manifests = manifestsList;
 
   // Stage 6: Health Index & Dual-Pillar Scores
   const rawScores = data.capabilities?.scores || data.scores || data.scoreCard || {};
@@ -549,12 +604,12 @@ export function mapBackendScanToV4State(rawPayload) {
   // Canonical 6-Stage Diagnostic Pipeline Scores
   const rawStages = data.stages || rawPayload.stages || {};
   const stages = {
-    stage1: { ...DEFAULT_STAGES.stage1, ...(rawStages.stage1 || {}) },
-    stage2: { ...DEFAULT_STAGES.stage2, ...(rawStages.stage2 || {}) },
-    stage3: { ...DEFAULT_STAGES.stage3, ...(rawStages.stage3 || {}) },
-    stage4: { ...DEFAULT_STAGES.stage4, ...(rawStages.stage4 || {}) },
-    stage5: { ...DEFAULT_STAGES.stage5, ...(rawStages.stage5 || {}) },
-    stage6: { ...DEFAULT_STAGES.stage6, ...(rawStages.stage6 || {}) }
+    stage1: rawStages.stage1 ? { ...rawStages.stage1 } : { ...DEFAULT_STAGES.stage1 },
+    stage2: rawStages.stage2 ? { ...rawStages.stage2 } : { ...DEFAULT_STAGES.stage2 },
+    stage3: rawStages.stage3 ? { ...rawStages.stage3 } : { ...DEFAULT_STAGES.stage3 },
+    stage4: rawStages.stage4 ? { ...rawStages.stage4 } : { ...DEFAULT_STAGES.stage4 },
+    stage5: rawStages.stage5 ? { ...rawStages.stage5 } : { ...DEFAULT_STAGES.stage5 },
+    stage6: rawStages.stage6 ? { ...rawStages.stage6 } : { ...DEFAULT_STAGES.stage6 }
   };
 
   return {
@@ -563,8 +618,8 @@ export function mapBackendScanToV4State(rawPayload) {
     stage1: { crawlers, score: stages.stage1.score, status: stages.stage1.status, summaryText: stages.stage1.summaryText, ...stages.stage1 },
     stage2: { routes, missingCount, discoveredCount, score: stages.stage2.score, status: stages.stage2.status, summaryText: stages.stage2.summaryText, ...stages.stage2 },
     stage3: { pages, score: stages.stage3.score, status: stages.stage3.status, summaryText: stages.stage3.summaryText, ...stages.stage3 },
-    stage4: { detectedTypes, hasAuthorBio, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, ...stages.stage4 },
-    stage5: { governanceGate: 'AI-Ready', manifests, score: stages.stage5.score, status: stages.stage5.status, summaryText: stages.stage5.summaryText, ...stages.stage5 },
+    stage4: { detectedTypes, hasAuthorBio, emailValue, phoneValue, authorityStatus, ageEstimate, contactDetails, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, schemaDetails: stages.stage4.schemaDetails || DEFAULT_STAGES.stage4.schemaDetails, authorDetails: stages.stage4.authorDetails || DEFAULT_STAGES.stage4.authorDetails, ...stages.stage4 },
+    stage5: { governanceGate: 'AI-Ready', manifests, level1Status, level2Status, level3Status, level4Status, score: stages.stage5.score, status: stages.stage5.status, summaryText: stages.stage5.summaryText, ...stages.stage5 },
     stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags, score: stages.stage6.score, status: stages.stage6.status, summaryText: stages.stage6.summaryText, ...stages.stage6 }
   };
 }

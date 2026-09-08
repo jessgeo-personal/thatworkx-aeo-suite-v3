@@ -222,6 +222,29 @@ export function renderEvaluatorData(responsePayload, targetUrlInput = '') {
                 Missing: ${stage.missingRoutes.join(', ')}
               </div>
             ` : ''}
+            ${stage.schemaDetails ? `
+              <div class="mt-3 pt-2 border-t border-gray-900 text-[11px] space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-400 text-[10px] uppercase font-bold">Schema Coverage:</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded font-mono ${stage.schemaDetails.status === 'PASS' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (stage.schemaDetails.status === 'WARN' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-red-950 text-red-400 border border-red-800')}">
+                    ${stage.schemaDetails.severityBadge || `${stage.schemaDetails.coveragePercent}%`}
+                  </span>
+                </div>
+                ${stage.schemaDetails.status === 'CRITICAL' ? `
+                  <p class="text-[10px] text-red-400 font-mono">No JSON-LD schema detected across any crawled page.</p>
+                ` : (stage.schemaDetails.status === 'WARN' && stage.schemaDetails.missingRoutes?.length > 0 ? `
+                  <details class="text-[10px] text-amber-300 cursor-pointer">
+                    <summary class="font-semibold hover:underline">Missing Schema Details</summary>
+                    <p class="pt-0.5 font-mono text-[9px] text-amber-200 break-words">Missing Schema on: ${stage.schemaDetails.missingRoutes.join(', ')}</p>
+                  </details>
+                ` : '')}
+                ${stage.schemaDetails.detectedTypes && stage.schemaDetails.detectedTypes.length > 0 ? `
+                  <div class="flex flex-wrap gap-1 pt-1">
+                    ${stage.schemaDetails.detectedTypes.map(t => `<span class="px-2 py-0.5 rounded bg-[#1f1f1f] text-[#38bdf8] font-mono text-xs border border-[#3c4043]">${t}</span>`).join('')}
+                  </div>
+                ` : '<span class="text-red-400 text-xs font-mono">None Detected</span>'}
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('');

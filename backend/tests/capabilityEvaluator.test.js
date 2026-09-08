@@ -447,3 +447,184 @@ describe('Canonical 6-Stage Diagnostic Pipeline Contract (BDD-TDD Red Phase)', (
   });
 });
 
+describe('Card 1 Schema Coverage Breakdown Contract (BDD-TDD Red Phase)', () => {
+  it('1. Schema Coverage Metrics Contract: evaluates detectedTypes, totalPages, pagesWithSchemaCount, pagesMissingSchemaCount, missingRoutes, and coveragePercent', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: true, schemaTypes: ['Organization', 'WebSite'], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: true, schemaTypes: ['AboutPage', 'Organization'], is404: false, statusCode: 200 },
+        { path: '/contact', route: '/contact', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/404-page', route: '/404-page', hasSchema: false, schemaTypes: [], is404: true, statusCode: 404 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(3);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(2);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(1);
+    expect(schemaDetails.coveragePercent).toBe(67);
+    expect(schemaDetails.missingRoutes).toEqual(['/contact']);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['AboutPage', 'Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('WARN');
+  });
+
+  it('2. Severity Rule - 0% Coverage: sets status to CRITICAL and includes severityBadge', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(2);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(0);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(2);
+    expect(schemaDetails.coveragePercent).toBe(0);
+    expect(schemaDetails.missingRoutes).toEqual(['/', '/about']);
+    expect(schemaDetails.detectedTypes).toEqual([]);
+    expect(schemaDetails.status).toBe('CRITICAL');
+    expect(schemaDetails.severityBadge).toBe('CRITICAL: 0% COVERAGE');
+  });
+
+  it('3. Severity Rule - 100% Coverage: sets status to PASS and missingRoutes to empty array', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: true, schemaTypes: ['WebSite', 'Organization'], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: true, schemaTypes: ['AboutPage'], is404: false, statusCode: 200 },
+        { path: '/contact', route: '/contact', hasSchema: true, schemaTypes: ['ContactPage'], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(3);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(3);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(0);
+    expect(schemaDetails.coveragePercent).toBe(100);
+    expect(schemaDetails.missingRoutes).toEqual([]);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['AboutPage', 'ContactPage', 'Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('PASS');
+    expect(schemaDetails.severityBadge).toBe('100% COVERAGE (PASS)');
+  });
+
+  it('4. Homepage Fallback Credit: credits homepage when status.jsonLdExists or status.jsonLdTypes has types', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      status: {
+        jsonLdExists: true,
+        jsonLdTypes: ['Organization', 'WebSite']
+      },
+      pages: [
+        { path: '/', route: '/', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(2);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(1);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(1);
+    expect(schemaDetails.coveragePercent).toBe(50);
+    expect(schemaDetails.missingRoutes).toEqual(['/about']);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('WARN');
+    expect(schemaDetails.severityBadge).toBe('1/2 PAGES WITH SCHEMA (50%)');
+  });
+});
+
+describe('Card 2 Author Person E-E-A-T Contract (BDD-TDD Red Phase)', () => {
+  it('1. Card 2 Author Details Contract & Verified Authors Discovery: discovers, deduplicates authors across pages with name, jobTitle, and sameAs array', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        {
+          path: '/',
+          route: '/',
+          is404: false,
+          statusCode: 200,
+          authors: [
+            { name: 'Dr. Jane Doe', jobTitle: 'Chief Scientist', sameAs: ['https://twitter.com/janedoe'] }
+          ]
+        },
+        {
+          path: '/blog/post-1',
+          route: '/blog/post-1',
+          is404: false,
+          statusCode: 200,
+          authors: [
+            { name: 'Dr. Jane Doe', jobTitle: 'Chief Scientist', sameAs: ['https://twitter.com/janedoe'] },
+            { name: 'John Smith', jobTitle: 'Lead AI Engineer', sameAs: ['https://linkedin.com/in/johnsmith', 'https://github.com/johnsmith'] }
+          ]
+        }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(Array.isArray(authorDetails.authors)).toBe(true);
+    expect(authorDetails.authors.length).toBe(2);
+    expect(authorDetails.authorCount).toBe(2);
+    expect(authorDetails.status).toBe('PASS');
+    expect(authorDetails.severityBadge).toBe('2 AUTHOR(S) VERIFIED');
+
+    const jane = authorDetails.authors.find(a => a.name === 'Dr. Jane Doe');
+    expect(jane).toBeDefined();
+    expect(jane.jobTitle).toBe('Chief Scientist');
+    expect(jane.sameAs).toEqual(['https://twitter.com/janedoe']);
+
+    const john = authorDetails.authors.find(a => a.name === 'John Smith');
+    expect(john).toBeDefined();
+    expect(john.jobTitle).toBe('Lead AI Engineer');
+    expect(john.sameAs).toEqual(['https://linkedin.com/in/johnsmith', 'https://github.com/johnsmith']);
+  });
+
+  it('2. Critical Gap Enforcement (0 Authors Found): sets status to CRITICAL with severity badge and empty array when no authors exist', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200, authors: [] },
+        { path: '/about', route: '/about', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(authorDetails.authors).toEqual([]);
+    expect(authorDetails.authorCount).toBe(0);
+    expect(authorDetails.status).toBe('CRITICAL');
+    expect(authorDetails.severityBadge).toBe('CRITICAL: 0 AUTHORS DETECTED');
+  });
+
+  it('3. Empty / Neutral State: safely resolves when crawledData is empty or un-audited', () => {
+    const res = evaluateCapabilities({});
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(authorDetails.status).toBe('CRITICAL');
+    expect(authorDetails.authorCount).toBe(0);
+    expect(authorDetails.authors).toEqual([]);
+    expect(authorDetails.severityBadge).toBe('CRITICAL: 0 AUTHORS DETECTED');
+  });
+});
+
+
+

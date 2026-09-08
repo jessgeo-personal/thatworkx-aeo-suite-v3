@@ -83,7 +83,9 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) 
       lastModified: null,
       semanticTags: { header: false, nav: false, main: false, footer: false, article: false, section: false },
       missingAltCount: 0,
-      missingAltList: []
+      missingAltList: [],
+      authors: [],
+      hasAuthorBio: false
     };
   }
 
@@ -240,6 +242,75 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) 
     missingAltCount: missingAltList.length,
     missingAltList
   };
+
+  // ---------------------------------------------------------------------------
+  // 3. AUTHOR & PERSON E-E-A-T ENTITY EXTRACTION
+  // ---------------------------------------------------------------------------
+  const authors = [];
+  const seenAuthorNames = new Set();
+
+  // 1. Scan JSON-LD schemas for Person or author entities
+  schemas.forEach(s => {
+    if (!s || typeof s !== 'object') return;
+    const isPerson = s['@type'] === 'Person' || (Array.isArray(s['@type']) && s['@type'].includes('Person'));
+    if (isPerson && s.name) {
+      const cleanName = String(s.name).trim();
+      if (cleanName && !seenAuthorNames.has(cleanName.toLowerCase())) {
+        seenAuthorNames.add(cleanName.toLowerCase());
+        authors.push({
+          name: cleanName,
+          jobTitle: s.jobTitle || s.role || '',
+          worksFor: s.worksFor?.name || '',
+          sameAs: Array.isArray(s.sameAs) ? s.sameAs : (s.sameAs ? [s.sameAs] : [])
+        });
+      }
+    }
+
+    // Nested author inside Article, BlogPosting, or WebPage
+    const authorObj = s.author || s.creator;
+    if (authorObj) {
+      const list = Array.isArray(authorObj) ? authorObj : [authorObj];
+      list.forEach(a => {
+        if (a && typeof a === 'object' && a.name) {
+          const cleanName = String(a.name).trim();
+          if (cleanName && !seenAuthorNames.has(cleanName.toLowerCase())) {
+            seenAuthorNames.add(cleanName.toLowerCase());
+            authors.push({
+              name: cleanName,
+              jobTitle: a.jobTitle || a.role || '',
+              worksFor: a.worksFor?.name || '',
+              sameAs: Array.isArray(a.sameAs) ? a.sameAs : (a.sameAs ? [a.sameAs] : [])
+            });
+          }
+        } else if (typeof a === 'string' && a.trim() && !seenAuthorNames.has(a.trim().toLowerCase())) {
+          seenAuthorNames.add(a.trim().toLowerCase());
+          authors.push({ name: a.trim(), jobTitle: '', worksFor: '', sameAs: [] });
+        }
+      });
+    }
+  });
+
+  // 2. Scan HTML meta tags & rel="author" anchors
+  const metaAuthor = $('meta[name="author"]').attr('content') || $('meta[property="article:author"]').attr('content');
+  if (metaAuthor && metaAuthor.trim()) {
+    const cleanName = metaAuthor.trim();
+    if (!seenAuthorNames.has(cleanName.toLowerCase())) {
+      seenAuthorNames.add(cleanName.toLowerCase());
+      authors.push({ name: cleanName, jobTitle: '', worksFor: '', sameAs: [] });
+    }
+  }
+
+  $('a[rel="author"]').each((_, el) => {
+    const name = $(el).text().trim();
+    const href = $(el).attr('href') || '';
+    if (name && !seenAuthorNames.has(name.toLowerCase())) {
+      seenAuthorNames.add(name.toLowerCase());
+      authors.push({ name, jobTitle: '', worksFor: '', sameAs: href ? [href] : [] });
+    }
+  });
+
+  pageObj.authors = authors;
+  pageObj.hasAuthorBio = authors.length > 0;
 
   if (pageRoute === '/') {
     pageObj.inPageSections = {
@@ -634,6 +705,10 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       if (i === 0) {
         pageHtml = htmlContent;
         const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute, mainHeaders);
+        if (result.status.jsonLdExists && (!parsedPage.hasSchema || parsedPage.schemaTypes.length === 0)) {
+          parsedPage.hasSchema = true;
+          parsedPage.schemaTypes = [...result.status.jsonLdTypes];
+        }
         result.pages.push(parsedPage);
       } else {
         if (process.env.NODE_ENV !== 'test') {

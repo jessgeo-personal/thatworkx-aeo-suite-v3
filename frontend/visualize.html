@@ -398,6 +398,50 @@
         <div class="text-[#5f6368]">$ aio-scanner --target=<span id="modal-target-display">target</span></div>
         <div id="modal-live-log" class="truncate">Initializing root socket handshake...</div>
       </div>
+  <!-- AUTHOR E-E-A-T GUIDANCE MODAL -->
+  <div id="author-eeat-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[100] flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hidden" style="display: none;">
+    <div class="max-w-2xl w-full mx-4 bg-[#1f1f1f] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-8 shadow-2xl text-left space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">👤</span>
+          <h3 class="text-lg font-black text-white font-headline">Author Person E-E-A-T Guide</h3>
+        </div>
+        <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.closeAuthorModal ? window.AEO_COCKPIT.closeAuthorModal() : document.getElementById('author-eeat-modal').style.display='none'" class="text-[#bdc1c6] hover:text-white p-1 text-lg font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
+        <h4 class="font-bold text-white uppercase text-xs tracking-wider text-[#38bdf8]">Why AI Search Engines Require This</h4>
+        <p class="text-[#bdc1c6]">
+          Generative search engines (OpenAI Search, Google Gemini, Perplexity) verify author identity to distinguish credible human subject-matter experts from AI-generated spam. Adding structured Person metadata with verified <code>sameAs</code> links allows models to corroborate author credentials against Knowledge Graphs.
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-white">Recommended Schema.org Person Snippet:</span>
+          <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.copyAuthorSnippet ? window.AEO_COCKPIT.copyAuthorSnippet(this) : null" class="px-3 py-1 rounded bg-[#38bdf8]/20 hover:bg-[#38bdf8]/30 border border-[#38bdf8]/40 text-[#38bdf8] text-xs font-bold transition">📋 Copy Snippet</button>
+        </div>
+        <pre id="author-schema-snippet" class="p-3.5 rounded-xl bg-[#121212] border border-[#3c4043] font-mono text-xs text-[#38bdf8] overflow-x-auto leading-relaxed">{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Jane Doe",
+  "jobTitle": "Chief Strategy Officer",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Your Company"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/in/janedoe",
+    "https://twitter.com/janedoe"
+  ]
+}</pre>
+      </div>
+
+      <div class="space-y-2 text-xs text-[#bdc1c6] pt-2 border-t border-[#3c4043]">
+        <strong class="text-white block">How to Implement:</strong>
+        <p>1. Nest this Person schema inside your <code>Article</code> or <code>BlogPosting</code> schema under the <code>"author"</code> property.</p>
+        <p>2. Ensure the author bio page on your website links out to the same verified social and professional profiles.</p>
+      </div>
     </div>
   </div>
 
