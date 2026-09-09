@@ -635,9 +635,10 @@ function renderStepper() {
 
     const btn = document.createElement('button');
     btn.title = `${stage.shortTitle} (${stage.classification})`;
+    btn.setAttribute('data-step', String(stage.step));
     btn.onclick = () => navigateToStep(stage.step);
 
-    let btnClasses = "stepper-pill flex items-center px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold relative cursor-pointer ";
+    let btnClasses = "stepper-pill stepper-tab flex items-center px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold relative cursor-pointer ";
 
     if (isCurrent) {
       btnClasses += "is-active ";
