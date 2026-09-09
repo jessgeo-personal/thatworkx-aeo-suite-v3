@@ -149,6 +149,76 @@ const fetchDomainAge = async (targetUrl) => {
   };
 };
 
+/**
+ * Extracts international phone numbers, emails, and physical addresses from the DOM.
+ * @param {import('cheerio').CheerioAPI} $ - Loaded Cheerio instance of the page
+ * @returns {{ emails: string[], phones: string[], address: string|null }}
+ */
+function extractContactAnchors($) {
+  const emails = [];
+  const phones = [];
+  let address = null;
+
+  // 1. Extract direct mailto: links
+  $('a[href^="mailto:"]').each((_, el) => {
+    const href = $(el).attr('href');
+    if (href) {
+      const clean = href.replace(/^mailto:/i, '').split('?')[0].trim();
+      if (clean && !emails.includes(clean)) emails.push(clean);
+    }
+  });
+
+  // 2. Extract direct tel: links (preserve E.164 international format, strip spaces)
+  $('a[href^="tel:"]').each((_, el) => {
+    const href = $(el).attr('href');
+    if (href) {
+      const clean = href.replace(/^tel:/i, '').replace(/\s+/g, '').trim();
+      if (clean && !phones.includes(clean)) phones.push(clean);
+    }
+  });
+
+  // 3. Extract physical address from semantic <address> elements
+  const addressEl = $('address').first();
+  if (addressEl.length > 0) {
+    const clone = addressEl.clone();
+    clone.find('br').replaceWith(', ');
+    const text = clone.text().replace(/\s+/g, ' ').replace(/,\s*,/g, ',').trim();
+    if (text) address = text;
+  }
+
+  // 4. Extract physical address from Microdata Schema.org PostalAddress
+  if (!address) {
+    const microdataEl = $('[itemtype*="schema.org/PostalAddress"]').first();
+    if (microdataEl.length > 0) {
+      const parts = [];
+      const street = microdataEl.find('[itemprop="streetAddress"]').text().trim();
+      const locality = microdataEl.find('[itemprop="addressLocality"]').text().trim();
+      const region = microdataEl.find('[itemprop="addressRegion"]').text().trim();
+      const postalCode = microdataEl.find('[itemprop="postalCode"]').text().trim();
+      const country = microdataEl.find('[itemprop="addressCountry"]').text().trim();
+
+      if (street) parts.push(street);
+      if (locality) parts.push(locality);
+      if (region) parts.push(region);
+      if (postalCode) parts.push(postalCode);
+      if (country) parts.push(country);
+
+      if (parts.length > 0) {
+        address = parts.join(', ');
+      } else {
+        const text = microdataEl.text().replace(/\s+/g, ' ').trim();
+        if (text) address = text;
+      }
+    }
+  }
+
+  return {
+    emails,
+    phones,
+    address: address || null
+  };
+}
+
 const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) => {
   if (!htmlContent) {
     return {
@@ -415,6 +485,15 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) 
       terms: $('#terms, #terms-of-service, [id*="terms"]').length > 0
     };
   }
+
+  const contactAnchors = extractContactAnchors($);
+  pageObj.contactAnchors = contactAnchors;
+  pageObj.addressText = contactAnchors.address;
+  pageObj.links = [
+    ...(pageObj.links || []),
+    ...contactAnchors.emails.map(e => `mailto:${e}`),
+    ...contactAnchors.phones.map(p => `tel:${p}`)
+  ];
 
   return pageObj;
 };
@@ -965,6 +1044,7 @@ module.exports = {
   fetchPageWithTimeout,
   fetchDomainAge,
   formatDomainAgeResult,
+  extractContactAnchors,
   AI_CRAWLERS
 };
 

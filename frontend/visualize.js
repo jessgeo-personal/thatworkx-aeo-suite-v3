@@ -2018,6 +2018,10 @@ export function renderStage4Canvas(container, state = cockpitState) {
   const addressChipText = cleanAddress ? `⚲ ${cleanAddress}` : '⚲ Address: None Detected';
   const addressChipClass = cleanAddress ? 'chip-success' : 'chip-warning';
 
+  const addressActionHtml = !cleanAddress
+    ? `<a href="javascript:void(0)" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.openAddressModal ? window.AEO_COCKPIT.openAddressModal() : null" class="action-link address-guide-trigger" data-action="open-address-guide">📍 Add Address for AI ↗</a>`
+    : `<a href="#contact-modal" class="action-link contact-trace-trigger" data-action="contact-trace">↗ View /contact Route Trace</a>`;
+
   const actionPlan = sec.actionPlan || 'Implement complete Schema.org Organization and Person schemas with sameAs knowledge graph links to establish verified entity authority.';
   const actionSteps = sec.actionSteps && sec.actionSteps.length > 0 ? sec.actionSteps : [
     { title: "Connect Wikidata & Knowledge Graphs", detail: "Add sameAs links to official Wikidata, Crunchbase, and LinkedIn entity profiles." },
@@ -2166,7 +2170,7 @@ export function renderStage4Canvas(container, state = cockpitState) {
                 <span class="metric-value">${cleanAddress || 'None Detected'}</span>
               </div>
             </div>
-            <a href="#contact-modal" class="action-link contact-trace-trigger" data-action="contact-trace">↗ View /contact Route Trace</a>
+            ${addressActionHtml}
             <p class="compliance-note">Direct organizational contact endpoints and schema PostalAddress for authority verification.</p>
           </div>
         </div>
@@ -2528,6 +2532,15 @@ export function renderStage4ContactCard(state) {
     } else {
       statusPill.textContent = 'CRITICAL';
       statusPill.classList.add('pill-critical', 'pill-danger');
+    }
+  }
+
+  const existingActionLink = card.querySelector('.action-link, [data-action="open-address-guide"], [data-action="contact-trace"]');
+  if (existingActionLink) {
+    if (!cleanAddress) {
+      existingActionLink.outerHTML = `<a href="javascript:void(0)" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.openAddressModal ? window.AEO_COCKPIT.openAddressModal() : null" class="action-link address-guide-trigger" data-action="open-address-guide">📍 Add Address for AI ↗</a>`;
+    } else {
+      existingActionLink.outerHTML = `<a href="#contact-modal" class="action-link contact-trace-trigger" data-action="contact-trace">↗ View /contact Route Trace</a>`;
     }
   }
 }
@@ -2993,8 +3006,48 @@ export function copyAuthorSnippet(btn) {
   }
 }
 
+export function openAddressModal() {
+  const modal = document.getElementById('address-guide-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+  modal.classList.add('opacity-100', 'pointer-events-auto');
+  modal.style.display = 'flex';
+}
+
+export function closeAddressModal() {
+  const modal = document.getElementById('address-guide-modal');
+  if (!modal) return;
+  modal.classList.remove('opacity-100', 'pointer-events-auto');
+  modal.classList.add('opacity-0', 'pointer-events-none');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }, 200);
+}
+
+export function copyAddressSnippet(btn, snippetId) {
+  const snippetEl = document.getElementById(snippetId || 'address-schema-snippet');
+  const text = snippetEl ? snippetEl.innerText : '';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(() => {});
+  }
+  if (btn) {
+    const orig = btn.innerText;
+    btn.innerText = '✓ Copied!';
+    setTimeout(() => {
+      btn.innerText = orig;
+    }, 2000);
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.toggleSidebar = toggleSidebar;
+  window.openAddressModal = openAddressModal;
+  window.closeAddressModal = closeAddressModal;
+  window.copyAddressSnippet = copyAddressSnippet;
+  window.openAuthorModal = openAuthorModal;
+  window.closeAuthorModal = closeAuthorModal;
+  window.copyAuthorSnippet = copyAuthorSnippet;
   window.AEO_COCKPIT = {
     initCockpit,
     executeCockpitScan,
@@ -3011,6 +3064,9 @@ if (typeof window !== 'undefined') {
     openAuthorModal,
     closeAuthorModal,
     copyAuthorSnippet,
+    openAddressModal,
+    closeAddressModal,
+    copyAddressSnippet,
     updateStage2FromPayload,
     buildTakeawayHeader,
     buildEvidenceAndActionDrawers,

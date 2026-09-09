@@ -549,53 +549,67 @@ export function mapBackendScanToV4State(rawPayload) {
   }
 
   // Stage 4 Contact Anchors Multi-Source Extraction
-  let contactEmail = null;
-  let contactPhone = null;
-  let contactAddress = null;
+  const sanitizeInput = (v) => (v && v !== '--' && v !== 'None Detected' && v !== 'null') ? v : null;
 
-  if (rawScan?.contact || data?.contact) {
-    const c = rawScan?.contact || data?.contact;
-    contactEmail = c.email || null;
-    contactPhone = c.phone || null;
-    contactAddress = c.address || null;
-  }
+  let contactEmail = sanitizeInput(rawScan?.contact?.email || data?.contact?.email || data?.contactDetails?.email);
+  let contactPhone = sanitizeInput(rawScan?.contact?.phone || data?.contact?.phone || data?.contactDetails?.phone);
+  let contactAddress = sanitizeInput(rawScan?.contact?.address || data?.contact?.address || data?.contactDetails?.address);
 
-  for (const page of s4CrawledPages) {
+  const allPages = [
+    ...(Array.isArray(s4CrawledPages) ? s4CrawledPages : []),
+    ...(Array.isArray(rawScan?.stage3?.pages) ? rawScan.stage3.pages : []),
+    ...(Array.isArray(data?.stage3?.pages) ? data.stage3.pages : [])
+  ];
+
+  for (const page of allPages) {
+    if (!page || typeof page !== 'object') continue;
+
+    // Ingest direct addressText from crawler
+    if (!contactAddress && page.addressText) {
+      contactAddress = sanitizeInput(page.addressText);
+    }
+    if (!contactAddress && page.contactAnchors?.address) {
+      contactAddress = sanitizeInput(page.contactAnchors.address);
+    }
+
+    // Ingest links (tel: and mailto:)
     if (Array.isArray(page.links)) {
       for (const link of page.links) {
         if (!contactEmail && typeof link === 'string' && link.toLowerCase().startsWith('mailto:')) {
-          contactEmail = link.replace(/^mailto:/i, '').split('?')[0].trim();
+          contactEmail = sanitizeInput(link.replace(/^mailto:/i, '').split('?')[0].trim());
         }
         if (!contactPhone && typeof link === 'string' && link.toLowerCase().startsWith('tel:')) {
-          contactPhone = link.replace(/^tel:/i, '').trim();
+          contactPhone = sanitizeInput(link.replace(/^tel:/i, '').replace(/\s+/g, '').trim());
         }
       }
     }
-    if (Array.isArray(page.schema)) {
-      for (const item of page.schema) {
-        if (!contactEmail && item.email) contactEmail = item.email;
-        if (!contactPhone && item.telephone) contactPhone = item.telephone;
-        if (!contactAddress && item.address) {
-          if (typeof item.address === 'string') {
-            contactAddress = item.address;
-          } else if (typeof item.address === 'object') {
-            const addr = item.address;
-            const parts = [
-              addr.streetAddress,
-              addr.addressLocality,
-              addr.addressRegion,
-              addr.postalCode,
-              typeof addr.addressCountry === 'string' ? addr.addressCountry : addr.addressCountry?.name
-            ].filter(Boolean);
-            contactAddress = parts.join(', ');
-          }
+
+    // Ingest JSON-LD Schemas
+    const schemas = Array.isArray(page.schema) ? page.schema : (page.schema ? [page.schema] : (Array.isArray(page.schemas) ? page.schemas : []));
+    for (const item of schemas) {
+      if (!item || typeof item !== 'object') continue;
+      if (!contactEmail && item.email) contactEmail = sanitizeInput(item.email);
+      if (!contactPhone && item.telephone) contactPhone = sanitizeInput(item.telephone);
+      if (!contactAddress && item.address) {
+        if (typeof item.address === 'string') {
+          contactAddress = sanitizeInput(item.address);
+        } else if (typeof item.address === 'object') {
+          const addr = item.address;
+          const parts = [
+            addr.streetAddress,
+            addr.addressLocality,
+            addr.addressRegion,
+            addr.postalCode,
+            typeof addr.addressCountry === 'string' ? addr.addressCountry : addr.addressCountry?.name
+          ].filter(Boolean);
+          contactAddress = sanitizeInput(parts.join(', '));
         }
-        if (item.contactPoint) {
-          const points = Array.isArray(item.contactPoint) ? item.contactPoint : [item.contactPoint];
-          for (const cp of points) {
-            if (!contactEmail && cp.email) contactEmail = cp.email;
-            if (!contactPhone && cp.telephone) contactPhone = cp.telephone;
-          }
+      }
+      if (item.contactPoint) {
+        const points = Array.isArray(item.contactPoint) ? item.contactPoint : [item.contactPoint];
+        for (const cp of points) {
+          if (!contactEmail && cp.email) contactEmail = sanitizeInput(cp.email);
+          if (!contactPhone && cp.telephone) contactPhone = sanitizeInput(cp.telephone);
         }
       }
     }
