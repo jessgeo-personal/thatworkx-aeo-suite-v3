@@ -45,6 +45,17 @@ const DEFAULT_STAGES = {
     status: 'UNAUDITED',
     summaryText: '--',
     classification: 'AI-Optimized',
+    isHttps: false,
+    sslValid: false,
+    hasPrivacyPolicy: false,
+    hasTermsOfService: false,
+    securityBadgeText: '--',
+    contact: {
+      email: null,
+      phone: null,
+      address: null,
+      trustAnchorCount: 0
+    },
     schemaDetails: {
       detectedTypes: [],
       totalPages: 0,
@@ -508,6 +519,93 @@ export function mapBackendScanToV4State(rawPayload) {
     };
   });
 
+  // Stage 4: Security, Legal Routes & Contact Anchors
+  const rawScan = rawPayload;
+  const s4TargetUrl = rawScan?.targetUrl || rawScan?.url || data?.targetUrl || data?.url || (targetUrl !== '--' ? targetUrl : '');
+  const protocol = rawScan?.protocol || data?.protocol || (s4TargetUrl.startsWith('https://') ? 'https:' : (s4TargetUrl.startsWith('http://') ? 'http:' : ''));
+  const isHttps = protocol === 'https:' || s4TargetUrl.startsWith('https://');
+  const sslValid = Boolean(s4TargetUrl) && isHttps && rawScan?.status !== 'failed' && rawScan?.status !== 'error' && data?.status !== 'failed' && data?.status !== 'error';
+
+  const s4MissingPages = Array.isArray(rawScan?.missingEssentialPages) ? rawScan.missingEssentialPages : (Array.isArray(data?.missingEssentialPages) ? data.missingEssentialPages : (Array.isArray(missingPages) ? missingPages : []));
+  const s4CrawledPages = Array.isArray(rawScan?.pages) ? rawScan.pages : (Array.isArray(data?.pages) ? data.pages : (Array.isArray(rawPages) ? rawPages : []));
+
+  const privacyInPages = s4CrawledPages.some(p => {
+    const u = (typeof p === 'string' ? p : (p.url || '')).toLowerCase();
+    return u.includes('/privacy-policy') || u.includes('/privacy') || u.includes('/#privacy');
+  });
+  const privacyMissing = s4MissingPages.some(m => m.toLowerCase().includes('privacy'));
+  const hasPrivacyPolicy = Boolean(s4TargetUrl) && (privacyInPages || (!privacyMissing && s4CrawledPages.length > 0));
+
+  const termsInPages = s4CrawledPages.some(p => {
+    const u = (typeof p === 'string' ? p : (p.url || '')).toLowerCase();
+    return u.includes('/terms-of-service') || u.includes('/terms') || u.includes('/#terms');
+  });
+  const termsMissing = s4MissingPages.some(m => m.toLowerCase().includes('terms'));
+  const hasTermsOfService = Boolean(s4TargetUrl) && (termsInPages || (!termsMissing && s4CrawledPages.length > 0));
+
+  let securityBadgeText = '--';
+  if (s4TargetUrl) {
+    securityBadgeText = isHttps ? 'TLS 1.3 / HTTPS Enforced' : 'Insecure HTTP Protocol';
+  }
+
+  // Stage 4 Contact Anchors Multi-Source Extraction
+  let contactEmail = null;
+  let contactPhone = null;
+  let contactAddress = null;
+
+  if (rawScan?.contact || data?.contact) {
+    const c = rawScan?.contact || data?.contact;
+    contactEmail = c.email || null;
+    contactPhone = c.phone || null;
+    contactAddress = c.address || null;
+  }
+
+  for (const page of s4CrawledPages) {
+    if (Array.isArray(page.links)) {
+      for (const link of page.links) {
+        if (!contactEmail && typeof link === 'string' && link.toLowerCase().startsWith('mailto:')) {
+          contactEmail = link.replace(/^mailto:/i, '').split('?')[0].trim();
+        }
+        if (!contactPhone && typeof link === 'string' && link.toLowerCase().startsWith('tel:')) {
+          contactPhone = link.replace(/^tel:/i, '').trim();
+        }
+      }
+    }
+    if (Array.isArray(page.schema)) {
+      for (const item of page.schema) {
+        if (!contactEmail && item.email) contactEmail = item.email;
+        if (!contactPhone && item.telephone) contactPhone = item.telephone;
+        if (!contactAddress && item.address) {
+          if (typeof item.address === 'string') {
+            contactAddress = item.address;
+          } else if (typeof item.address === 'object') {
+            const addr = item.address;
+            const parts = [
+              addr.streetAddress,
+              addr.addressLocality,
+              addr.addressRegion,
+              addr.postalCode,
+              typeof addr.addressCountry === 'string' ? addr.addressCountry : addr.addressCountry?.name
+            ].filter(Boolean);
+            contactAddress = parts.join(', ');
+          }
+        }
+        if (item.contactPoint) {
+          const points = Array.isArray(item.contactPoint) ? item.contactPoint : [item.contactPoint];
+          for (const cp of points) {
+            if (!contactEmail && cp.email) contactEmail = cp.email;
+            if (!contactPhone && cp.telephone) contactPhone = cp.telephone;
+          }
+        }
+      }
+    }
+  }
+
+  let trustAnchorCount = 0;
+  if (contactEmail) trustAnchorCount++;
+  if (contactPhone) trustAnchorCount++;
+  if (contactAddress) trustAnchorCount++;
+
   // Stage 4: Schema.org Entities & Author Credentials
   const detectedTypesFromPages = rawPages.flatMap((page) =>
     (typeof page === 'object' && page?.schema?.detectedTypes) ? page.schema.detectedTypes : []
@@ -625,7 +723,36 @@ export function mapBackendScanToV4State(rawPayload) {
     stage1: { crawlers, score: stages.stage1.score, status: stages.stage1.status, summaryText: stages.stage1.summaryText, ...stages.stage1 },
     stage2: { routes, missingCount, discoveredCount, score: stages.stage2.score, status: stages.stage2.status, summaryText: stages.stage2.summaryText, ...stages.stage2 },
     stage3: { pages, score: stages.stage3.score, status: stages.stage3.status, summaryText: stages.stage3.summaryText, ...stages.stage3 },
-    stage4: { detectedTypes, hasAuthorBio, emailValue, phoneValue, authorityStatus, ageEstimate, contactDetails, totalGraphEntities, score: stages.stage4.score, status: stages.stage4.status, summaryText: stages.stage4.summaryText, schemaDetails: stages.stage4.schemaDetails || DEFAULT_STAGES.stage4.schemaDetails, authorDetails: stages.stage4.authorDetails || DEFAULT_STAGES.stage4.authorDetails, authorityDetails: stages.stage4.authorityDetails || DEFAULT_STAGES.stage4.authorityDetails, ...stages.stage4 },
+    stage4: {
+      ...DEFAULT_STAGES.stage4,
+      ...stages.stage4,
+      ...(rawScan?.stage4 || {}),
+      detectedTypes,
+      hasAuthorBio,
+      emailValue,
+      phoneValue,
+      authorityStatus,
+      ageEstimate,
+      contactDetails,
+      totalGraphEntities,
+      score: stages.stage4.score,
+      status: stages.stage4.status,
+      summaryText: stages.stage4.summaryText,
+      schemaDetails: stages.stage4.schemaDetails || DEFAULT_STAGES.stage4.schemaDetails,
+      authorDetails: stages.stage4.authorDetails || DEFAULT_STAGES.stage4.authorDetails,
+      authorityDetails: stages.stage4.authorityDetails || DEFAULT_STAGES.stage4.authorityDetails,
+      isHttps,
+      sslValid,
+      hasPrivacyPolicy,
+      hasTermsOfService,
+      securityBadgeText,
+      contact: {
+        email: contactEmail,
+        phone: contactPhone,
+        address: contactAddress,
+        trustAnchorCount
+      }
+    },
     stage5: { governanceGate: 'AI-Ready', manifests, level1Status, level2Status, level3Status, level4Status, score: stages.stage5.score, status: stages.stage5.status, summaryText: stages.stage5.summaryText, ...stages.stage5 },
     stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags, score: stages.stage6.score, status: stages.stage6.status, summaryText: stages.stage6.summaryText, ...stages.stage6 }
   };

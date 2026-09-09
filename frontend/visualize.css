@@ -308,3 +308,190 @@ button, a[role="button"], .shortcut-card-btn {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
   letter-spacing: 0.01em;
 }
+
+/* ==========================================================================
+   Stage 4: Unified 5-Card Trust & E-E-A-T Design Tokens
+   ========================================================================== */
+
+.stage4-grid,
+.stage4-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+@media (min-width: 1200px) {
+  .stage4-grid,
+  .stage4-cards-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Card Container Base */
+.stage4-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--surface-card, #161b22);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 12px;
+  padding: 18px 16px;
+  min-height: 380px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stage4-card:hover {
+  border-color: var(--border-accent, #58a6ff);
+}
+
+/* Card Header & Compact Status Pills */
+.stage4-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stage4-card .status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  line-height: 1;
+  height: 20px;
+  width: fit-content;
+}
+
+.stage4-card .status-pill.pill-confirmed,
+.stage4-card .status-pill.pill-success {
+  background: rgba(46, 160, 67, 0.15) !important;
+  color: #3fb950 !important;
+  border: 1px solid rgba(46, 160, 67, 0.35) !important;
+}
+
+.stage4-card .status-pill.pill-warning {
+  background: rgba(210, 153, 34, 0.15) !important;
+  color: #d29922 !important;
+  border: 1px solid rgba(210, 153, 34, 0.35) !important;
+}
+
+.stage4-card .status-pill.pill-critical,
+.stage4-card .status-pill.pill-danger {
+  background: rgba(248, 81, 73, 0.15) !important;
+  color: #f85149 !important;
+  border: 1px solid rgba(248, 81, 73, 0.35) !important;
+}
+
+.security-icon,
+.contact-icon,
+.card-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* Card Typography */
+.stage4-card .card-title {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin: 6px 0 4px 0;
+  line-height: 1.25;
+}
+
+/* Subtitle Highlight (Cyan tone matching Cards 1 & 2) */
+.stage4-card .badge-highlight,
+.stage4-card .card-subtitle {
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #58a6ff;
+  margin: 2px 0 10px 0;
+  line-height: 1.3;
+}
+
+.stage4-card .badge-highlight.badge-warning {
+  color: #d29922 !important;
+}
+
+.stage4-card .badge-highlight.badge-danger {
+  color: #f85149 !important;
+}
+
+/* Subtle Chips Container */
+.stage4-chip-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 10px 0;
+}
+
+/* Refined Entity Chips */
+.stage4-card .chip-tag.entity-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 0.77rem;
+  font-weight: 500;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c9d1d9;
+  word-break: break-word;
+  transition: all 0.2s ease;
+}
+
+.stage4-card .chip-tag.entity-chip.chip-success {
+  background: rgba(46, 160, 67, 0.08);
+  border-color: rgba(46, 160, 67, 0.25);
+  color: #3fb950;
+}
+
+.stage4-card .chip-tag.entity-chip.chip-warning {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #8b949e;
+}
+
+/* Action Links (matching Card 2 Author Guide Trigger) */
+.stage4-card .action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #58a6ff;
+  text-decoration: none;
+  margin-top: auto;
+  padding-top: 8px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.stage4-card .action-link:hover {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+
+/* Footer Compliance Copy */
+.stage4-card .compliance-note,
+.stage4-card .card-footer-note {
+  font-family: inherit;
+  font-size: 0.73rem;
+  color: #8b949e;
+  line-height: 1.35;
+  margin-top: 8px;
+}
+
+

@@ -285,7 +285,140 @@
             <div id="stage-1" data-stage="1" class="stage-container"></div>
             <div id="stage-2" data-stage="2" class="stage-container"></div>
             <div id="stage-3" data-stage="3" class="stage-container"></div>
-            <div id="stage-4" data-stage="4" class="stage-container"></div>
+            <div id="stage-4" data-stage="4" class="stage-container">
+              <div class="stage4-grid">
+                <!-- Stage 4 Card 1: Schema.org Entity Graph -->
+                <div class="stage4-card" id="stage4-card-schema" data-card="schema-org">
+                  <div class="stage4-card-header">
+                    <span class="status-pill" data-slot="schema-status-pill">--</span>
+                    <span class="schema-icon" data-icon="schema" aria-label="Schema Entity Graph">🏢</span>
+                  </div>
+                  <h4 class="card-title">Schema.org Entity Graph</h4>
+                  <div class="badge-highlight" data-slot="schema-badge">--</div>
+                  <div class="stage4-chip-container schema-chips" data-slot="schema-chips">
+                    <div class="chip-tag entity-chip" data-chip="schema-types">🏢 Detected Types: --</div>
+                    <div class="chip-tag entity-chip" data-chip="schema-coverage">📊 HTML Coverage: --</div>
+                  </div>
+                  <div class="stage4-card-metrics" style="display: none;">
+                    <div class="metric-row" data-metric="schema-coverage"><span class="metric-label">Coverage:</span><span class="metric-value">--</span></div>
+                    <div class="metric-row" data-metric="schema-types"><span class="metric-label">Detected Types:</span><span class="metric-value">--</span></div>
+                  </div>
+                  <a href="javascript:void(0)" class="action-link guide-trigger" data-action="schema-guide">🏢 View Schema Entity Graph ↗</a>
+                  <p class="compliance-note">JSON-LD structured organization nodes for AI entity extraction.</p>
+                </div>
+
+                <!-- Stage 4 Card 2: Author Person E-E-A-T -->
+                <div class="stage4-card" id="stage4-card-author" data-card="author-eeat">
+                  <div class="stage4-card-header">
+                    <span class="status-pill" data-slot="author-status-pill">--</span>
+                    <span class="author-icon" data-icon="author" aria-label="Author Person E-E-A-T">👤</span>
+                  </div>
+                  <h4 class="card-title">Author Person E-E-A-T</h4>
+                  <div class="badge-highlight" data-slot="author-badge">--</div>
+                  <div class="stage4-chip-container author-chips" data-slot="author-chips">
+                    <div class="chip-tag entity-chip" data-chip="author-name">👤 Author: --</div>
+                    <div class="chip-tag entity-chip" data-chip="author-credentials">💼 Credentials: --</div>
+                  </div>
+                  <div class="stage4-card-metrics" style="display: none;">
+                    <div class="metric-row" data-metric="author-count"><span class="metric-label">Authors:</span><span class="metric-value">--</span></div>
+                    <div class="metric-row" data-metric="author-credentials"><span class="metric-label">Credentials:</span><span class="metric-value">--</span></div>
+                  </div>
+                  <a href="javascript:void(0)" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.openAuthorModal ? window.AEO_COCKPIT.openAuthorModal() : null" class="action-link guide-trigger" data-action="author-guide">👤 Author Person E-E-A-T Guide</a>
+                  <p class="compliance-note">Author identity and sameAs knowledge graph verification for AI engine trust.</p>
+                </div>
+
+                <!-- Stage 4 Card 3: Domain Age & External Authority -->
+                <div class="stage4-card" id="stage4-card-domain" data-card="domain-age">
+                  <div class="stage4-card-header">
+                    <span class="status-pill" data-slot="domain-status-pill">--</span>
+                    <span class="domain-icon" data-icon="domain" aria-label="Domain Age & External Authority">🌐</span>
+                  </div>
+                  <h4 class="card-title">Domain Age &amp; External Authority</h4>
+                  <div class="badge-highlight" data-slot="domain-badge">--</div>
+                  <div class="stage4-chip-container domain-chips" data-slot="domain-chips">
+                    <div class="chip-tag entity-chip" data-chip="domain-registered">📅 Registered: --</div>
+                    <div class="chip-tag entity-chip" data-chip="domain-status">🌐 Authority Status: --</div>
+                  </div>
+                  <div class="stage4-card-metrics" style="display: none;">
+                    <div class="metric-row" data-metric="domain-age"><span class="metric-label">Domain Age:</span><span class="metric-value">--</span></div>
+                    <div class="metric-row" data-metric="domain-registered"><span class="metric-label">Registration Date:</span><span class="metric-value">--</span></div>
+                  </div>
+                  <a href="https://ahrefs.com/website-authority-checker" target="_blank" rel="noopener noreferrer" class="action-link domain-rating-trigger" data-action="domain-rating">⚡ Check Domain Rating on Ahrefs (Free) ↗</a>
+                  <p class="compliance-note">Verify third-party Domain Rating (DR) and backlink profile with zero paid API overhead.</p>
+                </div>
+
+                <!-- Stage 4 Card 4: Security & Privacy Protocols -->
+                <div class="stage4-card" id="stage4-card-security-privacy" data-card="security-privacy">
+                  <div class="stage4-card-header">
+                    <span class="status-pill" data-slot="card-status-pill">--</span>
+                    <span class="security-icon" data-icon="security" aria-label="Security Protocols">🔒</span>
+                  </div>
+                  <h4 class="card-title">Security & Privacy</h4>
+                  
+                  <div class="badge-highlight" data-slot="security-badge">--</div>
+                  
+                  <div class="stage4-chip-container policy-chips" data-slot="policy-chips">
+                    <span class="chip-tag entity-chip" data-chip="privacy-policy">Privacy Policy: --</span>
+                    <span class="chip-tag entity-chip" data-chip="terms-of-service">Terms of Service: --</span>
+                  </div>
+
+                  <!-- Metric Slots for Diagnostic Trace -->
+                  <div class="stage4-card-metrics" style="display: none;">
+                    <div class="metric-row" data-metric="ssl-protocol">
+                      <span class="metric-label">SSL Protocol:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                    <div class="metric-row" data-metric="privacy-policy">
+                      <span class="metric-label">Privacy Policy:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                    <div class="metric-row" data-metric="terms-of-service">
+                      <span class="metric-label">Terms of Service:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                  </div>
+
+                  <a href="#security-modal" class="action-link guide-trigger" data-action="security-guide">🛡️ Security & Legal Anchors</a>
+                  <p class="compliance-note">HTTPS encryption and legal compliance anchors verified for AI search engine trust.</p>
+                </div>
+
+                <!-- Stage 4 Card 5: Verified Contact Anchors -->
+                <div class="stage4-card" id="stage4-card-contact-anchors" data-card="verified-contact">
+                  <div class="stage4-card-header">
+                    <span class="status-pill" data-slot="contact-status-pill">--</span>
+                    <span class="contact-icon" data-icon="contact" aria-label="Contact Anchors">📞</span>
+                  </div>
+                  <h4 class="card-title">Verified Contact Anchors</h4>
+
+                  <div class="badge-highlight" data-slot="contact-badge">--</div>
+
+                  <div class="stage4-chip-container contact-chips" data-slot="contact-chips">
+                    <div class="chip-tag entity-chip contact-chip" data-chip="contact-email">✉ Email: --</div>
+                    <div class="chip-tag entity-chip contact-chip" data-chip="contact-phone">✆ Phone: --</div>
+                    <div class="chip-tag entity-chip contact-chip" data-chip="contact-address">⚲ Address: --</div>
+                  </div>
+
+                  <!-- Metric Slots for Diagnostic Trace -->
+                  <div class="stage4-card-metrics" style="display: none;">
+                    <div class="metric-row" data-metric="contact-email">
+                      <span class="metric-label">Email:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                    <div class="metric-row" data-metric="contact-phone">
+                      <span class="metric-label">Phone:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                    <div class="metric-row" data-metric="contact-address">
+                      <span class="metric-label">Address:</span>
+                      <span class="metric-value">--</span>
+                    </div>
+                  </div>
+
+                  <a href="#contact-modal" class="action-link contact-trace-trigger" data-action="contact-trace">↗ View /contact Route Trace</a>
+                  <p class="compliance-note">Direct organizational contact endpoints and schema PostalAddress for authority verification.</p>
+                </div>
+              </div>
+            </div>
             <div id="stage-5" data-stage="5" class="stage-container"></div>
             <div id="stage-6" data-stage="6" class="stage-container"></div>
           </div>
@@ -398,6 +531,9 @@
         <div class="text-[#5f6368]">$ aio-scanner --target=<span id="modal-target-display">target</span></div>
         <div id="modal-live-log" class="truncate">Initializing root socket handshake...</div>
       </div>
+    </div>
+  </div>
+
   <!-- AUTHOR E-E-A-T GUIDANCE MODAL -->
   <div id="author-eeat-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[100] flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hidden" style="display: none;">
     <div class="max-w-2xl w-full mx-4 bg-[#1f1f1f] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-8 shadow-2xl text-left space-y-5 max-h-[90vh] overflow-y-auto">
