@@ -316,7 +316,18 @@ export function mapBackendScanToV4State(rawPayload) {
   ].filter(Boolean);
 
   const routes = CANONICAL_ESSENTIAL_ROUTES.map((route) => {
-    const isFound = crawledPaths.some((p) => p === route || p.endsWith(route));
+    const cleanRouteName = route.replace(/^\//, '');
+    const isExplicitlyMissing = missingPages.some(m => {
+      const cleanM = String(m).toLowerCase().replace(/^\//, '');
+      return cleanM === cleanRouteName || cleanM.includes(cleanRouteName);
+    });
+
+    const isFoundInCrawled = crawledPaths.some(p => {
+      return p === route || p.endsWith(route) || p.endsWith(`/${cleanRouteName}`) || p.includes(`/${cleanRouteName}`);
+    });
+
+    const isFound = !isExplicitlyMissing || isFoundInCrawled;
+
     return {
       route,
       status: isFound ? 'discovered' : 'missing'

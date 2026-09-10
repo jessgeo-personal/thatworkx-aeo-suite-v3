@@ -62,6 +62,19 @@ const fetchPageWithTimeout = async (pageUrl) => {
   }
 };
 
+/**
+ * Equates apex and www hostnames (e.g. microsoft.com === www.microsoft.com)
+ */
+function isSameDomainOrSubdomain(targetUrl, candidateUrl) {
+  try {
+    const h1 = new URL(targetUrl).hostname.toLowerCase().replace(/^www\./, '');
+    const h2 = new URL(candidateUrl).hostname.toLowerCase().replace(/^www\./, '');
+    return h1 === h2;
+  } catch {
+    return false;
+  }
+}
+
 function formatDomainAgeResult(createdDate) {
   if (!createdDate || isNaN(createdDate.getTime())) {
     return {
@@ -979,6 +992,65 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
               missingAltList: []
             });
           }
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Proactive Probe for 5 Essential Routes (Overcomes crawl budget exhaustion)
+    // ---------------------------------------------------------------------------
+    const ESSENTIAL_PROBE_PATHS = [
+      '/about',
+      '/contact',
+      '/pricing',
+      '/privacy-policy',
+      '/terms-of-service'
+    ];
+
+    const pages = result.pages || [];
+    const discoveredRoutes = result.discoveredRoutes || [];
+
+    for (const probePath of ESSENTIAL_PROBE_PATHS) {
+      const alreadyFound = pages.some(p => {
+        try {
+          const path = (new URL(p.url, targetUrl).pathname || '').toLowerCase();
+          return path.includes(probePath.slice(1));
+        } catch (e) {
+          return false;
+        }
+      });
+
+      if (!alreadyFound) {
+        try {
+          const probeTarget = new URL(probePath, targetUrl).href;
+          const probeRes = await fetch(probeTarget, {
+            method: 'GET',
+            redirect: 'follow',
+            headers: {
+              'User-Agent': 'AIO-Diagnostic-Crawler/3.0 (+https://thatworkx.com/aeo)'
+            }
+          });
+
+          if (probeRes.ok) {
+            const finalUrl = probeRes.url || probeTarget;
+            if (isSameDomainOrSubdomain(targetUrl, finalUrl)) {
+              const rawHtml = await probeRes.text();
+              pages.push({
+                url: finalUrl,
+                statusCode: probeRes.status,
+                content: rawHtml,
+                wordCount: rawHtml.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length,
+                isCrawled: true
+              });
+              if (Array.isArray(discoveredRoutes) && !discoveredRoutes.includes(finalUrl)) {
+                discoveredRoutes.push(finalUrl);
+              } else if (discoveredRoutes && typeof discoveredRoutes.add === 'function') {
+                discoveredRoutes.add(finalUrl);
+              }
+            }
+          }
+        } catch (err) {
+          // Probe endpoint unreachable, skip gracefully
         }
       }
     }

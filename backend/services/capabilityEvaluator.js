@@ -8,6 +8,90 @@
  * Use "AI-Optimized" for core site checks and "AI-Ready" for machine manifest checks.
  */
 
+/**
+ * International Locale Prefix Pattern
+ * Matches optional 2-3 letter language codes and regional subtags (e.g. /en-us/, /de/, /fr-ca/)
+ */
+const LOCALE_PREFIX = '(?:\\/[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?)?';
+
+const ESSENTIAL_ANCHOR_DEFINITIONS = [
+  {
+    canonical: '/about',
+    patterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/about(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/about-us(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/company(?:\\/|\\.html)?$`, 'i'),
+      /^#about$/i,
+      /^#about-us$/i,
+      /^#company$/i,
+      /^\/#about$/i,
+      /^\/#about-us$/i,
+      /^\/#company$/i
+    ]
+  },
+  {
+    canonical: '/contact',
+    patterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/contact(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/contact-us(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/get-in-touch(?:\\/|\\.html)?$`, 'i'),
+      /^#contact$/i,
+      /^#contact-us$/i,
+      /^\/#contact$/i,
+      /^\/#contact-us$/i
+    ]
+  },
+  {
+    canonical: '/pricing',
+    patterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/pricing(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/plans(?:\\/|\\.html)?$`, 'i'),
+      /^#pricing$/i,
+      /^#plans$/i,
+      /^\/#pricing$/i,
+      /^\/#plans$/i
+    ]
+  },
+  {
+    canonical: '/privacy-policy',
+    patterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/privacy(?:-policy)?(?:\\/|\\.html)?$`, 'i'),
+      /^#privacy(?:-policy)?$/i,
+      /^\/#privacy(?:-policy)?$/i
+    ]
+  },
+  {
+    canonical: '/terms-of-service',
+    patterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/terms(?:-of-service|-and-conditions)?(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/tos(?:\\/|\\.html)?$`, 'i'),
+      /^#terms(?:-of-service|-and-conditions)?$/i,
+      /^#tos$/i,
+      /^\/#terms(?:-of-service|-and-conditions)?$/i,
+      /^\/#tos$/i
+    ]
+  }
+];
+
+/**
+ * Normalizes a URL, route, or hash for resilient matching.
+ */
+function extractPathForEvaluation(item) {
+  if (!item) return '';
+  const raw = typeof item === 'string' ? item : (item.url || item.path || item.route || '');
+  if (!raw) return '';
+  try {
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      const parsed = new URL(raw);
+      const cleanPath = parsed.pathname.replace(/\/$/, '') || '/';
+      return parsed.hash ? `${cleanPath}${parsed.hash.toLowerCase()}` : cleanPath;
+    }
+    return raw.split('?')[0].replace(/\/$/, '') || '/';
+  } catch {
+    return raw.replace(/\/$/, '') || '/';
+  }
+}
+
 const CAPABILITY_MATRIX = [
   // ═════════════════════════════════════════════════════════════════════════
   // SECTION 1: Can AI see your website? (Bot Gateway & Access Control - 3)
@@ -1275,17 +1359,38 @@ function evaluateCapabilities(crawledData = {}) {
   }
 
   // c) Missing Essential Pages Array
-  const essentialPagesList = ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'];
-  const detectedRoutes = new Set((crawledData.discoveredRoutes || []).map(r => typeof r === 'string' ? r : (r.path || r.route || '')));
-  const missingEssentialPages = essentialPagesList.filter(route => !detectedRoutes.has(route));
+  const pagesList = Array.isArray(crawledData.pages) ? crawledData.pages : [];
+  const inPageAnchors = Array.isArray(crawledData.inPageAnchors) ? crawledData.inPageAnchors : [];
+  const discoveredRoutesInput = Array.isArray(crawledData.discoveredRoutes) ? crawledData.discoveredRoutes : [];
+
+  const candidatePaths = [
+    ...pagesList.map(extractPathForEvaluation),
+    ...discoveredRoutesInput.map(extractPathForEvaluation),
+    ...inPageAnchors.map(a => String(a).trim().toLowerCase())
+  ].filter(Boolean);
+
+  const missingEssentialPages = [];
+  const foundEssentialPages = [];
+
+  for (const anchorDef of ESSENTIAL_ANCHOR_DEFINITIONS) {
+    const isFound = candidatePaths.some(path => 
+      anchorDef.patterns.some(pattern => pattern.test(path))
+    );
+
+    if (isFound) {
+      foundEssentialPages.push(anchorDef.canonical);
+    } else {
+      missingEssentialPages.push(anchorDef.canonical);
+    }
+  }
 
   // d) Domain Trust & EEAT Payload
   const isSecure = typeof crawledData.eeatMetrics?.isSecure === 'boolean'
     ? crawledData.eeatMetrics.isSecure
     : (sec2.isHttps !== false && (!targetUrl || targetUrl.startsWith('https')));
 
-  const hasContactPage = detectedRoutes.has('/contact') || (crawledData.pages || []).some(p => p.route === '/contact' || p.path === '/contact');
-  const hasPrivacyPage = detectedRoutes.has('/privacy-policy') || detectedRoutes.has('/privacy') || (crawledData.pages || []).some(p => p.route === '/privacy-policy' || p.route === '/privacy');
+  const hasContactPage = foundEssentialPages.includes('/contact');
+  const hasPrivacyPage = foundEssentialPages.includes('/privacy-policy');
 
   const hasContactInfo = Boolean(crawledData.eeatMetrics?.hasContactInfo || sec3.hasContactInfo || hasContactPage || emailValue !== 'None Detected' || phoneValue !== 'None Detected');
   const hasPrivacyPolicy = Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy || sec3.hasPrivacyPolicy || hasPrivacyPage);
@@ -1617,6 +1722,7 @@ function evaluateCapabilities(crawledData = {}) {
   crawledData.emailValue = emailValue;
   crawledData.phoneValue = phoneValue;
   crawledData.missingEssentialPages = missingEssentialPages;
+  crawledData.discoveredEssentialPages = foundEssentialPages;
   crawledData.scrapedContentPreview = scrapedContentPreview;
   crawledData.stages = stages;
 
@@ -1657,7 +1763,8 @@ function evaluateCapabilities(crawledData = {}) {
     eeatMetrics,
     emailValue,
     phoneValue,
-    missingEssentialPages
+    missingEssentialPages,
+    discoveredEssentialPages: foundEssentialPages
   };
 }
 
@@ -1690,7 +1797,8 @@ function evaluateAllCapabilities(scanData = {}) {
     eeatMetrics: evalResult.eeatMetrics,
     emailValue: evalResult.emailValue,
     phoneValue: evalResult.phoneValue,
-    missingEssentialPages: evalResult.missingEssentialPages
+    missingEssentialPages: evalResult.missingEssentialPages,
+    discoveredEssentialPages: evalResult.discoveredEssentialPages
   };
 }
 

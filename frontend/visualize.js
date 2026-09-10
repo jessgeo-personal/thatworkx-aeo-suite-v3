@@ -143,43 +143,66 @@ export function onScanComplete(scanResult) {
 }
 
 /**
+ * Optional International Locale Prefix
+ * Matches 2-3 letter language codes with optional country/script subtags:
+ * Examples: /en-us/, /de/, /fr-ca/, /zh-cn/, /es-es/, /ja/
+ */
+const LOCALE_PREFIX = '(?:\\/[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?)?';
+
+/**
  * 5-Anchor Essential Pages Configuration
- * Aligned with backend/services/capabilityEvaluator.js and crawlerService.js
+ * Fully internationalized and resilient to regional enterprise routing.
  */
 export const ESSENTIAL_PAGE_DEFINITIONS = [
   {
     key: 'about',
     canonicalName: 'about',
     label: 'About',
-    routePatterns: [/^\/about(\/|\.html)?$/i, /^\/about-us(\/|\.html)?$/i, /^\/company(\/|\.html)?$/i],
+    routePatterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/about(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/about-us(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/company(?:\\/|\\.html)?$`, 'i')
+    ],
     anchorPatterns: [/^#about$/i, /^#about-us$/i, /^#company$/i]
   },
   {
     key: 'contact',
     canonicalName: 'contact',
     label: 'Contact',
-    routePatterns: [/^\/contact(\/|\.html)?$/i, /^\/contact-us(\/|\.html)?$/i, /^\/get-in-touch(\/|\.html)?$/i],
+    routePatterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/contact(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/contact-us(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/get-in-touch(?:\\/|\\.html)?$`, 'i')
+    ],
     anchorPatterns: [/^#contact$/i, /^#contact-us$/i, /^#get-in-touch$/i]
   },
   {
     key: 'pricing',
     canonicalName: 'pricing',
     label: 'Pricing',
-    routePatterns: [/^\/pricing(\/|\.html)?$/i, /^\/plans(\/|\.html)?$/i, /^\/pricing\.html$/i],
+    routePatterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/pricing(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/plans(?:\\/|\\.html)?$`, 'i')
+    ],
     anchorPatterns: [/^#pricing$/i, /^#plans$/i]
   },
   {
     key: 'privacy',
     canonicalName: 'privacy-policy',
     label: 'Privacy Policy',
-    routePatterns: [/^\/privacy(-policy)?(\/|\.html)?$/i],
+    routePatterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/privacy(-policy)?(?:\\/|\\.html)?$`, 'i')
+    ],
     anchorPatterns: [/^#privacy(-policy)?$/i]
   },
   {
     key: 'terms',
     canonicalName: 'terms-of-service',
     label: 'Terms of Service',
-    routePatterns: [/^\/terms(-of-service|-and-conditions)?(\/|\.html)?$/i, /^\/tos(\/|\.html)?$/i],
+    routePatterns: [
+      new RegExp(`^${LOCALE_PREFIX}\\/terms(-of-service|-and-conditions)?(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${LOCALE_PREFIX}\\/tos(?:\\/|\\.html)?$`, 'i')
+    ],
     anchorPatterns: [/^#terms(-of-service)?$/i, /^#terms-and-conditions$/i, /^#tos$/i]
   }
 ];
@@ -335,9 +358,10 @@ export function renderStage2EssentialPages(crawledPages = [], inPageAnchors = []
       card.classList.remove('status-missing');
       card.classList.add('status-found');
 
+      const routePath = extractPathname(pageData.matchedRoute) || pageData.matchedRoute || def.canonicalName;
       const discoveryText = pageData.discoveryType === 'anchor'
         ? `Found: In-Page Section (${pageData.matchedAnchor})`
-        : `Found: Standalone Route (${pageData.matchedRoute || def.canonicalName})`;
+        : `Found: Standalone Route (${routePath})`;
 
       card.innerHTML = `
         <div class="font-semibold text-slate-200">${pageData.label}</div>
