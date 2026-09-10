@@ -2030,7 +2030,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
             </p>
           </div>
           <span class="text-xs font-mono text-[#38bdf8] font-bold px-3 py-1 rounded-md bg-[#38bdf8]/10 border border-[#38bdf8]/30 w-fit self-start sm:self-center flex-shrink-0">
-            Avg ${(pages.length ? (pages.reduce((acc, p) => acc + p.ratio, 0) / pages.length).toFixed(1) : '28.4')}% Density
+            Avg ${(pages.length ? (pages.reduce((acc, p) => acc + p.ratio, 0) / pages.length).toFixed(1) : '--')}% Density
           </span>
         </div>
 
@@ -2186,7 +2186,7 @@ export function renderStage4Canvas(container, state = cockpitState) {
     : (authorPass ? '1 Author(s) Verified' : '0 Authors Detected');
   const authorBadgeClass = authorPass ? '' : 'badge-danger';
 
-  const authorName = (authorDetails.authors && authorDetails.authors[0]?.name) || s4.authorName || (authorPass ? 'Thatworkx Solutions' : null);
+  const authorName = (authorDetails.authors && authorDetails.authors[0]?.name) || s4.authorName || null;
   const authorRole = (authorDetails.authors && authorDetails.authors[0]?.jobTitle) || 'sameAs Credentials';
 
   const authorNameChipText = authorName ? `👤 ${authorName}` : '👤 Author: None Detected';
@@ -2210,11 +2210,11 @@ export function renderStage4Canvas(container, state = cockpitState) {
 
   const ageVal = authorityDetails.domainAge && authorityDetails.domainAge !== '--'
     ? authorityDetails.domainAge
-    : (s4.ageEstimate || '1 Year, 5 Months');
+    : (s4.ageEstimate || '--');
   const authorityBadgeText = `Age: ${ageVal}`;
   const authorityBadgeClass = isAuthorityPass ? '' : 'badge-warning';
 
-  const regDate = authorityDetails.registrationDate || s4.registrationDate || '2025-03-27';
+  const regDate = authorityDetails.registrationDate || s4.registrationDate || '--';
   const regChipText = `📅 Registered: ${regDate}`;
   const regChipClass = 'chip-success';
 
@@ -2575,7 +2575,7 @@ export function renderStage4AuthorCard(state) {
   const authorCount = authorDetails.authorCount || (Array.isArray(authorDetails.authors) ? authorDetails.authors.length : 0);
   const authorPass = Boolean(authorCount > 0 || s4.hasAuthorBio || s4.authorCredentialsVerified);
 
-  const authorName = (authorDetails.authors && authorDetails.authors[0]?.name) || s4.authorName || (authorPass ? 'Thatworkx Solutions' : null);
+  const authorName = (authorDetails.authors && authorDetails.authors[0]?.name) || s4.authorName || null;
   const authorRole = (authorDetails.authors && authorDetails.authors[0]?.jobTitle) || 'sameAs Credentials';
 
   const statusPill = card.querySelector('[data-slot="author-status-pill"]');
@@ -2617,8 +2617,8 @@ export function renderStage4DomainCard(state) {
   const isAuthorityPass = authorityDetails.status === 'PASS';
   const ageVal = authorityDetails.domainAge && authorityDetails.domainAge !== '--'
     ? authorityDetails.domainAge
-    : (s4.ageEstimate || '1 Year, 5 Months');
-  const regDate = authorityDetails.registrationDate || s4.registrationDate || '2025-03-27';
+    : (s4.ageEstimate || '--');
+  const regDate = authorityDetails.registrationDate || s4.registrationDate || '--';
   const authStatusText = isAuthorityPass ? '🌐 Authority: Established Domain Anchor' : '🌐 Authority: Verification Pending';
 
   const statusPill = card.querySelector('[data-slot="domain-status-pill"]');
@@ -3053,9 +3053,105 @@ export function renderStage5Canvas(container, state = cockpitState) {
 
 export const renderStage5 = renderStage5Canvas;
 
-// -----------------------------------------------------------------------------
-// STAGE 6: EXECUTIVE SUMMARY & ACTION TRIAGE (BOARDROOM MACRO VIEW)
-// -----------------------------------------------------------------------------
+/**
+ * Generates dynamic Top 5 Action Triage based on live stage results.
+ * Prioritizes Critical Blockers > High Warnings > Proactive Optimizations.
+ * 
+ * @param {Object} state - The complete cockpit state
+ * @returns {Array} Array of 5 triage action objects
+ */
+export function generateDynamicTriage(state = {}) {
+  const issues = [];
+  
+  // Stage 1 (Critical)
+  if (state.stage1 && state.stage1.status !== 'PASS' && state.stage1.status !== 'OPTIMIZED' && state.stage1.status !== 'UNAUDITED') {
+    issues.push({
+      severity: 100,
+      title: "Unblock Restricted AI Bot Crawlers",
+      desc: "Explicitly allow AI search crawlers in /robots.txt and WAF rules to ensure ingestion.",
+      stepJump: 1,
+      isUpgrade: false
+    });
+  }
+  
+  // Stage 2 (High)
+  if (state.stage2 && state.stage2.status !== 'PASS' && state.stage2.status !== 'OPTIMIZED' && state.stage2.status !== 'UNAUDITED') {
+    const missing = state.stage2.missingCount || 0;
+    issues.push({
+      severity: 90,
+      title: `Deploy ${missing} Missing Canonical Route(s)`,
+      desc: "Establish canonical entity anchors to allow direct AI commercial citation and verification.",
+      stepJump: 2,
+      isUpgrade: false
+    });
+  }
+  
+  // Stage 3 (Medium)
+  if (state.stage3 && state.stage3.status !== 'PASS' && state.stage3.status !== 'OPTIMIZED' && state.stage3.status !== 'UNAUDITED') {
+    issues.push({
+      severity: 80,
+      title: "Optimize Client-Side Text Density",
+      desc: "Ensure pages deliver >= 25% server-rendered semantic HTML text to AI crawlers.",
+      stepJump: 3,
+      isUpgrade: false
+    });
+  }
+  
+  // Stage 4 (Medium)
+  if (state.stage4 && state.stage4.status !== 'PASS' && state.stage4.status !== 'OPTIMIZED' && state.stage4.status !== 'UNAUDITED') {
+    issues.push({
+      severity: 70,
+      title: "Embed Schema.org & Trust Anchors",
+      desc: "Add structured JSON-LD Organization, author credentials, and sameAs entity links.",
+      stepJump: 4,
+      isUpgrade: false
+    });
+  }
+  
+  // Stage 5 (Medium)
+  if (state.stage5 && state.stage5.status !== 'PASS' && state.stage5.status !== 'OPTIMIZED' && state.stage5.status !== 'UNAUDITED') {
+    issues.push({
+      severity: 60,
+      title: "Publish 4-Level Machine Manifest Hierarchy",
+      desc: "Deploy /llms.txt and /ai-context.md to supply dense knowledge blueprints to AI agents.",
+      stepJump: 5,
+      isUpgrade: false
+    });
+  }
+
+  // Sort identified issues by severity
+  issues.sort((a, b) => b.severity - a.severity);
+
+  // Proactive Optimizations (Upgrade paths for passing stages)
+  const optimizations = [
+    { title: "Maintain Global AI Crawler Whitelists", desc: "Continuously monitor and allow new AI bot agents.", stepJump: 1, isUpgrade: true },
+    { title: "Audit Core Canonical Entity Routes", desc: "Ensure your 5 core corporate anchors remain robust and indexable.", stepJump: 2, isUpgrade: true },
+    { title: "Enhance Semantic Information Gain", desc: "Deliver structured, high-density server-rendered facts.", stepJump: 3, isUpgrade: true },
+    { title: "Strengthen Knowledge Graph Equity", desc: "Validate structured schemas and author E-E-A-T credentials regularly.", stepJump: 4, isUpgrade: true },
+    { title: "Expand Machine Manifest Endpoints", desc: "Deploy Level 3 and 4 markdown context routes for advanced autonomous agents.", stepJump: 5, isUpgrade: true }
+  ];
+
+  // Fill remaining slots up to 5
+  let optIndex = 0;
+  while (issues.length < 5 && optIndex < optimizations.length) {
+    // Prevent duplicate stage prompts if an issue already exists for that stage
+    if (!issues.some(issue => issue.stepJump === optimizations[optIndex].stepJump)) {
+      issues.push(optimizations[optIndex]);
+    }
+    optIndex++;
+  }
+
+  return issues.slice(0, 5).map((item, idx) => ({
+    rank: idx + 1,
+    title: item.title,
+    desc: item.desc,
+    stepJump: item.stepJump,
+    stageStep: item.stepJump,
+    stage: `Stage ${item.stepJump}`,
+    isUpgrade: item.isUpgrade
+  }));
+}
+
 export function renderStage6Canvas(container, state = cockpitState) {
   const stg6 = state.stages?.stage6 || cockpitState.stages?.stage6 || state.stage6 || {};
   const s6 = state.stage6 || cockpitState.stage6 || {};
@@ -3065,58 +3161,50 @@ export function renderStage6Canvas(container, state = cockpitState) {
   const humanScore = stg6.humanWebReadiness ?? s6.aiOptimizedScore ?? state.humanWebReadiness ?? 0;
   const machineScore = stg6.machineWebReadiness ?? s6.aiReadyScore ?? state.machineWebReadiness ?? 0;
   const score = stg6.score || `${healthIndex}%`;
-  const status = stg6.status || (healthIndex >= 80 ? 'PASS' : 'WARN');
+  const status = stg6.status || (healthIndex >= 80 ? 'PASS' : (state.isAudited ? 'WARN' : 'UNAUDITED'));
   const summaryText = stg6.summaryText || s6.summaryText || 'Executive Triage: Prioritized AEO Actions Ready';
   const baseTakeaway = sec.takeaway || s6.takeaway || stg6.summaryText || 'Executive Boardroom: Composite health index and dual-pillar readiness synthesized across all audit modules with prioritized action triage.';
   const takeaway = summaryText ? `${summaryText} — ${baseTakeaway}` : baseTakeaway;
 
-  // Top 5 Urgent Action Items
-  const rawActions = state.top5Actions || s6.top5Actions || [];
-  const defaultActions = [
-    { rank: 1, title: "Unblock Restricted AI Bot Crawlers", desc: "Explicitly allow ClaudeBot, GPTBot, and regional AI search crawlers in /robots.txt.", stepJump: 1, stage: "Stage 1" },
-    { rank: 2, title: "Deploy Missing Canonical /pricing Route", desc: "Establish canonical pricing entity anchors for direct AI commercial citation.", stepJump: 2, stage: "Stage 2" },
-    { rank: 3, title: "Optimize Client-Side Text Density", desc: "Ensure pages deliver >= 25% server-rendered semantic HTML text to AI crawlers.", stepJump: 3, stage: "Stage 3" },
-    { rank: 4, title: "Embed Schema.org Organization Graph", desc: "Add structured JSON-LD Organization and sameAs entity links for knowledge graph indexing.", stepJump: 4, stage: "Stage 4" },
-    { rank: 5, title: "Publish 4-Level Machine Manifest Hierarchy", desc: "Deploy /llms.txt and /ai-context.md to supply dense knowledge blueprints to AI agents.", stepJump: 5, stage: "Stage 5" }
-  ];
-  const top5Actions = rawActions.length > 0 ? rawActions : defaultActions;
+  // Dynamically generate Top 5 Urgent Action Items
+  const top5Actions = generateDynamicTriage(state);
 
-  // 5 Stages Matrix for bottom scorecard
+  // 5 Stages Matrix for bottom scorecard (Strict Zero-Fallback Mapping)
   const stagesSummary = [
     {
       step: 1,
       title: "AI Bot Blocks & Crawlers",
-      score: state.stages?.stage1?.score || state.stage1?.score || "100%",
-      status: state.stages?.stage1?.status || state.stage1?.status || "PASS",
-      summary: state.stages?.stage1?.summaryText || "20/20 AI Bots Verified Unblocked"
+      score: state.stages?.stage1?.score || state.stage1?.score || "--",
+      status: state.stages?.stage1?.status || state.stage1?.status || "UNAUDITED",
+      summary: state.stages?.stage1?.summaryText || state.stage1?.summaryText || "--"
     },
     {
       step: 2,
       title: "Essential Pages & Anchors",
-      score: state.stages?.stage2?.score || state.stage2?.score || "80%",
-      status: state.stages?.stage2?.status || state.stage2?.status || "PASS",
-      summary: state.stages?.stage2?.summaryText || "Canonical Anchors Verified"
+      score: state.stages?.stage2?.score || state.stage2?.score || "--",
+      status: state.stages?.stage2?.status || state.stage2?.status || "UNAUDITED",
+      summary: state.stages?.stage2?.summaryText || state.stage2?.summaryText || "--"
     },
     {
       step: 3,
       title: "Content Density & Extractability",
-      score: state.stages?.stage3?.score || state.stage3?.score || "85%",
-      status: state.stages?.stage3?.status || state.stage3?.status || "PASS",
-      summary: state.stages?.stage3?.summaryText || "Citation Readability High"
+      score: state.stages?.stage3?.score || state.stage3?.score || "--",
+      status: state.stages?.stage3?.status || state.stage3?.status || "UNAUDITED",
+      summary: state.stages?.stage3?.summaryText || state.stage3?.summaryText || "--"
     },
     {
       step: 4,
       title: "Trust, E-E-A-T & Privacy",
-      score: state.stages?.stage4?.score || state.stage4?.score || "80%",
-      status: state.stages?.stage4?.status || state.stage4?.status || "PASS",
-      summary: state.stages?.stage4?.summaryText || "Schema & Entity Validated"
+      score: state.stages?.stage4?.score || state.stage4?.score || "--",
+      status: state.stages?.stage4?.status || state.stage4?.status || "UNAUDITED",
+      summary: state.stages?.stage4?.summaryText || state.stage4?.summaryText || "--"
     },
     {
       step: 5,
       title: "AI-Ready Machine Manifests",
-      score: state.stages?.stage5?.score || state.stage5?.score || "71%",
-      status: state.stages?.stage5?.status || state.stage5?.status || "WARN",
-      summary: state.stages?.stage5?.summaryText || "4-Level Hierarchy Protocols"
+      score: state.stages?.stage5?.score || state.stage5?.score || "--",
+      status: state.stages?.stage5?.status || state.stage5?.status || "UNAUDITED",
+      summary: state.stages?.stage5?.summaryText || state.stage5?.summaryText || "--"
     }
   ];
 
@@ -3201,7 +3289,7 @@ export function renderStage6Canvas(container, state = cockpitState) {
             <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
               <div class="space-y-1">
                 <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">PRIORITY TRIAGE</span>
-                <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">Top 5 Urgent Action Items</h4>
+                <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">Top 5 Action Items</h4>
                 <p class="text-xs text-[#5f6368]">Highest ROI remediation steps ranked by algorithm impact</p>
               </div>
               <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-[#38bdf8]">
@@ -3210,24 +3298,29 @@ export function renderStage6Canvas(container, state = cockpitState) {
             </div>
 
             <div class="space-y-3">
-              ${top5Actions.slice(0, 5).map((action, idx) => {
-                const rankNum = action.rank || (idx + 1);
-                const stepJump = action.stepJump || (idx + 1);
+              ${top5Actions.map((action) => {
+                const buttonHtml = action.isUpgrade 
+                  ? `<button type="button" onclick="alert('Redirecting to AIOptimize Pro to fulfill ${action.title} requirement.');" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#b7410e] to-[#d45d2a] border border-[#b7410e]/60 text-white hover:text-white text-xs font-bold transition shadow-sm whitespace-nowrap self-start sm:self-center flex items-center space-x-1 active:scale-95 flex-shrink-0">
+                       <span>Upgrade to AIOptimize</span>
+                       <span>⚡</span>
+                     </button>`
+                  : `<button type="button" onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${action.stepJump}) : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm whitespace-nowrap self-start sm:self-center flex items-center space-x-1 active:scale-95 flex-shrink-0">
+                       <span>Fix in Stage ${action.stepJump}</span>
+                       <span>→</span>
+                     </button>`;
+
                 return `
-                  <div class="action-item-card p-3.5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition" data-action-item="${rankNum}">
+                  <div class="action-item-card p-3.5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition" data-action-item="${action.rank}">
                     <div class="flex items-start space-x-3">
-                      <span class="w-6 h-6 rounded-full bg-[#b7410e]/20 text-[#d45d2a] border border-[#b7410e]/40 flex items-center justify-center font-mono font-black text-xs flex-shrink-0 mt-0.5">
-                        ${rankNum}
+                      <span class="w-6 h-6 rounded-full ${action.isUpgrade ? 'bg-[#38bdf8]/20 text-[#38bdf8] border-[#38bdf8]/40' : 'bg-[#b7410e]/20 text-[#d45d2a] border-[#b7410e]/40'} border flex items-center justify-center font-mono font-black text-xs flex-shrink-0 mt-0.5">
+                        ${action.rank}
                       </span>
                       <div>
                         <h5 class="text-xs sm:text-sm font-bold text-white font-headline">${action.title}</h5>
-                        <p class="text-xs text-[#bdc1c6] mt-0.5 leading-relaxed">${action.desc || action.detail || ''}</p>
+                        <p class="text-xs text-[#bdc1c6] mt-0.5 leading-relaxed">${action.desc || ''}</p>
                       </div>
                     </div>
-                    <button type="button" onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stepJump}) : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm whitespace-nowrap self-start sm:self-center flex items-center space-x-1 active:scale-95 flex-shrink-0">
-                      <span>Fix in Stage ${stepJump}</span>
-                      <span>→</span>
-                    </button>
+                    ${buttonHtml}
                   </div>
                 `;
               }).join('')}
@@ -3248,13 +3341,16 @@ export function renderStage6Canvas(container, state = cockpitState) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
           ${stagesSummary.map(stg => {
-            const isPass = stg.status === 'PASS';
+            const isPass = stg.status === 'PASS' || stg.status === 'OPTIMIZED';
+            const isUn = stg.status === 'UNAUDITED';
+            const valColor = isPass ? 'text-[#10b981]' : (stg.status === 'WARN' ? 'text-[#f59e0b]' : (isUn ? 'text-[#bdc1c6]' : 'text-red-400'));
+            
             return `
               <div onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stg.step}) : null" class="scorecard-matrix-card p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] cursor-pointer transition flex flex-col justify-between space-y-3 group shadow-md" data-stage-card="${stg.step}">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6]">STAGE ${stg.step}</span>
-                    <span class="text-xs font-mono font-black ${isPass ? 'text-[#10b981]' : (stg.status === 'WARN' ? 'text-[#f59e0b]' : 'text-red-400')}">${stg.score}</span>
+                    <span class="text-xs font-mono font-black ${valColor}">${stg.score}</span>
                   </div>
                   <h5 class="text-xs font-bold text-white group-hover:text-[#d45d2a] transition font-headline">${stg.title}</h5>
                   <p class="text-[11px] text-[#bdc1c6] leading-relaxed line-clamp-2">${stg.summary}</p>
@@ -3414,6 +3510,7 @@ if (typeof window !== 'undefined') {
     renderStage5Canvas,
     renderStage6: renderStage6Canvas,
     renderStage6Canvas,
+    generateDynamicTriage,
     renderStageFromState
   };
 
