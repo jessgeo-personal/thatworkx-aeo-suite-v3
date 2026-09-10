@@ -282,8 +282,58 @@
 
           <!-- Stage Containers (Hidden: Kept in DOM for test harness backwards compatibility) -->
           <div id="stage-containers" class="hidden" style="display: none;">
-            <div id="stage-1" data-stage="1" class="stage-container"></div>
-            <div id="stage-2" data-stage="2" class="stage-container"></div>
+            <div id="stage-1" data-stage="1" class="stage-container">
+              <!-- Inside Robots.txt Directives grid/container -->
+              <div class="directives-grid">
+                <!-- ADD: Allowed AI bots Directive Card -->
+                <div class="directive-card card" id="stage1-allowed-bots-card">
+                  <div class="card-header flex items-center justify-between">
+                    <h4 class="card-title directive-title">Allowed AI bots</h4>
+                    <div id="stage1-allowed-bots-badge" class="badge badge-fail">FAIL</div>
+                  </div>
+                  <p class="card-subtitle directive-subtitle text-sm text-slate-400">Actual number of AI bots that are allowed to read your website</p>
+                </div>
+              </div>
+
+              <!-- Inside Stage 1 Supplementary Cards row -->
+              <div class="supplementary-grid grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <!-- REPLACE legacy Latency card with Allowed AI Bots count card -->
+                <div class="supplementary-card card metric-card" id="stage1-bot-count-card" data-metric="allowed-bots-count">
+                  <div class="metric-label text-xs uppercase tracking-wider text-slate-400">AI Crawlers Allowed</div>
+                  <div class="metric-value text-2xl font-bold text-fail" id="stage1-bot-count-value">0/20 bots allowed</div>
+                </div>
+              </div>
+            </div>
+            <section id="stage-2" data-stage="2" class="stage-container hidden">
+              <div class="stage-header mb-6">
+                <h3 class="text-xl font-bold text-slate-100">Stage 2: Essential Pages & Route Discovery</h3>
+                <p class="text-sm text-slate-400">Inspection of the 5-Anchor Core Business Matrix (Routes & Single-Page Section Anchors)</p>
+              </div>
+
+              <!-- Essential Pages 5-Anchor Grid Container -->
+              <div id="stage2-essential-pages-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 my-6">
+                <div class="card essential-page-card status-missing p-4 rounded-lg bg-slate-900/60 border border-slate-800" data-page="about">
+                  <div class="font-semibold text-slate-200">About</div>
+                  <div class="status-indicator text-xs text-slate-400 mt-1">Missing</div>
+                </div>
+                <div class="card essential-page-card status-missing p-4 rounded-lg bg-slate-900/60 border border-slate-800" data-page="contact">
+                  <div class="font-semibold text-slate-200">Contact</div>
+                  <div class="status-indicator text-xs text-slate-400 mt-1">Missing</div>
+                </div>
+                <div class="card essential-page-card status-missing p-4 rounded-lg bg-slate-900/60 border border-slate-800" data-page="pricing">
+                  <div class="font-semibold text-slate-200">Pricing</div>
+                  <div class="status-indicator text-xs text-slate-400 mt-1">Missing</div>
+                </div>
+                <div class="card essential-page-card status-missing p-4 rounded-lg bg-slate-900/60 border border-slate-800" data-page="privacy">
+                  <div class="font-semibold text-slate-200">Privacy Policy</div>
+                  <div class="status-indicator text-xs text-slate-400 mt-1">Missing</div>
+                </div>
+                <div class="card essential-page-card status-missing p-4 rounded-lg bg-slate-900/60 border border-slate-800" data-page="terms">
+                  <div class="font-semibold text-slate-200">Terms of Service</div>
+                  <div class="status-indicator text-xs text-slate-400 mt-1">Missing</div>
+                </div>
+              </div>
+            </section>
             <div id="stage-3" data-stage="3" class="stage-container"></div>
             <div id="stage-4" data-stage="4" class="stage-container">
               <div class="stage4-grid">

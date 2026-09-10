@@ -1,5 +1,361 @@
 import { mapBackendScanToV4State } from './v4PayloadAdapter.js';
 
+/**
+ * Core AI Bot Definitions & Stage Flow Control
+ */
+export const CORE_AI_BOTS = [
+  'GPTBot',
+  'ClaudeBot',
+  'Google-Extended',
+  'PerplexityBot',
+  'Meta-ExternalAgent',
+  'Qwenbot',
+  'CCBot',
+  'MistralBot'
+];
+
+let currentStage = 1;
+
+/**
+ * Evaluates bot directive status based on count, crawler roster, and core bot presence.
+ * Supports numbers, string lists, and crawler object arrays.
+ * 
+ * @param {number|Array} countOrList - Total allowed bots count or array of crawlers.
+ * @param {number} [totalBots=20] - Total bot capacity.
+ * @param {Object} [options={}] - Additional evaluation criteria.
+ * @returns {{ badgeText: string, badgeClass: string, cardText: string, colorClass: string }}
+ */
+export function evaluateBotDirectiveStatus(countOrList, totalBots = 20, options = {}) {
+  let allowedCount = 0;
+  let coreBotsPassed = true;
+
+  if (Array.isArray(countOrList)) {
+    const allowedItems = countOrList.filter(item => {
+      if (typeof item === 'object' && item !== null && 'allowed' in item) {
+        return Boolean(item.allowed);
+      }
+      return true;
+    });
+    allowedCount = allowedItems.length;
+    const lowerList = allowedItems.map(b => {
+      if (typeof b === 'object' && b !== null) {
+        return String(b.name || b.key || '').toLowerCase();
+      }
+      return String(b).toLowerCase();
+    });
+    coreBotsPassed = CORE_AI_BOTS.every(coreBot => lowerList.includes(coreBot.toLowerCase()));
+  } else if (typeof countOrList === 'number') {
+    allowedCount = countOrList;
+    if (options.coreBotsAllowed !== undefined) {
+      coreBotsPassed = Boolean(options.coreBotsAllowed);
+    }
+  }
+
+  // 0 bots allowed: FAIL
+  if (allowedCount === 0) {
+    return {
+      badgeText: 'FAIL',
+      badgeClass: 'badge-fail',
+      cardText: `0/${totalBots} bots allowed`,
+      colorClass: 'text-fail'
+    };
+  }
+
+  // All 20 bots allowed with core bots intact: ENABLED
+  if (allowedCount >= totalBots && coreBotsPassed) {
+    return {
+      badgeText: 'ENABLED',
+      badgeClass: 'badge-pass',
+      cardText: `${totalBots}/${totalBots} bots allowed`,
+      colorClass: 'text-pass'
+    };
+  }
+
+  // If core AI bots requirement is violated, flag as FAIL
+  if (!coreBotsPassed) {
+    return {
+      badgeText: 'FAIL',
+      badgeClass: 'badge-fail',
+      cardText: `${allowedCount}/${totalBots} bots allowed`,
+      colorClass: 'text-fail'
+    };
+  }
+
+  // Partial coverage (Core bots allowed, secondary bots blocked)
+  return {
+    badgeText: 'PARTIAL',
+    badgeClass: 'badge-warning',
+    cardText: `${allowedCount}/${totalBots} bots allowed`,
+    colorClass: 'text-warning'
+  };
+}
+
+export function getCurrentStage() {
+  return currentStage;
+}
+
+export function switchStage(stageNumber) {
+  currentStage = stageNumber;
+  cockpitState.currentStep = stageNumber;
+
+  for (let i = 1; i <= 6; i++) {
+    const stageContainer = document.getElementById(`stage-${i}`);
+    const stepperBtn = document.getElementById(`stepper-btn-${i}`) || document.querySelector(`[data-step="${i}"]`);
+
+    if (stageContainer) {
+      if (i === stageNumber) {
+        stageContainer.classList.remove('hidden');
+      } else {
+        stageContainer.classList.add('hidden');
+      }
+    }
+
+    if (stepperBtn) {
+      if (i === stageNumber) {
+        stepperBtn.classList.add('active');
+        stepperBtn.setAttribute('aria-selected', 'true');
+      } else {
+        stepperBtn.classList.remove('active');
+        stepperBtn.setAttribute('aria-selected', 'false');
+      }
+    }
+  }
+}
+
+export function onScanComplete(scanResult) {
+  switchStage(6);
+
+  const stage1BotsBadge = document.getElementById('stage1-allowed-bots-badge');
+  const stage1BotsVal = document.getElementById('stage1-bot-count-value');
+
+  if (scanResult && (scanResult.allowedBots !== undefined || scanResult.crawlers || scanResult.results?.crawlers)) {
+    const botsSource = scanResult.allowedBots ?? scanResult.crawlers ?? scanResult.results?.crawlers ?? [];
+    const status = evaluateBotDirectiveStatus(botsSource);
+    if (stage1BotsBadge) {
+      stage1BotsBadge.textContent = status.badgeText;
+      stage1BotsBadge.className = `badge ${status.badgeClass}`;
+    }
+    if (stage1BotsVal) {
+      stage1BotsVal.textContent = status.cardText;
+      stage1BotsVal.className = `metric-value text-2xl font-bold ${status.colorClass}`;
+    }
+  }
+}
+
+/**
+ * 5-Anchor Essential Pages Configuration
+ * Aligned with backend/services/capabilityEvaluator.js and crawlerService.js
+ */
+export const ESSENTIAL_PAGE_DEFINITIONS = [
+  {
+    key: 'about',
+    canonicalName: 'about',
+    label: 'About',
+    routePatterns: [/^\/about(\/|\.html)?$/i, /^\/about-us(\/|\.html)?$/i, /^\/company(\/|\.html)?$/i],
+    anchorPatterns: [/^#about$/i, /^#about-us$/i, /^#company$/i]
+  },
+  {
+    key: 'contact',
+    canonicalName: 'contact',
+    label: 'Contact',
+    routePatterns: [/^\/contact(\/|\.html)?$/i, /^\/contact-us(\/|\.html)?$/i, /^\/get-in-touch(\/|\.html)?$/i],
+    anchorPatterns: [/^#contact$/i, /^#contact-us$/i, /^#get-in-touch$/i]
+  },
+  {
+    key: 'pricing',
+    canonicalName: 'pricing',
+    label: 'Pricing',
+    routePatterns: [/^\/pricing(\/|\.html)?$/i, /^\/plans(\/|\.html)?$/i, /^\/pricing\.html$/i],
+    anchorPatterns: [/^#pricing$/i, /^#plans$/i]
+  },
+  {
+    key: 'privacy',
+    canonicalName: 'privacy-policy',
+    label: 'Privacy Policy',
+    routePatterns: [/^\/privacy(-policy)?(\/|\.html)?$/i],
+    anchorPatterns: [/^#privacy(-policy)?$/i]
+  },
+  {
+    key: 'terms',
+    canonicalName: 'terms-of-service',
+    label: 'Terms of Service',
+    routePatterns: [/^\/terms(-of-service|-and-conditions)?(\/|\.html)?$/i, /^\/tos(\/|\.html)?$/i],
+    anchorPatterns: [/^#terms(-of-service)?$/i, /^#terms-and-conditions$/i, /^#tos$/i]
+  }
+];
+
+/**
+ * Extracts normalized pathname from URL or relative string
+ * @param {string} urlStr 
+ * @returns {string}
+ */
+function extractPathname(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return '';
+  try {
+    if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) {
+      const parsed = new URL(urlStr);
+      return parsed.pathname.replace(/\/$/, '') || '/';
+    }
+    return urlStr.split('?')[0].split('#')[0].replace(/\/$/, '') || '/';
+  } catch {
+    return urlStr;
+  }
+}
+
+/**
+ * Normalizes an in-page section anchor tag (e.g. "/#about" -> "#about")
+ * @param {string} anchor 
+ * @returns {string}
+ */
+function normalizeAnchorTag(anchor) {
+  if (!anchor || typeof anchor !== 'string') return '';
+  const clean = anchor.trim().toLowerCase();
+  if (clean.startsWith('/#')) return clean.slice(1);
+  if (!clean.startsWith('#')) return `#${clean}`;
+  return clean;
+}
+
+/**
+ * Evaluates the 5 essential pages against crawled routes and in-page anchor section fallbacks.
+ * 
+ * @param {Array<{url: string}>|Array<string>} crawledPages 
+ * @param {Array<string>} [inPageAnchors=[]] 
+ * @returns {Object} { foundCount, missingCount, missingPages, pages }
+ */
+export function evaluateEssentialPages(crawledPages = [], inPageAnchors = []) {
+  const pagesList = Array.isArray(crawledPages) ? crawledPages : [];
+  const rawAnchors = Array.isArray(inPageAnchors) ? inPageAnchors : [];
+
+  const normalizedPaths = pagesList.map(p => {
+    const raw = typeof p === 'string' ? p : (p?.url || '');
+    return extractPathname(raw);
+  });
+
+  const normalizedAnchors = rawAnchors.map(normalizeAnchorTag);
+
+  const pagesResult = {};
+  const missingPages = [];
+  let foundCount = 0;
+
+  for (const def of ESSENTIAL_PAGE_DEFINITIONS) {
+    let found = false;
+    let discoveryType = 'none';
+    let matchedRoute = null;
+    let matchedAnchor = null;
+
+    // 1. Standalone Route Inspection
+    const routeIndex = normalizedPaths.findIndex(path => 
+      def.routePatterns.some(pattern => pattern.test(path))
+    );
+
+    if (routeIndex !== -1) {
+      found = true;
+      discoveryType = 'route';
+      matchedRoute = typeof pagesList[routeIndex] === 'string' 
+        ? pagesList[routeIndex] 
+        : pagesList[routeIndex]?.url;
+    } else {
+      // 2. In-Page Anchor Section Fallback Inspection (#about, #contact, etc.)
+      const anchorMatch = normalizedAnchors.find(anchor => 
+        def.anchorPatterns.some(pattern => pattern.test(anchor))
+      );
+
+      if (anchorMatch) {
+        found = true;
+        discoveryType = 'anchor';
+        matchedAnchor = anchorMatch;
+      }
+    }
+
+    if (found) {
+      foundCount++;
+    } else {
+      missingPages.push(def.canonicalName);
+    }
+
+    const pageStatus = {
+      key: def.key,
+      canonicalName: def.canonicalName,
+      label: def.label,
+      found,
+      discoveryType,
+      matchedRoute,
+      matchedAnchor
+    };
+
+    pagesResult[def.key] = pageStatus;
+
+    // Alias canonical route names for dual-key resilience
+    if (def.canonicalName !== def.key) {
+      pagesResult[def.canonicalName] = pageStatus;
+    }
+  }
+
+  const missingCount = ESSENTIAL_PAGE_DEFINITIONS.length - foundCount;
+
+  return {
+    foundCount,
+    missingCount,
+    missingPages,
+    pages: pagesResult
+  };
+}
+
+/**
+ * Renders the Stage 2 Essential Pages 5-Anchor cards into the DOM
+ * 
+ * @param {Array<{url: string}>|Array<string>} crawledPages 
+ * @param {Array<string>} inPageAnchors 
+ * @returns {Object} evaluation result
+ */
+export function renderStage2EssentialPages(crawledPages = [], inPageAnchors = []) {
+  const evaluation = evaluateEssentialPages(crawledPages, inPageAnchors);
+  const stage2 = document.getElementById('stage-2');
+
+  if (!stage2) return evaluation;
+
+  let listContainer = stage2.querySelector('#stage2-essential-pages-list');
+  if (!listContainer) {
+    listContainer = document.createElement('div');
+    listContainer.id = 'stage2-essential-pages-list';
+    stage2.appendChild(listContainer);
+  }
+
+  for (const def of ESSENTIAL_PAGE_DEFINITIONS) {
+    let card = listContainer.querySelector(`[data-page="${def.key}"]`);
+    if (!card) {
+      card = document.createElement('div');
+      card.setAttribute('data-page', def.key);
+      listContainer.appendChild(card);
+    }
+
+    const pageData = evaluation.pages[def.key];
+
+    if (pageData.found) {
+      card.classList.remove('status-missing');
+      card.classList.add('status-found');
+
+      const discoveryText = pageData.discoveryType === 'anchor'
+        ? `Found: In-Page Section (${pageData.matchedAnchor})`
+        : `Found: Standalone Route (${pageData.matchedRoute || def.canonicalName})`;
+
+      card.innerHTML = `
+        <div class="font-semibold text-slate-200">${pageData.label}</div>
+        <div class="status-indicator text-xs text-pass font-medium mt-1">${discoveryText}</div>
+      `;
+    } else {
+      card.classList.remove('status-found');
+      card.classList.add('status-missing');
+      card.innerHTML = `
+        <div class="font-semibold text-slate-200">${pageData.label}</div>
+        <div class="status-indicator text-xs text-fail font-medium mt-1">Missing</div>
+      `;
+    }
+  }
+
+  return evaluation;
+}
+
 // Internal Error Tracking Store (Zero Dummy Data Enforcement)
 const cockpitErrorLogs = [];
 
@@ -431,7 +787,7 @@ export async function executeCockpitScan(targetUrl) {
       ...mapped,
       stage2Data: mapped.stage2 ? updateStage2FromPayload({ stage2: mapped.stage2, ...payload }) : updateStage2FromPayload(payload),
       isAudited: true,
-      currentStep: 1,
+      currentStep: 6, // Sets Stage 6 as the default view
       completedSteps: [1, 2, 3, 4, 5, 6],
       scanningStep: null,
       targetUrl: targetUrl.trim(),
@@ -456,6 +812,7 @@ export async function executeCockpitScan(targetUrl) {
     };
 
     hideAuditModal();
+    onScanComplete(payload);
     renderCockpit();
   } catch (err) {
     hideAuditModal();
@@ -816,8 +1173,7 @@ export function renderStage1(container, state = cockpitState) {
   const sec = (state.sections && state.sections[1]) || (cockpitState.sections && cockpitState.sections[1]) || {};
   const rawCrawlers = s1.crawlers || [];
 
-  // Dynamic Metrics Calculation from Live Crawlers
-  const total = rawCrawlers.length;
+  const total = 20;
   const allowed = rawCrawlers.filter(c => c.allowed).length;
   const blocked = total - allowed;
   const calculatedScore = total > 0 ? `${Math.round((allowed / total) * 100)}%` : '100%';
@@ -825,9 +1181,17 @@ export function renderStage1(container, state = cockpitState) {
 
   const score = stg1.score || (s1.score && s1.score !== '0%' ? s1.score : calculatedScore);
   const status = stg1.status || (s1.status && s1.status !== 'UNAUDITED' ? s1.status : calculatedStatus);
-  const summaryText = stg1.summaryText || s1.summaryText || (total > 0 ? `Bot Access: ${allowed}/${total} Verified Unblocked` : 'Bot Access: Verified Unblocked');
+  const summaryText = stg1.summaryText || s1.summaryText || `Bot Access: ${allowed}/${total} Verified Unblocked`;
   const isPass = status === 'PASS' || status === 'OPTIMIZED';
-  const latency = s1.robotsFetchMs ? `${s1.robotsFetchMs}ms` : '120ms';
+
+  // Evaluate Bot Directives using the unified engine
+  const botStatus = evaluateBotDirectiveStatus(rawCrawlers.length > 0 ? rawCrawlers : allowed, total);
+
+  const botStatusBadgeClass = botStatus.badgeText === 'ENABLED'
+    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40'
+    : (botStatus.badgeText === 'PARTIAL'
+      ? 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/40'
+      : 'bg-red-950 text-red-400 border border-red-500/40');
 
   const gateway = s1.gateway || {
     robotsTxt: 'VALID',
@@ -841,7 +1205,6 @@ export function renderStage1(container, state = cockpitState) {
     : 'bg-red-950 text-red-400 border border-red-500/40';
   const gatewayBadgeText = gatewayPass ? `${score} PASS` : `${score} FAIL`;
 
-  // Dynamic Takeaway & Action Narrative (Never Empty or Mock)
   const baseTakeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
     ? sec.takeaway
     : (total > 0 && allowed === total)
@@ -916,6 +1279,7 @@ export function renderStage1(container, state = cockpitState) {
             </div>
 
             <div class="space-y-3.5">
+              <!-- Robots.txt Directives -->
               <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] flex items-center justify-between shadow-inner">
                 <div class="space-y-1">
                   <div class="text-base sm:text-lg font-black text-white font-headline">robots.txt Directives</div>
@@ -924,6 +1288,16 @@ export function renderStage1(container, state = cockpitState) {
                 <span class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-mono font-black ${gateway.robotsTxt === 'VALID' ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">${gateway.robotsTxt}</span>
               </div>
 
+              <!-- Allowed AI bots Directive Card -->
+              <div class="directive-card card p-5 rounded-2xl bg-[#121212] border border-[#3c4043] flex items-center justify-between shadow-inner" id="canvas-stage1-allowed-bots-card">
+                <div class="space-y-1">
+                  <div class="card-title directive-title text-base sm:text-lg font-black text-white font-headline">Allowed AI bots</div>
+                  <div class="card-subtitle directive-subtitle text-xs sm:text-sm text-[#bdc1c6]">Actual number of AI bots that are allowed to read your website</div>
+                </div>
+                <span class="badge px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-mono font-black ${botStatusBadgeClass}">${botStatus.badgeText}</span>
+              </div>
+
+              <!-- Cloudflare Challenge Gate -->
               <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] flex items-center justify-between shadow-inner">
                 <div class="space-y-1">
                   <div class="text-base sm:text-lg font-black text-white font-headline">Cloudflare Challenge Gate</div>
@@ -932,6 +1306,7 @@ export function renderStage1(container, state = cockpitState) {
                 <span class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-mono font-black ${gateway.cloudflareChallenge === 'CLEAN' ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">${gateway.cloudflareChallenge}</span>
               </div>
 
+              <!-- X-Robots-Tag Server Headers -->
               <div class="p-5 rounded-2xl bg-[#121212] border border-[#3c4043] flex items-center justify-between shadow-inner">
                 <div class="space-y-1">
                   <div class="text-base sm:text-lg font-black text-white font-headline">X-Robots-Tag Server Headers</div>
@@ -955,10 +1330,10 @@ export function renderStage1(container, state = cockpitState) {
               <div class="space-y-1">
                 <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">SUPPLEMENTARY BREAKDOWN</span>
                 <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">AI Crawler Allowance Matrix (20 Engines)</h4>
-                <p class="text-xs text-[#5f6368]">Grouped by provider with live socket latency trace</p>
+                <p class="text-xs text-[#5f6368]">Grouped by provider with crawler permission status</p>
               </div>
-              <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-[#38bdf8]">
-                LATENCY: ${latency}
+              <span id="stage1-bot-count-card" data-metric="allowed-bots-count" class="supplementary-card card metric-card text-xs font-mono font-bold px-3 py-1 rounded-xl ${botStatusBadgeClass}">
+                ${botStatus.cardText}
               </span>
             </div>
 
@@ -983,7 +1358,7 @@ export function renderStage1(container, state = cockpitState) {
                         <div class="p-2.5 rounded-xl bg-[#181818] border border-[#3c4043] flex items-center justify-between text-xs">
                           <div>
                             <span class="font-mono font-bold text-white text-xs block">${bot.name}</span>
-                            <span class="text-[10px] font-mono text-[#5f6368]">${latency}</span>
+                            <span class="text-[10px] font-mono text-[#5f6368]">${bot.key}</span>
                           </div>
                           <span class="px-2 py-0.5 rounded text-[10px] font-mono font-black ${bot.allowed ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40' : 'bg-red-950 text-red-400 border border-red-500/40'}">
                             ${bot.allowed ? 'ALLOWED' : 'BLOCKED'}
@@ -1017,89 +1392,40 @@ export const renderStage1Canvas = renderStage1;
 // STAGE 2: ESSENTIAL CONTENT ANCHORS & CANONICAL ROUTES
 // -----------------------------------------------------------------------------
 export function updateStage2FromPayload(payload = {}) {
-  // 1. If mapBackendScanToV4State already mapped stage2, preserve it directly
-  if (payload.stage2 && Array.isArray(payload.stage2.routes) && payload.stage2.routes.length > 0) {
-    const rawRoutes = payload.stage2.routes;
-    const routes = rawRoutes.map(r => {
-      const path = r.path || r.route || '';
-      const isFound = r.status === 'FOUND' || r.status === 'discovered';
-      return {
-        path,
-        title: r.title || (path === '/about' ? 'Company Identity & Mission' : path === '/contact' ? 'Direct Contact Point' : path === '/pricing' ? 'Commercial Tiering & Pricing' : path === '/privacy-policy' ? 'Data Protection & Privacy' : path === '/terms-of-service' ? 'Terms of Service & Licensing' : path),
-        status: isFound ? 'FOUND' : 'MISSING',
-        citationScore: r.citationScore || (isFound ? '90%' : '0%'),
-        desc: r.desc || (isFound ? 'Entity credentials and canonical anchor verified in DOM.' : '404 Not Found. AI engines cannot confirm credentials on this route.')
-      };
-    });
-
-    const foundCount = payload.stage2.foundCount ?? routes.filter(r => r.status === 'FOUND').length;
-    const missingCount = payload.stage2.missingCount ?? routes.filter(r => r.status !== 'FOUND').length;
-    const missingRoutes = routes.filter(r => r.status === 'MISSING').map(r => r.path).join(', ');
-
-    cockpitState.stage2Data = {
-      ...payload.stage2,
-      routes,
-      foundCount,
-      missingCount,
-      missingSummary: payload.stage2.missingSummary || (missingRoutes ? `(${missingRoutes})` : ''),
-      score: payload.stage2.score || `${Math.round((foundCount / routes.length) * 100)}%`,
-      status: payload.stage2.status || (foundCount === routes.length ? 'PASS' : 'WARN')
-    };
-    return cockpitState.stage2Data;
-  }
-
-  // 2. Unpack results wrapper if present
-  const data = payload.results || payload;
-
-  // 3. Extract crawled URLs from all possible sources
+  const data = (payload && payload.results && typeof payload.results === 'object') ? payload.results : (payload || {});
   const rawPages = data.pages || payload.pages || cockpitState.stage3?.pages || [];
-  const crawledUrls = Array.isArray(rawPages)
-    ? rawPages.map(p => typeof p === 'string' ? p : (p.url || p.path || p.route || ''))
-    : [];
+  const inPageAnchors = data.inPageAnchors || payload.inPageAnchors || data.anchors || [];
 
-  const discoveredList = data.discoveredEssentialPages || payload.discoveredEssentialPages || data.discoveredRoutes || payload.discoveredRoutes || [];
-  const missingList = data.missingEssentialPages || payload.missingEssentialPages || [];
+  const evaluated = evaluateEssentialPages(rawPages, inPageAnchors);
 
-  const anchorDefinitions = [
-    { path: '/about', title: 'Company Identity & Mission' },
-    { path: '/contact', title: 'Direct Contact Point' },
-    { path: '/pricing', title: 'Commercial Tiering & Pricing' },
-    { path: '/privacy-policy', title: 'Data Protection & Privacy' },
-    { path: '/terms-of-service', title: 'Terms of Service & Licensing' }
-  ];
-
-  const routes = anchorDefinitions.map(def => {
-    const cleanPath = def.path.toLowerCase();
-    const hashPath = '/#' + cleanPath.slice(1);
-
-    const inDiscovered = discoveredList.some(p => typeof p === 'string' && p.toLowerCase().includes(cleanPath));
-    const inMissing = missingList.some(p => typeof p === 'string' && p.toLowerCase().includes(cleanPath));
-    const inCrawled = crawledUrls.some(u => {
-      if (typeof u !== 'string') return false;
-      const lower = u.toLowerCase();
-      return lower.endsWith(cleanPath) || lower.includes(cleanPath + '/') || lower.includes(hashPath);
-    });
-
-    const isFound = inDiscovered || (!inMissing && inCrawled);
+  const routes = ESSENTIAL_PAGE_DEFINITIONS.map(def => {
+    const pageData = evaluated.pages[def.key];
+    const isFound = pageData.found;
+    const desc = isFound
+      ? (pageData.discoveryType === 'anchor'
+          ? `Found: In-Page Section (${pageData.matchedAnchor}). Verified in DOM.`
+          : 'Entity credentials and canonical anchor verified in DOM.')
+      : '404 Not Found. AI engines cannot confirm credentials on this route.';
 
     return {
-      path: def.path,
-      title: def.title,
+      path: '/' + def.canonicalName,
+      title: def.label === 'Privacy Policy' ? 'Data Protection & Privacy' : (def.label === 'Terms of Service' ? 'Terms of Service & Licensing' : (def.label === 'About' ? 'Company Identity & Mission' : (def.label === 'Contact' ? 'Direct Contact Point' : 'Commercial Tiering & Pricing'))),
       status: isFound ? 'FOUND' : 'MISSING',
+      discoveryType: pageData.discoveryType,
+      matchedAnchor: pageData.matchedAnchor,
       citationScore: isFound ? '90%' : '0%',
-      desc: isFound 
-        ? 'Entity credentials and canonical anchor verified in DOM.' 
-        : '404 Not Found. AI engines cannot confirm credentials on this route.'
+      desc
     };
   });
 
-  const foundCount = routes.filter(r => r.status === 'FOUND').length;
-  const missingRoutes = routes.filter(r => r.status === 'MISSING').map(r => r.path).join(', ');
+  const foundCount = evaluated.foundCount;
+  const missingCount = evaluated.missingCount;
+  const missingRoutes = evaluated.missingPages.map(p => '/' + p).join(', ');
 
   cockpitState.stage2Data = {
     routes,
     foundCount,
-    missingCount: routes.length - foundCount,
+    missingCount,
     missingSummary: missingRoutes ? `(${missingRoutes})` : '',
     score: `${Math.round((foundCount / routes.length) * 100)}%`,
     status: foundCount === routes.length ? 'PASS' : 'WARN'
