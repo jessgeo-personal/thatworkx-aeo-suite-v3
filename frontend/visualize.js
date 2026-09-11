@@ -1349,9 +1349,12 @@ export function renderStage1(container, state = cockpitState) {
             </div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-[#181818] border border-[#3c4043] flex items-center space-x-3 text-xs text-[#bdc1c6]">
-            <span class="text-base">🛡️</span>
-            <span>All core perimeter checks verified against target domain root socket.</span>
+          <div class="p-4 rounded-2xl bg-[#181818] border border-[#3c4043] flex items-center justify-between text-xs text-[#bdc1c6]">
+            <div class="flex items-center space-x-3">
+              <span class="text-base">🛡️</span>
+              <span>All core perimeter checks verified against target domain root socket.</span>
+            </div>
+            ${(stg1.robotsFetchMs || s1.robotsFetchMs) ? `<span class="font-mono text-xs px-2.5 py-1 rounded-lg bg-[#121212] border border-[#3c4043] text-[#38bdf8]">${stg1.robotsFetchMs || s1.robotsFetchMs}ms</span>` : ''}
           </div>
         </div>
 
@@ -1585,34 +1588,58 @@ export function buildEvidenceAndActionDrawers(secData = {}) {
   const shortcutPlan = secData.shortcutPlan || '';
   const evidencePlain = secData.evidencePlain || '';
   const evidenceTrace = secData.evidenceTrace || '';
+  const recoveryScore = secData.recoveryScore || '+15';
 
   return `
     <div class="space-y-5 mt-6">
-      <!-- BOX 1: MANUAL ACTION PLAN -->
-      <div class="bg-[#1f1f1f] border-2 border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl space-y-3.5">
-        <div class="flex items-center space-x-2.5">
-          <span class="text-base sm:text-lg">🛠️</span>
-          <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider font-headline">
-            Action Plan: How to improve how AI can read your current pages better
-          </h4>
-        </div>
+      <!-- BOX 1: MANUAL ACTION PLAN (HYBRID OPTION A + C: HIGH-VOLTAGE URGENCY & METRIC RECOVERY) -->
+      <div class="action-plan-urgent-card bg-gradient-to-b from-[#241712] via-[#1a1412] to-[#121212] border-2 border-[#d45d2a] rounded-3xl p-6 sm:p-7 shadow-[0_0_30px_rgba(212,93,42,0.25)] space-y-4 relative overflow-hidden" data-component="urgent-action-plan">
         
-        <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-7">
+        <!-- Ambient radial glow in top-right -->
+        <div class="absolute top-0 right-0 w-48 h-48 bg-[#b7410e]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header: Pulsing Beacon + Plus Jakarta Sans Headline + Metric Recovery Badge -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-[#3c4043]/60">
+          <div class="flex items-center space-x-3">
+            <div class="relative flex items-center justify-center flex-shrink-0">
+              <span class="w-3 h-3 rounded-full bg-[#d45d2a] animate-ping absolute"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#d45d2a] relative"></span>
+            </div>
+            <h4 class="action-plan-heading text-lg sm:text-xl lg:text-2xl font-black text-white uppercase tracking-tight font-headline">
+              ACTION PLAN: CRITICAL REMEDIATION FOR AI READABILITY
+            </h4>
+          </div>
+
+          <!-- Option C: Right-Aligned Health Score Recovery Badge -->
+          <div class="recovery-badge flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-black bg-[#b7410e]/30 border border-[#d45d2a] text-[#ff7a45] tracking-wider uppercase shadow-[0_0_12px_rgba(183,65,14,0.3)] flex-shrink-0" data-slot="recovery-score">
+            <span>⚡</span>
+            <span>${recoveryScore} HEALTH SCORE RECOVERY</span>
+          </div>
+        </div>
+
+        <!-- Core Directive Statement (Elevated Typography) -->
+        <p class="action-plan-directive text-base sm:text-lg text-[#f8fafc] font-semibold leading-relaxed">
           ${actionPlan}
         </p>
 
-        <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 ml-0 sm:ml-7 mt-2">
-          <summary class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
-            <span>▾ View Detailed Step-by-Step Fix Instructions</span>
-            <span class="text-xs text-[#bdc1c6] font-normal">[Click to Expand]</span>
+        <!-- Step-by-Step Fix Drawer (High Contrast & Glowing Step Badges) -->
+        <details class="executive-drawer bg-[#140e0b] border-2 border-[#d45d2a]/40 rounded-2xl p-4 sm:p-5 mt-2 shadow-inner" open>
+          <summary class="flex items-center justify-between text-sm sm:text-base font-mono font-black text-[#ff7a45] cursor-pointer hover:text-white transition">
+            <span class="flex items-center space-x-2">
+              <span>▾ Required Implementation Steps (Execute in Order)</span>
+            </span>
+            <span class="text-xs font-mono text-[#cbd5e1] font-normal">[Active Directive]</span>
           </summary>
-          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
+          
+          <div class="mt-4 pt-4 border-t border-[#d45d2a]/30 space-y-3.5">
             ${actionSteps.map((step, idx) => `
-              <div class="flex items-start space-x-3 text-xs sm:text-sm text-[#e8eaed] leading-relaxed">
-                <span class="w-5 h-5 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
+              <div class="flex items-start space-x-3.5 text-sm sm:text-base leading-relaxed p-3 rounded-xl bg-[#1c120c]/60 border border-[#3c4043]/40">
+                <span class="action-step-badge w-6 h-6 rounded-full bg-[#b7410e] text-white font-mono font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_12px_rgba(183,65,14,0.6)]">
+                  ${idx + 1}
+                </span>
                 <div class="flex-1">
-                  <strong class="text-white font-bold">${step.title}:</strong>
-                  <span class="text-[#bdc1c6] ml-1">${step.detail}</span>
+                  <strong class="action-step-title text-white font-black tracking-wide">${step.title}:</strong>
+                  <span class="action-step-detail text-[#cbd5e1] ml-1.5">${step.detail}</span>
                 </div>
               </div>
             `).join('')}

@@ -117,7 +117,7 @@ describe('Stage 1 Live Cockpit Component Suite (Zero Mock Enforced)', () => {
     expect(html).toContain('Asian AI Engines');
 
     // Check Remediation & Verification Drawers
-    expect(html).toContain('Action Plan: How to improve how AI can read your current pages better');
+    expect(html).toContain('ACTION PLAN: CRITICAL REMEDIATION FOR AI READABILITY');
     expect(html).toContain('Recommended Shortcut: Upgrade to AIOptimize Pro');
     expect(html).toContain('Verification Evidence (What We Found)');
   });
