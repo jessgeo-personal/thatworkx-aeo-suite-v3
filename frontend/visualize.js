@@ -740,12 +740,20 @@ export function handleCockpitNewScan() {
   }
 }
 
-export async function executeCockpitScan(targetUrl) {
+export async function executeCockpitScan(targetUrl, overrideEmail) {
   const startTime = Date.now();
   setErrorBanner('', false);
 
   if (!targetUrl || targetUrl.trim() === '' || targetUrl === '--') {
     setErrorBanner('Please supply a valid target domain (e.g., https://example.com).', true);
+    return;
+  }
+
+  // Authentication Session Gate: Enforce verified email session
+  const sessionEmail = overrideEmail || getAuthSession();
+  if (!sessionEmail) {
+    pendingScanUrl = targetUrl.trim();
+    showAuthEmailModal(pendingScanUrl);
     return;
   }
 
@@ -756,7 +764,7 @@ export async function executeCockpitScan(targetUrl) {
     const response = await fetch('/api/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: targetUrl.trim(), email: '' })
+      body: JSON.stringify({ targetUrl: targetUrl.trim(), email: sessionEmail })
     });
 
     const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
@@ -928,6 +936,33 @@ export function initCockpit() {
   const newScanBtn = document.getElementById('new-scan-btn');
   if (newScanBtn) {
     newScanBtn.addEventListener('click', handleCockpitNewScan);
+  }
+
+  const emailSubmitBtn = document.getElementById('auth-email-submit-btn');
+  if (emailSubmitBtn) {
+    emailSubmitBtn.addEventListener('click', () => submitAuthEmail());
+  }
+  const emailInput = document.getElementById('auth-email-input');
+  if (emailInput) {
+    emailInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitAuthEmail();
+    });
+  }
+
+  const otpVerifyBtn = document.getElementById('auth-otp-verify-btn');
+  if (otpVerifyBtn) {
+    otpVerifyBtn.addEventListener('click', () => verifyAuthOtp());
+  }
+  const otpInput = document.getElementById('auth-otp-input');
+  if (otpInput) {
+    otpInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') verifyAuthOtp();
+    });
+  }
+
+  const otpResendBtn = document.getElementById('auth-otp-resend-btn');
+  if (otpResendBtn) {
+    otpResendBtn.addEventListener('click', () => resendAuthOtp());
   }
 
   if (queryUrl) {
@@ -4035,7 +4070,280 @@ export function handleExport(type = 'JSON') {
   }
 }
 
+// ============================================================================
+// EMAIL-BASED OTP AUTHENTICATION GATEWAY
+// ============================================================================
+
+let currentAuthEmail = null;
+let pendingScanUrl = null;
+let pendingAuthEmail = null;
+
+/**
+ * Returns active verified email session from storage or memory.
+ */
+export function getAuthSession() {
+  if (typeof localStorage !== 'undefined') {
+    const stored = localStorage.getItem('aeo_auth_email');
+    if (stored && stored !== 'null' && stored !== 'undefined') {
+      currentAuthEmail = stored;
+      return stored;
+    }
+  }
+  if (typeof sessionStorage !== 'undefined') {
+    const stored = sessionStorage.getItem('aeo_auth_email');
+    if (stored && stored !== 'null' && stored !== 'undefined') {
+      currentAuthEmail = stored;
+      return stored;
+    }
+  }
+  currentAuthEmail = null;
+  return null;
+}
+
+/**
+ * Sets active verified email session across memory, localStorage, and sessionStorage.
+ */
+export function setAuthSession(email) {
+  currentAuthEmail = email || null;
+  if (typeof localStorage !== 'undefined') {
+    if (email) {
+      localStorage.setItem('aeo_auth_email', email);
+    } else {
+      localStorage.removeItem('aeo_auth_email');
+    }
+  }
+  if (typeof sessionStorage !== 'undefined') {
+    if (email) {
+      sessionStorage.setItem('aeo_auth_email', email);
+    } else {
+      sessionStorage.removeItem('aeo_auth_email');
+    }
+  }
+  if (typeof cockpitState !== 'undefined' && cockpitState) {
+    cockpitState.sessionEmail = email;
+  }
+}
+
+/**
+ * Clears active session.
+ */
+export function clearAuthSession() {
+  setAuthSession(null);
+}
+
+export function showAuthEmailModal(targetUrl = '') {
+  if (targetUrl) pendingScanUrl = targetUrl;
+  const modal = document.getElementById('auth-email-modal');
+  if (modal) {
+    modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100', 'pointer-events-auto');
+    modal.style.display = 'flex';
+  }
+  const err = document.getElementById('auth-email-error');
+  if (err) {
+    err.textContent = '';
+    err.classList.add('hidden');
+  }
+}
+
+export function hideAuthEmailModal() {
+  const modal = document.getElementById('auth-email-modal');
+  if (modal) {
+    modal.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100', 'pointer-events-auto');
+    modal.style.display = 'none';
+  }
+}
+
+export function showAuthOtpModal(email = '') {
+  const modal = document.getElementById('auth-otp-modal');
+  if (modal) {
+    modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100', 'pointer-events-auto');
+    modal.style.display = 'flex';
+  }
+  const display = document.getElementById('auth-otp-email-display');
+  if (display && email) {
+    display.textContent = email;
+  }
+  const err = document.getElementById('auth-otp-error');
+  if (err) {
+    err.textContent = '';
+    err.classList.add('hidden');
+  }
+}
+
+export function hideAuthOtpModal() {
+  const modal = document.getElementById('auth-otp-modal');
+  if (modal) {
+    modal.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100', 'pointer-events-auto');
+    modal.style.display = 'none';
+  }
+}
+
+/**
+ * Submits work email to request a 6-digit OTP code via Resend API.
+ */
+export async function submitAuthEmail(targetUrl = '') {
+  if (targetUrl) pendingScanUrl = targetUrl;
+  const emailInput = document.getElementById('auth-email-input');
+  const email = (emailInput ? emailInput.value : '').trim();
+  const errorEl = document.getElementById('auth-email-error');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (errorEl) {
+      errorEl.textContent = 'Please enter a valid email address.';
+      errorEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  pendingAuthEmail = email;
+  if (errorEl) {
+    errorEl.textContent = '';
+    errorEl.classList.add('hidden');
+  }
+
+  try {
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (res.ok && data.success !== false) {
+      hideAuthEmailModal();
+      showAuthOtpModal(email);
+    } else {
+      if (errorEl) {
+        errorEl.textContent = data.error || data.message || 'Failed to send OTP. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = err.message || 'Network error sending OTP';
+      errorEl.classList.remove('hidden');
+    }
+  }
+}
+
+/**
+ * Verifies submitted OTP code and launches pending scan on success.
+ */
+export async function verifyAuthOtp() {
+  const otpInput = document.getElementById('auth-otp-input');
+  const otp = (otpInput ? otpInput.value : '').trim();
+  const errorEl = document.getElementById('auth-otp-error');
+  const emailDisplay = document.getElementById('auth-otp-email-display');
+  const email = pendingAuthEmail || (emailDisplay ? emailDisplay.textContent.trim() : '');
+
+  if (!otp) {
+    if (errorEl) {
+      errorEl.textContent = 'Please enter the 6-digit OTP code.';
+      errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+      errorEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (errorEl) {
+    errorEl.textContent = '';
+    errorEl.classList.add('hidden');
+  }
+
+  try {
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success !== false) {
+      const verifiedEmail = data.email || email;
+      setAuthSession(verifiedEmail);
+      hideAuthOtpModal();
+      if (pendingScanUrl) {
+        const urlToScan = pendingScanUrl;
+        pendingScanUrl = null;
+        await executeCockpitScan(urlToScan);
+      }
+    } else {
+      if (errorEl) {
+        errorEl.textContent = data.error || data.message || 'Invalid or expired OTP code';
+        errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = err.message || 'Network error verifying OTP';
+      errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+      errorEl.classList.remove('hidden');
+    }
+  }
+}
+
+/**
+ * Resends code to pending email address.
+ */
+export async function resendAuthOtp() {
+  const emailDisplay = document.getElementById('auth-otp-email-display');
+  const email = pendingAuthEmail || (emailDisplay ? emailDisplay.textContent.trim() : '');
+  const errorEl = document.getElementById('auth-otp-error');
+
+  if (!email) {
+    if (errorEl) {
+      errorEl.textContent = 'No email address found. Please re-enter your email.';
+      errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+      errorEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (res.ok && data.success !== false) {
+      if (errorEl) {
+        errorEl.textContent = 'A new verification code has been sent to your email.';
+        errorEl.className = 'p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/50 text-emerald-300 text-xs font-mono';
+        errorEl.classList.remove('hidden');
+      }
+    } else {
+      if (errorEl) {
+        errorEl.textContent = data.error || data.message || 'Failed to resend code.';
+        errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = err.message || 'Network error resending OTP';
+      errorEl.className = 'p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono';
+      errorEl.classList.remove('hidden');
+    }
+  }
+}
+
 if (typeof window !== 'undefined') {
+  window.getAuthSession = getAuthSession;
+  window.setAuthSession = setAuthSession;
+  window.clearAuthSession = clearAuthSession;
+  window.showAuthEmailModal = showAuthEmailModal;
+  window.hideAuthEmailModal = hideAuthEmailModal;
+  window.showAuthOtpModal = showAuthOtpModal;
+  window.hideAuthOtpModal = hideAuthOtpModal;
+  window.submitAuthEmail = submitAuthEmail;
+  window.verifyAuthOtp = verifyAuthOtp;
+  window.resendAuthOtp = resendAuthOtp;
+
   window.handleExport = handleExport;
   window.toggleSidebar = toggleSidebar;
   window.openAddressModal = openAddressModal;
@@ -4054,6 +4362,16 @@ if (typeof window !== 'undefined') {
   window.isHomepagePath = isHomepagePath;
   window.getPageTier = getPageTier;
   window.AEO_COCKPIT = {
+    getAuthSession,
+    setAuthSession,
+    clearAuthSession,
+    showAuthEmailModal,
+    hideAuthEmailModal,
+    showAuthOtpModal,
+    hideAuthOtpModal,
+    submitAuthEmail,
+    verifyAuthOtp,
+    resendAuthOtp,
     handleExport,
     initCockpit,
     executeCockpitScan,

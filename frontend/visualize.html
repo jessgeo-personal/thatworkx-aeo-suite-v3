@@ -671,6 +671,77 @@
     </div>
   </div>
 
+  <!-- ======================================================== -->
+  <!-- EMAIL AUTHENTICATION MODAL (PRE-RENDERED)                -->
+  <!-- ======================================================== -->
+  <div id="auth-email-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[100] flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hidden" style="display: none;">
+    <div class="max-w-md w-full mx-4 bg-[#1f1f1f] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(183,65,14,0.35)] text-left space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-2xl">🔒</span>
+          <div>
+            <h3 class="text-lg font-black text-white font-headline">Verify Work Email</h3>
+            <p class="text-xs text-[#bdc1c6]">A free one-time verification code is required to run diagnostics.</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.hideAuthEmailModal ? window.hideAuthEmailModal() : document.getElementById('auth-email-modal').classList.add('hidden')" class="text-[#bdc1c6] hover:text-white p-1 text-lg font-bold" title="Close">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label for="auth-email-input" class="block text-xs font-mono font-bold text-[#e8eaed] uppercase tracking-wider mb-1.5">Work Email Address</label>
+          <input type="email" id="auth-email-input" placeholder="name@company.com" class="w-full px-4 py-3 rounded-xl bg-[#121212] border border-[#3c4043] focus:border-[#b7410e] text-white text-sm font-mono outline-none transition shadow-inner placeholder-[#5f6368]" />
+        </div>
+
+        <div id="auth-email-error" class="hidden p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono"></div>
+
+        <button type="button" id="auth-email-submit-btn" onclick="window.submitAuthEmail ? window.submitAuthEmail() : null" class="w-full py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-sm tracking-wide transition shadow-lg flex items-center justify-center space-x-2 active:scale-95">
+          <span>Send One-Time Verification Code</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-[#5f6368] text-center">We will never spam you. OTP codes expire in 10 minutes.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- OTP VERIFICATION MODAL (PRE-RENDERED)                    -->
+  <!-- ======================================================== -->
+  <div id="auth-otp-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[100] flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hidden" style="display: none;">
+    <div class="max-w-md w-full mx-4 bg-[#1f1f1f] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(183,65,14,0.35)] text-left space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-2xl">✉️</span>
+          <div>
+            <h3 class="text-lg font-black text-white font-headline">Enter Verification Code</h3>
+            <p class="text-xs text-[#bdc1c6]">Enter the 6-digit code sent to <strong id="auth-otp-email-display" class="text-white"></strong></p>
+          </div>
+        </div>
+        <button type="button" onclick="window.hideAuthOtpModal ? window.hideAuthOtpModal() : document.getElementById('auth-otp-modal').classList.add('hidden')" class="text-[#bdc1c6] hover:text-white p-1 text-lg font-bold" title="Close">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label for="auth-otp-input" class="block text-xs font-mono font-bold text-[#e8eaed] uppercase tracking-wider mb-1.5">6-Digit OTP Code</label>
+          <input type="text" id="auth-otp-input" maxlength="6" placeholder="123456" class="w-full px-4 py-3 rounded-xl bg-[#121212] border border-[#3c4043] focus:border-[#b7410e] text-white text-center text-xl tracking-[0.4em] font-mono outline-none transition shadow-inner placeholder-[#5f6368]" />
+        </div>
+
+        <div id="auth-otp-error" class="hidden p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-xs font-mono"></div>
+
+        <button type="button" id="auth-otp-verify-btn" onclick="window.verifyAuthOtp ? window.verifyAuthOtp() : null" class="w-full py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-sm tracking-wide transition shadow-lg flex items-center justify-center space-x-2 active:scale-95">
+          <span>Verify &amp; Start Diagnostic Audit</span>
+          <span>✓</span>
+        </button>
+
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-[#3c4043]/60">
+          <span class="text-[#5f6368]">Didn't receive code?</span>
+          <button type="button" id="auth-otp-resend-btn" onclick="window.resendAuthOtp ? window.resendAuthOtp() : null" class="text-[#38bdf8] hover:underline font-bold">Resend Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="visualize.js" type="module"></script>
 </body>
 </html>
