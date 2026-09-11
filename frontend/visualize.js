@@ -807,9 +807,21 @@ export async function executeCockpitScan(targetUrl) {
       ? `${payload.scanMetrics.scanTimeSeconds}s`
       : (mapped.scanDuration && mapped.scanDuration !== '--' ? mapped.scanDuration : elapsedSeconds);
 
-    const totalPages = typeof payload.pagesCrawled === 'number'
-      ? payload.pagesCrawled
-      : (Array.isArray(payload.pages) ? payload.pages.length : (Array.isArray(payload.results?.pages) ? payload.results.pages.length : (mapped.totalPages || 0)));
+    // Calculate sanitized total pages count (ignoring .txt/.md files and duplicates)
+    const rawPagesList = Array.isArray(payload.pages)
+      ? payload.pages
+      : (Array.isArray(payload.results?.pages)
+        ? payload.results.pages
+        : (Array.isArray(mapped.pages) ? mapped.pages : []));
+
+    let totalPages;
+    if (rawPagesList.length > 0) {
+      totalPages = deduplicateStage3Pages(filterStage3Pages(rawPagesList)).length;
+    } else if (typeof payload.pagesCrawled === 'number') {
+      totalPages = payload.pagesCrawled;
+    } else {
+      totalPages = mapped.totalPages || 0;
+    }
 
     const health = mapped.healthIndex ?? mapped.summary?.healthScore ?? payload.overallScore ?? payload.results?.capabilities?.scores?.compositeHealth ?? 0;
     const badgeLabel = mapped.statusLabel || (health >= 80 ? 'AI-Optimized' : 'NEEDS IMPROVEMENT');
@@ -941,7 +953,25 @@ export function renderCockpit(state) {
     const incomingTargetUrl = state.targetUrl || state.meta?.targetUrl || cockpitState.targetUrl;
     const incomingTimestamp = state.timestamp || state.meta?.timestamp || cockpitState.timestamp;
     const incomingDuration = state.scanDuration || state.meta?.scanDuration || cockpitState.scanDuration;
-    const incomingPages = state.totalPages ?? state.meta?.totalPages ?? (Array.isArray(state.stage3?.pages) ? state.stage3.pages.length : (Array.isArray(state.pages) ? state.pages.length : cockpitState.totalPages));
+    // Extract pages candidates to synchronize sanitized count
+    const rawPagesForCount = (Array.isArray(state.pages) && state.pages.length > 0)
+      ? state.pages
+      : (Array.isArray(state.stage3?.pages) && state.stage3.pages.length > 0)
+        ? state.stage3.pages
+        : (Array.isArray(state.results?.pages) && state.results.pages.length > 0)
+          ? state.results.pages
+          : (Array.isArray(cockpitState.pages) && cockpitState.pages.length > 0)
+            ? cockpitState.pages
+            : (Array.isArray(cockpitState.stage3?.pages) && cockpitState.stage3.pages.length > 0)
+              ? cockpitState.stage3.pages
+              : null;
+
+    let incomingPages;
+    if (rawPagesForCount) {
+      incomingPages = deduplicateStage3Pages(filterStage3Pages(rawPagesForCount)).length;
+    } else {
+      incomingPages = state.totalPages ?? state.meta?.totalPages ?? cockpitState.totalPages;
+    }
     const incomingHealth = state.healthScore ?? state.healthIndex ?? state.stage6?.overallHealthIndex ?? state.summary?.healthScore ?? cockpitState.healthScore;
 
     cockpitState = {
@@ -2393,6 +2423,18 @@ export function renderStage3Canvas(container, state = cockpitState) {
   const sortedPages = sortStage3Pages(pages);
 
   const totalPages = sortedPages.length;
+  cockpitState.totalPages = totalPages;
+
+  // Synchronize header labels to match sanitized Stage 3 count
+  const headerTotalPagesLabel = document.getElementById('total-pages-label');
+  if (headerTotalPagesLabel) {
+    headerTotalPagesLabel.textContent = String(totalPages);
+  }
+  const scannedPagesEl = document.getElementById('cockpit-scanned-pages');
+  if (scannedPagesEl) {
+    scannedPagesEl.textContent = String(totalPages);
+  }
+
   const count = cockpitState.stage3VisibleCount || 5;
   const visiblePages = sortedPages.slice(0, count);
 
