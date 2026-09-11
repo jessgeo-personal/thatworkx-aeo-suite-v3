@@ -143,6 +143,23 @@ export function onScanComplete(scanResult) {
 }
 
 /**
+ * Extracts normalized pathname from URL or relative string, preserving route hashes.
+ */
+function extractPathname(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return '';
+  try {
+    if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) {
+      const parsed = new URL(urlStr);
+      const cleanPath = parsed.pathname.replace(/\/$/, '') || '';
+      return parsed.hash ? `${cleanPath}/${parsed.hash.toLowerCase()}` : (cleanPath || '/');
+    }
+    return urlStr.split('?')[0].replace(/\/$/, '') || '/';
+  } catch {
+    return urlStr;
+  }
+}
+
+/**
  * Optional International Locale Prefix
  * Matches 2-3 letter language codes with optional country/script subtags:
  * Examples: /en-us/, /de/, /fr-ca/, /zh-cn/, /es-es/, /ja/
@@ -151,7 +168,7 @@ const LOCALE_PREFIX = '(?:\\/[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?)?';
 
 /**
  * 5-Anchor Essential Pages Configuration
- * Fully internationalized and resilient to regional enterprise routing.
+ * Comprehensive Permutations & Combinations for Routes, Localized Redirects, and In-Page Hashes.
  */
 export const ESSENTIAL_PAGE_DEFINITIONS = [
   {
@@ -159,71 +176,57 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'about',
     label: 'About',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/about(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/about-us(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/company(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i')
     ],
-    anchorPatterns: [/^#about$/i, /^#about-us$/i, /^#company$/i]
+    anchorPatterns: [
+      /^#?(?:\/)?#?(about(?:-?us)?|company)$/i
+    ]
   },
   {
     key: 'contact',
     canonicalName: 'contact',
     label: 'Contact',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/contact(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/contact-us(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/get-in-touch(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i')
     ],
-    anchorPatterns: [/^#contact$/i, /^#contact-us$/i, /^#get-in-touch$/i]
+    anchorPatterns: [
+      /^#?(?:\/)?#?(contact(?:-?us)?|get-in-touch)$/i
+    ]
   },
   {
     key: 'pricing',
     canonicalName: 'pricing',
     label: 'Pricing',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/pricing(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/plans(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i')
     ],
-    anchorPatterns: [/^#pricing$/i, /^#plans$/i]
+    anchorPatterns: [
+      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans)$/i
+    ]
   },
   {
     key: 'privacy',
     canonicalName: 'privacy-policy',
     label: 'Privacy Policy',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/privacy(-policy)?(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?policy)?|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i')
     ],
-    anchorPatterns: [/^#privacy(-policy)?$/i]
+    anchorPatterns: [
+      /^#?(?:\/)?#?(privacy(?:-?policy)?|data-?(?:privacy|policy))$/i
+    ]
   },
   {
     key: 'terms',
     canonicalName: 'terms-of-service',
     label: 'Terms of Service',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/terms(-of-service|-and-conditions)?(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/tos(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)(?:\\/|\\.html)?$`, 'i')
     ],
-    anchorPatterns: [/^#terms(-of-service)?$/i, /^#terms-and-conditions$/i, /^#tos$/i]
+    anchorPatterns: [
+      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)$/i
+    ]
   }
 ];
-
-/**
- * Extracts normalized pathname from URL or relative string
- * @param {string} urlStr 
- * @returns {string}
- */
-function extractPathname(urlStr) {
-  if (!urlStr || typeof urlStr !== 'string') return '';
-  try {
-    if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) {
-      const parsed = new URL(urlStr);
-      return parsed.pathname.replace(/\/$/, '') || '/';
-    }
-    return urlStr.split('?')[0].split('#')[0].replace(/\/$/, '') || '/';
-  } catch {
-    return urlStr;
-  }
-}
 
 /**
  * Normalizes an in-page section anchor tag (e.g. "/#about" -> "#about")

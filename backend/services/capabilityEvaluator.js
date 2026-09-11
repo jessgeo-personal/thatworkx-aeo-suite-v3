@@ -18,57 +18,36 @@ const ESSENTIAL_ANCHOR_DEFINITIONS = [
   {
     canonical: '/about',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/about(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/about-us(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/company(?:\\/|\\.html)?$`, 'i'),
-      /^#about$/i,
-      /^#about-us$/i,
-      /^#company$/i,
-      /^\/#about$/i,
-      /^\/#about-us$/i,
-      /^\/#company$/i
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i'),
+      /^#?(?:\/)?#?(about(?:-?us)?|company)$/i
     ]
   },
   {
     canonical: '/contact',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/contact(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/contact-us(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/get-in-touch(?:\\/|\\.html)?$`, 'i'),
-      /^#contact$/i,
-      /^#contact-us$/i,
-      /^\/#contact$/i,
-      /^\/#contact-us$/i
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i'),
+      /^#?(?:\/)?#?(contact(?:-?us)?|get-in-touch)$/i
     ]
   },
   {
     canonical: '/pricing',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/pricing(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/plans(?:\\/|\\.html)?$`, 'i'),
-      /^#pricing$/i,
-      /^#plans$/i,
-      /^\/#pricing$/i,
-      /^\/#plans$/i
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i'),
+      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans)$/i
     ]
   },
   {
     canonical: '/privacy-policy',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/privacy(?:-policy)?(?:\\/|\\.html)?$`, 'i'),
-      /^#privacy(?:-policy)?$/i,
-      /^\/#privacy(?:-policy)?$/i
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?policy)?|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i'),
+      /^#?(?:\/)?#?(privacy(?:-?policy)?|data-?(?:privacy|policy))$/i
     ]
   },
   {
     canonical: '/terms-of-service',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}\\/terms(?:-of-service|-and-conditions)?(?:\\/|\\.html)?$`, 'i'),
-      new RegExp(`^${LOCALE_PREFIX}\\/tos(?:\\/|\\.html)?$`, 'i'),
-      /^#terms(?:-of-service|-and-conditions)?$/i,
-      /^#tos$/i,
-      /^\/#terms(?:-of-service|-and-conditions)?$/i,
-      /^\/#tos$/i
+      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)(?:\\/|\\.html)?$`, 'i'),
+      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)$/i
     ]
   }
 ];
@@ -83,8 +62,8 @@ function extractPathForEvaluation(item) {
   try {
     if (raw.startsWith('http://') || raw.startsWith('https://')) {
       const parsed = new URL(raw);
-      const cleanPath = parsed.pathname.replace(/\/$/, '') || '/';
-      return parsed.hash ? `${cleanPath}${parsed.hash.toLowerCase()}` : cleanPath;
+      const cleanPath = parsed.pathname.replace(/\/$/, '') || '';
+      return parsed.hash ? `${cleanPath}/${parsed.hash.toLowerCase()}` : (cleanPath || '/');
     }
     return raw.split('?')[0].replace(/\/$/, '') || '/';
   } catch {

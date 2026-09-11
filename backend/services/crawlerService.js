@@ -63,14 +63,41 @@ const fetchPageWithTimeout = async (pageUrl) => {
 };
 
 /**
- * Equates apex and www hostnames (e.g. microsoft.com === www.microsoft.com)
+ * Equates apex and organizational subdomains (e.g., support.microsoft.com is part of microsoft.com).
+ * Rejects third parties (google.com) and lookalikes (support-microsoft.com).
  */
 function isSameDomainOrSubdomain(targetUrl, candidateUrl) {
   try {
     const h1 = new URL(targetUrl).hostname.toLowerCase().replace(/^www\./, '');
     const h2 = new URL(candidateUrl).hostname.toLowerCase().replace(/^www\./, '');
-    return h1 === h2;
-  } catch {
+
+    if (h1 === h2) return true;
+    if (h2.endsWith('.' + h1)) return true;
+    if (h1.endsWith('.' + h2)) return true;
+
+    // Base domain extraction for targets on multi-level subdomains
+    const getApex = (host) => {
+      const parts = host.split('.');
+      if (parts.length <= 2) return host;
+      const secondLevel = parts[parts.length - 2];
+      const topLevel = parts[parts.length - 1];
+      if (['co', 'com', 'org', 'net', 'edu', 'gov'].includes(secondLevel) && topLevel.length === 2) {
+        return parts.slice(-3).join('.');
+      }
+      return parts.slice(-2).join('.');
+    };
+
+    const apex1 = getApex(h1);
+    const apex2 = getApex(h2);
+
+    if (apex1 && apex1 === apex2) {
+      if (h2 === apex1 || h2.endsWith('.' + apex1)) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch (e) {
     return false;
   }
 }
@@ -1001,10 +1028,17 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     // ---------------------------------------------------------------------------
     const ESSENTIAL_PROBE_PATHS = [
       '/about',
+      '/about-us',
+      '/aboutus',
       '/contact',
+      '/contact-us',
+      '/contactus',
       '/pricing',
       '/privacy-policy',
-      '/terms-of-service'
+      '/privacy',
+      '/terms-of-service',
+      '/terms',
+      '/terms-and-conditions'
     ];
 
     const pages = result.pages || [];
@@ -1117,6 +1151,7 @@ module.exports = {
   fetchDomainAge,
   formatDomainAgeResult,
   extractContactAnchors,
+  isSameDomainOrSubdomain,
   AI_CRAWLERS
 };
 
