@@ -1744,21 +1744,21 @@ function buildLegacyMatchedPageFixPanels(p, idx) {
 
   // 2. Headings Summary
   let headingsHtml = '';
-  if (p.headingCounts && (p.headingCounts.h1 > 0 || p.headingCounts.h2 > 0)) {
-    headingsHtml = `
-      <div class="flex items-center space-x-3 text-xs font-mono">
-        <span class="text-[#bdc1c6] font-bold">Headings:</span>
-        <span class="text-[#38bdf8]">H1: ${p.headingCounts.h1}</span>
-        <span class="text-[#cbd5e1]">H2: ${p.headingCounts.h2}</span>
-        ${p.headingCounts.h3 ? `<span class="text-[#94a3b8]">H3: ${p.headingCounts.h3}</span>` : ''}
-        <span class="text-[#10b981] font-bold ml-2">✓ ${p.headingHierarchy}</span>
-      </div>
-    `;
-  } else if (p.headingTexts && (p.headingTexts.h1.length > 0 || p.headingTexts.h2.length > 0)) {
+  if (p.headingTexts && (p.headingTexts.h1.length > 0 || p.headingTexts.h2.length > 0)) {
     headingsHtml = `
       <div class="space-y-1 text-xs">
         ${p.headingTexts.h1.map(h => `<div class="text-[#38bdf8] font-bold font-mono">H1: ${h}</div>`).join('')}
         ${p.headingTexts.h2.map(h => `<div class="text-[#cbd5e1] font-mono pl-3">H2: ${h}</div>`).join('')}
+      </div>
+    `;
+  } else if (p.headingCounts && (p.headingCounts.h1 > 0 || p.headingCounts.h2 > 0)) {
+    headingsHtml = `
+      <div class="flex items-center space-x-3 text-xs font-mono">
+        <span class="text-[#bdc1c6] font-bold">Headings:</span>
+        <span class="text-[#38bdf8]">H1: Count: ${p.headingCounts.h1}</span>
+        <span class="text-[#cbd5e1]">H2: Count: ${p.headingCounts.h2}</span>
+        ${p.headingCounts.h3 ? `<span class="text-[#94a3b8]">H3: Count: ${p.headingCounts.h3}</span>` : ''}
+        <span class="text-[#10b981] font-bold ml-2">✓ ${p.headingHierarchy}</span>
       </div>
     `;
   }
@@ -1817,7 +1817,7 @@ function buildLegacyMatchedPageFixPanels(p, idx) {
   if (p.isThin) {
     panels.push(`
       <div class="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs text-red-300">
-        <strong>⚠️ Thin Content Warning:</strong> Contains only ${p.wordCount} words (&lt; 250 words required for AI snippet extractability).
+        <strong>⚠️ Thin Content Warning (&lt; 250 words):</strong> Contains only ${p.wordCount} words (&lt; 250 words required for AI snippet extractability).
       </div>
     `);
   }
@@ -1825,7 +1825,26 @@ function buildLegacyMatchedPageFixPanels(p, idx) {
   if (p.isHeavySpa) {
     panels.push(`
       <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300">
-        <strong>⚠️ SPA / Low Text Density (${p.ratio}%):</strong> Initial server payload has low readable text. Pre-render HTML on server.
+        <strong>⚠️ SPA / Heavy JavaScript &amp; Deep DOM Nesting Detected (${p.ratio}%):</strong> Initial server payload has low readable text. Pre-render HTML on server.
+      </div>
+    `);
+  }
+
+  if (!p.hasAllRequired && p.missingRequired && p.missingRequired.length > 0) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300">
+        <strong>⚠️ Missing Required Semantic HTML5 Tags:</strong> Missing &lt;${p.missingRequired.join('&gt;, &lt;')}&gt; tag(s).
+      </div>
+    `);
+  }
+
+  if (p.missingAltCount > 0 && p.missingAltList && p.missingAltList.length > 0) {
+    panels.push(`
+      <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs text-amber-300 space-y-1">
+        <strong>⚠️ Images Without Alt Attributes (${p.missingAltCount}):</strong>
+        <div class="space-y-1 pt-1">
+          ${p.missingAltList.map(img => `<div><code>${img.src}</code> (Suggested: "${img.suggestedAlt || 'Image description'}")</div>`).join('')}
+        </div>
       </div>
     `);
   }
@@ -1860,6 +1879,265 @@ function buildLegacyMatchedPageFixPanels(p, idx) {
   return panels.join('');
 }
 
+// ============================================================================
+// STAGE 3: SEMANTIC TEXT DENSITY PAGE ORDERING & THERMOMETER RENDERING
+// Hierarchy:
+//   Tier 1 (Top): Homepage (/)
+//   Tier 2 (Middle): Discovered Essential Anchor Pages (/about, /contact, /pricing, etc.)
+//   Tier 3 (Bottom): All other crawled routes
+// ============================================================================
+
+const ESSENTIAL_PAGE_REGEX = /^\/(about|about-us|about_us|our-story|who-we-are|contact|contact-us|contact_us|get-in-touch|support|pricing|plans|pricing-plans|pricing_plans|cost|privacy|privacy-policy|privacy_policy|privacy-statement|terms|terms-of-service|terms_of_service|terms-and-conditions|terms-of-use|tos)$/i;
+
+/**
+ * Normalizes a URL or relative path for canonical comparison.
+ * Extracts pathname from absolute URLs, strips query strings/hashes,
+ * and removes trailing slashes (except for root '/').
+ */
+export function normalizePagePath(raw = '') {
+  if (!raw || typeof raw !== 'string') return '/';
+  let pathStr = raw.trim();
+  try {
+    if (pathStr.startsWith('http://') || pathStr.startsWith('https://')) {
+      const parsed = new URL(pathStr);
+      pathStr = parsed.pathname;
+    }
+  } catch {
+    // If URL parsing fails, continue with raw string
+  }
+  pathStr = pathStr.split('?')[0].split('#')[0];
+  if (pathStr.length > 1 && pathStr.endsWith('/')) {
+    pathStr = pathStr.replace(/\/+$/, '');
+  }
+  if (!pathStr.startsWith('/')) {
+    pathStr = '/' + pathStr;
+  }
+  return pathStr.toLowerCase();
+}
+
+/**
+ * Checks whether a path or URL represents the site homepage.
+ */
+export function isHomepagePath(raw) {
+  const norm = normalizePagePath(raw);
+  return norm === '/' || norm === '';
+}
+
+/**
+ * Categorizes a page object into Tier 1 (Homepage), Tier 2 (Essential Anchor),
+ * or Tier 3 (Remaining Crawled Routes).
+ */
+export function getPageTier(page) {
+  const raw = page?.path || page?.url || page?.route || '';
+  if (isHomepagePath(raw)) return 1;
+  const norm = normalizePagePath(raw);
+  if (ESSENTIAL_PAGE_REGEX.test(norm)) return 2;
+  return 3;
+}
+
+/**
+ * Sorts Stage 3 crawled pages strictly according to the 3-tier hierarchy:
+ * 1. Homepage (/)
+ * 2. Essential Anchor Pages (/about, /contact, /pricing, /privacy-policy, /terms-of-service and aliases)
+ * 3. All remaining crawled routes
+ */
+export function sortStage3Pages(pages = []) {
+  if (!Array.isArray(pages)) return [];
+  return [...pages].sort((a, b) => {
+    const tierA = getPageTier(a);
+    const tierB = getPageTier(b);
+    return tierA - tierB;
+  });
+}
+
+/**
+ * Excludes non-HTML / manifest files (.txt, .md, .markdown) whose non-markup
+ * nature artificially inflates text density ratios.
+ */
+export function filterStage3Pages(pages = []) {
+  if (!Array.isArray(pages)) return [];
+  const textOrMdRegex = /\.(txt|md|markdown)(\?.*)?$/i;
+  return pages.filter((page) => {
+    const raw = page?.path || page?.url || page?.route || '';
+    return !textOrMdRegex.test(raw);
+  });
+}
+
+/**
+ * Converts a page object, relative path, or URL into a standardized full URL.
+ * Preserves existing absolute URLs and resolves relative routes against baseUrl.
+ */
+export function toFullUrl(pageOrUrl, baseUrl = '') {
+  let raw = '';
+  if (typeof pageOrUrl === 'string') {
+    raw = pageOrUrl;
+  } else if (pageOrUrl && typeof pageOrUrl === 'object') {
+    raw = pageOrUrl.url || pageOrUrl.path || pageOrUrl.route || '/';
+  }
+  if (!raw) raw = '/';
+  raw = raw.trim();
+
+  let cleanBase = (baseUrl || (typeof cockpitState !== 'undefined' ? cockpitState.targetUrl : '') || '').trim();
+  if (cleanBase && !cleanBase.startsWith('http://') && !cleanBase.startsWith('https://')) {
+    cleanBase = 'https://' + cleanBase;
+  }
+  cleanBase = cleanBase.replace(/\/+$/, '');
+
+  // If already absolute URL
+  if (/^https?:\/\//i.test(raw)) {
+    if (raw.startsWith('http://') && cleanBase.startsWith('https://')) {
+      try {
+        const rawUrl = new URL(raw);
+        const baseUrlObj = new URL(cleanBase);
+        if (rawUrl.hostname.toLowerCase() === baseUrlObj.hostname.toLowerCase()) {
+          rawUrl.protocol = 'https:';
+          return rawUrl.toString();
+        }
+      } catch {}
+    }
+    return raw;
+  }
+
+  if (!cleanBase) return raw;
+
+  if (raw === '/' || raw === '') {
+    return cleanBase + '/';
+  }
+
+  const cleanPath = raw.startsWith('/') ? raw : '/' + raw;
+  return cleanBase + cleanPath;
+}
+
+/**
+ * Evaluates candidate quality when merging duplicates.
+ * Prioritizes accessible pages (status 200, !notFound) with real text density.
+ */
+function scorePageCandidate(p = {}) {
+  let score = 0;
+  const isNotFound = p.notFound === true || 
+                     p.status === 404 || 
+                     p.statusCode === 404 || 
+                     p.is404 === true || 
+                     p.status === '404 NOT FOUND' || 
+                     p.missingStatus === 'Missing' || 
+                     (p.isCrawled === false && (p.wordCount ?? 0) === 0);
+
+  if (!isNotFound) score += 1000;
+  const wordCount = p.wordCount ?? p.words ?? 0;
+  score += Math.min(wordCount, 500);
+  const ratio = p.ratio ?? p.density ?? 0;
+  score += ratio * 100;
+  if (p.status === 200 || p.statusCode === 200) score += 100;
+  return score;
+}
+
+/**
+ * Deduplicates crawled pages that resolve to the same canonical path
+ * (e.g., /contact and http://thatworkx.com/contact). Preserves the found/populated record.
+ */
+export function deduplicateStage3Pages(pages = []) {
+  if (!Array.isArray(pages)) return [];
+
+  const groups = new Map();
+
+  for (const page of pages) {
+    const raw = page?.path || page?.url || page?.route || '/';
+    const norm = normalizePagePath(raw);
+
+    if (!groups.has(norm)) {
+      groups.set(norm, []);
+    }
+    groups.get(norm).push(page);
+  }
+
+  const result = [];
+  for (const [, candidates] of groups.entries()) {
+    if (candidates.length === 1) {
+      result.push(candidates[0]);
+    } else {
+      // Pick candidate with highest quality score
+      const best = [...candidates].sort((a, b) => scorePageCandidate(b) - scorePageCandidate(a))[0];
+      result.push(best);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Renders prioritized, deduplicated page density thermometer cards with
+ * standardized card headings: "Review Page (X of Y pages): <full URL>".
+ */
+export function renderStage3Thermometers(pages = [], container = null, baseUrl = '') {
+  const target =
+    container ||
+    document.querySelector('#stage3-thermometers, [data-component="thermometers"], .stage3-page-list, #stage-3-pages');
+
+  if (!target) return [];
+
+  const filtered = filterStage3Pages(pages);
+  const deduplicated = deduplicateStage3Pages(filtered);
+  const sortedPages = sortStage3Pages(deduplicated);
+  const total = sortedPages.length;
+
+  const itemsHtml = sortedPages.map((page, index) => {
+    const rawPath = page.path || page.url || page.route || '/';
+    const fullUrl = toFullUrl(page, baseUrl);
+    const wordCount = page.wordCount ?? page.words ?? 0;
+    const ratio = page.ratio ?? page.density ?? 0;
+    const ratioPercent = Math.round(ratio * 100);
+    const tier = getPageTier(page);
+    const tierLabel = tier === 1 ? 'Homepage' : tier === 2 ? 'Essential Anchor' : 'Crawled Route';
+
+    return `
+      <div class="thermometer-card page-density-item" data-page-path="${rawPath}" data-thermometer-page="${rawPath}">
+        <div class="thermometer-card-heading review-page-heading">
+          Review Page (${index + 1} of ${total} pages): ${fullUrl}
+        </div>
+        <div class="page-meta">
+          <span class="page-tier-badge tier-${tier}">${tierLabel}</span>
+          <span class="page-path">${rawPath}</span>
+        </div>
+        <div class="density-stats">
+          <span class="word-count">${wordCount} words</span>
+          <span class="density-ratio">${ratioPercent}% density</span>
+        </div>
+        <div class="thermometer-bar-container">
+          <div class="thermometer-fill" style="width: ${Math.min(100, Math.max(0, ratioPercent))}%;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  target.innerHTML = itemsHtml;
+  return sortedPages;
+}
+
+/**
+ * Renders the educational copy for "What AI Search Engines See & Why It Matters"
+ * in Stage 3, detailing text-to-markup density efficiency and citation readability.
+ */
+export function renderStage3EducationalCopy(stats = {}, container = null) {
+  const target =
+    container ||
+    document.querySelector('#stage3-explanation, [data-component="stage3-explanation"], .stage3-educational-copy');
+
+  if (!target) return '';
+
+  const highExtract = stats.highExtractabilityCount ?? stats.highExtract ?? 0;
+  const totalCrawled = stats.totalCrawledPages ?? stats.totalCrawled ?? stats.totalPages ?? 0;
+
+  const html = `
+    <div class="stage3-educational-text">
+      <p class="educational-ideal-density">AI prefers pages that have a higher density of text to html and other markups, as it takes less effort to parse and process.</p>
+      <p class="educational-citation-readability">Citation Readability: ${highExtract}/${totalCrawled} High Extractability — Crawled ${totalCrawled} pages. Average text density is healthy across canonical marketing pages with direct extractable answers.</p>
+    </div>
+  `;
+
+  target.innerHTML = html;
+  return html;
+}
+
 export function renderStage3Canvas(container, state = cockpitState) {
   const stg3 = state.stages?.stage3 || cockpitState.stages?.stage3 || state.stage3 || {};
   const s3 = state.stage3 || cockpitState.stage3 || {};
@@ -1873,10 +2151,16 @@ export function renderStage3Canvas(container, state = cockpitState) {
         ? state.results.pages
         : [];
 
-  const pages = rawPages.map(p => {
+  // 1. Filter out manifest files (.txt, .md, .markdown)
+  const filteredPages = filterStage3Pages(rawPages);
+
+  // 2. Deduplicate canonical routes (e.g. /about vs http://thatworkx.com/about)
+  const deduplicatedPages = deduplicateStage3Pages(filteredPages);
+
+  // 3. Map page metrics and evaluation flags
+  const pages = deduplicatedPages.map(p => {
     const url = p.url || p.path || '/';
 
-    // 1. Text Density Ratio: Support textDensityRatio, contentDensityRatio, textToHtmlRatio, and strings like "587%"
     let rawRatio = p.textDensityRatio ?? p.contentDensityRatio ?? p.textToHtmlRatio ?? p.textRatio ?? p.ratio ?? 0;
     if (typeof rawRatio === 'string') {
       rawRatio = parseFloat(rawRatio.replace('%', ''));
@@ -1895,25 +2179,20 @@ export function renderStage3Canvas(container, state = cockpitState) {
                   (p.isCrawled === false && wordCount === 0);
 
     const isThin = !is404 && (p.isThin !== undefined ? p.isThin : (wordCount < 250));
-    // Heavy SPA only if ratio is genuinely low (< 15%) AND content is sparse (< 300 words)
     const isHeavySpa = !is404 && (p.isHeavySpa !== undefined ? p.isHeavySpa : (ratio < 15 && wordCount < 300));
     const isCrawled = !is404 && (p.isCrawled !== undefined ? p.isCrawled : true);
 
-    // 2. Canonical Tag
     const canonicalUrl = p.canonicalTag || p.canonical || p.canonicalUrl || '';
     const hasCanonical = is404 ? true : (p.hasCanonical !== undefined ? p.hasCanonical : Boolean(canonicalUrl));
 
-    // 3. Schema.org / JSON-LD
     const schemasList = Array.isArray(p.schemas) ? p.schemas : (Array.isArray(p.schema) ? p.schema : (Array.isArray(p.jsonLd) ? p.jsonLd : []));
     const schemaTypes = Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0
       ? p.schemaTypes
       : schemasList.map(s => s['@type'] || s.type).filter(Boolean);
     const hasSchema = is404 ? false : (p.hasSchema !== undefined ? p.hasSchema : (schemaTypes.length > 0 || schemasList.length > 0));
 
-    // 4. Revision Date (Freshness)
     const lastUpdated = is404 ? null : (p.lastUpdated || p.lastModified || p.dateModified || p.modifiedTime || p.revisionDate || null);
 
-    // 5. Headings: Support { H1: 1, H2: 4 } and { h1: [...], h2: [...] }
     let headings = p.headings || {};
     let headingCounts = { h1: 0, h2: 0, h3: 0 };
     let headingTexts = { h1: [], h2: [] };
@@ -1931,10 +2210,8 @@ export function renderStage3Canvas(container, state = cockpitState) {
       }
     }
 
-    // 6. Extracted Clean Text: Prioritize bodyTextSnippet over raw content; strip any leftover HTML tags
     let rawSnippet = p.bodyTextSnippet || p.bodySnippet || p.bodyText || p.extractedContent || p.markdown || p.snippet || '';
     if (!rawSnippet && p.content) {
-      // Fallback: strip HTML tags to avoid displaying raw markup
       rawSnippet = p.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
                             .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
                             .replace(/<[^>]+>/g, ' ')
@@ -1943,18 +2220,18 @@ export function renderStage3Canvas(container, state = cockpitState) {
     }
     const extractedContent = is404 ? '' : rawSnippet;
 
-    // Semantic Tags & Alts
     const missingRequired = is404 ? [] : (Array.isArray(p.missingRequired) ? p.missingRequired : []);
     const hasAllRequired = is404 ? true : (missingRequired.length === 0);
     const missingAltList = is404 ? [] : (Array.isArray(p.missingAltList) ? p.missingAltList : []);
     const missingAltCount = is404 ? 0 : (p.missingAltCount ?? missingAltList.length);
 
-    const status = p.status || (is404 ? '404 NOT FOUND' : (ratio >= 35 ? 'EXCELLENT' : ratio >= 25 ? 'GOOD' : ratio >= 15 ? 'MODERATE' : 'WARNING (SPA)'));
+    const status = p.status || (is404 ? '404 NOT FOUND' : (ratio >= 35 ? 'EXCELLENT' : ratio >= 25 ? 'GOOD' : ratio >= 15 ? 'MODERATE' : 'CRITICAL LOW'));
     const color = p.color || (is404 ? 'bg-red-500' : (ratio >= 35 ? 'bg-[#10b981]' : ratio >= 25 ? 'bg-[#38bdf8]' : ratio >= 15 ? 'bg-[#f59e0b]' : 'bg-red-500'));
     const gain = p.gain || (is404 ? '0.00' : (ratio > 0 ? Math.min(0.99, (ratio / 50)).toFixed(2) : '0.20'));
 
     return {
       url,
+      path: p.path || url,
       ratio: is404 ? 0 : ratio,
       wordCount,
       is404,
@@ -1982,22 +2259,17 @@ export function renderStage3Canvas(container, state = cockpitState) {
     };
   });
 
-  // Sort: lowest density first
-  pages.sort((a, b) => a.ratio - b.ratio);
+  // 4. Sort according to 3-tier hierarchy (Homepage -> Essential Anchors -> Other Routes)
+  const sortedPages = sortStage3Pages(pages);
 
-  const totalPages = pages.length;
+  const totalPages = sortedPages.length;
   const count = cockpitState.stage3VisibleCount || 5;
-  const visiblePages = pages.slice(0, count);
+  const visiblePages = sortedPages.slice(0, count);
 
-  const score = stg3.score || (stg3.scoreNum ? `${stg3.scoreNum}%` : (sec.score && sec.score !== '0%' ? sec.score : (s3.score && s3.score !== '0%' ? s3.score : '0%')));
+  const highExtractCount = sortedPages.filter(p => p.ratio >= 25 && p.wordCount >= 250).length;
+  const score = stg3.score || (stg3.scoreNum ? `${stg3.scoreNum}%` : (sec.score && sec.score !== '0%' ? sec.score : (s3.score && s3.score !== '0%' ? s3.score : `${Math.round((highExtractCount / (totalPages || 1)) * 100)}%`)));
   const status = stg3.status || (sec.status && sec.status !== 'UNAUDITED' ? sec.status : (s3.status || 'PASS'));
-  const summaryText = stg3.summaryText || (pages.length ? `Citation Readability: ${pages.filter(p => p.ratio >= 25 && p.wordCount >= 250).length}/${pages.length} High Extractability` : 'Citation Readability: 0/0 High Extractability');
-
-  const baseTakeaway = (sec.takeaway && sec.takeaway !== '--' && sec.takeaway !== '')
-    ? sec.takeaway
-    : `Crawled ${totalPages} pages. Average text density is healthy across canonical marketing pages with direct extractable answers.`;
-
-  const takeaway = `${summaryText} — ${baseTakeaway}`;
+  const summaryText = `Citation Readability: ${highExtractCount}/${totalPages} High Extractability`;
 
   const actionPlan = (sec.actionPlan && sec.actionPlan !== '--' && sec.actionPlan !== '')
     ? sec.actionPlan
@@ -2016,10 +2288,11 @@ export function renderStage3Canvas(container, state = cockpitState) {
     ? sec.shortcutPlan
     : 'AIOptimize Pro automatically generates clean, high-density Level 3 & 4 Markdown feeds (/ai-context.md), bypassing HTML parsing overhead and supplying 100% extractable facts directly to LLMs.';
 
-  const evidencePlain = `${pages.filter(p => p.ratio >= 25).length} of ${totalPages} crawled pages deliver clean semantic text with valid heading structures.`;
-  const evidenceTrace = pages.map(p => `${p.url}: ${p.ratio}% Text Density (${p.status}) • Words: ${p.wordCount} • Schema: ${p.hasSchema ? 'Detected' : 'Missing'}`).join('\n');
+  const evidencePlain = `${sortedPages.filter(p => p.ratio >= 25).length} of ${totalPages} crawled pages deliver clean semantic text with valid heading structures.`;
+  const evidenceTrace = sortedPages.map(p => `${p.url}: ${p.ratio}% Text Density (${p.status}) • Words: ${p.wordCount} • Schema: ${p.hasSchema ? 'Detected' : 'Missing'}`).join('\n');
 
   const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+  const targetDomain = state.targetUrl || cockpitState.targetUrl || '';
 
   const html = `
     <div class="space-y-6">
@@ -2035,7 +2308,10 @@ export function renderStage3Canvas(container, state = cockpitState) {
               <span class="text-[#5f6368]">•</span>
               <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#e8eaed] font-bold uppercase">AI-Optimized</span>
             </div>
-            <p class="text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">${summaryText} — ${baseTakeaway}</p>
+            <div class="space-y-1.5 text-sm sm:text-base font-normal text-[#e8eaed] leading-relaxed max-w-3xl">
+              <p>AI prefers pages that have a higher density of text to html and other markups, as it takes less effort to parse and process.</p>
+              <p>Citation Readability: ${highExtractCount}/${totalPages} High Extractability — Crawled ${totalPages} pages. Average text density is healthy across canonical marketing pages with direct extractable answers.</p>
+            </div>
           </div>
           
           <div class="flex items-center space-x-4 self-start sm:self-center flex-shrink-0 px-5 py-3.5 rounded-2xl bg-[#121212] border-2 ${status === 'PASS' ? 'border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]' : 'border-[#f59e0b]/50 shadow-[0_0_25px_rgba(245,158,11,0.25)]'}">
@@ -2056,67 +2332,73 @@ export function renderStage3Canvas(container, state = cockpitState) {
             <div class="flex flex-wrap items-center gap-2.5">
               <h3 class="text-sm sm:text-base font-black text-white uppercase tracking-wider font-headline">Semantic Text Density Thermometers</h3>
               <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 whitespace-nowrap">${summaryText}</span>
+              <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40 whitespace-nowrap">${totalPages} Total Pages Scanned</span>
             </div>
             <p class="text-xs text-[#bdc1c6] leading-relaxed">
               Target: ≥ 25% Text-to-HTML ratio for instant answer extraction (showing lowest density routes first)
             </p>
           </div>
           <span class="text-xs font-mono text-[#38bdf8] font-bold px-3 py-1 rounded-md bg-[#38bdf8]/10 border border-[#38bdf8]/30 w-fit self-start sm:self-center flex-shrink-0">
-            Avg ${(pages.length ? (pages.reduce((acc, p) => acc + p.ratio, 0) / pages.length).toFixed(1) : '--')}% Density
+            Avg ${(sortedPages.length ? (sortedPages.reduce((acc, p) => acc + p.ratio, 0) / sortedPages.length).toFixed(1) : '--')}% Density
           </span>
         </div>
 
-        <div class="space-y-4 pt-1">
-          ${visiblePages.map((bar, idx) => `
-            <div class="p-4 sm:p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/40 space-y-3 transition shadow-lg">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
-                <div class="flex items-center space-x-2.5 truncate max-w-[55%] sm:max-w-[45%]">
-                  <span class="font-mono font-black text-white truncate">${bar.url}</span>
+        <div class="space-y-4 pt-1" id="stage3-thermometers-list">
+          ${visiblePages.map((bar, idx) => {
+            const fullUrl = toFullUrl(bar.url, targetDomain);
+            return `
+              <div class="thermometer-card page-density-item p-4 sm:p-5 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#38bdf8]/40 space-y-3 transition shadow-lg" data-page-path="${bar.url}" data-thermometer-page="${bar.url}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                  <div class="flex items-center space-x-2.5 min-w-0 flex-1">
+                    <span class="font-mono font-black text-white truncate review-page-heading thermometer-card-heading text-xs sm:text-sm">
+                      Review Page (${idx + 1} of ${totalPages} pages): ${fullUrl}
+                    </span>
+                  </div>
+                  
+                  <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-center flex-shrink-0">
+                    ${bar.is404 
+                      ? `<span class="text-red-400 font-mono font-black">404 NOT FOUND (PAGE MISSING)</span>`
+                      : `<span class="font-mono font-black ${bar.ratio >= 25 ? 'text-[#10b981]' : bar.ratio >= 15 ? 'text-[#f59e0b]' : 'text-red-400'}">${bar.ratio}% Density (${bar.ratio < 15 ? 'CRITICAL LOW' : bar.status})</span>`}
+                    
+                    <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.viewWhatAISees ? window.AEO_COCKPIT.viewWhatAISees('${bar.url}', ${bar.ratio}, '${bar.status}', '${bar.gain}') : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95" title="View clean text ingested by AI crawlers">
+                      <span>📄 View What AI sees</span>
+                      <span class="text-[10px]">↗</span>
+                    </button>
+
+                    <button type="button" onclick="const d = document.getElementById('details-row-${idx}'); if (d) d.toggleAttribute('open');" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#38bdf8] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95">
+                      <span>🔍 Details</span>
+                      <span class="text-[10px]">▾</span>
+                    </button>
+                  </div>
                 </div>
                 
-                <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-center flex-shrink-0">
-                  ${bar.is404 
-                    ? `<span class="text-red-400 font-mono font-black">404 NOT FOUND (PAGE MISSING)</span>`
-                    : `<span class="font-mono font-black ${bar.ratio >= 25 ? 'text-[#10b981]' : bar.ratio >= 15 ? 'text-[#f59e0b]' : 'text-red-400'}">${bar.ratio}% Density (${bar.status})</span>`}
-                  
-                  <button type="button" onclick="window.AEO_COCKPIT && window.AEO_COCKPIT.viewWhatAISees ? window.AEO_COCKPIT.viewWhatAISees('${bar.url}', ${bar.ratio}, '${bar.status}', '${bar.gain}') : null" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#b7410e] border border-[#3c4043] hover:border-[#b7410e] text-[#e8eaed] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95" title="View clean text ingested by AI crawlers">
-                    <span>📄 View What AI sees</span>
-                    <span class="text-[10px]">↗</span>
-                  </button>
-
-                  <button type="button" onclick="const d = document.getElementById('details-row-${idx}'); if (d) d.toggleAttribute('open');" class="px-3 py-1.5 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#38bdf8] hover:text-white text-xs font-bold transition shadow-sm flex items-center space-x-1.5 active:scale-95">
-                    <span>🔍 Details</span>
-                    <span class="text-[10px]">▾</span>
-                  </button>
+                <div class="w-full bg-[#1f1f1f] rounded-full h-3 overflow-hidden border border-[#3c4043]">
+                  <div class="${bar.color} h-3 rounded-full transition-all duration-1000" style="width: ${Math.min(bar.ratio, 100)}%"></div>
                 </div>
-              </div>
-              
-              <div class="w-full bg-[#1f1f1f] rounded-full h-3 overflow-hidden border border-[#3c4043]">
-                <div class="${bar.color} h-3 rounded-full transition-all duration-1000" style="width: ${Math.min(bar.ratio, 100)}%"></div>
-              </div>
-              
-              <div class="flex items-center justify-between text-xs font-mono text-[#bdc1c6]">
-                <span>Information Gain Score: <strong class="text-white font-bold">${bar.gain}</strong> • Words: <strong class="text-white font-bold">${bar.wordCount}</strong></span>
-                <span>Target: ≥ 25% Text-to-HTML Ratio</span>
-              </div>
+                
+                <div class="flex items-center justify-between text-xs font-mono text-[#bdc1c6]">
+                  <span>Information Gain Score: <strong class="text-white font-bold">${bar.gain}</strong> • Words: <strong class="text-white font-bold">${bar.wordCount}</strong></span>
+                  <span>Target: ≥ 25% Text-to-HTML Ratio</span>
+                </div>
 
-              <details id="details-row-${idx}" class="executive-drawer bg-[#181818] border border-[#3c4043] rounded-2xl p-4 sm:p-5 mt-3 space-y-4">
-                <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
-                  <span class="flex items-center space-x-2">
-                    <span>▾ Page Diagnostic Breakdown &amp; In-Page Fix Snippets</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded ${bar.ratio >= 25 ? 'bg-[#10b981]/20 text-[#10b981]' : 'bg-red-950 text-red-300'} border border-current">
-                      ${bar.ratio >= 25 ? 'VERIFIED PASSED' : 'ACTION REQUIRED'}
+                <details id="details-row-${idx}" class="executive-drawer bg-[#181818] border border-[#3c4043] rounded-2xl p-4 sm:p-5 mt-3 space-y-4">
+                  <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#38bdf8] cursor-pointer hover:text-[#7dd3fc]">
+                    <span class="flex items-center space-x-2">
+                      <span>▾ Page Diagnostic Breakdown &amp; In-Page Fix Snippets</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded ${bar.ratio >= 25 ? 'bg-[#10b981]/20 text-[#10b981]' : 'bg-red-950 text-red-300'} border border-current">
+                        ${bar.ratio >= 25 ? 'VERIFIED PASSED' : 'ACTION REQUIRED'}
+                      </span>
                     </span>
-                  </span>
-                  <span class="text-xs text-[#bdc1c6] font-normal">[Toggle Details]</span>
-                </summary>
+                    <span class="text-xs text-[#bdc1c6] font-normal">[Toggle Details]</span>
+                  </summary>
 
-                <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3.5">
-                  ${buildLegacyMatchedPageFixPanels(bar)}
-                </div>
-              </details>
-            </div>
-          `).join('')}
+                  <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3.5">
+                    ${buildLegacyMatchedPageFixPanels(bar)}
+                  </div>
+                </details>
+              </div>
+            `;
+          }).join('')}
         </div>
 
         ${count < totalPages ? `
@@ -3503,6 +3785,15 @@ if (typeof window !== 'undefined') {
   window.openAuthorModal = openAuthorModal;
   window.closeAuthorModal = closeAuthorModal;
   window.copyAuthorSnippet = copyAuthorSnippet;
+  window.filterStage3Pages = filterStage3Pages;
+  window.deduplicateStage3Pages = deduplicateStage3Pages;
+  window.toFullUrl = toFullUrl;
+  window.sortStage3Pages = sortStage3Pages;
+  window.renderStage3Thermometers = renderStage3Thermometers;
+  window.renderStage3EducationalCopy = renderStage3EducationalCopy;
+  window.normalizePagePath = normalizePagePath;
+  window.isHomepagePath = isHomepagePath;
+  window.getPageTier = getPageTier;
   window.AEO_COCKPIT = {
     initCockpit,
     executeCockpitScan,
@@ -3531,6 +3822,15 @@ if (typeof window !== 'undefined') {
     renderStage2Canvas,
     renderStage3: renderStage3Canvas,
     renderStage3Canvas,
+    filterStage3Pages,
+    deduplicateStage3Pages,
+    toFullUrl,
+    sortStage3Pages,
+    renderStage3Thermometers,
+    renderStage3EducationalCopy,
+    normalizePagePath,
+    isHomepagePath,
+    getPageTier,
     renderStage4: renderStage4Canvas,
     renderStage4Canvas,
     renderStage4SchemaCard,
