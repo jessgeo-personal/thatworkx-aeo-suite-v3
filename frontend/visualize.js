@@ -3907,7 +3907,94 @@ export function copyAddressSnippet(btn, snippetId) {
   }
 }
 
+// ============================================================================
+// AUDIT EXPORT ENGINE (JSON & PRINT-TO-PDF)
+// ============================================================================
+
+/**
+ * Handles exporting diagnostic audit report data to JSON or initiating print-to-PDF.
+ * Validates audited state before generating downloads.
+ * 
+ * @param {string} [type='JSON'] - Export format ('JSON' or 'PDF')
+ */
+export function handleExport(type = 'JSON') {
+  const exportType = (type || 'JSON').toUpperCase();
+
+  // 1. Unaudited Guard: Require active audit data before allowing export
+  if (!cockpitState.isAudited || cockpitState.targetUrl === '--' || !cockpitState.targetUrl) {
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert('Please run an audit scan first before exporting diagnostic reports.');
+    }
+    return;
+  }
+
+  // 2. PDF Export: Trigger system print dialog formatted for print stylesheets
+  if (exportType === 'PDF') {
+    if (typeof window !== 'undefined' && typeof window.print === 'function') {
+      window.print();
+    }
+    return;
+  }
+
+  // 3. JSON Export: Generate formatted audit payload download
+  if (exportType === 'JSON') {
+    const rawDomain = (cockpitState.targetUrl || 'audit')
+      .replace(/^https?:\/\//i, '')
+      .split('/')[0]
+      .replace(/[^a-zA-Z0-9.-]/g, '')
+      .replace(/\./g, '-');
+
+    const dateSlug = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `aeo-audit-${rawDomain || 'domain'}-${dateSlug}.json`;
+
+    const exportData = {
+      auditEngine: "Thatworkx AEO Diagnostic Suite V4",
+      targetUrl: cockpitState.targetUrl,
+      timestamp: cockpitState.timestamp,
+      scanDuration: cockpitState.scanDuration,
+      totalPages: cockpitState.totalPages,
+      compositeHealthIndex: cockpitState.healthIndex ?? cockpitState.healthScore ?? 0,
+      statusLabel: cockpitState.statusLabel,
+      dualPillarReadiness: {
+        humanWebReadiness: cockpitState.humanWebReadiness ?? 0,
+        machineWebReadiness: cockpitState.machineWebReadiness ?? 0
+      },
+      summary: cockpitState.summary || {},
+      stage1: cockpitState.stage1 || {},
+      stage2: cockpitState.stage2 || cockpitState.stage2Data || {},
+      stage3: {
+        score: cockpitState.stage3?.score,
+        status: cockpitState.stage3?.status,
+        totalPages: cockpitState.stage3?.pages?.length || 0,
+        pages: cockpitState.stage3?.pages || []
+      },
+      stage4: cockpitState.stage4 || {},
+      stage5: cockpitState.stage5 || {},
+      stage6: {
+        healthIndex: cockpitState.healthIndex,
+        top5Actions: typeof generateDynamicTriage === 'function' ? generateDynamicTriage(cockpitState) : []
+      },
+      exportedAt: new Date().toISOString()
+    };
+
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = blobUrl;
+    downloadAnchor.download = filename;
+    downloadAnchor.style.display = 'none';
+
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+    URL.revokeObjectURL(blobUrl);
+  }
+}
+
 if (typeof window !== 'undefined') {
+  window.handleExport = handleExport;
   window.toggleSidebar = toggleSidebar;
   window.openAddressModal = openAddressModal;
   window.closeAddressModal = closeAddressModal;
@@ -3925,6 +4012,7 @@ if (typeof window !== 'undefined') {
   window.isHomepagePath = isHomepagePath;
   window.getPageTier = getPageTier;
   window.AEO_COCKPIT = {
+    handleExport,
     initCockpit,
     executeCockpitScan,
     handleCockpitRescan,
