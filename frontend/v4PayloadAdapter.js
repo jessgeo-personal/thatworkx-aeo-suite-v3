@@ -317,16 +317,22 @@ export function mapBackendScanToV4State(rawPayload) {
 
   const routes = CANONICAL_ESSENTIAL_ROUTES.map((route) => {
     const cleanRouteName = route.replace(/^\//, '');
-    const isExplicitlyMissing = missingPages.some(m => {
+    const isExplicitlyMissing = Array.isArray(missingPages) && missingPages.some(m => {
       const cleanM = String(m).toLowerCase().replace(/^\//, '');
-      return cleanM === cleanRouteName || cleanM.includes(cleanRouteName);
+      return cleanM === cleanRouteName;
     });
 
-    const isFoundInCrawled = crawledPaths.some(p => {
-      return p === route || p.endsWith(route) || p.endsWith(`/${cleanRouteName}`) || p.includes(`/${cleanRouteName}`);
+    const isFoundInCrawled = crawledPaths.some((p) => {
+      if (p === route || p.endsWith(route)) return true;
+      if (route === '/privacy-policy' && (p.includes('privacy') || p.includes('data-policy') || p.includes('data-privacy'))) return true;
+      if (route === '/terms-of-service' && (p.includes('terms') || p.includes('tos') || p.includes('limits') || p.includes('usage') || p.includes('servicesagreement') || p.includes('services-agreement'))) return true;
+      if (route === '/about' && (p.includes('about') || p.includes('company'))) return true;
+      if (route === '/contact' && (p.includes('contact') || p.includes('get-in-touch'))) return true;
+      if (route === '/pricing' && (p.includes('pricing') || p.includes('plans') || p.includes('store') || p.includes('buy') || p.includes('compare'))) return true;
+      return false;
     });
 
-    const isFound = !isExplicitlyMissing || isFoundInCrawled;
+    const isFound = isFoundInCrawled && !isExplicitlyMissing;
 
     return {
       route,

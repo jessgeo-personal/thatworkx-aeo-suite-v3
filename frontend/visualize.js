@@ -160,11 +160,10 @@ function extractPathname(urlStr) {
 }
 
 /**
- * Optional International Locale Prefix
- * Matches 2-3 letter language codes with optional country/script subtags:
- * Examples: /en-us/, /de/, /fr-ca/, /zh-cn/, /es-es/, /ja/
+ * Path prefix pattern supporting optional language/locale codes and legal/policy subdirectories
+ * Examples: /en-us/, /de/, /fr-ca/, /legal/, /en-us/legal/, /policies/
  */
-const LOCALE_PREFIX = '(?:\\/[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?)?';
+const PATH_PREFIX = '(?:\\/(?:[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?|legal|policies|policy))*';
 
 /**
  * 5-Anchor Essential Pages Configuration
@@ -176,7 +175,8 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'about',
     label: 'About',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(about(?:-?us)?|company)(?:[\/?#]|$)/i
     ],
     anchorPatterns: [
       /^#?(?:\/)?#?(about(?:-?us)?|company)$/i
@@ -187,7 +187,8 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'contact',
     label: 'Contact',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(contact(?:-?us)?|get-in-touch)(?:[\/?#]|$)/i
     ],
     anchorPatterns: [
       /^#?(?:\/)?#?(contact(?:-?us)?|get-in-touch)$/i
@@ -198,10 +199,11 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'pricing',
     label: 'Pricing',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(pricing(?:-?plans)?|plans|store|buy|compare)(?:[\/?#]|$)/i
     ],
     anchorPatterns: [
-      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans)$/i
+      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans|store|buy|compare)$/i
     ]
   },
   {
@@ -209,10 +211,11 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'privacy-policy',
     label: 'Privacy Policy',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?policy)?|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:[\/?#]|$)/i
     ],
     anchorPatterns: [
-      /^#?(?:\/)?#?(privacy(?:-?policy)?|data-?(?:privacy|policy))$/i
+      /^#?(?:\/)?#?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))$/i
     ]
   },
   {
@@ -220,10 +223,12 @@ export const ESSENTIAL_PAGE_DEFINITIONS = [
     canonicalName: 'terms-of-service',
     label: 'Terms of Service',
     routePatterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)(?:\\/|\\.html)?$`, 'i')
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:\\/|\\.html)?$`, 'i'),
+      /(?:terms[-_]conditions|terms[-_]and[-_]conditions|terms[-_]of[-_]service|terms[-_]of[-_]use|services[-_]?agreement|service[-_]?agreement|user[-_]?agreement)/i,
+      /(?:\/|\/#|#)(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:[\/?#]|$)/i
     ],
     anchorPatterns: [
-      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)$/i
+      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)$/i
     ]
   }
 ];

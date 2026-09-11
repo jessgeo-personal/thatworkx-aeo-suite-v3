@@ -9,45 +9,51 @@
  */
 
 /**
- * International Locale Prefix Pattern
- * Matches optional 2-3 letter language codes and regional subtags (e.g. /en-us/, /de/, /fr-ca/)
+ * Path prefix pattern supporting optional language/locale codes and legal/policy subdirectories
+ * Examples: /en-us/, /de/, /fr-ca/, /legal/, /en-us/legal/, /policies/
  */
-const LOCALE_PREFIX = '(?:\\/[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?)?';
+const PATH_PREFIX = '(?:\\/(?:[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?|legal|policies|policy))*';
 
 const ESSENTIAL_ANCHOR_DEFINITIONS = [
   {
     canonical: '/about',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(about(?:-?us)?|company)(?:[\/?#]|$)/i,
       /^#?(?:\/)?#?(about(?:-?us)?|company)$/i
     ]
   },
   {
     canonical: '/contact',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i'),
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(contact(?:-?us)?|get-in-touch)(?:[\/?#]|$)/i,
       /^#?(?:\/)?#?(contact(?:-?us)?|get-in-touch)$/i
     ]
   },
   {
     canonical: '/pricing',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i'),
-      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans)$/i
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(pricing(?:-?plans)?|plans|store|buy|compare)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans|store|buy|compare)$/i
     ]
   },
   {
     canonical: '/privacy-policy',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?policy)?|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i'),
-      /^#?(?:\/)?#?(privacy(?:-?policy)?|data-?(?:privacy|policy))$/i
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))$/i
     ]
   },
   {
     canonical: '/terms-of-service',
     patterns: [
-      new RegExp(`^${LOCALE_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)(?:\\/|\\.html)?$`, 'i'),
-      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service))?|terms(?:andconditions|ofservice)|usage-?terms|limits|tos)$/i
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:\\/|\\.html)?$`, 'i'),
+      /(?:terms[-_]conditions|terms[-_]and[-_]conditions|terms[-_]of[-_]service|terms[-_]of[-_]use|services[-_]?agreement|service[-_]?agreement|user[-_]?agreement)/i,
+      /(?:\/|\/#|#)(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)$/i
     ]
   }
 ];

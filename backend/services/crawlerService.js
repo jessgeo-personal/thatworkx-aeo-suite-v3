@@ -11,6 +11,18 @@ try {
   whois = null;
 }
 
+// ============================================================================
+// CENTRAL CRAWLER TIMEOUT & CONCURRENCY CONFIGURATION
+// You can adjust these values here or override them via your .env file.
+// ============================================================================
+const CRAWLER_CONFIG = {
+  // Timeout for proactive essential route probes (supports multi-hop enterprise redirects)
+  PROBE_TIMEOUT_MS: parseInt(process.env.PROBE_TIMEOUT_MS, 10) || 7500, // 7.5 seconds default
+
+  // Timeout for individual page crawls in the main BFS queue
+  PAGE_FETCH_TIMEOUT_MS: parseInt(process.env.PAGE_FETCH_TIMEOUT_MS, 10) || 6000, // 6.0 seconds default
+};
+
 const AI_CRAWLERS = [
   { key: 'gptBot', name: 'GPTBot', pattern: /User-agent:\s*GPTBot\s*Disallow:\s*\//i },
   { key: 'chatGptUser', name: 'ChatGPT-User', pattern: /User-agent:\s*ChatGPT-User\s*Disallow:\s*\//i },
@@ -75,7 +87,6 @@ function isSameDomainOrSubdomain(targetUrl, candidateUrl) {
     if (h2.endsWith('.' + h1)) return true;
     if (h1.endsWith('.' + h2)) return true;
 
-    // Base domain extraction for targets on multi-level subdomains
     const getApex = (host) => {
       const parts = host.split('.');
       if (parts.length <= 2) return host;
@@ -100,6 +111,145 @@ function isSameDomainOrSubdomain(targetUrl, candidateUrl) {
   } catch (e) {
     return false;
   }
+}
+
+/**
+ * Validates if candidate URL belongs to target domain or an organizational subdomain.
+ * Excludes noisy/auth redirect subdomains (login, account, appsource, sso, etc.)
+ */
+function isInternalLink(candidateUrl, baseUrl) {
+  if (!candidateUrl || !baseUrl) return false;
+  try {
+    const candidateObj = new URL(candidateUrl, baseUrl);
+    if (!['http:', 'https:'].includes(candidateObj.protocol)) return false;
+
+    if (!isSameDomainOrSubdomain(baseUrl, candidateObj.href)) return false;
+
+    const candidateHost = candidateObj.hostname.toLowerCase();
+    const baseHost = new URL(baseUrl).hostname.toLowerCase().replace(/^www\./, '');
+
+    // Reject authentication, profile, marketplace, and portal subdomains prone to redirect loops
+    const NOISY_SUBDOMAIN_PREFIXES = [
+      'login.', 'account.', 'accounts.', 'appsource.', 'auth.',
+      'signin.', 'signup.', 'sso.', 'admin.', 'billing.',
+      'myaccount.', 'identity.', 'portal.', 'secure.'
+    ];
+
+    if (NOISY_SUBDOMAIN_PREFIXES.some(prefix => candidateHost === prefix.slice(0, -1) + '.' + baseHost || candidateHost.startsWith(prefix))) {
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Concurrently probes the 5 essential route categories in parallel with central timeout.
+ * Skips categories already found in BFS crawl to preserve bandwidth and avoid WAF rate-limiting.
+ */
+async function probeEssentialRoutes(
+  targetUrl, 
+  pages = [], 
+  discoveredRoutes = [], 
+  fetchFn = fetch, 
+  timeoutMs = CRAWLER_CONFIG.PROBE_TIMEOUT_MS
+) {
+  const ESSENTIAL_PROBE_GROUPS = [
+    {
+      category: 'about',
+      paths: ['/about', '/about-us', '/aboutus']
+    },
+    {
+      category: 'contact',
+      paths: ['/contact', '/contact-us', '/contactus']
+    },
+    {
+      category: 'pricing',
+      paths: ['/pricing', '/store', '/buy']
+    },
+    {
+      category: 'privacy',
+      paths: ['/privacy', '/privacy-policy', '/privacystatement', '/privacy-statement']
+    },
+    {
+      category: 'terms',
+      paths: ['/terms', '/terms-of-service', '/terms-of-use', '/terms-and-conditions', '/servicesagreement', '/services-agreement']
+    }
+  ];
+
+  // Identify which categories still require probing
+  const pathsToProbe = [];
+  for (const group of ESSENTIAL_PROBE_GROUPS) {
+    const alreadyFound = pages.some(p => {
+      try {
+        const path = (new URL(p.url, targetUrl).pathname || '').toLowerCase();
+        return group.paths.some(gp => path.includes(gp.replace(/^\//, '')));
+      } catch {
+        return false;
+      }
+    });
+
+    if (!alreadyFound) {
+      pathsToProbe.push(...group.paths);
+    }
+  }
+
+  // Execute all required probes concurrently using the central timeout
+  const probeTasks = pathsToProbe.map(async (probePath) => {
+    let signal;
+    let timer;
+
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+      signal = AbortSignal.timeout(timeoutMs);
+    } else {
+      const controller = new AbortController();
+      timer = setTimeout(() => controller.abort(), timeoutMs);
+      signal = controller.signal;
+    }
+
+    try {
+      const probeTarget = new URL(probePath, targetUrl).href;
+      const probeRes = await fetchFn(probeTarget, {
+        method: 'GET',
+        redirect: 'follow',
+        signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 (compatible; AIO-Diagnostic-Crawler/3.0)'
+        }
+      });
+
+      if (timer) clearTimeout(timer);
+
+      if (probeRes && probeRes.ok) {
+        const finalUrl = probeRes.url || probeTarget;
+        if (isSameDomainOrSubdomain(targetUrl, finalUrl)) {
+          const rawHtml = typeof probeRes.text === 'function' ? await probeRes.text() : '';
+          pages.push({
+            url: finalUrl,
+            statusCode: probeRes.status,
+            content: rawHtml,
+            wordCount: rawHtml.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length,
+            isCrawled: true
+          });
+
+          if (Array.isArray(discoveredRoutes) && !discoveredRoutes.includes(finalUrl)) {
+            discoveredRoutes.push(finalUrl);
+          } else if (discoveredRoutes && typeof discoveredRoutes.add === 'function') {
+            discoveredRoutes.add(finalUrl);
+          }
+        }
+      }
+    } catch (err) {
+      // Abort timeouts or 403/404s skipped cleanly
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  });
+
+  await Promise.allSettled(probeTasks);
+  return pages;
 }
 
 function formatDomainAgeResult(createdDate) {
@@ -1026,68 +1176,11 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     // ---------------------------------------------------------------------------
     // Proactive Probe for 5 Essential Routes (Overcomes crawl budget exhaustion)
     // ---------------------------------------------------------------------------
-    const ESSENTIAL_PROBE_PATHS = [
-      '/about',
-      '/about-us',
-      '/aboutus',
-      '/contact',
-      '/contact-us',
-      '/contactus',
-      '/pricing',
-      '/privacy-policy',
-      '/privacy',
-      '/terms-of-service',
-      '/terms',
-      '/terms-and-conditions'
-    ];
-
     const pages = result.pages || [];
     const discoveredRoutes = result.discoveredRoutes || [];
 
-    for (const probePath of ESSENTIAL_PROBE_PATHS) {
-      const alreadyFound = pages.some(p => {
-        try {
-          const path = (new URL(p.url, targetUrl).pathname || '').toLowerCase();
-          return path.includes(probePath.slice(1));
-        } catch (e) {
-          return false;
-        }
-      });
-
-      if (!alreadyFound) {
-        try {
-          const probeTarget = new URL(probePath, targetUrl).href;
-          const probeRes = await fetch(probeTarget, {
-            method: 'GET',
-            redirect: 'follow',
-            headers: {
-              'User-Agent': 'AIO-Diagnostic-Crawler/3.0 (+https://thatworkx.com/aeo)'
-            }
-          });
-
-          if (probeRes.ok) {
-            const finalUrl = probeRes.url || probeTarget;
-            if (isSameDomainOrSubdomain(targetUrl, finalUrl)) {
-              const rawHtml = await probeRes.text();
-              pages.push({
-                url: finalUrl,
-                statusCode: probeRes.status,
-                content: rawHtml,
-                wordCount: rawHtml.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length,
-                isCrawled: true
-              });
-              if (Array.isArray(discoveredRoutes) && !discoveredRoutes.includes(finalUrl)) {
-                discoveredRoutes.push(finalUrl);
-              } else if (discoveredRoutes && typeof discoveredRoutes.add === 'function') {
-                discoveredRoutes.add(finalUrl);
-              }
-            }
-          }
-        } catch (err) {
-          // Probe endpoint unreachable, skip gracefully
-        }
-      }
-    }
+    // Replace legacy sequential probe loop with concurrent safe prober:
+    await probeEssentialRoutes(targetUrl, pages, discoveredRoutes, fetch);
 
     result.scanMetrics = {
       scanTimeSeconds: Number(((Date.now() - scanStartTime) / 1000).toFixed(2)),
@@ -1152,6 +1245,9 @@ module.exports = {
   formatDomainAgeResult,
   extractContactAnchors,
   isSameDomainOrSubdomain,
+  isInternalLink,
+  probeEssentialRoutes,
+  CRAWLER_CONFIG,
   AI_CRAWLERS
 };
 
