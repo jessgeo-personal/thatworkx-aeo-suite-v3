@@ -1414,7 +1414,7 @@ export function renderStage1(container, state = cockpitState) {
         </div>
       </div>
 
-      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace })}
+      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace, stage: 1 })}
     </div>
   `;
 
@@ -1573,7 +1573,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
         </div>
       </div>
 
-      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan: 'Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.', evidencePlain, evidenceTrace })}
+      ${buildEvidenceAndActionDrawers({ actionPlan, actionSteps, shortcutPlan: 'Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.', evidencePlain, evidenceTrace, stage: 2 })}
     </div>
   `;
 
@@ -1582,14 +1582,116 @@ export function renderStage2Canvas(container, state = cockpitState) {
 
 export const renderStage2 = renderStage2Canvas;
 
+/**
+ * Generates the standardized 4-feature list for AIOptimize Pro manifest automation.
+ */
+function renderAIOptimizeFeaturesList() {
+  return `
+    <ul class="aioptimize-features-list space-y-2.5 text-sm sm:text-base text-[#e8eaed] pl-1 sm:pl-7">
+      <li class="flex items-start space-x-3">
+        <span class="text-[#f97316] font-black text-sm sm:text-base flex-shrink-0 mt-0.5">1.</span>
+        <span>Deploy standard machine-friendly files (machine manifests like <code class="text-[#38bdf8] font-mono text-xs sm:text-sm">/llms.txt</code> and <code class="text-[#38bdf8] font-mono text-xs sm:text-sm">/ai-context.md</code>) to provide clean structured context for AI bots without HTML noise.</span>
+      </li>
+      <li class="flex items-start space-x-3">
+        <span class="text-[#f97316] font-black text-sm sm:text-base flex-shrink-0 mt-0.5">2.</span>
+        <span>Machine Manifest content can be updated automatically everytime you make a change on your website.</span>
+      </li>
+      <li class="flex items-start space-x-3">
+        <span class="text-[#f97316] font-black text-sm sm:text-base flex-shrink-0 mt-0.5">3.</span>
+        <span>Content pulled directly from your website, your social posts (using AISocialize), content your upload, or just plugin your github repository</span>
+      </li>
+      <li class="flex items-start space-x-3">
+        <span class="text-[#f97316] font-black text-sm sm:text-base flex-shrink-0 mt-0.5">4.</span>
+        <span>API's available to integrate directly to your Content Management Systems(CMS).</span>
+      </li>
+    </ul>
+  `;
+}
+
 export function buildEvidenceAndActionDrawers(secData = {}) {
+  const stageNum = Number(secData.stage ?? 0);
   const actionPlan = secData.actionPlan || '';
   const actionSteps = secData.actionSteps || [];
-  const shortcutPlan = secData.shortcutPlan || '';
   const evidencePlain = secData.evidencePlain || '';
   const evidenceTrace = secData.evidenceTrace || '';
   const recoveryScore = secData.recoveryScore || '+15';
 
+  // =========================================================================
+  // STAGE 5 SPECIAL CASE: ACTION PLAN IS THE PRIMARY UPSELL CONTAINER
+  // OMIT SEPARATE RECOMMENDED SHORTCUT BOX IN STAGE 5
+  // =========================================================================
+  if (stageNum === 5) {
+    return `
+      <div class="space-y-5 mt-6">
+        <!-- STAGE 5 PRIMARY UPSELL CARD -->
+        <div class="action-plan-urgent-card bg-gradient-to-b from-[#241712] via-[#1a1412] to-[#121212] border-2 border-[#d45d2a] rounded-3xl p-6 sm:p-8 shadow-[0_0_30px_rgba(212,93,42,0.25)] space-y-5 relative overflow-hidden" data-component="urgent-action-plan">
+          <!-- Ambient radial glow -->
+          <div class="absolute top-0 right-0 w-48 h-48 bg-[#b7410e]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Header: Pulsing Beacon + Heading + Recovery Badge -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-[#3c4043]/60">
+            <div class="flex items-center space-x-3">
+              <div class="relative flex items-center justify-center flex-shrink-0">
+                <span class="w-3 h-3 rounded-full bg-[#d45d2a] animate-ping absolute"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#d45d2a] relative"></span>
+              </div>
+              <h4 class="action-plan-heading stage5-upsell-heading text-lg sm:text-xl lg:text-2xl font-black text-white uppercase tracking-tight font-headline">
+                Upgrade to AIOptimize Pro to automatically create AI-ready files
+              </h4>
+            </div>
+
+            <div class="recovery-badge flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-black bg-[#b7410e]/30 border border-[#d45d2a] text-[#ff7a45] tracking-wider uppercase shadow-[0_0_12px_rgba(183,65,14,0.3)] flex-shrink-0" data-slot="recovery-score">
+              <span>⚡</span>
+              <span>${recoveryScore} HEALTH SCORE RECOVERY</span>
+            </div>
+          </div>
+
+          <!-- 4 Core Features List -->
+          ${renderAIOptimizeFeaturesList()}
+
+          <!-- Centered Gradient CTA Button & Guarantee Subtext -->
+          <div class="shortcut-card-btn-container flex flex-col items-center justify-center text-center w-full pt-3 space-y-2.5">
+            <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#f97316] via-[#ea580c] to-[#c2410c] hover:opacity-95 text-white font-black text-base sm:text-lg tracking-wide transition shadow-[0_6px_25px_rgba(234,88,12,0.45)] whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95">
+              <span>🚀 Make My Website AI-Ready with AIOptimize Pro</span>
+            </button>
+            <div class="shortcut-card-subtext text-[#7dd3fc] text-xs sm:text-sm font-medium tracking-wide">
+              Instant 2–Minute Setup • Available via Unlimited Monthly Sync or Flexible Single-Pass Scans
+            </div>
+          </div>
+        </div>
+
+        <!-- TIER 2: VERIFICATION EVIDENCE DRAWER -->
+        <details class="executive-drawer bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 shadow-lg open" open>
+          <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white font-headline cursor-pointer">
+            <span class="flex items-center space-x-2.5">
+              <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Verification Evidence (What We Found)</span>
+            </span>
+            <span class="text-[#bdc1c6] text-xs font-mono font-semibold">[Toggle Verification]</span>
+          </summary>
+          <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-4">
+            <p class="text-sm sm:text-base leading-relaxed text-[#e8eaed] font-medium">
+              ${evidencePlain}
+            </p>
+            
+            <details class="executive-drawer bg-[#121212] border border-[#3c4043] rounded-2xl p-4 mt-3">
+              <summary class="flex items-center justify-between text-xs font-mono font-bold text-[#bdc1c6] cursor-pointer">
+                <span>▾ View Technical Diagnostics &amp; Server Response Trace</span>
+                <span class="text-[#38bdf8] text-xs font-mono">[Raw Headers Trace]</span>
+              </summary>
+              <div class="mt-3.5 pt-3.5 border-t border-[#3c4043]">
+                <pre class="bg-[#181818] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]">${evidenceTrace}</pre>
+              </div>
+            </details>
+          </div>
+        </details>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // STAGES 1–4 DEFAULT: ACTION PLAN CARD + WHITE BORDER SHORTCUT BOX WITH 4 FEATURES
+  // =========================================================================
   return `
     <div class="space-y-5 mt-6">
       <!-- BOX 1: MANUAL ACTION PLAN (HYBRID OPTION A + C: HIGH-VOLTAGE URGENCY & METRIC RECOVERY) -->
@@ -1647,24 +1749,25 @@ export function buildEvidenceAndActionDrawers(secData = {}) {
         </details>
       </div>
 
-      <!-- BOX 2: RECOMMENDED SHORTCUT (AI-READY MANIFEST AUTOMATION VIA AIOPTIMIZE PRO) -->
-      <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-        <div class="shortcut-card-body space-y-2.5">
+      <!-- BOX 2: RECOMMENDED SHORTCUT (SOLID WHITE OUTLINE, 4 FEATURES LIST, CENTERED WARM GRADIENT BUTTON & GUARANTEE SUBTEXT) -->
+      <div class="shortcut-card bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-white rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-5">
+        <div class="shortcut-card-body space-y-3">
           <div class="flex items-center space-x-2.5">
             <span class="text-base sm:text-lg text-[#d45d2a]">⚡</span>
-            <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider font-headline">
+            <h4 class="text-sm sm:text-base font-black text-[#d45d2a] uppercase tracking-wider font-headline">
               Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
             </h4>
           </div>
-          <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed pl-0 sm:pl-7">
-            ${shortcutPlan}
-          </p>
+          ${renderAIOptimizeFeaturesList()}
         </div>
-        <div class="shortcut-card-btn-container">
-          <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-6 py-3.5 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white font-black text-xs sm:text-sm font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95 flex-shrink-0">
-            <span>⚡ Deploy AI-Ready files using AIOptimize Pro</span>
-            <span>↗</span>
+
+        <div class="shortcut-card-btn-container flex flex-col items-center justify-center text-center w-full pt-2 space-y-2.5">
+          <button type="button" onclick="alert('Navigating to AIOptimize Pro Automated Manifest Deployment')" class="shortcut-card-btn px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#f97316] via-[#ea580c] to-[#c2410c] hover:opacity-95 text-white font-black text-base sm:text-lg tracking-wide transition shadow-[0_6px_25px_rgba(234,88,12,0.45)] whitespace-nowrap flex items-center justify-center space-x-2 active:scale-95">
+            <span>🚀 Make My Website AI-Ready with AIOptimize Pro</span>
           </button>
+          <div class="shortcut-card-subtext text-[#7dd3fc] text-xs sm:text-sm font-medium tracking-wide">
+            Instant 2–Minute Setup • Available via Unlimited Monthly Sync or Flexible Single-Pass Scans
+          </div>
         </div>
       </div>
 
@@ -2318,7 +2421,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
   const evidencePlain = `${sortedPages.filter(p => p.ratio >= 25).length} of ${totalPages} crawled pages deliver clean semantic text with valid heading structures.`;
   const evidenceTrace = sortedPages.map(p => `${p.url}: ${p.ratio}% Text Density (${p.status}) • Words: ${p.wordCount} • Schema: ${p.hasSchema ? 'Detected' : 'Missing'}`).join('\n');
 
-  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace, stage: 3 };
   const targetDomain = state.targetUrl || cockpitState.targetUrl || '';
 
   const html = `
@@ -2701,7 +2804,7 @@ export function renderStage4Canvas(container, state = cockpitState) {
   const evidencePlain = sec.evidencePlain || `Verified Schema.org graphs: ${schemaGraphStatus}. Author E-E-A-T credentials: ${authorStatus}. Authority Grounding: ${authorityDetails.domainAge}.`;
   const evidenceTrace = sec.evidenceTrace || `Schema Entities: ${detectedTypesString || 'None'}\nAuthor Bio: ${authorPass ? 'Verified' : 'Gaps detected'}\nDomain Age: ${authorityDetails.domainAge}\nContact Email: ${cleanEmail || '--'}\nContact Phone: ${cleanPhone || '--'}`;
 
-  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace, stage: 4 };
 
   const html = `
     <div class="space-y-6">
@@ -3275,7 +3378,7 @@ export function renderStage5Canvas(container, state = cockpitState) {
   const evidencePlain = sec.evidencePlain || 'Inspected 4-Level machine manifest hierarchy endpoints. Level 1 robots.txt active, Level 2 /llms.txt active, Level 3 /ai-context.md under configuration.';
   const evidenceTrace = sec.evidenceTrace || `GET /robots.txt -> ${mRobots.exists ? '200 OK' : '404 Not Found'}\nGET /sitemap.xml -> ${mSitemap.exists ? '200 OK' : '404 Not Found'}\nGET /llms.txt -> ${mLlms.exists ? '200 OK' : '404 Not Found'}\nGET /ai-context.md -> ${mAiContext.exists ? '200 OK' : '404 Not Found'}\nGET /README.md -> ${mReadme.exists ? '200 OK' : '404 Not Found'}\nGET /about.md -> ${mAbout.exists ? '200 OK' : '404 Not Found'}\nGET /docs.md -> ${mDocs.exists ? '200 OK' : '404 Not Found'}\nGET /content.md -> ${mContent.exists ? '200 OK' : '404 Not Found'}`;
 
-  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace };
+  const secData = { actionPlan, actionSteps, shortcutPlan, evidencePlain, evidenceTrace, stage: 5 };
 
   const html = `
     <div class="space-y-6">
