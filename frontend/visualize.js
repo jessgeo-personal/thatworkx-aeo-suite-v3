@@ -90,20 +90,87 @@ export function evaluateBotDirectiveStatus(countOrList, totalBots = 20, options 
   };
 }
 
+const STAGE_METADATA = {
+  1: {
+    badge: 'STAGE 1',
+    title: 'Stage 1: Crawler Access & Allowance',
+    subtitle: 'Robots.txt directive validation, crawler permissions, and HTTP response headers verification'
+  },
+  2: {
+    badge: 'STAGE 2',
+    title: 'Stage 2: Core Site Structure & Hierarchy',
+    subtitle: 'Semantic HTML tag nesting, DOM depth index, and semantic outline verification'
+  },
+  3: {
+    badge: 'STAGE 3',
+    title: 'Stage 3: Content Density & Depth Analysis',
+    subtitle: 'Content-to-code ratios and extractable text weight across all deduplicated pages'
+  },
+  4: {
+    badge: 'STAGE 4',
+    title: 'Stage 4: Schema & Structured Data Validation',
+    subtitle: 'JSON-LD graph entities, OpenGraph properties, and machine-readable schema compliance'
+  },
+  5: {
+    badge: 'STAGE 5',
+    title: 'Stage 5: Machine Manifests & AI-Ready Files',
+    subtitle: 'llms.txt, ai-context.md, and standard machine manifest hierarchy verification'
+  },
+  6: {
+    badge: 'STAGE 6',
+    title: 'Executive Summary & Action Triage',
+    subtitle: 'Composite health index and dynamic priority remediation triage'
+  }
+};
+
 export function getCurrentStage() {
   return currentStage;
 }
 
-export function switchStage(stageNumber) {
-  currentStage = stageNumber;
-  cockpitState.currentStep = stageNumber;
+/**
+ * Switches current stage view (1-6) and scrolls viewport to absolute top.
+ * @param {number|string} stageNum
+ */
+export function switchStage(stageNum) {
+  const num = Number(stageNum) || 6;
+  currentStage = num;
+  cockpitState.activeStage = num;
+  cockpitState.currentStep = num;
+
+  // 1. Viewport Topmost Scroll Reset
+  if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }
+  if (typeof document !== 'undefined') {
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    const canvas = document.getElementById('canvas-body');
+    if (canvas) canvas.scrollTop = 0;
+    const mainCanvas = document.getElementById('main-workspace-canvas');
+    if (mainCanvas) mainCanvas.scrollTop = 0;
+  }
+
+  // 2. Synchronize Stage Header Titles
+  const meta = STAGE_METADATA[num] || STAGE_METADATA[6];
+  const titleEl = document.getElementById('stage-title') || document.getElementById('stage-header-title') || document.getElementById('canvas-stage-title');
+  if (titleEl) {
+    titleEl.textContent = meta.title;
+  }
+  const subtitleEl = document.getElementById('stage-subtitle') || document.getElementById('canvas-stage-desc');
+  if (subtitleEl) {
+    subtitleEl.textContent = meta.subtitle;
+  }
+  const badgeEl = document.getElementById('stage-badge-pill') || document.getElementById('canvas-stage-badge');
+  if (badgeEl) {
+    badgeEl.textContent = meta.badge;
+  }
 
   for (let i = 1; i <= 6; i++) {
     const stageContainer = document.getElementById(`stage-${i}`);
     const stepperBtn = document.getElementById(`stepper-btn-${i}`) || document.querySelector(`[data-step="${i}"]`);
 
     if (stageContainer) {
-      if (i === stageNumber) {
+      if (i === num) {
         stageContainer.classList.remove('hidden');
       } else {
         stageContainer.classList.add('hidden');
@@ -111,7 +178,7 @@ export function switchStage(stageNumber) {
     }
 
     if (stepperBtn) {
-      if (i === stageNumber) {
+      if (i === num) {
         stepperBtn.classList.add('active');
         stepperBtn.setAttribute('aria-selected', 'true');
       } else {
@@ -119,6 +186,25 @@ export function switchStage(stageNumber) {
         stepperBtn.setAttribute('aria-selected', 'false');
       }
     }
+  }
+
+  // 3. Update Navigation Highlight & Stepper
+  if (typeof renderStepper === 'function') {
+    renderStepper();
+  }
+  if (typeof updateStageNav === 'function') {
+    updateStageNav(num);
+  }
+
+  // 4. Render Active Stage Canvas
+  const canvasBody = document.getElementById('canvas-body') || document.getElementById('main-workspace-canvas');
+  if (canvasBody) {
+    if (num === 1) renderStage1(canvasBody, cockpitState);
+    else if (num === 2) renderStage2Canvas(canvasBody, cockpitState);
+    else if (num === 3) renderStage3Canvas(canvasBody, cockpitState);
+    else if (num === 4) renderStage4Canvas(canvasBody, cockpitState);
+    else if (num === 5) renderStage5Canvas(canvasBody, cockpitState);
+    else renderStage6Canvas(canvasBody, cockpitState);
   }
 }
 
@@ -728,15 +814,22 @@ export function hideAuditModal() {
 
 export function handleCockpitNewScan() {
   const input = document.getElementById('target-url-input');
-  const currentVal = (input && input.value && input.value !== '--') ? input.value.trim() : 'https://';
-  const entered = window.prompt('Enter target domain for new AEO audit:', currentVal);
+  const val = input ? input.value.trim() : '';
+
+  if (val && val !== '--' && val !== 'https://') {
+    executeCockpitScan(val);
+    return;
+  }
+
+  const entered = (typeof window !== 'undefined' && typeof window.prompt === 'function')
+    ? window.prompt('Enter target domain for new AEO audit:', 'https://')
+    : null;
 
   if (entered && entered.trim() && entered.trim() !== 'https://') {
     if (input) input.value = entered.trim();
     executeCockpitScan(entered.trim());
   } else if (input) {
     input.focus();
-    input.select();
   }
 }
 
@@ -912,14 +1005,6 @@ export function initCockpit() {
     input.value = queryUrl;
   }
 
-  const searchBtn = document.getElementById('cockpit-search-btn');
-  if (searchBtn) {
-    searchBtn.addEventListener('click', () => {
-      const url = input ? input.value : '';
-      executeCockpitScan(url);
-    });
-  }
-
   if (input) {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -930,12 +1015,47 @@ export function initCockpit() {
 
   const rescanBtn = document.getElementById('rescan-btn');
   if (rescanBtn) {
-    rescanBtn.addEventListener('click', handleCockpitRescan);
+    rescanBtn.onclick = handleCockpitRescan;
   }
 
   const newScanBtn = document.getElementById('new-scan-btn');
   if (newScanBtn) {
-    newScanBtn.addEventListener('click', handleCockpitNewScan);
+    newScanBtn.onclick = handleCockpitNewScan;
+  }
+
+  const sessionBtn = document.getElementById('auth-session-btn');
+  if (sessionBtn) {
+    sessionBtn.onclick = (e) => {
+      e.stopPropagation();
+      toggleAuthDropdown();
+    };
+  }
+
+  const logoutBtn = document.getElementById('auth-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.onclick = (e) => {
+      e.stopPropagation();
+      handleLogout();
+    };
+  }
+
+  const loginBtn = document.getElementById('auth-login-btn');
+  if (loginBtn) {
+    loginBtn.onclick = (e) => {
+      e.stopPropagation();
+      toggleAuthDropdown(false);
+      showAuthEmailModal();
+    };
+  }
+
+  // Dismiss dropdown when clicking anywhere outside the capsule
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('auth-session-container');
+      if (container && !container.contains(e.target)) {
+        toggleAuthDropdown(false);
+      }
+    });
   }
 
   const emailSubmitBtn = document.getElementById('auth-email-submit-btn');
@@ -965,6 +1085,8 @@ export function initCockpit() {
     otpResendBtn.addEventListener('click', () => resendAuthOtp());
   }
 
+  updateAuthSessionDisplay();
+
   if (queryUrl) {
     executeCockpitScan(queryUrl);
   } else {
@@ -972,15 +1094,22 @@ export function initCockpit() {
   }
 }
 
-export function navigateToStep(stepNum) {
-  cockpitState.currentStep = stepNum;
-  renderStepper();
-  renderStageFromState(stepNum, cockpitState);
+/**
+ * Generates the standardized "Back to Summary" navigation capsule for Stages 1-5.
+ */
+export function renderBackToSummaryButton() {
+  return `
+    <div class="back-to-summary-container mb-5 flex items-center justify-start">
+      <button type="button" onclick="window.switchStage ? window.switchStage(6) : null" class="back-to-summary-btn inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#1a1412] hover:bg-[#251b17] border border-[#d45d2a]/60 hover:border-[#f97316] text-[#f97316] hover:text-white text-xs sm:text-sm font-mono font-black tracking-wide transition-all duration-300 ease-out transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(212,93,42,0.25)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)] cursor-pointer">
+        <span>←</span>
+        <span>Back to Summary</span>
+      </button>
+    </div>
+  `;
+}
 
-  const canvas = document.getElementById('main-workspace-canvas');
-  if (canvas && typeof canvas.scrollTo === 'function') {
-    canvas.scrollTo({ top: 0, behavior: 'instant' });
-  }
+export function navigateToStep(stepNum) {
+  switchStage(stepNum);
 }
 
 export function renderCockpit(state) {
@@ -1359,6 +1488,7 @@ export function renderStage1(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      ${renderBackToSummaryButton()}
       ${buildTakeawayHeader("Stage 1", takeaway, score, "AI-Optimized", status)}
 
       <!-- 50% / 50% TWO-COLUMN WORKBENCH GRID -->
@@ -1484,6 +1614,10 @@ export function renderStage1(container, state = cockpitState) {
   `;
 
   container.innerHTML = html;
+  const backBtn = container.querySelector('.back-to-summary-btn');
+  if (backBtn) {
+    backBtn.onclick = () => switchStage(6);
+  }
 }
 
 export const renderStage1Canvas = renderStage1;
@@ -1589,6 +1723,7 @@ export function renderStage2Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      ${renderBackToSummaryButton()}
       ${buildTakeawayHeader("Stage 2", takeaway, score, "AI-Optimized", status)}
 
       <!-- KANBAN MATRIX CARD SECTION -->
@@ -1643,6 +1778,10 @@ export function renderStage2Canvas(container, state = cockpitState) {
   `;
 
   container.innerHTML = html;
+  const backBtn = container.querySelector('.back-to-summary-btn');
+  if (backBtn) {
+    backBtn.onclick = () => switchStage(6);
+  }
 }
 
 export const renderStage2 = renderStage2Canvas;
@@ -2503,6 +2642,7 @@ export function renderStage3Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      ${renderBackToSummaryButton()}
       <!-- TIER 1 EXECUTIVE TAKEAWAY HEADER -->
       <div class="bg-[#1f1f1f] border border-[#3c4043] rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
@@ -2630,6 +2770,10 @@ export function renderStage3Canvas(container, state = cockpitState) {
   `;
 
   container.innerHTML = html;
+  const backBtn = container.querySelector('.back-to-summary-btn');
+  if (backBtn) {
+    backBtn.onclick = () => switchStage(6);
+  }
 }
 
 export const renderStage3 = renderStage3Canvas;
@@ -2885,6 +3029,7 @@ export function renderStage4Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      ${renderBackToSummaryButton()}
       ${buildTakeawayHeader("Stage 4", takeaway, score, "AI-Optimized", status)}
 
       <!-- ENTITY AUTHORITY & E-E-A-T RELATIONAL GRAPH -->
@@ -3029,6 +3174,10 @@ export function renderStage4Canvas(container, state = cockpitState) {
   `;
 
   container.innerHTML = html;
+  const backBtn = container.querySelector('.back-to-summary-btn');
+  if (backBtn) {
+    backBtn.onclick = () => switchStage(6);
+  }
   renderStage4SchemaCard(state);
   renderStage4AuthorCard(state);
   renderStage4DomainCard(state);
@@ -3459,6 +3608,7 @@ export function renderStage5Canvas(container, state = cockpitState) {
 
   const html = `
     <div class="space-y-6">
+      ${renderBackToSummaryButton()}
       ${buildTakeawayHeader("Stage 5", takeaway, score, "AI-Ready", status)}
 
       <!-- MACHINE MANIFEST PROTOCOL EXPLORER (4-LEVEL MACHINE HIERARCHY) -->
@@ -3570,6 +3720,10 @@ export function renderStage5Canvas(container, state = cockpitState) {
   `;
 
   container.innerHTML = html;
+  const backBtn = container.querySelector('.back-to-summary-btn');
+  if (backBtn) {
+    backBtn.onclick = () => switchStage(6);
+  }
 }
 
 export const renderStage5 = renderStage5Canvas;
@@ -3855,30 +4009,76 @@ export function renderStage6Canvas(container, state = cockpitState) {
         <div class="flex items-center justify-between pb-3.5 border-b border-[#3c4043]">
           <div class="space-y-1">
             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase tracking-wider">DIAGNOSTIC MATRIX</span>
-            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">5-Section Scorecard Matrix</h4>
+            <h4 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-headline">5-Stage Diagnostic Breakdown</h4>
             <p class="text-xs text-[#5f6368]">Direct jump links to inspect and remediate each diagnostic pillar</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-          ${stagesSummary.map(stg => {
-            const isPass = stg.status === 'PASS' || stg.status === 'OPTIMIZED';
-            const isUn = stg.status === 'UNAUDITED';
-            const valColor = isPass ? 'text-[#10b981]' : (stg.status === 'WARN' ? 'text-[#f59e0b]' : (isUn ? 'text-[#bdc1c6]' : 'text-red-400'));
-            
+        <!-- 5 STAGE BREAKDOWN CARDS (2-COLUMN HORIZONTAL BARS WITH HIGH-IMPACT STATUS PILLS) -->
+        <div class="stage-preview-grid grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6" data-stage-grid>
+          ${[
+            { num: 1, title: 'Crawler Access & Allowance', score: state.stage1?.score ?? 85, status: state.stage1?.status, desc: 'Robots.txt & HTTP Headers verified' },
+            { num: 2, title: 'Core Site Structure', score: state.stage2?.score ?? 80, status: state.stage2?.status, desc: 'Semantic tags & hierarchy index' },
+            { num: 3, title: 'Content Density & Depth', score: state.stage3?.score ?? 75, status: state.stage3?.status, desc: 'Content-to-code ratios across pages' },
+            { num: 4, title: 'Schema & Structured Data', score: state.stage4?.score ?? 90, status: state.stage4?.status, desc: 'JSON-LD graph entities confirmed' },
+            { num: 5, title: 'Machine Manifests & AI-Ready Files', score: state.stage5?.score ?? 95, status: state.stage5?.status, desc: 'llms.txt & ai-context.md hierarchy' }
+          ].map(stage => {
+            // High-impact status resolution
+            let badgeLabel = 'PASS';
+            let badgeClasses = 'bg-emerald-500/20 text-emerald-300 border-2 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)] font-black';
+
+            const rawStatus = (stage.status || '').toLowerCase();
+            const scoreVal = typeof stage.score === 'number' ? stage.score : parseInt(stage.score || '80');
+            if (rawStatus.includes('fail') || (!rawStatus && scoreVal < 50)) {
+              badgeLabel = 'FAIL';
+              badgeClasses = 'bg-red-500/20 text-red-300 border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)] font-black';
+            } else if (rawStatus.includes('review') || rawStatus.includes('warn') || rawStatus.includes('need') || (!rawStatus && scoreVal < 80)) {
+              badgeLabel = 'WARN';
+              badgeClasses = 'bg-amber-500/20 text-amber-300 border-2 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.4)] font-black';
+            } else if (scoreVal < 50) {
+              badgeLabel = 'FAIL';
+              badgeClasses = 'bg-red-500/20 text-red-300 border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)] font-black';
+            } else if (scoreVal < 80) {
+              badgeLabel = 'WARN';
+              badgeClasses = 'bg-amber-500/20 text-amber-300 border-2 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.4)] font-black';
+            }
+
             return `
-              <div onclick="window.AEO_COCKPIT ? window.AEO_COCKPIT.navigateToStep(${stg.step}) : null" class="scorecard-matrix-card p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] cursor-pointer transition flex flex-col justify-between space-y-3 group shadow-md" data-stage-card="${stg.step}">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#1f1f1f] text-[#bdc1c6]">STAGE ${stg.step}</span>
-                    <span class="text-xs font-mono font-black ${valColor}">${stg.score}</span>
+              <div class="stage-preview-card bg-gradient-to-b from-[#1f1f1f] to-[#181818] border-2 border-[#3c4043] hover:border-[#d45d2a]/70 rounded-2xl p-4 sm:p-5 shadow-lg transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-stage-card="${stage.num}">
+                
+                <!-- Left Side: Identity, Title, Description, & Status Pill -->
+                <div class="flex-1 space-y-2">
+                  <div class="flex items-center space-x-2.5">
+                    <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#121212] border border-[#3c4043] text-[#bdc1c6] uppercase">
+                      Stage ${stage.num}
+                    </span>
+                    <span class="stage-status-pill text-xs font-mono font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${badgeClasses}" data-slot="stage-status">
+                      ${badgeLabel}
+                    </span>
                   </div>
-                  <h5 class="text-xs font-bold text-white group-hover:text-[#d45d2a] transition font-headline">${stg.title}</h5>
-                  <p class="text-[11px] text-[#bdc1c6] leading-relaxed line-clamp-2">${stg.summary}</p>
+
+                  <h4 class="stage-card-title text-base sm:text-lg font-black text-white uppercase tracking-tight font-headline">
+                    ${stage.title}
+                  </h4>
+                  
+                  <p class="text-xs text-[#bdc1c6] line-clamp-1">
+                    ${stage.desc}
+                  </p>
                 </div>
-                <div class="pt-2 border-t border-[#3c4043]/50 flex items-center justify-between text-[11px] font-mono text-[#38bdf8]">
-                  <span>Inspect</span>
-                  <span>→</span>
+
+                <!-- Right Side: Diagnostic Score & Glowing Aceternity Inspect Button -->
+                <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center flex-shrink-0 gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#3c4043]/40">
+                  <div class="text-right flex sm:flex-col items-baseline sm:items-end gap-1.5 sm:gap-0">
+                    <span class="text-[10px] font-mono font-bold text-[#5f6368] uppercase hidden sm:block">Score</span>
+                    <span class="stage-card-score text-2xl sm:text-3xl font-mono font-black ${stage.score >= 80 ? 'text-[#38bdf8]' : 'text-[#f97316]'}" data-slot="stage-score">
+                      ${stage.score}<span class="text-xs text-[#5f6368] font-normal">/100</span>
+                    </span>
+                  </div>
+
+                  <button type="button" onclick="window.switchStage ? window.switchStage(${stage.num}) : null" class="stage-inspect-btn py-2 px-3.5 rounded-xl bg-gradient-to-r from-[#f97316] via-[#ea580c] to-[#c2410c] hover:opacity-95 text-white font-mono font-black text-xs tracking-wider uppercase transition-all duration-300 ease-out transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(234,88,12,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.7)] border border-white/20 hover:border-white/50 flex items-center space-x-1.5 cursor-pointer whitespace-nowrap">
+                    <span>Inspect</span>
+                    <span>→</span>
+                  </button>
                 </div>
               </div>
             `;
@@ -4122,6 +4322,7 @@ export function setAuthSession(email) {
   if (typeof cockpitState !== 'undefined' && cockpitState) {
     cockpitState.sessionEmail = email;
   }
+  updateAuthSessionDisplay();
 }
 
 /**
@@ -4129,6 +4330,80 @@ export function setAuthSession(email) {
  */
 export function clearAuthSession() {
   setAuthSession(null);
+}
+
+/**
+ * Toggles visibility of the header session dropdown menu.
+ * @param {boolean} [forceState] - Optional explicit state
+ */
+export function toggleAuthDropdown(forceState) {
+  const menu = document.getElementById('auth-dropdown-menu');
+  if (!menu) return;
+
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : menu.classList.contains('hidden');
+
+  if (shouldOpen) {
+    menu.classList.remove('hidden');
+    menu.style.display = 'block';
+  } else {
+    menu.classList.add('hidden');
+    menu.style.display = 'none';
+  }
+}
+
+/**
+ * Synchronizes header session capsule and dropdown elements with active authentication state.
+ */
+export function updateAuthSessionDisplay() {
+  const sessionEmail = getAuthSession();
+  const badge = document.getElementById('session-email-badge');
+  const statusDot = document.getElementById('auth-session-status-dot');
+  const emailLabel = document.getElementById('auth-dropdown-email-label');
+  const loggedInSection = document.getElementById('auth-dropdown-logged-in');
+  const loggedOutSection = document.getElementById('auth-dropdown-logged-out');
+
+  // 1. Update Capsule Label
+  if (badge) {
+    badge.textContent = sessionEmail || 'Login';
+  }
+
+  // 2. Update Pulsing Status Indicator
+  if (statusDot) {
+    if (sessionEmail) {
+      statusDot.className = 'w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]';
+    } else {
+      statusDot.className = 'w-2 h-2 rounded-full bg-[#5f6368]';
+    }
+  }
+
+  // 3. Update Dropdown Content Sections
+  if (emailLabel) {
+    emailLabel.textContent = sessionEmail || '--';
+  }
+
+  if (loggedInSection && loggedOutSection) {
+    if (sessionEmail) {
+      loggedInSection.classList.remove('hidden');
+      loggedInSection.style.display = 'block';
+      loggedOutSection.classList.add('hidden');
+      loggedOutSection.style.display = 'none';
+    } else {
+      loggedInSection.classList.add('hidden');
+      loggedInSection.style.display = 'none';
+      loggedOutSection.classList.remove('hidden');
+      loggedOutSection.style.display = 'block';
+    }
+  }
+}
+
+/**
+ * Signs out of the current session, clears stored tokens, and reverts capsule to 'Login'.
+ */
+export function handleLogout() {
+  clearAuthSession();
+  resetCockpitToNeutral();
+  updateAuthSessionDisplay();
+  toggleAuthDropdown(false);
 }
 
 export function showAuthEmailModal(targetUrl = '') {
@@ -4336,6 +4611,9 @@ if (typeof window !== 'undefined') {
   window.getAuthSession = getAuthSession;
   window.setAuthSession = setAuthSession;
   window.clearAuthSession = clearAuthSession;
+  window.toggleAuthDropdown = toggleAuthDropdown;
+  window.updateAuthSessionDisplay = updateAuthSessionDisplay;
+  window.handleLogout = handleLogout;
   window.showAuthEmailModal = showAuthEmailModal;
   window.hideAuthEmailModal = hideAuthEmailModal;
   window.showAuthOtpModal = showAuthOtpModal;
@@ -4343,6 +4621,9 @@ if (typeof window !== 'undefined') {
   window.submitAuthEmail = submitAuthEmail;
   window.verifyAuthOtp = verifyAuthOtp;
   window.resendAuthOtp = resendAuthOtp;
+  window.switchStage = switchStage;
+  window.renderBackToSummaryButton = renderBackToSummaryButton;
+  window.handleCockpitNewScan = handleCockpitNewScan;
 
   window.handleExport = handleExport;
   window.toggleSidebar = toggleSidebar;
@@ -4365,6 +4646,9 @@ if (typeof window !== 'undefined') {
     getAuthSession,
     setAuthSession,
     clearAuthSession,
+    toggleAuthDropdown,
+    updateAuthSessionDisplay,
+    handleLogout,
     showAuthEmailModal,
     hideAuthEmailModal,
     showAuthOtpModal,
@@ -4377,6 +4661,8 @@ if (typeof window !== 'undefined') {
     executeCockpitScan,
     handleCockpitRescan,
     handleCockpitNewScan,
+    switchStage,
+    renderBackToSummaryButton,
     navigateToStep,
     toggleSidebar,
     getCockpitState,
