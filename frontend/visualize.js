@@ -1,4 +1,127 @@
-import { mapBackendScanToV4State } from './v4PayloadAdapter.js';
+import { mapBackendScanToV4State, adaptV4Payload } from './v4PayloadAdapter.js';
+
+export function resetCockpitToDefault() {
+  const overallScore = document.getElementById('overall-score');
+  if (overallScore) overallScore.textContent = '--';
+
+  const healthStatus = document.getElementById('health-status');
+  if (healthStatus) healthStatus.textContent = 'UNAUDITED';
+
+  const stage3Count = document.getElementById('stage3-page-count');
+  if (stage3Count) stage3Count.textContent = '0';
+
+  const errorBanner = document.getElementById('audit-error-banner');
+  if (errorBanner) {
+    errorBanner.classList.add('hidden');
+    const msgEl = document.getElementById('audit-error-message');
+    if (msgEl) msgEl.textContent = '';
+  }
+}
+
+export async function executeLiveScan(domain) {
+  const errorBanner = document.getElementById('audit-error-banner');
+  const errorMsg = document.getElementById('audit-error-message');
+  const rescanBtn = document.getElementById('rescan-btn') || document.getElementById('btn-cockpit-rescan');
+
+  if (errorBanner) {
+    errorBanner.classList.add('hidden');
+    if (errorMsg) errorMsg.textContent = '';
+  }
+
+  if (rescanBtn) {
+    rescanBtn.disabled = true;
+    rescanBtn.textContent = 'Auditing Domain...';
+  }
+
+  try {
+    const response = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain })
+    });
+
+    let result = null;
+    try {
+      result = await response.json();
+    } catch {
+      result = null;
+    }
+
+    if (!response.ok || !result?.success) {
+      const failureMessage = result?.error || 'Crawl pipeline failed: Domain unreachable';
+      resetCockpitToDefault();
+
+      if (errorBanner) {
+        if (errorMsg) {
+          errorMsg.textContent = failureMessage;
+        } else {
+          errorBanner.textContent = failureMessage;
+        }
+        errorBanner.classList.remove('hidden');
+      }
+      return null;
+    }
+
+    // Adapt live network payload
+    const rawData = result.data || result;
+    const adaptedData = typeof adaptV4Payload === 'function' ? adaptV4Payload(rawData) : rawData;
+
+    const score = adaptedData?.summary?.overallScore ?? adaptedData?.overallScore ?? '--';
+    const health = adaptedData?.summary?.healthStatus ?? adaptedData?.healthStatus ?? 'AI-READY';
+    const pages = adaptedData?.pages || adaptedData?.stage3Pages || [];
+
+    const scoreEl = document.getElementById('overall-score');
+    if (scoreEl) scoreEl.textContent = String(score);
+
+    const healthEl = document.getElementById('health-status');
+    if (healthEl) healthEl.textContent = String(health);
+
+    const countEl = document.getElementById('stage3-page-count');
+    if (countEl) countEl.textContent = String(pages.length);
+
+    return adaptedData;
+  } catch (err) {
+    const errorText = err.message || 'Crawl pipeline failed: Domain unreachable';
+    resetCockpitToDefault();
+
+    if (errorBanner) {
+      if (errorMsg) {
+        errorMsg.textContent = errorText;
+      } else {
+        errorBanner.textContent = errorText;
+      }
+      errorBanner.classList.remove('hidden');
+    }
+    return null;
+  } finally {
+    if (rescanBtn) {
+      rescanBtn.disabled = false;
+      rescanBtn.textContent = 'Rescan';
+    }
+  }
+}
+
+export function initCockpitEvents() {
+  const rescanBtn = document.getElementById('rescan-btn') || document.getElementById('btn-cockpit-rescan');
+  if (rescanBtn) {
+    rescanBtn.onclick = (e) => {
+      e.preventDefault();
+      const domainInput = document.getElementById('domain-input') || document.getElementById('scan-domain-input') || document.getElementById('target-url-input');
+      const targetDomain = domainInput?.value?.trim() || window.location.hostname;
+      executeLiveScan(targetDomain);
+    };
+  }
+
+  const retryBtn = document.getElementById('audit-error-retry-btn');
+  if (retryBtn) {
+    retryBtn.onclick = (e) => {
+      e.preventDefault();
+      const domainInput = document.getElementById('domain-input') || document.getElementById('scan-domain-input') || document.getElementById('target-url-input');
+      const targetDomain = domainInput?.value?.trim() || window.location.hostname;
+      executeLiveScan(targetDomain);
+    };
+  }
+}
 
 /**
  * Core AI Bot Definitions & Stage Flow Control

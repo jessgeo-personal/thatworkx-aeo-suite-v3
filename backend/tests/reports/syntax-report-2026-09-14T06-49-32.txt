@@ -1,0 +1,50 @@
+AEO Suite - Syntax Integrity Report
+Generated: 2026-09-14T06:49:32.042Z
+
+FILE: frontend\index.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\visualize.html
+------------------------------------------------------------------------
+  [ERR   1]  Line 102  Malformed entity: bare '&' at col 66 — use &amp; in HTML contexts
+  [ERR   2]  Line 105  Malformed entity: bare '&' at col 29 — use &amp; in HTML contexts
+  [ERR   3]  Line 117  Malformed entity: bare '&' at col 70 — use &amp; in HTML contexts
+  [ERR   4]  Line 121  Malformed entity: bare '&' at col 60 — use &amp; in HTML contexts
+  [ERR   5]  Line 169  Malformed entity: bare '&' at col 71 — use &amp; in HTML contexts
+  [ERR   6]  Line 229  Malformed entity: bare '&' at col 32 — use &amp; in HTML contexts
+  [ERR   7]  Line 298  Malformed entity: bare '&' at col 87 — use &amp; in HTML contexts
+  [ERR   8]  Line 299  Malformed entity: bare '&' at col 107 — use &amp; in HTML contexts
+  [ERR   9]  Line 365  Malformed entity: bare '&' at col 76 — use &amp; in HTML contexts
+  [ERR  10]  Line 365  Malformed entity: bare '&' at col 77 — use &amp; in HTML contexts
+  [ERR  11]  Line 369  Malformed entity: bare '&' at col 49 — use &amp; in HTML contexts
+  [ERR  12]  Line 373  Malformed entity: bare '&' at col 89 — use &amp; in HTML contexts
+  [ERR  13]  Line 389  Malformed entity: bare '&' at col 47 — use &amp; in HTML contexts
+  [ERR  14]  Line 395  Malformed entity: bare '&' at col 51 — use &amp; in HTML contexts
+  [ERR  15]  Line 420  Malformed entity: bare '&' at col 121 — use &amp; in HTML contexts
+  [ERR  16]  Line 581  Malformed entity: bare '&' at col 59 — use &amp; in HTML contexts
+  [ERR  17]  Line 581  Malformed entity: bare '&' at col 60 — use &amp; in HTML contexts
+  [ERR  18]  Line 594  Malformed entity: bare '&' at col 61 — use &amp; in HTML contexts
+  [ERR  19]  Line 594  Malformed entity: bare '&' at col 62 — use &amp; in HTML contexts
+  [ERR  20]  Line 628  Malformed entity: bare '&' at col 93 — use &amp; in HTML contexts
+  [ERR  21]  Line 628  Malformed entity: bare '&' at col 94 — use &amp; in HTML contexts
+  [ERR  22]  Line 642  Malformed entity: bare '&' at col 96 — use &amp; in HTML contexts
+  [ERR  23]  Line 642  Malformed entity: bare '&' at col 97 — use &amp; in HTML contexts
+  [ERR  24]  Line 663  Malformed entity: bare '&' at col 96 — use &amp; in HTML contexts
+  [ERR  25]  Line 663  Malformed entity: bare '&' at col 97 — use &amp; in HTML contexts
+  25 error(s).
+
+FILE: frontend\optimize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\socialize.html
+------------------------------------------------------------------------
+  OK - no errors.
+
+FILE: frontend\index.js
+------------------------------------------------------------------------
+  OK - no errors.
+
+========================================================================
+RESULT: 25 error(s) - review above.

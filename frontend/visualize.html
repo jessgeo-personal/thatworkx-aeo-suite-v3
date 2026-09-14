@@ -247,6 +247,24 @@
       <main id="main-workspace-canvas" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative flex flex-col pb-28 scroll-smooth">
         <div class="max-w-[1200px] w-full mx-auto flex-1 flex flex-col">
           
+          <!-- Cockpit Live Audit Error Notification Banner (Strict Governance Gate 6 - Pre-rendered Static HTML) -->
+          <div id="audit-error-banner" class="audit-error-banner hidden" role="alert" aria-live="assertive">
+            <div class="audit-error-content">
+              <span class="audit-error-icon">⚠️</span>
+              <span id="audit-error-message" class="audit-error-message"></span>
+            </div>
+            <div class="audit-error-actions">
+              <button type="button" id="audit-error-retry-btn" class="btn-audit-retry">Retry Scan</button>
+            </div>
+          </div>
+
+          <!-- Pre-scan Diagnostic Status Metric Slots (Strict Governance Gate 4) -->
+          <div id="cockpit-metric-slots" class="sr-only">
+            <span id="overall-score">--</span>
+            <span id="health-status">UNAUDITED</span>
+            <span id="stage3-page-count">0</span>
+          </div>
+
           <!-- Cockpit Live Error Notification Banner -->
           <div id="cockpit-error-banner" class="cockpit-error-banner hidden mb-6 p-4 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-200 shadow-2xl font-mono text-sm flex items-center justify-between" style="display: none;" role="alert">
             <span class="error-msg"></span>
@@ -267,53 +285,6 @@
             <button onclick="retryEntireAudit()" class="px-5 py-2.5 rounded-xl bg-[#f59e0b] hover:bg-[#d97706] text-black font-black text-xs font-bold tracking-wide transition shadow-lg flex items-center space-x-2 flex-shrink-0">
               <span>↺ Retry Entire Audit</span>
             </button>
-          </div>
-
-          <!-- Canvas Header Bar with Topic-First Title &amp; Prominent Stage Score Bubble -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#3c4043] gap-4 mb-6">
-            <div class="space-y-1.5">
-              <div class="flex items-center space-x-2.5">
-                <span id="canvas-stage-badge" class="px-3 py-1 rounded-full text-xs font-mono font-black bg-[#b7410e]/20 border border-[#b7410e]/40 text-[#d45d2a]">
-                  STAGE 6 OF 6
-                </span>
-                <span id="canvas-governance-badge" class="px-2.5 py-0.5 rounded text-xs font-mono tracking-wider bg-[#1f1f1f] border border-[#3c4043] text-[#bdc1c6] uppercase font-bold">
-                  Executive Boardroom
-                </span>
-              </div>
-              <h1 id="canvas-stage-title" class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight font-headline">
-                Executive Summary &amp; Action Triage
-              </h1>
-              <p id="canvas-stage-desc" class="text-sm sm:text-base text-[#bdc1c6] leading-relaxed max-w-3xl">
-                Boardroom Macro View: Health index dial, dual-pillar readiness, 5-section scorecards, and prioritized action plan.
-              </p>
-            </div>
-
-            <!-- Prominent Score Bubble &amp; Return Anchor -->
-            <div class="flex items-center space-x-3 self-start sm:self-center">
-              <div id="canvas-score-pill" class="flex items-center space-x-3.5 px-5 py-3 rounded-2xl bg-[#121212] border-2 border-[#10b981]/50 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
-                <div class="text-right">
-                  <span class="text-xs font-mono uppercase text-[#bdc1c6] block font-bold leading-none">Diagnostic Score</span>
-                  <span id="canvas-score-value" class="health-score-value font-mono font-black text-[#10b981] leading-tight text-3xl"><span id="health-score">--</span></span>
-                </div>
-                <span id="canvas-score-status" class="px-2.5 py-1 rounded-md text-xs font-mono font-black bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/40">
-                  UNAUDITED
-                </span>
-              </div>
-
-              <!-- Dual Pillar Score Markers -->
-              <div class="hidden">
-                <span id="ai-optimized-score" class="score-optimized">--</span>
-                <span id="ai-ready-score" class="score-ready">--</span>
-              </div>
-
-              <!-- Floating Return Anchor -->
-              <div id="canvas-return-anchor" class="hidden">
-                <button onclick="navigateToStep(6)" class="inline-flex items-center space-x-2 px-5 py-3 rounded-2xl bg-[#b7410e]/20 border border-[#b7410e]/60 text-[#d45d2a] hover:bg-[#b7410e] hover:text-white text-sm font-bold shadow-[0_0_15px_rgba(183,65,14,0.25)] transition active:scale-95">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                  <span>Back to Summary</span>
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Stage Containers (Hidden: Kept in DOM for test harness backwards compatibility) -->
@@ -795,6 +766,79 @@
     </div>
   </div>
 
+  <!-- AI Optimize Pro Waitlist Modal (Pre-rendered for Bot/LLM Indexing - Strict Governance Gate 5) -->
+  <div id="optimize-pro-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="waitlist-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-top">
+          <span id="waitlist-badge" class="badge-waitlist">Waitlist Active — Limited Cohort Access</span>
+          <button type="button" id="waitlist-modal-close" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+        </div>
+        <h2 id="waitlist-modal-title" class="modal-title">AI Optimize Pro</h2>
+        <div id="waitlist-pricing" class="modal-pricing">
+          <span class="price-prefix">starting at</span> <span class="price-value">20</span><span class="price-currency">USD</span><span class="price-cadence">/month</span> <span class="price-billing">billed annually</span>
+        </div>
+        <div class="modal-subtitle">
+          <p class="modal-subtitle-lead">
+            Experience the ease in maintaining your web and brand presence for AI and LLMs, with AI Optimize Pro.
+          </p>
+          <p class="modal-subtitle-beta">
+            AIOptimize Pro is currently in Beta. To experience the Beta, provide us with your details to join our waitlist below and we will reach out to you as early as possible.
+          </p>
+        </div>
+      </div>
+
+      <div id="waitlist-form-error" class="waitlist-banner error hidden" role="alert"></div>
+      <div id="waitlist-form-success" class="waitlist-banner success hidden" role="status"></div>
+
+      <form id="waitlist-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="waitlist-first-name">First Name *</label>
+            <input type="text" id="waitlist-first-name" name="firstName" placeholder="Elena" required />
+          </div>
+          <div class="form-group">
+            <label for="waitlist-last-name">Last Name *</label>
+            <input type="text" id="waitlist-last-name" name="lastName" placeholder="Rostova" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="waitlist-email">Business Email *</label>
+          <input type="email" id="waitlist-email" name="email" placeholder="elena@enterprise.io" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="waitlist-phone">Phone Number *</label>
+            <input type="tel" id="waitlist-phone" name="phone" placeholder="+1 (555) 019-2834" required />
+          </div>
+          <div class="form-group country-select-group">
+            <label for="waitlist-country">Country *</label>
+            <div class="country-input-wrapper">
+              <input 
+                type="text" 
+                id="waitlist-country" 
+                name="country" 
+                placeholder="United Arab Emirates" 
+                value="United Arab Emirates" 
+                required 
+                autocomplete="off" 
+              />
+              <span id="country-dropdown-chevron" class="country-dropdown-chevron" aria-hidden="true">▼</span>
+            </div>
+            <div id="waitlist-country-dropdown" class="country-dropdown-menu hidden" role="listbox"></div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" id="waitlist-submit-btn" class="stage5-cta-btn btn-ai-optimize-pro btn-waitlist-submit">Join AI Optimize Pro Waitlist</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="waitlistModal.js"></script>
   <script src="visualize.js" type="module"></script>
 </body>
 </html>

@@ -725,7 +725,7 @@ export function mapBackendScanToV4State(rawPayload) {
   // Stage 6: Health Index & Dual-Pillar Scores
   const rawScores = data.capabilities?.scores || data.scores || data.scoreCard || {};
   const overallHealthIndex = Number(
-    rawScores.overallHealthIndex ?? data.overallScore ?? rawPayload.overallScore ?? rawScores.overallScore ?? 0
+    rawScores.overallHealthIndex ?? data.summary?.overallScore ?? rawPayload.summary?.overallScore ?? data.overallScore ?? rawPayload.overallScore ?? rawScores.overallScore ?? 0
   ) || 0;
   const aiOptimizedScore = Number(
     rawScores.aiOptimizedScore ?? data.pillarScores?.P1 ?? data.scoreCard?.pillars?.p1?.score ?? 0
@@ -748,8 +748,17 @@ export function mapBackendScanToV4State(rawPayload) {
     stage6: rawStages.stage6 ? { ...rawStages.stage6 } : { ...DEFAULT_STAGES.stage6 }
   };
 
+  const summary = {
+    overallScore: overallHealthIndex,
+    healthStatus: data.summary?.healthStatus || rawPayload.summary?.healthStatus || (overallHealthIndex >= 80 ? 'AI-READY' : (overallHealthIndex >= 50 ? 'AI-OPTIMIZED' : 'UNAUDITED')),
+    ...(data.summary || rawPayload.summary || {})
+  };
+
   return {
     meta,
+    summary,
+    overallScore: overallHealthIndex,
+    healthStatus: summary.healthStatus,
     stages,
     stage1: { crawlers, score: stages.stage1.score, status: stages.stage1.status, summaryText: stages.stage1.summaryText, ...stages.stage1 },
     stage2: { routes, missingCount, discoveredCount, score: stages.stage2.score, status: stages.stage2.status, summaryText: stages.stage2.summaryText, ...stages.stage2 },
@@ -788,3 +797,6 @@ export function mapBackendScanToV4State(rawPayload) {
     stage6: { overallHealthIndex, aiOptimizedScore, aiReadyScore, triageFlags, score: stages.stage6.score, status: stages.stage6.status, summaryText: stages.stage6.summaryText, ...stages.stage6 }
   };
 }
+
+export const adaptV4Payload = mapBackendScanToV4State;
+

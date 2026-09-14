@@ -390,6 +390,17 @@ app.post('/api/beta-signup', async (req, res) => {
   }
 });
 
+// Endpoint for AI Optimize Pro Waitlist Submissions
+app.post('/api/waitlist', async (req, res) => {
+  try {
+    const { handleWaitlistSubmission } = await import('./controllers/waitlistController.js');
+    return handleWaitlistSubmission(req, res);
+  } catch (err) {
+    console.error('Waitlist route error:', err);
+    return res.status(500).json({ success: false, error: 'Internal server error processing waitlist registration.' });
+  }
+});
+
 // Endpoint to build Level 3 Context Maps and Remediation Scripts
 app.post('/api/generator/build', async (req, res) => {
   try {
