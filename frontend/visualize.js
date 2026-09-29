@@ -4580,14 +4580,18 @@ export function hideAuthOtpModal() {
   }
 }
 
+let isOtpSubmitting = false;
+
 /**
  * Submits work email to request a 6-digit OTP code via Resend API.
  */
 export async function submitAuthEmail(targetUrl = '') {
+  if (isOtpSubmitting) return;
   if (targetUrl) pendingScanUrl = targetUrl;
   const emailInput = document.getElementById('auth-email-input');
   const email = (emailInput ? emailInput.value : '').trim();
   const errorEl = document.getElementById('auth-email-error');
+  const btn = document.getElementById('auth-email-submit-btn');
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     if (errorEl) {
@@ -4602,6 +4606,12 @@ export async function submitAuthEmail(targetUrl = '') {
     errorEl.textContent = '';
     errorEl.classList.add('hidden');
   }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.setAttribute('disabled', 'true');
+  }
+  isOtpSubmitting = true;
 
   try {
     const res = await fetch('/api/auth/send-otp', {
@@ -4624,6 +4634,9 @@ export async function submitAuthEmail(targetUrl = '') {
       errorEl.textContent = err.message || 'Network error sending OTP';
       errorEl.classList.remove('hidden');
     }
+  } finally {
+    isOtpSubmitting = false;
+    if (btn) btn.disabled = false;
   }
 }
 

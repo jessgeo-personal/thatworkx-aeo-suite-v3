@@ -1,22 +1,15 @@
-const path = require('path');
-const fs = require('fs');
-if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
-  const devEnv = path.join(__dirname, '../.env.development');
-  const defaultEnv = path.join(__dirname, '../.env');
-  if (fs.existsSync(devEnv)) {
-    require('dotenv').config({ path: devEnv });
-  } else if (fs.existsSync(defaultEnv)) {
-    require('dotenv').config({ path: defaultEnv });
-  }
-}
-const express = require('express');
-const cors = require('cors');
-const queueService = require('./services/queueService');
-const mongoose = require('mongoose');
-const { checkTierLimits } = require('./middleware/rateLimiter');
-const { analyzeUrl } = require('./services/crawlerService');
-const { evaluateCapabilities } = require('./services/capabilityEvaluator');
-const {
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import queueService from './services/queueService.js';
+import mongoose from 'mongoose';
+import { checkTierLimits } from './middleware/rateLimiter.js';
+import { analyzeUrl } from './services/crawlerService.js';
+import { evaluateCapabilities } from './services/capabilityEvaluator.js';
+import {
   generateLlmsTxt,
   generateAiContextMd,
   generateCloudflareWorkerJs,
@@ -26,13 +19,26 @@ const {
   generateDocsMd,
   generateContentMd,
   generateSitemapXml
-} = require('./services/generatorService');
-const { registerUser, loginUser, getCurrentUser, verifyOtp, sendOtp } = require('./controllers/authController');
-const User = require('./models/User');
-const ScanLog = require('./models/ScanLog');
-const DomainProfile = require('./models/DomainProfile');
-const BetaSignup = require('./models/BetaSignup');
-const url = require('url');
+} from './services/generatorService.js';
+import { registerUser, loginUser, getCurrentUser, verifyOtp, sendOtp } from './controllers/authController.js';
+import User from './models/User.js';
+import ScanLog from './models/ScanLog.js';
+import DomainProfile from './models/DomainProfile.js';
+import BetaSignup from './models/BetaSignup.js';
+import url from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
+  const devEnv = path.join(__dirname, '../.env.development');
+  const defaultEnv = path.join(__dirname, '../.env');
+  if (fs.existsSync(devEnv)) {
+    dotenv.config({ path: devEnv });
+  } else if (fs.existsSync(defaultEnv)) {
+    dotenv.config({ path: defaultEnv });
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -667,5 +673,6 @@ app.listen(PORT, () => {
   console.log(`Thatworkx AEO Suite backend running on http://localhost:${PORT}`);
 });
 
-module.exports = app;
+export { app };
+export default app;
 

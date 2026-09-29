@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const DomainProfileSchema = new mongoose.Schema({
   domain_name: {
@@ -36,4 +36,5 @@ const DomainProfileSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('DomainProfile', DomainProfileSchema);
+const DomainProfile = mongoose.models.DomainProfile || mongoose.model('DomainProfile', DomainProfileSchema);
+export default DomainProfile;

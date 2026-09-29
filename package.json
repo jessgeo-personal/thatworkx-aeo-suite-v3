@@ -1,6 +1,7 @@
 {
   "name": "aeo-audit-tool-v3",
   "version": "1.0.0",
+  "type": "module",
   "description": "Thatworkx AEO Suite (AI Engine Optimization) - Greenfield Build",
   "main": "backend/server.js",
   "engines": {

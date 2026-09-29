@@ -1787,7 +1787,13 @@ function evaluateAllCapabilities(scanData = {}) {
   };
 }
 
-module.exports = {
+export {
+  evaluateCapabilities,
+  evaluateAllCapabilities,
+  CAPABILITY_MATRIX
+};
+
+export default {
   evaluateCapabilities,
   evaluateAllCapabilities,
   CAPABILITY_MATRIX

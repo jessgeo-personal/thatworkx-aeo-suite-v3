@@ -1,15 +1,9 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const url = require('url');
-const { parseHtmlMetrics } = require('./parserService');
-const { evaluateCapabilities } = require('./capabilityEvaluator');
-
-let whois;
-try {
-  whois = require('whois-json');
-} catch (_) {
-  whois = null;
-}
+import axios from 'axios';
+import * as cheerio from 'cheerio';
+import url from 'url';
+import { parseHtmlMetrics } from './parserService.js';
+import { evaluateCapabilities } from './capabilityEvaluator.js';
+import whois from 'whois-json';
 
 // ============================================================================
 // CENTRAL CRAWLER TIMEOUT & CONCURRENCY CONFIGURATION
@@ -1237,7 +1231,21 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
   return result;
 };
 
-module.exports = {
+export {
+  analyzeUrl,
+  parsePageHtml,
+  fetchPageWithTimeout,
+  fetchDomainAge,
+  formatDomainAgeResult,
+  extractContactAnchors,
+  isSameDomainOrSubdomain,
+  isInternalLink,
+  probeEssentialRoutes,
+  CRAWLER_CONFIG,
+  AI_CRAWLERS
+};
+
+export default {
   analyzeUrl,
   parsePageHtml,
   fetchPageWithTimeout,

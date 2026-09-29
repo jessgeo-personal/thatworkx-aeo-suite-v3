@@ -13,9 +13,14 @@
  * Exit code: 0 = clean, 1 = errors found
  * Report saved to: backend/tests/reports/syntax-report-<timestamp>.txt
  */
-'use strict';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const fs   = require('fs');
-const path = require('path');
 
 const C = {
   reset : '\x1b[0m', bold : '\x1b[1m',
