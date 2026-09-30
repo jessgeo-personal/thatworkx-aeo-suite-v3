@@ -40,17 +40,6 @@
   </nav>
 
   <div class="header-actions flex items-center gap-3">
-    <div class="tier-badge-container">
-      <span class="tier-label">Plan:</span>
-      <select id="user-tier-selector" class="tier-select" onchange="updateUserTier()">
-        <option value="AIVisualize Free">AIVisualize Free</option>
-        <option value="AIVisualize Pro">AIVisualize Pro</option>
-        <option value="AIVisualize ENT">AIVisualize ENT</option>
-        <option value="AIOptimize Free">AIOptimize Free</option>
-        <option value="AIOptimize Pro">AIOptimize Pro</option>
-        <option value="AIOptimize ENT">AIOptimize ENT</option>
-      </select>
-    </div>
     <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
   </div>
 </header>
@@ -1330,18 +1319,14 @@ Traditional sitemaps target index rankings. AEO structures brand data context. M
     <div class="footer-container">
       <div class="footer-grid">
         <div class="footer-col brand-col" data-footer-col="brand">
-          <div class="footer-brand footer-logo">
+          <div class="footer-brand footer-logo" style="margin-bottom: 0.75rem;">
             <img 
               src="src/images/ai-thatworkx-logo-dark.png" 
               alt="Thatworkx AEO Suite" 
               class="footer-logo-img" 
-              height="32" 
+              height="44" 
+              style="height: 44px; width: auto; object-fit: contain;" 
             />
-          </div>
-          <div class="footer-logo-lockup">
-            <span class="footer-logo-icon">⚡</span>
-            <span class="footer-logo-text">THATWORKX</span>
-            <span class="footer-version-badge">v3.0</span>
           </div>
           <p class="footer-brand-desc">
             The foundational AEO &amp; GEO infrastructure platform engineering deterministic discovery, machine manifest hierarchies, and entity citation graphs for frontier AI engines.

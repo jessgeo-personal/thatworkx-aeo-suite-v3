@@ -1040,7 +1040,8 @@ function switchProduct(productName) {
   document.getElementById(`panel-${productName}`).classList.add('active');
 
   // Display/Hide headless execution controls depending on the active product and tier
-  const tier = document.getElementById('user-tier-selector').value;
+  const tierSelector = document.getElementById('user-tier-selector');
+  const tier = tierSelector ? tierSelector.value : '';
   const isAio = productName === 'optimize' || productName === 'visualize';
   const headlessControls = document.getElementById('headless-checkbox-wrapper');
   
