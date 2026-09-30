@@ -8,30 +8,137 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&amp;family=JetBrains+Mono:wght@600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
 </head>
 <body class="page-optimize">
 
   <!-- Top Navigation Header -->
   <!-- HEADER_START -->
-<header class="app-header">
-  <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
-    <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
-    <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
-    <div class="logo-placeholder" data-logo="AEO Suite" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AEO Suite</div>
-  </div>
-  
-  <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
-    <a href="visualize.html" class="nav-logo-btn" data-nav="visualize" data-logo="AIVisualize">AI Visualize</a>
-    <a href="optimize.html" class="nav-logo-btn" data-nav="optimize" class="nav-logo-btn active" style="border-color: var(--burnt-copper); background: rgba(183, 65, 14, 0.2);" data-logo="AIOptimize">AIOptimize</a>
-    <a href="socialize.html" class="nav-logo-btn" data-nav="socialize" data-logo="AISocialize">AISocialize</a>
-  </nav>
+  <header class="app-header">
+    <div class="w-full bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
+      
+      <!-- Header Container (Max 1200px) -->
+      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-3.5 space-y-3">
+        
+        <!-- Line 1: Logo on Left + Input, + Action & Session Controls on Right -->
+        <div class="flex items-center justify-between gap-3">
+          
+          <!-- Left: Home / Navigation Trigger & Logo -->
+          <div class="flex items-center space-x-3">
+            <a href="index.html" class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] text-[#d45d2a] hover:text-white transition flex items-center justify-center shadow-md active:scale-95" title="Go back to Homepage">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </a>
 
-  <div class="header-actions flex items-center gap-3">
-    <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
-  </div>
-</header>
-<!-- HEADER_END -->
+            <div class="flex items-center space-x-3">
+              <a href="optimize.html">
+                <img src="src/images/aioptimize-logo.svg" alt="AIOptimize Logo" class="h-9 sm:h-10 md:h-11 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] transition hover:opacity-95">
+              </a>
+              <span class="text-xs px-2 py-0.5 rounded bg-[#f59e0b]/20 border border-[#f59e0b]/40 text-[#f59e0b] font-mono font-bold hidden sm:inline-block">REMEDIATION</span>
+            </div>
+          </div>
+
+          <!-- Right Actions: Target URL Input, Action Buttons & User Session -->
+          <div class="flex items-center space-x-2.5 flex-shrink-0">
+            <input type="text" id="optimize-target-input" class="cockpit-domain-input hidden sm:block px-3 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-white text-xs font-mono focus:border-[#b7410e] outline-none" placeholder="https://example.com" value="thatworkx.com" onchange="if(window.updateOptimizeTargetDomain) { document.getElementById('optimize-target-domain').value = this.value; window.updateOptimizeTargetDomain(); }" />
+
+            <!-- + Generate Manifests Button -->
+            <button id="btn-generate-manifests" onclick="if(window.generateManifests) window.generateManifests();" class="px-4 py-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] hover:border-[#f97316]/50 text-[#e8eaed] hover:text-[#d45d2a] text-sm font-mono font-bold transition-all duration-300 ease-out transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(212,93,42,0.25)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)] flex items-center space-x-2 cursor-pointer">
+              <span>+ Generate Manifests</span>
+            </button>
+
+            <!-- Export Bundle Button -->
+            <button id="btn-export-bundle" onclick="alert('Manifests bundle ready for export.');" class="px-4 py-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] hover:border-[#f97316]/50 text-[#e8eaed] hover:text-[#d45d2a] text-sm font-mono font-bold transition-all duration-300 ease-out transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-[0_0_15px_rgba(212,93,42,0.2)] flex items-center space-x-2 cursor-pointer">
+              <svg class="w-4 h-4 text-[#d45d2a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Export ZIP</span>
+            </button>
+
+            <!-- Authenticated User Session Dropdown Capsule -->
+            <div id="auth-session-container" class="relative pl-2 border-l border-[#3c4043]">
+              <button id="auth-btn" type="button" onclick="openAuthModal()" class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] hover:border-[#b7410e]/60 text-xs font-mono text-[#bdc1c6] hover:text-white transition-all duration-300 ease-out transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(183,65,14,0.3)] cursor-pointer">
+                <span class="w-2 h-2 rounded-full bg-[#5f6368]"></span>
+                <span class="text-white font-semibold truncate max-w-[140px] sm:max-w-[190px]">🔑 Sign In</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Line 2: Scanned Domain, Generated Files Count, Status, & Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          
+          <!-- Metadata Group -->
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-[#121212] border border-[#3c4043] text-sm font-mono">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] animate-pulse"></span>
+              <span class="text-[#bdc1c6] text-xs font-semibold">Target:</span>
+              <span id="optimize-current-domain" class="font-bold text-white">thatworkx.com</span>
+            </div>
+
+            <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
+              <svg class="w-4 h-4 text-[#bdc1c6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Generated: <strong class="text-white">Active Session</strong></span>
+            </div>
+
+            <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
+              <svg class="w-4 h-4 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Manifests Ready: <strong class="text-[#38bdf8] font-bold">6 Files</strong></span>
+            </div>
+
+            <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#121212]/70 border border-[#3c4043] text-xs font-mono text-[#bdc1c6]">
+              <svg class="w-4 h-4 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Remediation Engine: <strong class="text-white font-bold">100% Operational</strong></span>
+            </div>
+          </div>
+
+          <!-- Quick Navigation to other Tools -->
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono text-[#bdc1c6] uppercase tracking-wider hidden sm:inline">Switch Tool:</span>
+            <a href="visualize.html" class="px-2.5 py-1 rounded-lg bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#38bdf8] text-xs font-mono transition flex items-center space-x-1" title="AI Visualize">
+              <img src="src/images/aivisualize-logo.png" alt="AI Visualize" class="h-4 w-auto object-contain" />
+              <span>Visualize</span>
+            </a>
+            <a href="socialize.html" class="px-2.5 py-1 rounded-lg bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#a855f7] text-xs font-mono transition flex items-center space-x-1" title="AISocialize">
+              <img src="src/images/aisocialize-logo.png" alt="AISocialize" class="h-4 w-auto object-contain" />
+              <span>Socialize</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORIZONTAL MENU PROGRESS BAR (LINE 3: TRACK/TOOL STRIP) -->
+      <div class="w-full bg-[#181818] border-t border-[#3c4043] px-4 sm:px-6 py-2.5 shadow-inner">
+        <div class="max-w-[1200px] mx-auto flex items-center justify-between overflow-x-auto">
+          <nav id="optimize-stepper" class="flex items-center space-x-2 sm:space-x-3 min-w-max mx-auto" aria-label="AIOptimize Tools Progression">
+            <button onclick="switchOptimizeTrack(1); switchOptimizeTool('robots');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+              <span>1. Robots.txt</span>
+            </button>
+            <button onclick="switchOptimizeTrack(1); switchOptimizeTool('cloudflare');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+              <span>2. Cloudflare Edge</span>
+            </button>
+            <button onclick="switchOptimizeTrack(1); switchOptimizeTool('shopify');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+              <span>3. Shopify Hook</span>
+            </button>
+            <button onclick="switchOptimizeTrack(1); switchOptimizeTool('jsonld');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+              <span>4. JSON-LD Schema</span>
+            </button>
+            <button onclick="switchOptimizeTrack(2); switchOptimizeTool('llmstxt');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+              <span>5. /llms.txt</span>
+            </button>
+            <button onclick="switchOptimizeTrack(2); switchOptimizeTool('aicontext');" class="stepper-tab px-3 py-1.5 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#a855f7]"></span>
+              <span>6. /ai-context.md</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- HEADER_END -->
 
   <!-- Main Optimize Workspace -->
   <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
