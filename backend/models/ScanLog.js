@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ScanLogSchema = new mongoose.Schema({
   user_email: {
@@ -36,4 +36,5 @@ const ScanLogSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('ScanLog', ScanLogSchema);
+const ScanLog = mongoose.models.ScanLog || mongoose.model('ScanLog', ScanLogSchema);
+export default ScanLog;

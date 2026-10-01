@@ -1,4 +1,4 @@
-const { CAPABILITY_MATRIX, evaluateAllCapabilities } = require('../services/capabilityEvaluator.js');
+const { CAPABILITY_MATRIX, evaluateCapabilities, evaluateAllCapabilities } = require('../services/capabilityEvaluator.js');
 
 describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View Payload)', () => {
   it('should contain exactly 32 distinct capabilities in the capability matrix', () => {
@@ -117,14 +117,14 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Free Third-Party Check Available', 'Verified Domain Profile', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
   });
 
   it('should return valid non-null Executive View extension payloads for default empty input', () => {
     const res = evaluateAllCapabilities({});
     expect(res.scanMetrics).not.toBeNull();
-    expect(typeof res.scanMetrics.scanTimeSeconds).toBe('number');
+    expect(res.scanMetrics.scanTimeSeconds).toBeNull();
     expect(typeof res.scanMetrics.lastScanned).toBe('string');
 
     expect(Array.isArray(res.scrapedContentPreview)).toBe(true);
@@ -137,36 +137,14 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(typeof res.manifestPreviews.about).toBe('string');
 
     expect(Array.isArray(res.discoveredRoutes)).toBe(true);
-    expect(res.discoveredRoutes.length).toBeGreaterThan(0);
-    res.discoveredRoutes.forEach(route => {
-      expect(route).toHaveProperty('path');
-      expect(route).toHaveProperty('wordCount');
-      expect(route).toHaveProperty('tokenLoad');
-      expect(route).toHaveProperty('hiddenFromAi');
-      expect(route).toHaveProperty('inSitemap');
-      expect(route).toHaveProperty('isEssential');
-      expect(route).toHaveProperty('missingStatus');
-      expect(route).toHaveProperty('actionUrl');
-      expect(route).toHaveProperty('canonicalTag');
-      expect(route).toHaveProperty('headingHierarchy');
-      expect(route).toHaveProperty('isMobileFriendly');
-      expect(route).toHaveProperty('hasSemanticTags');
-      expect(route).toHaveProperty('imagesWithoutAlt');
-      expect(route).toHaveProperty('lastUpdated');
-      expect(typeof route.canonicalTag).toBe('boolean');
-      expect(typeof route.headingHierarchy).toBe('boolean');
-      expect(typeof route.isMobileFriendly).toBe('boolean');
-      expect(typeof route.hasSemanticTags).toBe('boolean');
-      expect(typeof route.imagesWithoutAlt).toBe('number');
-      expect(typeof route.lastUpdated).toBe('string');
-    });
+    expect(res.discoveredRoutes.length).toBe(0);
 
     expect(res.eeatMetrics).not.toBeNull();
     expect(typeof res.eeatMetrics.isSecure).toBe('boolean');
     expect(typeof res.eeatMetrics.hasContactInfo).toBe('boolean');
     expect(typeof res.eeatMetrics.hasPrivacyPolicy).toBe('boolean');
     expect(typeof res.eeatMetrics.ageEstimate).toBe('string');
-    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
+    expect(['Optimized Anchor', 'Information Isolation', 'Abstention Risk', 'Free Third-Party Check Available', 'Verified Domain Profile', 'Requires Ahrefs/Moz API']).toContain(res.eeatMetrics.authorityStatus);
     expect(typeof res.eeatMetrics.diagnosticSummary).toBe('string');
 
     expect(res).toHaveProperty('emailValue');
@@ -201,9 +179,9 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(res.emailValue).toBe('info@example.com');
     expect(res.phoneValue).toBe('1-800-555-0199');
 
-    // 3. Missing essential pages logic: '/about' is in discoveredRoutes, so only '/contact', '/privacy', and '/terms' are missing.
+    // 3. Missing essential pages logic: '/about' is in discoveredRoutes, so only '/contact', '/pricing', '/privacy-policy', and '/terms-of-service' are missing.
     expect(Array.isArray(res.missingEssentialPages)).toBe(true);
-    expect(res.missingEssentialPages).toEqual(['/contact', '/privacy', '/terms']);
+    expect(res.missingEssentialPages).toEqual(['/contact', '/pricing', '/privacy-policy', '/terms-of-service']);
   });
 
   it('should fallback to default contact values when they are not present', () => {
@@ -214,8 +192,9 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
         { path: '/' },
         { path: '/about' },
         { path: '/contact' },
-        { path: '/privacy' },
-        { path: '/terms' }
+        { path: '/pricing' },
+        { path: '/privacy-policy' },
+        { path: '/terms-of-service' }
       ]
     });
 
@@ -305,3 +284,400 @@ describe('AIVisualize 32-Capability Evaluation Engine (Milestone 2 & Exec View P
     expect(jsonStr).not.toContain('ai-first');
   });
 });
+
+describe('Canonical 6-Stage Diagnostic Pipeline Contract (BDD-TDD Red Phase)', () => {
+  const sampleCrawlPayload = {
+    url: 'https://example.com',
+    status: {
+      botPermissions: {
+        'GPTBot': 'Allowed',
+        'ClaudeBot': 'Allowed',
+        'PerplexityBot': 'Allowed',
+        'Google-Extended': 'Allowed',
+        'Applebot-Extended': 'Allowed'
+      },
+      isWafBlocked: false,
+      robotsTxtExists: true,
+      sitemapExists: true,
+      llmsTxtExists: true,
+      aiContextExists: true,
+      aboutTxtExists: true,
+      docsTxtExists: true,
+      contentTxtExists: true,
+      jsonLdExists: true,
+      jsonLdTypes: ['Organization', 'WebSite'],
+      seoOptimalTitle: true,
+      seoOptimalDesc: true,
+      hasProperHierarchy: true,
+      wordCount: 1500
+    },
+    discoveredRoutes: [
+      { path: '/', wordCount: 500, textDensityRatio: 0.35, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/about', wordCount: 300, textDensityRatio: 0.28, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/contact', wordCount: 200, textDensityRatio: 0.20, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/privacy-policy', wordCount: 450, textDensityRatio: 0.40, isCrawled: true, is404: false, statusCode: 200 },
+      { path: '/terms-of-service', wordCount: 600, textDensityRatio: 0.42, isCrawled: true, is404: false, statusCode: 200 }
+    ],
+    pages: [
+      { url: 'https://example.com/', wordCount: 500, textRatio: 35, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/about', wordCount: 300, textRatio: 28, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/contact', wordCount: 200, textRatio: 20, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/privacy-policy', wordCount: 450, textRatio: 40, isCrawled: true, is404: false, statusCode: 200 },
+      { url: 'https://example.com/terms-of-service', wordCount: 600, textRatio: 42, isCrawled: true, is404: false, statusCode: 200 }
+    ],
+    eeatMetrics: {
+      isSecure: true,
+      hasContactInfo: true,
+      hasPrivacyPolicy: true,
+      hasAuthorBio: true,
+      hasOrgSchema: true,
+      authorityStatus: 'Optimized Anchor'
+    },
+    sec1: { blocked: false },
+    sec2: { isHttps: true, essentialPagesFound: 4 },
+    sec3: { hasContactInfo: true, hasPrivacyPolicy: true, seoOptimalTitle: true, seoOptimalDesc: true, hasProperHierarchy: true, wordCount: 1500, fleschScore: 70 },
+    sec4: {
+      robotsTxtFound: true,
+      sitemapFound: true,
+      llmsTxtFound: true,
+      aiContextFound: true,
+      aboutMdFound: true,
+      docsMdFound: true,
+      contentMdFound: true
+    }
+  };
+
+  it('1. Contract Schema & Property Existence: evaluateCapabilities and evaluateAllCapabilities return stages with stage1..stage6', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    expect(res).toHaveProperty('stages');
+    expect(res.stages).toHaveProperty('stage1');
+    expect(res.stages).toHaveProperty('stage2');
+    expect(res.stages).toHaveProperty('stage3');
+    expect(res.stages).toHaveProperty('stage4');
+    expect(res.stages).toHaveProperty('stage5');
+    expect(res.stages).toHaveProperty('stage6');
+
+    const wrapperRes = evaluateAllCapabilities(sampleCrawlPayload);
+    expect(wrapperRes).toHaveProperty('stages');
+    expect(wrapperRes.stages).toHaveProperty('stage1');
+    expect(wrapperRes.stages).toHaveProperty('stage6');
+  });
+
+  it('2. Stage 1 (Bot Blocks & Gateway): computes allowedCount, totalCount, score string, status, and summaryText from botPermissions', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage1 = res.stages.stage1;
+    expect(stage1.allowedCount).toBe(5);
+    expect(stage1.totalCount).toBe(5);
+    expect(stage1.score).toBe('100%');
+    expect(stage1.status).toBe('PASS');
+    expect(stage1.summaryText).toBe('Bot Access: 5/5 Verified Unblocked');
+  });
+
+  it('3. Stage 2 (Essential Content Anchors): evaluates 5-anchor matrix, calculates score, status, and dynamic missing summaryText', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage2 = res.stages.stage2;
+    expect(stage2.foundCount).toBe(4);
+    expect(stage2.missingCount).toBe(1);
+    expect(stage2.score).toBe('80%');
+    expect(stage2.status).toBe('WARN');
+    expect(stage2.summaryText).toContain('Essential Pages: 4 Found, 1 Missing (/pricing)');
+  });
+
+  it('4. Stage 3 (Content Availability & Density): computes non-hardcoded score based on high extractability threshold and valid pages', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage3 = res.stages.stage3;
+    expect(stage3.totalValidPages).toBe(5);
+    expect(stage3.highExtractabilityCount).toBe(4);
+    expect(stage3.score).toBe('80%');
+    expect(stage3.score).not.toBe('85%');
+    expect(stage3.status).toBe('PASS');
+    expect(stage3.summaryText).toBe('Citation Readability: 4/5 High Extractability');
+  });
+
+  it('5. Stage 4 (Trust & E-E-A-T): evaluates trust metrics, returns score, PASS/WARN status, and summaryText', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage4 = res.stages.stage4;
+    expect(typeof stage4.score).toBe('string');
+    expect(stage4.score.endsWith('%')).toBe(true);
+    expect(['PASS', 'WARN']).toContain(stage4.status);
+    expect(stage4.summaryText).toBeDefined();
+  });
+
+  it('6. Stage 5 (Machine Manifest Protocols): enforces governanceGate "AI-Ready", tracks 4-level machine hierarchy, computes score & status', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage5 = res.stages.stage5;
+    expect(stage5.governanceGate).toBe('AI-Ready');
+    expect(stage5.manifestsFound).toBe(7);
+    expect(stage5.totalManifests).toBe(7);
+    expect(stage5.score).toBe('100%');
+    expect(stage5.status).toBe('PASS');
+  });
+
+  it('7. Stage 6 (Executive Boardroom & Action Triage): healthIndex equals overallScore, status categorized, human/machine readiness exposed', () => {
+    const res = evaluateCapabilities(sampleCrawlPayload);
+    const stage6 = res.stages.stage6;
+    expect(stage6.healthIndex).toBe(res.overallScore);
+    expect(stage6.score).toBe(`${res.overallScore}%`);
+    const expectedStatus = res.overallScore >= 80 ? 'OPTIMIZED' : (res.overallScore >= 50 ? 'NEEDS IMPROVEMENT' : 'CRITICAL');
+    expect(stage6.status).toBe(expectedStatus);
+    expect(typeof stage6.humanWebReadiness).toBe('number');
+    expect(typeof stage6.machineWebReadiness).toBe('number');
+  });
+
+  it('8. Empty / Un-scanned State: resolves all stages to safe neutral values without mock strings or fallbacks', () => {
+    const res = evaluateCapabilities({});
+    expect(res).toHaveProperty('stages');
+    const { stage1, stage2, stage3, stage4, stage5, stage6 } = res.stages;
+    expect(stage1.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage1.status);
+    expect(stage2.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage2.status);
+    expect(stage3.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage3.status);
+    expect(stage4.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage4.status);
+    expect(stage5.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL']).toContain(stage5.status);
+    expect(stage6.score).toBe('0%');
+    expect(['UNAUDITED', 'FAIL', 'CRITICAL']).toContain(stage6.status);
+
+    const jsonStr = JSON.stringify(res.stages);
+    expect(jsonStr).not.toContain('Mock');
+    expect(jsonStr).not.toContain('AI-first');
+  });
+});
+
+describe('Card 1 Schema Coverage Breakdown Contract (BDD-TDD Red Phase)', () => {
+  it('1. Schema Coverage Metrics Contract: evaluates detectedTypes, totalPages, pagesWithSchemaCount, pagesMissingSchemaCount, missingRoutes, and coveragePercent', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: true, schemaTypes: ['Organization', 'WebSite'], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: true, schemaTypes: ['AboutPage', 'Organization'], is404: false, statusCode: 200 },
+        { path: '/contact', route: '/contact', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/404-page', route: '/404-page', hasSchema: false, schemaTypes: [], is404: true, statusCode: 404 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(3);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(2);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(1);
+    expect(schemaDetails.coveragePercent).toBe(67);
+    expect(schemaDetails.missingRoutes).toEqual(['/contact']);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['AboutPage', 'Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('WARN');
+  });
+
+  it('2. Severity Rule - 0% Coverage: sets status to CRITICAL and includes severityBadge', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(2);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(0);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(2);
+    expect(schemaDetails.coveragePercent).toBe(0);
+    expect(schemaDetails.missingRoutes).toEqual(['/', '/about']);
+    expect(schemaDetails.detectedTypes).toEqual([]);
+    expect(schemaDetails.status).toBe('CRITICAL');
+    expect(schemaDetails.severityBadge).toBe('CRITICAL: 0% COVERAGE');
+  });
+
+  it('3. Severity Rule - 100% Coverage: sets status to PASS and missingRoutes to empty array', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', hasSchema: true, schemaTypes: ['WebSite', 'Organization'], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: true, schemaTypes: ['AboutPage'], is404: false, statusCode: 200 },
+        { path: '/contact', route: '/contact', hasSchema: true, schemaTypes: ['ContactPage'], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(3);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(3);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(0);
+    expect(schemaDetails.coveragePercent).toBe(100);
+    expect(schemaDetails.missingRoutes).toEqual([]);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['AboutPage', 'ContactPage', 'Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('PASS');
+    expect(schemaDetails.severityBadge).toBe('100% COVERAGE (PASS)');
+  });
+
+  it('4. Homepage Fallback Credit: credits homepage when status.jsonLdExists or status.jsonLdTypes has types', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      status: {
+        jsonLdExists: true,
+        jsonLdTypes: ['Organization', 'WebSite']
+      },
+      pages: [
+        { path: '/', route: '/', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 },
+        { path: '/about', route: '/about', hasSchema: false, schemaTypes: [], is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('schemaDetails');
+    const { schemaDetails } = res.stages.stage4;
+
+    expect(schemaDetails.totalPages).toBe(2);
+    expect(schemaDetails.pagesWithSchemaCount).toBe(1);
+    expect(schemaDetails.pagesMissingSchemaCount).toBe(1);
+    expect(schemaDetails.coveragePercent).toBe(50);
+    expect(schemaDetails.missingRoutes).toEqual(['/about']);
+    expect(schemaDetails.detectedTypes.sort()).toEqual(['Organization', 'WebSite'].sort());
+    expect(schemaDetails.status).toBe('WARN');
+    expect(schemaDetails.severityBadge).toBe('1/2 PAGES WITH SCHEMA (50%)');
+  });
+});
+
+describe('Card 2 Author Person E-E-A-T Contract (BDD-TDD Red Phase)', () => {
+  it('1. Card 2 Author Details Contract & Verified Authors Discovery: discovers, deduplicates authors across pages with name, jobTitle, and sameAs array', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        {
+          path: '/',
+          route: '/',
+          is404: false,
+          statusCode: 200,
+          authors: [
+            { name: 'Dr. Jane Doe', jobTitle: 'Chief Scientist', sameAs: ['https://twitter.com/janedoe'] }
+          ]
+        },
+        {
+          path: '/blog/post-1',
+          route: '/blog/post-1',
+          is404: false,
+          statusCode: 200,
+          authors: [
+            { name: 'Dr. Jane Doe', jobTitle: 'Chief Scientist', sameAs: ['https://twitter.com/janedoe'] },
+            { name: 'John Smith', jobTitle: 'Lead AI Engineer', sameAs: ['https://linkedin.com/in/johnsmith', 'https://github.com/johnsmith'] }
+          ]
+        }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(Array.isArray(authorDetails.authors)).toBe(true);
+    expect(authorDetails.authors.length).toBe(2);
+    expect(authorDetails.authorCount).toBe(2);
+    expect(authorDetails.status).toBe('PASS');
+    expect(authorDetails.severityBadge).toBe('2 AUTHOR(S) VERIFIED');
+
+    const jane = authorDetails.authors.find(a => a.name === 'Dr. Jane Doe');
+    expect(jane).toBeDefined();
+    expect(jane.jobTitle).toBe('Chief Scientist');
+    expect(jane.sameAs).toEqual(['https://twitter.com/janedoe']);
+
+    const john = authorDetails.authors.find(a => a.name === 'John Smith');
+    expect(john).toBeDefined();
+    expect(john.jobTitle).toBe('Lead AI Engineer');
+    expect(john.sameAs).toEqual(['https://linkedin.com/in/johnsmith', 'https://github.com/johnsmith']);
+  });
+
+  it('2. Critical Gap Enforcement (0 Authors Found): sets status to CRITICAL with severity badge and empty array when no authors exist', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200, authors: [] },
+        { path: '/about', route: '/about', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(authorDetails.authors).toEqual([]);
+    expect(authorDetails.authorCount).toBe(0);
+    expect(authorDetails.status).toBe('CRITICAL');
+    expect(authorDetails.severityBadge).toBe('CRITICAL: 0 AUTHORS DETECTED');
+  });
+
+  it('3. Empty / Neutral State: safely resolves when crawledData is empty or un-audited', () => {
+    const res = evaluateCapabilities({});
+    expect(res.stages.stage4).toHaveProperty('authorDetails');
+    const { authorDetails } = res.stages.stage4;
+
+    expect(authorDetails.status).toBe('CRITICAL');
+    expect(authorDetails.authorCount).toBe(0);
+    expect(authorDetails.authors).toEqual([]);
+    expect(authorDetails.severityBadge).toBe('CRITICAL: 0 AUTHORS DETECTED');
+  });
+});
+
+describe('Card 3 Domain Age & External Authority Contract (BDD-TDD Red Phase)', () => {
+  it('1. Card 3 Authority Details Contract & Verified Domain: resolves domainAge, registrationDate, externalCheckerUrl, and PASS status when domain age is verified', () => {
+    const crawledData = {
+      url: 'https://example.com',
+      domainAge: '3 Years, 2 Months',
+      registrationDate: '2023-07-01T00:00:00Z',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.domainAge).toContain('3 Years, 2 Months');
+    expect(authorityDetails.registrationDate).toBe('2023-07-01T00:00:00Z');
+    expect(authorityDetails.externalCheckerUrl).toBe('https://ahrefs.com/website-authority-checker/?input=example.com');
+    expect(authorityDetails.status).toBe('PASS');
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+
+  it('2. Zero-Paid-API Enforcement & Pending Resolution: handles unverified domain age without referencing paid APIs', () => {
+    const crawledData = {
+      url: 'https://thatworkx.com',
+      pages: [
+        { path: '/', route: '/', is404: false, statusCode: 200 }
+      ]
+    };
+
+    const res = evaluateCapabilities(crawledData);
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.status).toBe('PENDING');
+    expect(authorityDetails.externalCheckerUrl).toBe('https://ahrefs.com/website-authority-checker/?input=thatworkx.com');
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+
+  it('3. Empty / Un-scanned State: safely resolves when crawledData is empty or un-audited', () => {
+    const res = evaluateCapabilities({});
+    expect(res.stages.stage4).toHaveProperty('authorityDetails');
+    const { authorityDetails } = res.stages.stage4;
+
+    expect(authorityDetails.status).toBe('PENDING');
+    expect(authorityDetails.domainAge).toBe('--');
+    expect(authorityDetails.registrationDate).toBeNull();
+    expect(authorityDetails.externalCheckerUrl).toBeNull();
+    expect(authorityDetails.authorityStatus).not.toContain('Requires Ahrefs/Moz API');
+  });
+});
+
+
+
+

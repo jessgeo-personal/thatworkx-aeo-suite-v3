@@ -1,0 +1,116 @@
+                                       Header
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	-----------------------
+	|                     |                                      
+	| AIOptimize Logo     |                                  
+	|                     |                                 
+	-----------------------  
+	
+Scanned page: <page URL>
+	Last Scanned: <scanned date and time>
+	Time to Scan: <scanned time in seconds>
+	
+	## Welcome to AIOptimize
+	#### Tools to simplify your AI-ready web presence
+	
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	1. Has JSON-LD Schema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+		- HasOrganizationSchema in (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)
+		- HasFAQSchema (upgrade to AIV Pro/ENT for sample JSON-LD Schema and AIO Pro for custom JSON-LD Schema)	
+	6. Identified EssentialPages
+		- Missing EssentialPages(upgrade to AIV Pro/ENT so if pages exist, they can be fixed, or create sample about.md/README.md/docs.md to supplement.  Conversely upgrade to AIO Pro to use headless browser to identify and fix existing essentialpages)
+	11. Heavy Page Analysis: too much markup (upgrade to AIV Pro/ENT for sample ai-context.md and AIO Pro for custom ai-context.md)
+	12. Heavy Page Analysis: heavy client side rendering (upgrade to AIV Pro/ENT for sample ai-context.md and AIO Pro for custom ai-context.md)
+	15. Internal Links Analysis(list links in pop-up or preview section.  In AIV Pro/ENT, confirms if links are valid and accessible.  AIO Pro for custom llms.txt, content.md and docs.md)
+	17. Page Level EEAT Score (upgrade to AIO Pro to review at individual level)
+	18. Last Updated - provide date if found (advise that a Last Updated date should be available per page and made visible)
+	19. Answer/Question parity ratio(if not equal, upgrade to AIO Pro to read through site using headless browser to identify and fix Q and A to follow FAQ schema)
+	20. Hidden by robots.txt (upgrade to AIV Pro/ENT for sample robots.txt or AIO Pro for custom robots.txt)
+	21. Token Load Analysis (upgrade to AIV Pro/ENT for sample ai-context.md and content from page and AIO Pro for custom ai-context.md)
+	22. Reading Comeplexity(Flesch score): (upgrade to AIO Pro to reduce complexity using AI**)
+	
+----------------------------------------------------------------------------------------------
+	Robots.txt  |
+	- Shows current status of robots.txt
+	- If existent, shows contents
+	- If non-existent or disallow's, 
+		- provides sample file where all bots are unblocked (AIV Pro)
+		- provides actively updated robots.txt (AIO Pro)
+	----------------------------------------------------------------------------------------------
+	            | llms.txt  |
+	- Shows current status of llms.txt
+	- If Existent, shows contents
+	- If non-existent, provide sample file where the (AIV Pro)
+		- meta description is included as 'Core Entity Pitch'
+		- all links are provided as link index (AIO Pro provides active updates to llms.txt when links change/add/delete)
+		- pointers to existing Manifest files (ai-context.md, about.md, docs.md etc.)  (AIO Pro provides active updates to llms.txt when Manifest files change)
+		- Social Citation Hooks: (use AIO Pro to source github references, official press releases, and key documentation repos from website.  use AISocialize to get snippets to add to llms.txt for social posts and other media pointers)
+	- Actively monitors web sites for updated content to update the llms.txt (AIO Pro)
+	----------------------------------------------------------------------------------------------
+	                        | sitemap.xml  |
+	- Shows current status of sitemap.xml
+	- confirm sitemap.xml mentioned in robots.txt
+	- If Existent, shows contents
+	- If non-existent, provide file with sitemap pulled from website (upto 40 pages for AIV Pro and the rest for AIV ENT)
+	- Actively monitors web sites for updated content to update the sitemap.xml (AIO Pro)	
+	----------------------------------------------------------------------------------------------
+	                                       | JSON-LD Schema  |
+	- Shows current status of JSON-LD Schema on homepage
+	- If Existent, shows contents
+	- If non-existent, 
+		- provide sample file with organization schema nad FAQ schema (AIV Pro)
+		- actively includes other entity schemas as and when website is updated - like product schema, contact schema etc. (AIO Pro)
+				
+	----------------------------------------------------------------------------------------------
+	                                                         | ai-context.md  |
+	-Shows current status of ai-context.md
+	- if existent, show contents
+	- if non-existent, provide sample file which 
+		- pulls content from homepage and available essential pages, strips off all tags and markups, structures as markdown (AIV Pro)
+		- pulls content from all pages including heavy pages (AIO Pro)
+			- includes FAQ in proper FAQSchema from JSON-LD Schema(AIO Pro)
+			- includes Organzation details in proper OrganizationSchema (AIO Pro)
+			- includes other identified entities in proper Schema per JSON-LD Schema (AIO Pro)
+		- Actively monitors web sites for updated content to update the ai-context.md (AIO Pro)
+	----------------------------------------------------------------------------------------------
+	                                                                          | README.md  |
+	-Shows current status of README.md
+	- if existent, show contents
+	- if non-existent, provide sample file which 
+		- runs formula to pull from the site and populates file (AIV Pro)
+		- provides script to populate README.md in their site itself (AIO Pro)
+	
+	----------------------------------------------------------------------------------------------
+	                                                                                        | about.md  |
+	-Shows current status of about.md
+	- if existent, show contents
+	- if non-existent, provide sample file which
+		- crawls site to pull information and formats (AIV Pro)
+		- highlights areas where content isnt available (AIV Pro)
+		- actively monitors for new content that can be added to about.md from teh website (AIO Pro)
+	----------------------------------------------------------------------------------------------
+	                                                                                                    | docs.md  |
+	-Shows current status of docs.md
+	- if existent, show contents
+	- if non-existent, provide sample file which contains content from existing /docs folder, if it exists
+		- crawls site to pull information and formats (AIV Pro) - WIP**
+		- highlights areas where content isnt available (AIV Pro) - WIP**
+		- actively monitors for new content that can be added to docs.md from the website (AIO Pro) - WIP**
+		
+	----------------------------------------------------------------------------------------------
+	                                                                                                                | content.md  |
+	-Shows current status of content.md
+	- if existent, show contents
+	- if non-existent, link to AISocialize to use to generate content.md snippets which can be copied
+		- checks if site has the following
+			- HTML5 Semantic Tags: The most reliable targets are <article> and <main>. If a site uses HTML5 correctly, 90% of the narrative text lives inside these boundaries.
+			- Common Content Classes: Fallback targets include common CSS classes used by standard CMS platforms (WordPress, Webflow, Ghost): .post-content, .entry-content, .article-body, or .content-wrapper.
+			- Schema.org JSON-LD: Look for the @type declarations "Article", "BlogPosting", or "NewsArticle". These scripts often contain the exact headline, author, datePublished, and sometimes the full articleBody.
+			- Header and Metadata: Extract the primary <h1> for the document title and the <meta name="description"> to draft the initial Executive Summary.JSON-LD schema for blogs, crawls site to pull information and formats (AIV Pro) - WIP**
+		- generates sample file based on content on the site already (AIV Pro)
+		- actively monitors for new content that can be added to content.md from the website (AIO Pro) - WIP**
+		
+	----------------------------------------------------------------------------------------------
+	
+	--------------------------------------------------------------------------------------

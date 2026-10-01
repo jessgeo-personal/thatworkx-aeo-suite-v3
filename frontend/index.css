@@ -6946,6 +6946,231 @@ body {
   animation: input-pulse 0.6s ease 2;
 }
 
+/* ==========================================================================
+   Tactile 3D Glass & Metallic Badges & Executive Drawers
+   ========================================================================== */
+
+.status-badge--pass {
+  background: linear-gradient(180deg, #064e3b 0%, #022c22 100%);
+  border: 1px solid #10b981;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4), 0 0 12px rgba(16,185,129,0.25);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.status-badge--warning {
+  background: linear-gradient(180deg, #78350f 0%, #451a03 100%);
+  border: 1px solid #f59e0b;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4), 0 0 12px rgba(245,158,11,0.25);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.status-badge--blocked {
+  background: linear-gradient(180deg, #881337 0%, #4c0519 100%);
+  border: 1px solid #f43f5e;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4), 0 0 14px rgba(244,63,94,0.35);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.score-dial-card {
+  /* Retained class identifier */
+}
+
+.executive-drawer {
+  /* Retained class identifier */
+}
+
+details.executive-drawer {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+details.executive-drawer summary {
+  cursor: pointer;
+  color: #38bdf8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+}
+
+details.executive-drawer summary:hover {
+  color: #7dd3fc;
+}
+
+/* Typography Enforcement Rules */
+body, h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.telemetry-value, .metric-score, .telemetry-http {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 3-Tier Boardroom Refactor Layout Overrides */
+.exec-action-triage {
+  background: rgba(8, 9, 12, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sec1-subgrid, .sec2-subgrid, .sec3-subgrid, .sec4-subgrid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
+#sec1-why-matters-box, #sec3-why-matters-box, #sec4-why-matters-box {
+  display: none !important;
+}
+
+/* ==========================================================================
+   V4 Cockpit Layout & Progression Stepper Styles
+   ========================================================================== */
+.pipeline-header {
+  background-color: rgba(15, 17, 23, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.pipeline-stepper .step-num {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.pipeline-stepper .step-ready .step-num {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.v4-cockpit-container {
+  min-height: calc(100vh - 65px);
+}
+
+.v4-left-pane {
+  min-width: 260px;
+}
+
+.v4-center-feed {
+  min-width: 320px;
+}
+
+.cockpit-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* Discovery Stream & Cockpit Cards */
+.discovery-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.discovery-card:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.feed-tab-switcher button {
+  font-size: 11px;
+}
+
+.validator-pill {
+  letter-spacing: 0.02em;
+}
+
+/* Inspector Studio Code Viewer & Diagnostics */
+.manifest-code-viewer pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.manifest-code-viewer code {
+  color: #a1a1aa;
+}
+
+.diagnostic-card {
+  transition: border-color 0.2s ease;
+}
+
+.diagnostic-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.inspector-format-pill {
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Explee Cockpit Layout & Design Tokens
+   ========================================================================== */
+
+/* Custom Clean Scrollbars */
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #1F2430;
+  border-radius: 9999px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #2E3648;
+}
+
+/* Timeline Progression Connectors */
+.explee-stepper .step-circle {
+  transition: all 0.2s ease;
+}
+
+.step-capsule-active {
+  box-shadow: 0 0 16px rgba(0, 229, 153, 0.2);
+}
+
+/* Card Transitions */
+.explee-stream-card {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.explee-stream-card:hover {
+  background-color: #161A24;
+}
+
+.explee-stream-card:active {
+  transform: scale(0.99);
+}
+
+.campaign-tile {
+  transition: all 0.15s ease;
+}
+
+.campaign-tile:hover {
+  background-color: #171C26;
+}
+
+.competitor-chip {
+  transition: all 0.15s ease;
+}
+
+.competitor-chip:hover {
+  background-color: #171C26;
+}
+
+
+
+
+
+
+
 
 
 

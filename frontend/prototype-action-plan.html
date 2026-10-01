@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEO Suite V4 - Action Plan Urgency Prototype Sandbox</title>
+  
+  <!-- CDN Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Design System Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            headline: ['"Plus Jakarta Sans"', 'sans-serif'],
+            space: ['"Space Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              orange: '#d45d2a',
+              rust: '#b7410e',
+              glow: '#ff7a45'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: #202124;
+      color: #e8eaed;
+    }
+    
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #121212;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3c4043;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d45d2a;
+    }
+
+    /* Industrial Hazard Stripes */
+    .hazard-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(245, 158, 11, 0.15),
+        rgba(245, 158, 11, 0.15) 12px,
+        rgba(18, 18, 18, 0.8) 12px,
+        rgba(18, 18, 18, 0.8) 24px
+      );
+    }
+    .hazard-stripe-bar {
+      background: repeating-linear-gradient(
+        -45deg,
+        #f59e0b,
+        #f59e0b 8px,
+        #121212 8px,
+        #121212 16px
+      );
+    }
+
+    /* Smooth Transitions */
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+    details[open] summary .chevron-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Pulse Glow Animation */
+    @keyframes pulseGlowOrange {
+      0%, 100% {
+        box-shadow: 0 0 25px rgba(212, 93, 42, 0.25), inset 0 0 15px rgba(212, 93, 42, 0.08);
+      }
+      50% {
+        box-shadow: 0 0 45px rgba(212, 93, 42, 0.45), inset 0 0 25px rgba(212, 93, 42, 0.18);
+      }
+    }
+
+    @keyframes pulseGlowAmber {
+      0%, 100% {
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.2), inset 0 0 12px rgba(245, 158, 11, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 45px rgba(245, 158, 11, 0.4), inset 0 0 20px rgba(245, 158, 11, 0.15);
+      }
+    }
+
+    .pulse-orange-card {
+      animation: pulseGlowOrange 4s infinite ease-in-out;
+    }
+    .pulse-amber-card {
+      animation: pulseGlowAmber 4s infinite ease-in-out;
+    }
+
+    .completed-step {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#202124] text-[#e8eaed] selection:bg-[#b7410e] selection:text-white pb-20">
+
+  <!-- ======================================================== -->
+  <!-- TOAST NOTIFICATION                                       -->
+  <!-- ======================================================== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 px-5 py-3.5 rounded-2xl bg-[#121212] border border-[#d45d2a] text-white shadow-[0_0_25px_rgba(212,93,42,0.4)]">
+    <span class="text-[#ff7a45] text-base" id="toast-icon">✓</span>
+    <span class="text-xs font-mono font-bold" id="toast-msg">Step copied to clipboard</span>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- STICKY TOP CONTROL & NAVIGATION BAR                      -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 bg-[#191a1d]/95 backdrop-blur-xl border-b border-[#3c4043] shadow-2xl">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3.5 space-y-3">
+      
+      <!-- Top Row: Logo, Title & Sandbox Governance Badge -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#d45d2a] to-[#b7410e] flex items-center justify-center font-black text-white text-xl shadow-[0_0_15px_rgba(212,93,42,0.5)]">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-base sm:text-lg font-black text-white tracking-tight font-headline">AIVisualize Diagnostic Cockpit</h1>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#b7410e]/20 border border-[#b7410e]/50 text-[#ff7a45]">
+                DESIGN PROTOTYPE
+              </span>
+            </div>
+            <p class="text-xs text-[#bdc1c6] font-medium">Action Plan Urgency & Contrast Sandbox (refactor/visualize-v4)</p>
+          </div>
+        </div>
+
+        <!-- Governance Indicators -->
+        <div class="flex items-center space-x-2 text-xs font-mono">
+          <span class="px-2.5 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-[#38bdf8] flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#38bdf8] animate-pulse"></span>
+            <span>Zero Production Mocks</span>
+          </span>
+          <span class="px-2.5 py-1 rounded-xl bg-[#121212] border border-[#3c4043] text-[#10b981] flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+            <span>AI-Optimized &amp; AI-Ready Compliant</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Controls Row: View Mode Tabs + Stage Switcher + Viewport Width -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-[#3c4043]/60">
+        
+        <!-- Design Option Tabs -->
+        <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto pb-1 sm:pb-0 font-mono text-xs">
+          <button onclick="setViewMode('option-a')" id="tab-option-a" class="tab-btn px-3.5 py-2 rounded-xl border font-bold transition flex items-center space-x-2 bg-[#b7410e]/20 border-[#d45d2a] text-[#ff7a45] shadow-[0_0_15px_rgba(212,93,42,0.3)]">
+            <span>⚡ Option A: Brand Orange Alert</span>
+          </button>
+          <button onclick="setViewMode('option-b')" id="tab-option-b" class="tab-btn px-3.5 py-2 rounded-xl border border-[#3c4043] bg-[#121212] text-[#bdc1c6] hover:text-white hover:border-amber-500/50 font-bold transition flex items-center space-x-2">
+            <span>⚠️ Option B: Hazard Warning</span>
+          </button>
+          <button onclick="setViewMode('option-c')" id="tab-option-c" class="tab-btn px-3.5 py-2 rounded-xl border border-[#3c4043] bg-[#121212] text-[#bdc1c6] hover:text-white hover:border-[#d45d2a]/50 font-bold transition flex items-center space-x-2">
+            <span>📈 Option C: Executive Triage</span>
+          </button>
+          <button onclick="setViewMode('grid')" id="tab-grid" class="tab-btn px-3.5 py-2 rounded-xl border border-[#3c4043] bg-[#121212] text-[#bdc1c6] hover:text-white font-bold transition flex items-center space-x-2">
+            <span>⊞ Side-by-Side Comparison</span>
+          </button>
+        </div>
+
+        <!-- Stage Scenario Switcher & Viewport Width -->
+        <div class="flex items-center space-x-3 text-xs font-mono">
+          
+          <!-- Stage Selector -->
+          <div class="flex items-center space-x-1.5 bg-[#121212] border border-[#3c4043] rounded-xl p-1">
+            <span class="text-[#5f6368] px-2 font-bold uppercase text-[10px]">Scenario:</span>
+            <button onclick="setScenario('stage1')" id="scen-stage1" class="scen-btn px-2.5 py-1 rounded-lg font-bold bg-[#b7410e] text-white transition">
+              Stage 1 (Bot Blocks)
+            </button>
+            <button onclick="setScenario('stage2')" id="scen-stage2" class="scen-btn px-2.5 py-1 rounded-lg font-bold text-[#bdc1c6] hover:text-white transition">
+              Stage 2 (Routes)
+            </button>
+            <button onclick="setScenario('stage3')" id="scen-stage3" class="scen-btn px-2.5 py-1 rounded-lg font-bold text-[#bdc1c6] hover:text-white transition">
+              Stage 3 (Density)
+            </button>
+          </div>
+
+          <!-- Viewport Mode (Desktop / Tablet / Mobile) -->
+          <div class="hidden lg:flex items-center space-x-1 bg-[#121212] border border-[#3c4043] rounded-xl p-1">
+            <button onclick="setViewport('desktop')" id="vp-desktop" class="vp-btn px-2 py-1 rounded-lg font-bold bg-[#3c4043] text-white" title="Desktop 1200px">
+              🖥 Desktop
+            </button>
+            <button onclick="setViewport('tablet')" id="vp-tablet" class="vp-btn px-2 py-1 rounded-lg font-bold text-[#bdc1c6] hover:text-white" title="Tablet 768px">
+              📱 Tablet
+            </button>
+            <button onclick="setViewport('mobile')" id="vp-mobile" class="vp-btn px-2 py-1 rounded-lg font-bold text-[#bdc1c6] hover:text-white" title="Mobile 390px">
+              📲 Mobile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN PROTOTYPE WORKSPACE CANVAS                          -->
+  <!-- ======================================================== -->
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-8">
+    
+    <!-- Context Banner -->
+    <div class="mb-8 p-5 rounded-3xl bg-[#191a1d] border border-[#3c4043] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2">
+          <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase bg-[#d45d2a]/20 border border-[#d45d2a]/40 text-[#ff7a45]" id="banner-stage-tag">
+            SCENARIO: STAGE 1 (BOT BLOCKS & CRAWLABILITY)
+          </span>
+          <span class="text-xs text-[#5f6368]">•</span>
+          <span class="text-xs font-mono text-[#38bdf8]" id="banner-score-impact">Impact: +35 Potential Score Lift</span>
+        </div>
+        <h2 class="text-lg sm:text-xl font-bold text-white font-headline" id="banner-stage-headline">
+          Simulating 19 Blocked AI Crawlers on Root Directives
+        </h2>
+        <p class="text-xs sm:text-sm text-[#bdc1c6]" id="banner-stage-sub">
+          Comparing how each visual urgency variant transforms user motivation to remediate technical blockers immediately.
+        </p>
+      </div>
+
+      <!-- Action Utilities -->
+      <div class="flex items-center space-x-2.5 flex-shrink-0">
+        <button onclick="toggleAllDrawers()" class="px-3.5 py-2 rounded-xl bg-[#121212] hover:bg-[#252525] border border-[#3c4043] text-xs font-mono font-bold text-[#e8eaed] transition">
+          ↕ Toggle All Step Drawers
+        </button>
+        <button onclick="resetCompletedSteps()" class="px-3.5 py-2 rounded-xl bg-[#121212] hover:bg-[#252525] border border-[#3c4043] text-xs font-mono font-bold text-[#bdc1c6] hover:text-white transition">
+          ↺ Reset Checkmarks
+        </button>
+      </div>
+    </div>
+
+    <!-- Viewport Container Wrapper (Supports Desktop / Tablet / Mobile Widths) -->
+    <div id="viewport-container" class="w-full max-w-[1200px] mx-auto transition-all duration-300">
+      
+      <!-- ======================================================== -->
+      <!-- VIEW MODE: OPTION A (High-Voltage Brand Orange Alert)    -->
+      <!-- ======================================================== -->
+      <section id="view-option-a" class="view-panel space-y-6">
+        <div class="flex items-center justify-between pb-2">
+          <div class="space-y-0.5">
+            <span class="text-xs font-mono font-bold text-[#ff7a45] uppercase tracking-wider">Option A • Signature Command Center</span>
+            <h3 class="text-xl font-black text-white font-headline">High-Voltage Brand Orange Alert</h3>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#b7410e]/20 border border-[#d45d2a] text-[#ff7a45]">
+            Signature Thatworkx Theme
+          </span>
+        </div>
+
+        <!-- OPTION A CARD CONTAINER -->
+        <div class="pulse-orange-card relative rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#241712] via-[#1a1412] to-[#121212] border-2 border-[#d45d2a] overflow-hidden">
+          
+          <!-- Ambient Glow Flare -->
+          <div class="absolute -top-24 -right-24 w-80 h-80 bg-[#b7410e]/25 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#d45d2a]/10 rounded-full blur-2xl pointer-events-none"></div>
+
+          <!-- Card Header Lockup -->
+          <div class="relative z-10 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d45d2a]/30">
+              
+              <!-- Icon + Pulsing Beacon + Title -->
+              <div class="flex items-center space-x-3">
+                <div class="relative flex items-center justify-center">
+                  <span class="relative flex h-4 w-4">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff7a45] opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-[#d45d2a]"></span>
+                  </span>
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-base sm:text-lg">🛠️</span>
+                    <h4 class="text-sm sm:text-base font-mono font-black text-white uppercase tracking-wider font-headline" id="card-a-title">
+                      Action Plan: How to Unblock 20 AI Search Engines & WAF Gates
+                    </h4>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prominent Urgency Badge Pill -->
+              <div class="flex items-center space-x-2">
+                <span class="px-3.5 py-1.5 rounded-full text-xs font-mono font-black uppercase tracking-wider bg-[#b7410e]/30 border border-[#d45d2a] text-[#ff7a45] shadow-[0_0_14px_rgba(183,65,14,0.4)] flex items-center space-x-1.5">
+                  <span>⚡</span>
+                  <span id="card-a-badge">IMMEDIATE ACTION REQUIRED</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Descriptive Subtitle -->
+            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed" id="card-a-desc">
+              Critical crawlability blockers detected. 19 AI crawlers (including GPTBot, ClaudeBot, PerplexityBot) are actively blocked by Disallow: / or Cloudflare WAF challenge gates.
+            </p>
+
+            <!-- Step Progress Indicator Bar -->
+            <div class="bg-[#121212] p-3.5 rounded-2xl border border-[#d45d2a]/30 space-y-2">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-[#bdc1c6]">Remediation Progress:</span>
+                <span class="text-[#ff7a45] font-bold" id="card-a-progress-label">0 of 4 Steps Completed (0%)</span>
+              </div>
+              <div class="w-full h-2 bg-[#1f1f1f] rounded-full overflow-hidden border border-[#3c4043]">
+                <div id="card-a-progress-bar" class="h-full bg-gradient-to-r from-[#b7410e] to-[#ff7a45] transition-all duration-500 rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Step-by-step Interactive Action List -->
+            <div class="space-y-3 pt-2" id="card-a-steps-container">
+              <!-- Dynamically Populated in JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPPLEMENTARY: RECOMMENDED SHORTCUT & EVIDENCE DRAWER (Preserving V4 Architecture) -->
+        <div class="space-y-4 pt-2">
+          <!-- Shortcut Card -->
+          <div class="bg-gradient-to-r from-[#1f1f1f] to-[#251b17] border-2 border-[#b7410e]/60 rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="space-y-2">
+              <div class="flex items-center space-x-2.5">
+                <span class="text-lg text-[#d45d2a]">⚡</span>
+                <h4 class="text-xs sm:text-sm font-mono font-black text-[#d45d2a] uppercase tracking-wider">
+                  Recommended Shortcut: Upgrade to AIOptimize Pro to automatically create AI-ready files
+                </h4>
+              </div>
+              <p class="text-xs sm:text-sm text-[#e8eaed] leading-relaxed" id="card-a-shortcut">
+                Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates cloud edge proxy rules and verified crawler permissions across all 20 AI search engines—skipping manual configuration.
+              </p>
+            </div>
+            <button onclick="showToast('Navigating to AIOptimize Pro Automated Deployment...')" class="px-5 py-3 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white text-xs font-mono font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center space-x-2 flex-shrink-0 active:scale-95">
+              <span>⚡ Deploy AI-Ready Files</span>
+              <span>↗</span>
+            </button>
+          </div>
+
+          <!-- Evidence Drawer -->
+          <details class="group bg-[#1a1a1a] border border-[#3c4043] rounded-3xl p-5 sm:p-6 shadow-lg open" open>
+            <summary class="flex items-center justify-between text-sm sm:text-base font-bold text-white cursor-pointer list-none">
+              <span class="flex items-center space-x-2.5">
+                <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Verification Evidence (What We Found)</span>
+              </span>
+              <span class="text-xs font-mono text-[#bdc1c6] chevron-icon transition-transform duration-200">▼</span>
+            </summary>
+            <div class="mt-4 pt-4 border-t border-[#3c4043] space-y-3">
+              <p class="text-xs sm:text-sm text-[#e8eaed]" id="card-a-evidence-plain">
+                Verified HTTP 200 responses across 20 registered AI User-Agents. 19 blocked directives encountered in root /robots.txt.
+              </p>
+              <pre class="bg-[#121212] p-4 rounded-xl text-xs font-mono text-[#38bdf8] overflow-x-auto leading-relaxed border border-[#3c4043]" id="card-a-evidence-trace">User-agent: *
+Disallow: /
+User-agent: GPTBot
+Disallow: /
+Status: 19/20 AI Engines Blocked</pre>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW MODE: OPTION B (Industrial Hazard Amber Warning)     -->
+      <!-- ======================================================== -->
+      <section id="view-option-b" class="view-panel space-y-6 hidden">
+        <div class="flex items-center justify-between pb-2">
+          <div class="space-y-0.5">
+            <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">Option B • Critical System Alert</span>
+            <h3 class="text-xl font-black text-white font-headline">Industrial Hazard Amber Warning</h3>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 border border-amber-500 text-amber-300">
+            High-Visibility Hazard Theme
+          </span>
+        </div>
+
+        <!-- OPTION B CARD CONTAINER -->
+        <div class="pulse-amber-card relative rounded-3xl p-6 sm:p-8 bg-[#181613] border-2 border-amber-500/80 overflow-hidden">
+          
+          <!-- Hazard Top Accent Line -->
+          <div class="absolute top-0 left-0 right-0 h-2 hazard-stripe-bar"></div>
+
+          <!-- Card Header Lockup -->
+          <div class="relative z-10 space-y-4 pt-1">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-amber-500/30">
+              
+              <!-- Flashing Warning Icon + Beacon + Title -->
+              <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500 text-black font-black flex items-center justify-center text-lg shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                  ⚠️
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                    <h4 class="text-sm sm:text-base font-mono font-black text-white uppercase tracking-wider font-headline" id="card-b-title">
+                      Action Plan: Critical Crawlability Remediation
+                    </h4>
+                  </div>
+                </div>
+              </div>
+
+              <!-- High Contrast Hazard Badge -->
+              <div class="flex items-center space-x-2">
+                <span class="px-3.5 py-1.5 rounded-full text-xs font-mono font-black uppercase tracking-wider bg-amber-500/20 border border-amber-500 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.3)] flex items-center space-x-1.5">
+                  <span>🚨</span>
+                  <span id="card-b-badge">CRITICAL CRAWLABILITY BLOCKER</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Descriptive Subtitle -->
+            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed" id="card-b-desc">
+              Critical crawlability blockers detected. 19 AI crawlers (including GPTBot, ClaudeBot, PerplexityBot) are actively blocked by Disallow: / or Cloudflare WAF challenge gates.
+            </p>
+
+            <!-- Hazard Steps Container -->
+            <div class="space-y-3 pt-2" id="card-b-steps-container">
+              <!-- Dynamically Populated in JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPPLEMENTARY -->
+        <div class="space-y-4 pt-2">
+          <!-- Shortcut Card -->
+          <div class="bg-[#1f1d19] border-2 border-amber-500/50 rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="space-y-2">
+              <div class="flex items-center space-x-2.5">
+                <span class="text-lg text-amber-400">⚡</span>
+                <h4 class="text-xs sm:text-sm font-mono font-black text-amber-300 uppercase tracking-wider">
+                  Automated Resolution: Bypass Manual WAF Debugging via AIOptimize Pro
+                </h4>
+              </div>
+              <p class="text-xs sm:text-sm text-[#e8eaed] leading-relaxed" id="card-b-shortcut">
+                Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates cloud edge proxy rules and verified crawler permissions across all 20 AI search engines.
+              </p>
+            </div>
+            <button onclick="showToast('Navigating to AIOptimize Pro Automated Deployment...')" class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-mono font-black tracking-wide transition shadow-lg whitespace-nowrap flex items-center space-x-2 flex-shrink-0 active:scale-95">
+              <span>⚡ Auto-Deploy Machine Manifests</span>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW MODE: OPTION C (Executive Triage Stripe & Recovery) -->
+      <!-- ======================================================== -->
+      <section id="view-option-c" class="view-panel space-y-6 hidden">
+        <div class="flex items-center justify-between pb-2">
+          <div class="space-y-0.5">
+            <span class="text-xs font-mono font-bold text-[#ff7a45] uppercase tracking-wider">Option C • Incentive-Driven Urgency</span>
+            <h3 class="text-xl font-black text-white font-headline">Executive Triage Stripe & Score Recovery</h3>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#181818] border border-[#3c4043] text-[#38bdf8]">
+            Score Incentive Engine
+          </span>
+        </div>
+
+        <!-- OPTION C CARD CONTAINER -->
+        <div class="relative rounded-3xl p-6 sm:p-8 bg-[#181818] border border-[#3c4043] border-l-[8px] border-l-[#d45d2a] shadow-2xl overflow-hidden">
+          
+          <div class="space-y-4">
+            <!-- Header Row with Metric Reward Tag -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#3c4043]">
+              
+              <div class="flex items-center space-x-3">
+                <span class="text-base sm:text-lg">📈</span>
+                <div class="space-y-0.5">
+                  <h4 class="text-sm sm:text-base font-mono font-black text-white uppercase tracking-wider font-headline" id="card-c-title">
+                    Action Plan & Score Recovery Triage
+                  </h4>
+                  <span class="text-xs text-[#bdc1c6] font-mono">Estimated resolution time: 15 minutes</span>
+                </div>
+              </div>
+
+              <!-- Metric Reward Tag -->
+              <div class="flex items-center space-x-2">
+                <span class="px-4 py-2 rounded-2xl font-mono font-black text-xs sm:text-sm bg-[#b7410e]/20 border border-[#d45d2a]/60 text-[#ff7a45] shadow-[0_0_15px_rgba(183,65,14,0.25)] flex items-center space-x-2" id="card-c-reward-badge">
+                  <span class="text-base">🚀</span>
+                  <span>+35 HEALTH SCORE RECOVERY</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Descriptive Subtitle -->
+            <p class="text-sm sm:text-base text-[#e8eaed] font-medium leading-relaxed" id="card-c-desc">
+              Critical crawlability blockers detected. 19 AI crawlers (including GPTBot, ClaudeBot, PerplexityBot) are actively blocked by Disallow: / or Cloudflare WAF challenge gates.
+            </p>
+
+            <!-- Option C Step List (Monospace with Underlined Imperatives) -->
+            <div class="space-y-3 pt-2" id="card-c-steps-container">
+              <!-- Dynamically Populated in JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPPLEMENTARY -->
+        <div class="space-y-4 pt-2">
+          <!-- Shortcut Card -->
+          <div class="bg-gradient-to-r from-[#181818] to-[#201815] border border-[#3c4043] border-l-4 border-l-[#d45d2a] rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="space-y-2">
+              <div class="flex items-center space-x-2.5">
+                <span class="text-lg text-[#d45d2a]">⚡</span>
+                <h4 class="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider">
+                  Instant Score Recovery via AIOptimize Pro
+                </h4>
+              </div>
+              <p class="text-xs sm:text-sm text-[#bdc1c6] leading-relaxed" id="card-c-shortcut">
+                Deploying Level 1 Machine Manifests automatically recovers full citation readiness points across all 20 AI search engines.
+              </p>
+            </div>
+            <button onclick="showToast('Navigating to AIOptimize Pro Automated Deployment...')" class="px-5 py-3 rounded-xl bg-[#b7410e] hover:bg-[#d45d2a] text-white text-xs font-mono font-bold tracking-wide transition shadow-lg whitespace-nowrap flex items-center space-x-2 flex-shrink-0 active:scale-95">
+              <span>🚀 Claim +35 Score Lift</span>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW MODE: SIDE-BY-SIDE COMPARISON GRID                  -->
+      <!-- ======================================================== -->
+      <section id="view-grid" class="view-panel space-y-6 hidden">
+        <div class="flex items-center justify-between pb-2 border-b border-[#3c4043]">
+          <div class="space-y-0.5">
+            <span class="text-xs font-mono font-bold text-[#38bdf8] uppercase tracking-wider">Tri-Variant Comparison</span>
+            <h3 class="text-xl font-black text-white font-headline">Side-by-Side Urgency & Contrast Matrix</h3>
+          </div>
+          <span class="text-xs font-mono text-[#bdc1c6]">Inspecting All 3 Competing Models Concurrently</span>
+        </div>
+
+        <!-- 3-Column Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Column 1: Option A -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-mono font-bold text-[#ff7a45]">OPTION A: BRAND ORANGE</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#b7410e]/20 text-[#ff7a45]">Signature</span>
+            </div>
+            <div class="pulse-orange-card rounded-3xl p-5 bg-gradient-to-b from-[#241712] via-[#1a1412] to-[#121212] border-2 border-[#d45d2a] space-y-3.5">
+              <div class="flex items-center justify-between pb-3 border-b border-[#d45d2a]/30">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#d45d2a] animate-ping"></span>
+                  <span class="text-xs font-mono font-black text-white">⚡ ACTION PLAN</span>
+                </div>
+                <span class="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-[#b7410e]/30 border border-[#d45d2a] text-[#ff7a45]">IMMEDIATE</span>
+              </div>
+              <p class="text-xs text-[#e8eaed] leading-relaxed line-clamp-2" id="grid-a-desc">
+                Critical crawlability blockers detected across 19 engines.
+              </p>
+              <div class="space-y-2 pt-1" id="grid-a-steps">
+                <!-- Injected in JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Option B -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-mono font-bold text-amber-400">OPTION B: HAZARD AMBER</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Warning</span>
+            </div>
+            <div class="pulse-amber-card rounded-3xl p-5 bg-[#181613] border-2 border-amber-500/80 space-y-3.5 relative overflow-hidden">
+              <div class="absolute top-0 left-0 right-0 h-1.5 hazard-stripe-bar"></div>
+              <div class="flex items-center justify-between pb-3 border-b border-amber-500/30 pt-1">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs">⚠️</span>
+                  <span class="text-xs font-mono font-black text-white">SYSTEM ALERT</span>
+                </div>
+                <span class="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500 text-amber-300">BLOCKER</span>
+              </div>
+              <p class="text-xs text-[#e8eaed] leading-relaxed line-clamp-2" id="grid-b-desc">
+                Critical crawlability blockers detected across 19 engines.
+              </p>
+              <div class="space-y-2 pt-1" id="grid-b-steps">
+                <!-- Injected in JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Option C -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-mono font-bold text-[#38bdf8]">OPTION C: EXEC TRIAGE</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8]">Incentive</span>
+            </div>
+            <div class="rounded-3xl p-5 bg-[#181818] border border-[#3c4043] border-l-[6px] border-l-[#d45d2a] shadow-xl space-y-3.5">
+              <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs">📈</span>
+                  <span class="text-xs font-mono font-black text-white">TRIAGE STRIPE</span>
+                </div>
+                <span class="text-[10px] font-mono font-black px-2 py-0.5 rounded-lg bg-[#b7410e]/20 border border-[#d45d2a]/60 text-[#ff7a45]" id="grid-c-badge">+35 SCORE</span>
+              </div>
+              <p class="text-xs text-[#e8eaed] leading-relaxed line-clamp-2" id="grid-c-desc">
+                Critical crawlability blockers detected across 19 engines.
+              </p>
+              <div class="space-y-2 pt-1" id="grid-c-steps">
+                <!-- Injected in JS -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- DESIGN EVALUATION MATRIX & RECOMMENDATION SCORECARD       -->
+    <!-- ======================================================== -->
+    <section class="mt-14 max-w-[1200px] mx-auto p-6 sm:p-8 rounded-3xl bg-[#191a1d] border border-[#3c4043] shadow-2xl space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#3c4043]">
+        <div class="space-y-1">
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-[#38bdf8]/20 border border-[#38bdf8]/40 text-[#38bdf8] uppercase">
+              DESIGN SYSTEM SCORECARD
+            </span>
+            <span class="text-xs text-[#5f6368]">•</span>
+            <span class="text-xs font-mono text-[#bdc1c6]">A/B/C Evaluation Matrix</span>
+          </div>
+          <h3 class="text-lg sm:text-xl font-bold text-white font-headline">
+            Design Lead Comparative Assessment &amp; Governance Fit
+          </h3>
+        </div>
+        <div class="text-right">
+          <span class="text-xs font-mono text-[#10b981] font-bold">✓ Ready for Human Verification</span>
+        </div>
+      </div>
+
+      <!-- Comparison Matrix Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead>
+            <tr class="border-b border-[#3c4043] text-[#bdc1c6] uppercase">
+              <th class="py-3 px-4">Evaluation Dimension</th>
+              <th class="py-3 px-4 text-[#ff7a45]">Option A (Brand Orange)</th>
+              <th class="py-3 px-4 text-amber-400">Option B (Hazard Amber)</th>
+              <th class="py-3 px-4 text-[#38bdf8]">Option C (Exec Stripe)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#3c4043]/60 text-[#e8eaed]">
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-white">Urgency &amp; Call to Action</td>
+              <td class="py-3.5 px-4 text-[#ff7a45] font-bold">9.5/10 (High Electric Pulse)</td>
+              <td class="py-3.5 px-4 text-amber-400 font-bold">9.8/10 (Hazard Warning Alert)</td>
+              <td class="py-3.5 px-4 text-[#38bdf8] font-bold">8.5/10 (Score-Driven Motive)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-white">Thatworkx Brand Harmony</td>
+              <td class="py-3.5 px-4 text-[#10b981] font-bold">10/10 (Signature Rust/Orange)</td>
+              <td class="py-3.5 px-4 text-[#bdc1c6]">7.5/10 (Generic Amber Alert)</td>
+              <td class="py-3.5 px-4 text-[#10b981]">9.2/10 (Subtle Rust Stripe)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-white">Visual Contrast on Dark Slate</td>
+              <td class="py-3.5 px-4 text-[#10b981] font-bold">Superior (Radial Amber Well)</td>
+              <td class="py-3.5 px-4 text-[#10b981]">High (Striped Perimeter)</td>
+              <td class="py-3.5 px-4 text-[#bdc1c6]">Clean (High-End Editorial)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-white">Executive / Developer Clarity</td>
+              <td class="py-3.5 px-4 text-[#38bdf8]">Clear Step Verbs &amp; Badges</td>
+              <td class="py-3.5 px-4 text-[#38bdf8]">High Alert Severity</td>
+              <td class="py-3.5 px-4 text-[#10b981] font-bold">Best ROI Quantification</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-bold text-white">Production Porting Effort</td>
+              <td class="py-3.5 px-4 text-[#10b981]">Drop-in `buildEvidenceAndActionDrawers`</td>
+              <td class="py-3.5 px-4 text-[#10b981]">Drop-in `buildEvidenceAndActionDrawers`</td>
+              <td class="py-3.5 px-4 text-[#10b981]">Drop-in `buildEvidenceAndActionDrawers`</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Architectural Recommendation Callout -->
+      <div class="p-5 rounded-2xl bg-[#121212] border border-[#d45d2a]/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center space-x-2">
+            <span class="text-base text-[#ff7a45]">💡</span>
+            <h4 class="text-sm font-black text-white uppercase font-headline">Frontend Architect Recommendation: Hybrid Option A + C</h4>
+          </div>
+          <p class="text-xs text-[#bdc1c6] leading-relaxed">
+            Combine Option A's high-voltage brand orange perimeter and glowing step badges with Option C's right-aligned metric recovery badge (`+XX Health Score Recovery`). This maximizes emotional urgency, brand consistency, and boardroom incentive simultaneously.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- INLINE CLIENT SCRIPT (SELF-CONTAINED LOGIC)               -->
+  <!-- ======================================================== -->
+  <script>
+    // Stage Scenario Mock Datasets
+    const SCENARIOS = {
+      stage1: {
+        stageNum: 1,
+        stageName: 'Stage 1: Bot Blocks & Crawlability',
+        headline: 'Simulating 19 Blocked AI Crawlers on Root Directives',
+        sub: 'Comparing how each visual urgency variant transforms user motivation to unblock AI engines immediately.',
+        scoreLift: '+35 Potential Score Lift',
+        title: 'Action Plan: How to Unblock 20 AI Search Engines & WAF Gates',
+        desc: 'Critical crawlability blockers detected. 19 AI crawlers (including GPTBot, ClaudeBot, PerplexityBot) are actively blocked by Disallow: / or Cloudflare WAF challenge gates.',
+        badgeA: 'IMMEDIATE ACTION REQUIRED',
+        badgeB: 'CRITICAL CRAWLABILITY BLOCKER',
+        badgeC: '+35 HEALTH SCORE RECOVERY',
+        rewardText: '+35 HEALTH SCORE RECOVERY',
+        shortcut: 'Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates cloud edge proxy rules and verified crawler permissions across all 20 AI search engines—skipping the need to manually configure server headers or debug complex WAF firewall rules.',
+        evidencePlain: 'Verified HTTP 200 responses across 20 registered AI User-Agents. 19 blocked directives encountered in root /robots.txt.',
+        evidenceTrace: 'User-agent: *\nDisallow: /\nUser-agent: GPTBot\nDisallow: /\nUser-agent: ClaudeBot\nDisallow: /\nUser-agent: PerplexityBot\nDisallow: /\nStatus: 19/20 AI Engines Blocked',
+        steps: [
+          { verb: 'Review', title: 'Review root robots.txt directives', detail: 'Check root /robots.txt file for accidental wildcard Disallow: / directives or restrictive crawler blocks.' },
+          { verb: 'Whitelist', title: 'Whitelist all 20 global AI engines', detail: 'Add explicit Allow: / blocks for OAI-SearchBot, GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended, and Asian engines.' },
+          { verb: 'Configure', title: 'Configure Cloudflare / WAF rules', detail: 'Ensure Web Application Firewall settings bypass JavaScript challenge gates and CAPTCHAs for verified search bot IP ranges.' },
+          { verb: 'Verify', title: 'Verify HTTP response headers', detail: 'Ensure public routes return X-Robots-Tag: all, index, follow to prevent stealth de-indexing by search engine crawlers.' }
+        ]
+      },
+      stage2: {
+        stageNum: 2,
+        stageName: 'Stage 2: Essential Pages & Route Discovery',
+        headline: 'Simulating Missing Commercial Anchors (/pricing & /contact)',
+        sub: 'Comparing urgency cues when AI search engines cannot discover pricing facts or corporate authority records.',
+        scoreLift: '+22 Potential Score Lift',
+        title: 'Action Plan: Deploy Missing Core Routes & Canonical Anchors',
+        desc: 'Missing 2 of 5 core trust anchors (/pricing, /contact). AI citation engines require verified commercial pricing and organization endpoints.',
+        badgeA: 'COMMERCIAL CITATION GAP',
+        badgeB: 'MISSING CANONICAL ANCHORS',
+        badgeC: '+22 HEALTH SCORE RECOVERY',
+        rewardText: '+22 HEALTH SCORE RECOVERY',
+        shortcut: 'Deploying Level 1 Machine Manifests via AIOptimize Pro automatically generates canonical entity references and structured anchor endpoints across all essential routes—guaranteeing 100% citation readiness for AI engines.',
+        evidencePlain: 'Verified 3 canonical routes with active DOM credentials. Discovered 2 unresolved routes: GET /pricing -> 404 Not Found, GET /contact -> 404 Not Found.',
+        evidenceTrace: 'GET /pricing -> 404 Not Found\n  Citation Readiness: 0%\nGET /contact -> 404 Not Found\n  Citation Readiness: 0%\nGET /about -> 200 OK (Verified)\nGET /privacy-policy -> 200 OK (Verified)\nGET /terms-of-service -> 200 OK (Verified)',
+        steps: [
+          { verb: 'Deploy', title: 'Deploy canonical /pricing endpoint', detail: 'Publish a dedicated pricing table or plan breakdown URL at /pricing to provide structured commercial facts for search bots.' },
+          { verb: 'Verify', title: 'Verify HTTP 200 responses', detail: 'Ensure all 5 canonical routes return HTTP 200 with clean server headers and valid HTML content.' },
+          { verb: 'Update', title: 'Update header & footer navigation', detail: 'Link all 5 canonical pages in both the header and footer DOM to establish strong internal link equity for crawlers.' },
+          { verb: 'Embed', title: 'Embed Offer & ContactPoint schemas', detail: 'Add JSON-LD Offer and ContactPoint structured data on respective pages for direct AI entity ingestion.' }
+        ]
+      },
+      stage3: {
+        stageNum: 3,
+        stageName: 'Stage 3: Content Density & Semantic Hierarchy',
+        headline: 'Simulating Low Text Density (<25%) on Heavy JS Pages',
+        sub: 'Comparing remediation motivators for semantic heading structure and static HTML payload delivery.',
+        scoreLift: '+18 Potential Score Lift',
+        title: 'Action Plan: Increase Semantic Text Density & Heading Tree',
+        desc: 'Average text-to-HTML density is below 25% on key landing pages due to heavy client-side JavaScript bundles and missing heading hierarchy.',
+        badgeA: 'LOW EXTRACTION DENSITY',
+        badgeB: 'HEAVY MARKUP OVERHEAD',
+        badgeC: '+18 HEALTH SCORE RECOVERY',
+        rewardText: '+18 HEALTH SCORE RECOVERY',
+        shortcut: 'AIOptimize Pro automatically generates clean, high-density Level 3 & 4 Markdown feeds (/ai-context.md), bypassing HTML parsing overhead and supplying 100% extractable facts directly to LLMs.',
+        evidencePlain: '2 of 7 crawled pages deliver clean semantic text with valid heading structures. 5 pages below 25% text density.',
+        evidenceTrace: 'https://example.com/app: 12% Text Density (FAIL) • Words: 120 • Schema: Missing\nhttps://example.com/features: 18% Text Density (FAIL) • Words: 210 • Schema: Missing\nhttps://example.com/blog: 34% Text Density (PASS) • Words: 1420 • Schema: Detected',
+        steps: [
+          { verb: 'Audit', title: 'Audit low-density routes', detail: 'Ensure interactive app routes maintain >= 25% server-rendered semantic text ratio.' },
+          { verb: 'Embed', title: 'Embed Schema.org markup', detail: 'Connect Organization and Article JSON-LD metadata across all key routes.' },
+          { verb: 'Maintain', title: 'Maintain Canonical URLs', detail: 'Verify each page points to its canonical HTTPS endpoint with direct factual answers.' },
+          { verb: 'Preserve', title: 'Preserve Heading Hierarchy', detail: 'Place direct factual answers immediately below H1 and H2 tags for direct LLM extraction.' }
+        ]
+      }
+    };
+
+    let currentScenarioKey = 'stage1';
+    let currentViewMode = 'option-a';
+    let completedSteps = {
+      'stage1': new Set(),
+      'stage2': new Set(),
+      'stage3': new Set()
+    };
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    function copyStepText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('✓ Copied instruction to clipboard');
+      }).catch(() => {
+        showToast('✓ Step copied');
+      });
+    }
+
+    function toggleStepDone(scenKey, stepIdx) {
+      const set = completedSteps[scenKey];
+      if (set.has(stepIdx)) {
+        set.delete(stepIdx);
+      } else {
+        set.add(stepIdx);
+      }
+      renderCurrentScenario();
+    }
+
+    function resetCompletedSteps() {
+      completedSteps[currentScenarioKey].clear();
+      renderCurrentScenario();
+      showToast('↺ Checkmarks reset');
+    }
+
+    function toggleAllDrawers() {
+      const drawers = document.querySelectorAll('.step-details');
+      const allOpen = Array.from(drawers).every(d => d.open);
+      drawers.forEach(d => d.open = !allOpen);
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('bg-[#b7410e]/20', 'border-[#d45d2a]', 'text-[#ff7a45]', 'shadow-[0_0_15px_rgba(212,93,42,0.3)]');
+        b.classList.add('border-[#3c4043]', 'bg-[#121212]', 'text-[#bdc1c6]');
+      });
+
+      const activeTab = document.getElementById('tab-' + mode);
+      if (activeTab) {
+        activeTab.classList.remove('border-[#3c4043]', 'bg-[#121212]', 'text-[#bdc1c6]');
+        activeTab.classList.add('bg-[#b7410e]/20', 'border-[#d45d2a]', 'text-[#ff7a45]', 'shadow-[0_0_15px_rgba(212,93,42,0.3)]');
+      }
+
+      const activeView = document.getElementById('view-' + mode);
+      if (activeView) {
+        activeView.classList.remove('hidden');
+      }
+    }
+
+    function setScenario(key) {
+      currentScenarioKey = key;
+      document.querySelectorAll('.scen-btn').forEach(b => {
+        b.classList.remove('bg-[#b7410e]', 'text-white');
+        b.classList.add('text-[#bdc1c6]');
+      });
+      const activeBtn = document.getElementById('scen-' + key);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-[#bdc1c6]');
+        activeBtn.classList.add('bg-[#b7410e]', 'text-white');
+      }
+      renderCurrentScenario();
+    }
+
+    function setViewport(vp) {
+      const container = document.getElementById('viewport-container');
+      document.querySelectorAll('.vp-btn').forEach(b => {
+        b.classList.remove('bg-[#3c4043]', 'text-white');
+        b.classList.add('text-[#bdc1c6]');
+      });
+      const btn = document.getElementById('vp-' + vp);
+      if (btn) {
+        btn.classList.add('bg-[#3c4043]', 'text-white');
+        btn.classList.remove('text-[#bdc1c6]');
+      }
+
+      if (vp === 'desktop') {
+        container.style.maxWidth = '1200px';
+      } else if (vp === 'tablet') {
+        container.style.maxWidth = '768px';
+      } else if (vp === 'mobile') {
+        container.style.maxWidth = '390px';
+      }
+    }
+
+    function renderCurrentScenario() {
+      const data = SCENARIOS[currentScenarioKey];
+      const doneSet = completedSteps[currentScenarioKey];
+      const totalSteps = data.steps.length;
+      const doneCount = doneSet.size;
+      const pct = Math.round((doneCount / totalSteps) * 100);
+
+      // Top Banner
+      document.getElementById('banner-stage-tag').textContent = `SCENARIO: ${data.stageName.toUpperCase()}`;
+      document.getElementById('banner-score-impact').textContent = `Impact: ${data.scoreLift}`;
+      document.getElementById('banner-stage-headline').textContent = data.headline;
+      document.getElementById('banner-stage-sub').textContent = data.sub;
+
+      // ==========================================
+      // RENDER OPTION A
+      // ==========================================
+      document.getElementById('card-a-title').textContent = data.title;
+      document.getElementById('card-a-desc').textContent = data.desc;
+      document.getElementById('card-a-badge').textContent = data.badgeA;
+      document.getElementById('card-a-shortcut').textContent = data.shortcut;
+      document.getElementById('card-a-evidence-plain').textContent = data.evidencePlain;
+      document.getElementById('card-a-evidence-trace').textContent = data.evidenceTrace;
+
+      document.getElementById('card-a-progress-label').textContent = `${doneCount} of ${totalSteps} Steps Completed (${pct}%)`;
+      document.getElementById('card-a-progress-bar').style.width = `${pct}%`;
+
+      const stepsContainerA = document.getElementById('card-a-steps-container');
+      stepsContainerA.innerHTML = data.steps.map((step, idx) => {
+        const isDone = doneSet.has(idx);
+        return `
+          <div class="step-card group p-4 sm:p-5 rounded-2xl bg-[#141211] border ${isDone ? 'border-[#10b981]/40 bg-[#10b981]/5' : 'border-[#d45d2a]/30 hover:border-[#d45d2a]'} transition-all shadow-sm">
+            <div class="flex items-start justify-between gap-3">
+              
+              <!-- Left: Number Badge + Text -->
+              <div class="flex items-start space-x-3.5 flex-1 min-w-0">
+                <button onclick="toggleStepDone('${currentScenarioKey}', ${idx})" class="w-7 h-7 rounded-full ${isDone ? 'bg-[#10b981] text-black' : 'bg-[#b7410e] text-white shadow-[0_0_10px_rgba(183,65,14,0.6)]'} font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5 hover:scale-105 transition" title="Toggle Done">
+                  ${isDone ? '✓' : (idx + 1)}
+                </button>
+                <div class="space-y-1 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-mono font-black uppercase px-2 py-0.5 rounded bg-[#b7410e]/20 border border-[#b7410e]/40 text-[#ff7a45]">
+                      ${step.verb}
+                    </span>
+                    <strong class="text-sm font-bold text-white ${isDone ? 'line-through text-[#bdc1c6]' : ''}">${step.title}</strong>
+                  </div>
+                  <p class="text-xs sm:text-sm text-[#bdc1c6] leading-relaxed ${isDone ? 'line-through' : ''}">
+                    ${step.detail}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Right: Interactive Actions (Copy / Done) -->
+              <div class="flex items-center space-x-1.5 flex-shrink-0 opacity-80 group-hover:opacity-100 transition">
+                <button onclick="copyStepText('${step.title}: ${step.detail}')" class="p-2 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#bdc1c6] hover:text-white transition text-xs" title="Copy Step Instruction">
+                  📋
+                </button>
+                <button onclick="toggleStepDone('${currentScenarioKey}', ${idx})" class="px-2.5 py-1.5 rounded-xl border ${isDone ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]' : 'bg-[#1f1f1f] border-[#3c4043] text-[#bdc1c6] hover:text-white'} text-xs font-mono font-bold transition">
+                  ${isDone ? 'Done ✓' : 'Mark Done'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ==========================================
+      // RENDER OPTION B
+      // ==========================================
+      document.getElementById('card-b-title').textContent = data.title;
+      document.getElementById('card-b-desc').textContent = data.desc;
+      document.getElementById('card-b-badge').textContent = data.badgeB;
+      document.getElementById('card-b-shortcut').textContent = data.shortcut;
+
+      const stepsContainerB = document.getElementById('card-b-steps-container');
+      stepsContainerB.innerHTML = data.steps.map((step, idx) => {
+        const isDone = doneSet.has(idx);
+        return `
+          <div class="p-4 sm:p-5 rounded-2xl bg-[#12100d] border ${isDone ? 'border-[#10b981]/40' : 'border-amber-500/40 hover:border-amber-500/80'} transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start space-x-3.5 flex-1">
+                <span class="w-6 h-6 rounded-md ${isDone ? 'bg-[#10b981] text-black' : 'bg-amber-500 text-black'} font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                  ${isDone ? '✓' : (idx + 1)}
+                </span>
+                <div class="space-y-1">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 uppercase">STEP ${idx + 1}</span>
+                    <strong class="text-sm font-bold text-white ${isDone ? 'line-through text-[#bdc1c6]' : ''}">${step.title}</strong>
+                  </div>
+                  <p class="text-xs sm:text-sm text-[#bdc1c6] leading-relaxed ${isDone ? 'line-through' : ''}">
+                    ${step.detail}
+                  </p>
+                </div>
+              </div>
+              <button onclick="copyStepText('${step.title}: ${step.detail}')" class="p-2 rounded-lg bg-[#1a1815] hover:bg-[#25221d] border border-amber-500/30 text-amber-400 text-xs transition">
+                📋
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ==========================================
+      // RENDER OPTION C
+      // ==========================================
+      document.getElementById('card-c-title').textContent = data.title;
+      document.getElementById('card-c-desc').textContent = data.desc;
+      document.getElementById('card-c-reward-badge').innerHTML = `<span>🚀</span><span>${data.rewardText}</span>`;
+      document.getElementById('card-c-shortcut').textContent = data.shortcut;
+
+      const stepsContainerC = document.getElementById('card-c-steps-container');
+      stepsContainerC.innerHTML = data.steps.map((step, idx) => {
+        const isDone = doneSet.has(idx);
+        return `
+          <div class="p-4 rounded-2xl bg-[#121212] border border-[#3c4043] hover:border-[#d45d2a]/60 transition">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start space-x-3.5 flex-1 font-mono">
+                <span class="text-xs text-[#d45d2a] font-bold mt-0.5">[0${idx + 1}]</span>
+                <div class="space-y-1">
+                  <div class="text-sm text-white font-bold">
+                    <span class="underline decoration-[#d45d2a] decoration-2 underline-offset-4">${step.title}</span>
+                  </div>
+                  <p class="text-xs text-[#bdc1c6] font-sans font-normal leading-relaxed">
+                    ${step.detail}
+                  </p>
+                </div>
+              </div>
+              <button onclick="copyStepText('${step.title}: ${step.detail}')" class="p-2 rounded-xl bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#38bdf8] text-xs transition">
+                📋
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ==========================================
+      // RENDER GRID COMPARISON
+      // ==========================================
+      document.getElementById('grid-a-desc').textContent = data.desc;
+      document.getElementById('grid-b-desc').textContent = data.desc;
+      document.getElementById('grid-c-desc').textContent = data.desc;
+      document.getElementById('grid-c-badge').textContent = data.badgeC;
+
+      document.getElementById('grid-a-steps').innerHTML = data.steps.map((s, i) => `
+        <div class="p-2.5 rounded-xl bg-[#141211] border border-[#d45d2a]/30 text-xs flex items-center space-x-2">
+          <span class="w-5 h-5 rounded-full bg-[#b7410e] text-white font-mono text-[10px] font-bold flex items-center justify-center flex-shrink-0">${i + 1}</span>
+          <span class="text-white font-bold truncate">${s.title}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('grid-b-steps').innerHTML = data.steps.map((s, i) => `
+        <div class="p-2.5 rounded-xl bg-[#12100d] border border-amber-500/30 text-xs flex items-center space-x-2">
+          <span class="w-5 h-5 rounded bg-amber-500 text-black font-mono text-[10px] font-bold flex items-center justify-center flex-shrink-0">${i + 1}</span>
+          <span class="text-white font-bold truncate">${s.title}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('grid-c-steps').innerHTML = data.steps.map((s, i) => `
+        <div class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] text-xs flex items-center space-x-2">
+          <span class="text-[#d45d2a] font-mono text-xs font-bold">[0${i + 1}]</span>
+          <span class="text-white font-bold underline decoration-[#d45d2a] truncate">${s.title}</span>
+        </div>
+      `).join('');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCurrentScenario();
+    });
+  </script>
+</body>
+</html>

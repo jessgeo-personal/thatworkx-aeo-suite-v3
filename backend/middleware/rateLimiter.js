@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const User = require('../models/User');
+import mongoose from 'mongoose';
+import User from '../models/User.js';
 
-const TIER_LIMITS = {
+export const TIER_LIMITS = {
   'AIVisualize Free': {
     maxScans: parseInt(process.env.AIV_FREE_MAX_SCANS || (process.env.NODE_ENV === 'test' ? '5' : '100'), 10),
     maxPages: 500,
@@ -34,7 +34,7 @@ const TIER_LIMITS = {
   }
 };
 
-const checkTierLimits = async (req, res, next) => {
+export const checkTierLimits = async (req, res, next) => {
   try {
     const { email, headless } = req.body;
 
@@ -129,4 +129,4 @@ const checkTierLimits = async (req, res, next) => {
   }
 };
 
-module.exports = { checkTierLimits, TIER_LIMITS };
+export default { checkTierLimits, TIER_LIMITS };

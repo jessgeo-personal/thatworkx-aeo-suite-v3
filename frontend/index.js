@@ -928,6 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (domainInput) domainInput.value = cleanDomain;
     }
     switchOptimizeTrack(1);
+    const issueParam = params.get('issue');
+    if (issueParam === 'cloudflare') {
+      switchOptimizeTool('cloudflare');
+    }
 
     const devSchemaBuilderWrap = document.getElementById('dev-schema-builder-wrapper');
     if (devSchemaBuilderWrap) {
@@ -1036,7 +1040,8 @@ function switchProduct(productName) {
   document.getElementById(`panel-${productName}`).classList.add('active');
 
   // Display/Hide headless execution controls depending on the active product and tier
-  const tier = document.getElementById('user-tier-selector').value;
+  const tierSelector = document.getElementById('user-tier-selector');
+  const tier = tierSelector ? tierSelector.value : '';
   const isAio = productName === 'optimize' || productName === 'visualize';
   const headlessControls = document.getElementById('headless-checkbox-wrapper');
   
@@ -2575,6 +2580,20 @@ function copyEdgeScript() {
   }
 }
 
+function copySec2Prompt() {
+  const promptBox = document.getElementById('sec2-prompt-box');
+  if (promptBox) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(promptBox.value);
+    } else {
+      promptBox.select();
+      document.execCommand('copy');
+    }
+    alert('GenAI Prompt copied to clipboard!');
+  }
+}
+window.copySec2Prompt = copySec2Prompt;
+
 
 
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
@@ -2727,6 +2746,30 @@ function formatRagTextWithTruncation(rawText, pageRoute) {
          `*Ingestion Metadata:* Token Density ~${totalTokens} tokens | 🔴 Exceeds Maximum AI Bot Context Budget (${totalWords - 2500} words lost to AI search)`;
 }
 
+function getBadgeClass(status, score) {
+  const normStatus = String(status || '').toUpperCase();
+  const normScore = Number(score ?? 0);
+  if (normStatus === 'BLOCKED' || normScore === 0) {
+    return 'status-badge--blocked';
+  }
+  if (normStatus === 'WARNING') {
+    return 'status-badge--warning';
+  }
+  if (normStatus === 'PASS' || (normScore > 0 && normStatus !== 'FAIL' && normStatus !== 'CRITICAL')) {
+    return 'status-badge--pass';
+  }
+  return 'status-badge--blocked';
+}
+
+function getStatusPillClass(status, score) {
+  return getBadgeClass(status, score);
+}
+
+if (typeof window !== 'undefined') {
+  window.getBadgeClass = getBadgeClass;
+  window.getStatusPillClass = getStatusPillClass;
+}
+
 // Dynamically bind scanned domain & evaluation metrics to Executive Mode UI
 function updateExecutiveViewData(results) {
   window.latestScanResults = results;
@@ -2828,13 +2871,13 @@ function updateExecutiveViewData(results) {
 
   // Dynamically evaluate pass/fail for every individual check inside the 4 section cards against live scan results:
   // Card 1 Checks:
-  const isCdnPass = !(results.sec1?.cdnBlocked === true);
-  const isXRobotsPass = !(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false);
-  const isUseragentsPass = !(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false);
-  const isAiBotsPass = Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
+  const isCdnPass = !(results.sec1?.cdnBlocked === true || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isXRobotsPass = !(results.sec1?.xRobotsNoIndex === true || results.status?.xRobotsIndexable === false || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isUseragentsPass = !(results.sec1?.disallowAll === true || results.status?.robotsTxtExists === false || results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED');
+  const isAiBotsPass = !(results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true || results.executiveSections?.section1?.status === 'BLOCKED') && Object.values(results.status?.botPermissions || {}).every(allowed => allowed !== false);
 
   // Card 2 Checks:
-  const isSecurePass = results.sec2?.isHttps !== false;
+  const isSecurePass = results.sec2?.isHttps !== false && results.eeatMetrics?.isSecure !== false;
   const isSpaPass = !(results.status?.spaTrapDetected === true || results.sec2?.isHeavyJs === true);
   const isRagPass = results.status?.llmsTxtExists === true && results.status?.aiContextExists === true;
   const isEntityPass = (results.sec2?.essentialPagesFound ?? (results.status?.aboutTxtExists ? 3 : 2)) === 3;
@@ -2843,7 +2886,8 @@ function updateExecutiveViewData(results) {
   const isSeoPass = results.status?.seoOptimalTitle !== false && results.status?.seoOptimalDesc !== false;
   const isTokenPass = (results.sec3?.fleschScore ?? 68) >= 50 && (results.status?.wordCount ?? results.sec3?.wordCount ?? 800) >= 500;
   const isParityPass = (results.sec3?.faqQuestions ?? 4) === (results.sec3?.faqAnswers ?? 4) && (results.status?.jsonLdExists ?? results.sec3?.hasFaqSchema ?? true) === true;
-  const isEeatPass = results.sec3?.hasContactInfo !== false && results.sec3?.hasPrivacyPolicy !== false;
+  const isEeatPass = results.sec3?.hasContactInfo !== false && results.sec3?.hasPrivacyPolicy !== false &&
+                     results.eeatMetrics?.hasContactInfo !== false && results.eeatMetrics?.hasPrivacyPolicy !== false;
 
   // Card 4 Checks:
   const isRobotsPass = results.status?.robotsTxtExists === true;
@@ -3114,20 +3158,48 @@ function updateExecutiveViewData(results) {
     const noteEl = document.getElementById(`pillar-sec${secNum}-note`);
     const titleEl = document.getElementById(`pillar-sec${secNum}-title`);
 
-    const currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
+    const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
+    const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
+    const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus}) — Security Shield Active`;
+
+    let currentScore = secObj ? secObj.score : (pData ? pData.score : 0);
     const currentMax = secObj ? secObj.max : (pData ? pData.max : 25);
-    const badgeText = secObj ? (currentScore === 25 ? 'OPTIMIZED' : (currentScore >= 15 ? 'PARTIAL' : 'CRITICAL')) : (pData ? pData.badge : 'UNAUDITED');
+    if (secNum === 1 && isWafBlocked) {
+      currentScore = 0;
+    }
+    let badgeText = secObj ? (currentScore === 25 ? 'OPTIMIZED' : (currentScore >= 15 ? 'PARTIAL' : 'CRITICAL')) : (pData ? pData.badge : 'UNAUDITED');
+    if (secNum === 1 && isWafBlocked) {
+      badgeText = 'BLOCKED';
+    }
     
     // deductionReason resolution: if 25/25, "🟢 No deductions — All protocols clean.", never undefined
     let deductionReason = '🟢 No deductions — All protocols clean.';
-    if (currentScore < currentMax) {
+    if (secNum === 1 && isWafBlocked) {
+      deductionReason = blockedMessage;
+    } else if (currentScore < currentMax) {
       deductionReason = (secObj && secObj.deductionReason) 
         ? secObj.deductionReason 
         : (pData && pData.note ? pData.note : 'Deductions identified during scan.');
     }
 
-    const isGreen = currentScore >= 20;
-    const isAmber = currentScore >= 10 && currentScore < 20;
+    let statusEnum = 'FAIL';
+    if (secNum === 1 && isWafBlocked) {
+      statusEnum = 'BLOCKED';
+    } else if (secObj && secObj.status) {
+      statusEnum = secObj.status;
+    } else {
+      if (currentScore === 25) {
+        statusEnum = 'PASS';
+      } else if (currentScore >= 10) {
+        statusEnum = 'WARNING';
+      } else {
+        statusEnum = 'FAIL';
+      }
+    }
+    const badgeClass = getBadgeClass(statusEnum, currentScore);
+
+    const isGreen = currentScore >= 20 && !(secNum === 1 && isWafBlocked);
+    const isAmber = currentScore >= 10 && currentScore < 20 && !(secNum === 1 && isWafBlocked);
     
     const theme = isGreen
       ? { bg: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)', class: 'badge-status status-green' }
@@ -3135,28 +3207,62 @@ function updateExecutiveViewData(results) {
       ? { bg: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', class: 'badge-status status-amber' }
       : { bg: 'rgba(244, 63, 94, 0.18)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.4)', class: 'badge-status status-red' };
 
-    if (titleEl && secObj && secObj.title) {
-      titleEl.innerText = secObj.title;
+    let displayTitle = secObj && secObj.title ? secObj.title : (titleEl ? titleEl.textContent : '');
+    if (secNum === 1) displayTitle = "AI Search Permissions & Gateway Access";
+    if (secNum === 2) displayTitle = "Content Readability & Answer Citation";
+    if (secNum === 3) displayTitle = "Brand Authority & Entity Consensus";
+    if (secNum === 4) displayTitle = "Dedicated Machine Manifests & 4-Tier Blueprint";
+
+    if (titleEl && displayTitle) {
+      titleEl.textContent = displayTitle;
     }
     if (badgeEl) {
       badgeEl.innerText = badgeText;
-      badgeEl.className = theme.class;
-      badgeEl.style.setProperty('background', theme.bg, 'important');
-      badgeEl.style.setProperty('color', theme.color, 'important');
-      badgeEl.style.setProperty('border', theme.border, 'important');
+      badgeEl.className = `badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        badgeEl.style.background = '';
+        badgeEl.style.color = '';
+        badgeEl.style.border = '';
+      } else {
+        badgeEl.style.setProperty('background', theme.bg, 'important');
+        badgeEl.style.setProperty('color', theme.color, 'important');
+        badgeEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     if (scoreEl) {
-      scoreEl.innerText = `${currentScore}/${currentMax} pts`;
-      scoreEl.style.setProperty('background', theme.bg, 'important');
-      scoreEl.style.setProperty('color', theme.color, 'important');
-      scoreEl.style.setProperty('border', theme.border, 'important');
+      if (secNum === 1 && isWafBlocked) {
+        scoreEl.textContent = '0/25 pts';
+      } else {
+        scoreEl.textContent = `${currentScore}/${currentMax} pts`;
+      }
+      scoreEl.className = `badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        scoreEl.style.background = '';
+        scoreEl.style.color = '';
+        scoreEl.style.border = '';
+      } else {
+        scoreEl.style.setProperty('background', theme.bg, 'important');
+        scoreEl.style.setProperty('color', theme.color, 'important');
+        scoreEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     const easyScoreBadgeEl = document.getElementById(`section-${secNum}-easy-score-badge`);
     if (easyScoreBadgeEl) {
-      easyScoreBadgeEl.innerText = `${currentScore}/${currentMax} pts`;
-      easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
-      easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
-      easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
+      if (secNum === 1 && isWafBlocked) {
+        easyScoreBadgeEl.textContent = '[ 🔴 SECURITY SHIELD ACTIVE ]';
+      } else {
+        easyScoreBadgeEl.textContent = `${currentScore}/${currentMax} pts`;
+      }
+      easyScoreBadgeEl.className = `easy-view-score-badge badge-status ${badgeClass}`;
+      if (badgeClass.startsWith('status-badge--')) {
+        easyScoreBadgeEl.style.background = '';
+        easyScoreBadgeEl.style.color = '';
+        easyScoreBadgeEl.style.border = '';
+      } else {
+        easyScoreBadgeEl.style.setProperty('background', theme.bg, 'important');
+        easyScoreBadgeEl.style.setProperty('color', theme.color, 'important');
+        easyScoreBadgeEl.style.setProperty('border', theme.border, 'important');
+      }
     }
     if (noteEl) {
       if (secObj && secObj.deductions && secObj.deductions.length > 0 && currentScore < currentMax) {
@@ -3254,19 +3360,58 @@ function updateExecutiveViewData(results) {
     }
   }
 
+  console.log("robotsTxtEl is found:", !!robotsTxtEl);
+  const isWafBlocked = results.status?.isWafBlocked === true || results.executiveSections?.section1?.blocked === true;
+  console.log("isWafBlocked is:", isWafBlocked);
+  const wafStatus = results.status?.wafStatusCode || results.executiveSections?.section1?.wafStatusCode || 403;
+  const blockedMessage = `Automated Bot Traffic Rejected (HTTP ${wafStatus}) — Security Shield Active`;
+
   if (robotsTxtEl) {
-    if (isRobotsTxtAllowed) {
-      robotsTxtEl.innerText = "Passed / Allow";
-      robotsTxtEl.className = "badge-status status-green";
-      robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
-      robotsTxtEl.style.setProperty('color', '#34d399', 'important');
-      robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+    const wafClass = getBadgeClass(isWafBlocked ? 'BLOCKED' : (isRobotsTxtAllowed ? 'PASS' : 'FAIL'), isWafBlocked ? 0 : 25);
+    robotsTxtEl.className = `badge-status ${wafClass}`;
+    if (isWafBlocked) {
+      robotsTxtEl.textContent = `Automated Bot Traffic Rejected (HTTP ${wafStatus})`;
+      robotsTxtEl.style.background = '';
+      robotsTxtEl.style.color = '';
+      robotsTxtEl.style.border = '';
+    } else if (isRobotsTxtAllowed) {
+      robotsTxtEl.textContent = "Passed / Allow";
+      if (wafClass.startsWith('status-badge--')) {
+        robotsTxtEl.style.background = '';
+        robotsTxtEl.style.color = '';
+        robotsTxtEl.style.border = '';
+      } else {
+        robotsTxtEl.style.setProperty('background', 'rgba(16, 185, 129, 0.18)', 'important');
+        robotsTxtEl.style.setProperty('color', '#34d399', 'important');
+        robotsTxtEl.style.setProperty('border', '1px solid rgba(16, 185, 129, 0.4)', 'important');
+      }
     } else {
-      robotsTxtEl.innerText = "Blocked / Disallow";
-      robotsTxtEl.className = "badge-status status-red";
-      robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
-      robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
-      robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+      robotsTxtEl.textContent = "Blocked / Disallow";
+      if (wafClass.startsWith('status-badge--')) {
+        robotsTxtEl.style.background = '';
+        robotsTxtEl.style.color = '';
+        robotsTxtEl.style.border = '';
+      } else {
+        robotsTxtEl.style.setProperty('background', 'rgba(244, 63, 94, 0.18)', 'important');
+        robotsTxtEl.style.setProperty('color', '#f43f5e', 'important');
+        robotsTxtEl.style.setProperty('border', '1px solid rgba(244, 63, 94, 0.4)', 'important');
+      }
+    }
+  }
+
+  // Handle sec1 contextual remediation banner link override
+  const sec1Banner = document.getElementById('sec1-remediation-banner');
+  if (sec1Banner) {
+    if (isWafBlocked) {
+      sec1Banner.style.setProperty('display', 'block', 'important');
+    }
+    const bridgeBtn = document.getElementById('sec1-remediation-bridge-btn') || sec1Banner.querySelector('a');
+    if (bridgeBtn) {
+      if (isWafBlocked) {
+        bridgeBtn.setAttribute('href', 'optimize.html?section=access&issue=cloudflare');
+      } else {
+        bridgeBtn.setAttribute('href', 'optimize.html?section=access');
+      }
     }
   }
 
@@ -3410,6 +3555,78 @@ function updateExecutiveViewData(results) {
         <td style="padding: 0.6rem; text-align: right;"><a href="optimize.html?url=${encodeURIComponent(domainName)}" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none;">View ↗</a></td>
       </tr>
     `).join('');
+  }
+
+  // Calculate deductions dynamically for Executive Triage Card
+  const deductions = [
+    {
+      sectionNum: 1,
+      deduction: 25 - score1,
+      pill: 'GATEWAY BLOCK',
+      impact: 'Search engine crawlers and AI bots are restricted from accessing your site.',
+      actionHtml: `<a href="optimize.html?section=access" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    },
+    {
+      sectionNum: 2,
+      deduction: 25 - score2,
+      pill: 'CITATION RISK',
+      impact: 'Your site content lacks optimized citation formats and structured HTML hygiene.',
+      actionHtml: `<button id="btn-copy-genai-prompt" class="action-btn" onclick="copySec2Prompt()" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; cursor: pointer;">📋 Copy GenAI Prompt</button>`
+    },
+    {
+      sectionNum: 3,
+      deduction: 25 - score3,
+      pill: 'AUTHORITY GAP',
+      impact: 'Missing corporate organization metadata and verified contact signals decrease citation trust.',
+      actionHtml: `<a href="optimize.html?section=trust" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    },
+    {
+      sectionNum: 4,
+      deduction: 25 - score4,
+      pill: 'AI-READY GAP',
+      impact: 'Absence of /llms.txt, /ai-context.md, or semantic workspace files slows down AI crawlers.',
+      actionHtml: `<a href="optimize.html?section=blueprint" class="action-btn btn-burnt-copper" style="padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; background: var(--burnt-copper); color: #fff;">⚡ Open AIOptimize →</a>`
+    }
+  ];
+
+  // Sort deductions descending
+  deductions.sort((a, b) => b.deduction - a.deduction);
+
+  // Filter only those with deduction > 0
+  const activeDeductions = deductions.filter(d => d.deduction > 0).slice(0, 3);
+
+  // Render inside #exec-action-triage
+  const triageContainer = document.getElementById('exec-action-triage');
+  if (triageContainer) {
+    if (activeDeductions.length > 0) {
+      triageContainer.innerHTML = `
+        <div class="triage-card-header" style="margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem; color: #ffffff;">
+          ⚠️ Executive Action Triage (Top Priority Fixes)
+        </div>
+        <div class="triage-items-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          ${activeDeductions.map(d => `
+            <div class="triage-item" style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 0.75rem 1rem; gap: 1rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 250px;">
+                <span class="badge-status status-red" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; font-weight: bold; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); white-space: nowrap;">
+                  ${d.pill}
+                </span>
+                <span style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.45;">${d.impact}</span>
+              </div>
+              <div class="triage-action-btn">
+                ${d.actionHtml}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      triageContainer.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 1rem; color: #34d399; font-size: 0.9rem; font-weight: 700; text-align: center;">
+          🟢 All Systems AI-Optimized & AI-Ready — No Critical Issues Detected
+        </div>
+      `;
+    }
+    triageContainer.style.display = 'block';
   }
 }
 
@@ -5969,4 +6186,156 @@ if (typeof module !== 'undefined' && module.exports) {
   initFaqHub.initFaqHub = initFaqHub;
   module.exports = initFaqHub;
 }
-
+
+// Appended to frontend/index.js for Visualize V4 Cockpit Interactivity
+
+const MANIFEST_PAYLOADS = {
+  '/robots.txt': {
+    format: 'TXT (Level 1)',
+    to: 'crawler-directives@thatworkx.com',
+    subj: 'Thatworkx x Bot Crawler Rules & Access Policy',
+    body: `Hi Webmaster,\n\nWe have generated the /robots.txt crawl directives for AI-Optimized presence. LLM search engines require explicit Allow rules to index core services without hallucination.\n\nDirectives configured for GPTBot, ClaudeBot, and PerplexityBot.`,
+    code: `User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /\nSitemap: https://thatworkx.com/sitemap.xml`
+  },
+  '/llms.txt': {
+    format: 'Markdown (Level 2)',
+    to: 'abdelaziz@alhanaee.com',
+    subj: 'Thatworkx x Abdelaziz Alhanaee Law Firm',
+    body: `Hi Abdelaziz,\n\nSaw Abdelaziz Alhanaee Law Firm handles 350+ cases across construction, real estate, and financial crimes in Dubai. With that volume, AI search gaps and email confidentiality can get messy fast.\n\nI'm with Thatworkx. We help firms tighten AI visibility and secure client email workflows with compliant legal setups (AI-Optimized citation matrix & Level 1–4 AI-Ready manifests).\n\nIf useful, reply and I'll send a short outline of where firms usually miss citations and where email risk shows up first.`,
+    code: `# Machine Manifest Spec (AI-Ready)\n> Title: Thatworkx Solutions\n> Scope: AI-Optimized Web Presence & Legal Workflows\n\n## Core Capabilities\n- Entity Grounding & Knowledge Architecture\n- Verified Citation Matrix for MENA Legal Practice\n- Real-time LLM Crawler Directives (/robots.txt & /llms.txt)`
+  },
+  '/ai-context.md': {
+    format: 'Markdown (Level 3)',
+    to: 'nasser@nmlawyers.ae',
+    subj: 'Thatworkx x NM Lawyers Entity Boundaries',
+    body: `Hi Nasser,\n\nWe reviewed your firm's entity graph. Pre-rendered AI Context files anchor direct domain grounding across LLM inference engines.\n\nLevel 3 semantic definition is ready for deployment.`,
+    code: `# AI Context & Entity Definition (AI-Ready)\n> Domain: thatworkx.com\n> Audit Protocol: AI-Optimized\n\n## Semantic Knowledge Graph\n- Primary Entity: Organization Core Capabilities\n- Service Taxonomy: Verified Technical Grounding\n- Citation Boundaries: Level 3 Deep Protocol`
+  },
+  'schema.jsonld': {
+    format: 'JSON-LD (Level 4)',
+    to: 'schema-validator@thatworkx.com',
+    subj: 'Thatworkx x Structured Schema.org Graph',
+    body: `Hi Engineering Lead,\n\nThe JSON-LD knowledge graph definition is validated against Schema.org standards. Ready for injection into the root document head.`,
+    code: `{\n  "@context": "https://schema.org",\n  "@type": "Organization",\n  "name": "Thatworkx Solutions",\n  "url": "https://thatworkx.com",\n  "description": "AI-Ready domain knowledge architecture.",\n  "knowsAbout": [\n    "Answer Engine Optimization",\n    "LLM Ingestion Protocol",\n    "Entity Hierarchy"\n  ]\n}`
+  }
+};
+
+function initVisualizeV4Cockpit() {
+  // 1. Center Feed Tab Switcher
+  const feedTabs = document.querySelectorAll('[data-feed-tab]');
+  feedTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      feedTabs.forEach(t => {
+        t.classList.remove('bg-[#1E2330]', 'text-white', 'border-[#2F374A]', 'shadow-sm', 'active');
+        t.classList.add('text-[#8B949E]');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.remove('text-[#8B949E]');
+      tab.classList.add('bg-[#1E2330]', 'text-white', 'border-[#2F374A]', 'shadow-sm', 'active');
+      tab.setAttribute('aria-selected', 'true');
+    });
+  });
+
+  // 2. Discovery Card Selection -> Dynamic Inspector Canvas Update
+  const discoveryCards = document.querySelectorAll('[data-testid="discovery-card"], .discovery-card');
+  const targetTitle = document.querySelector('[data-testid="inspector-target-title"]');
+  const formatPill = document.querySelector('[data-testid="inspector-format-pill"]');
+  const metaTo = document.querySelector('[data-field="meta-to"]');
+  const metaSubj = document.querySelector('[data-field="meta-subj"]');
+  const studioBody = document.querySelector('[data-testid="inspector-studio-body"]');
+  const codeViewer = document.querySelector('[data-testid="manifest-code-viewer"]');
+
+  discoveryCards.forEach(card => {
+    card.addEventListener('click', () => {
+      discoveryCards.forEach(c => {
+        c.classList.remove('border-[#00E599]/30', 'bg-[#141720]');
+        c.classList.add('border-[#1C202B]', 'bg-[#10131A]');
+      });
+      card.classList.remove('border-[#1C202B]', 'bg-[#10131A]');
+      card.classList.add('border-[#00E599]/30', 'bg-[#141720]');
+
+      const cardTitleEl = card.querySelector('[data-card-title], .card-title') || card;
+      const key = card.getAttribute('data-card-title') || cardTitleEl.textContent.trim();
+      const payload = MANIFEST_PAYLOADS[key];
+
+      if (targetTitle) {
+        targetTitle.textContent = key;
+        targetTitle.setAttribute('data-inspector-target', key);
+      }
+
+      if (payload) {
+        if (formatPill) formatPill.textContent = payload.format;
+        if (metaTo) metaTo.textContent = payload.to;
+        if (metaSubj) metaSubj.textContent = payload.subj;
+        if (studioBody) {
+          studioBody.innerHTML = `
+            <p>Hi there,</p>
+            <p>${payload.body}</p>
+            <p class="pt-2 text-[#8B949E]">Best,<br><span class="text-white font-medium">Thatworkx</span></p>
+          `;
+        }
+        if (codeViewer) {
+          const codeEl = codeViewer.querySelector('code') || codeViewer.querySelector('pre');
+          if (codeEl) codeEl.textContent = payload.code;
+        }
+      }
+    });
+  });
+
+  // 3. Inspector Copy Trigger
+  const copyBtn = document.querySelector('[data-action="copy-manifest"]');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const codeEl = document.querySelector('[data-testid="manifest-code-viewer"] code') || document.querySelector('[data-testid="manifest-code-viewer"] pre');
+      const textToCopy = codeEl ? codeEl.textContent : '';
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy);
+        }
+      } catch (err) {
+        // Ignore clipboard failure
+      }
+
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    });
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVisualizeV4Cockpit);
+  } else {
+    initVisualizeV4Cockpit();
+  }
+}
+
+
+
+function toggleSidebar(isOpen) {
+  const sidebar = document.getElementById('main-terminal-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar) {
+    if (isOpen) {
+      sidebar.classList.remove('-translate-x-full');
+      sidebar.classList.add('translate-x-0');
+    } else {
+      sidebar.classList.remove('translate-x-0');
+      sidebar.classList.add('-translate-x-full');
+    }
+  }
+  if (backdrop) {
+    if (isOpen) {
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    } else {
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+    }
+  }
+}
+window.toggleSidebar = toggleSidebar;

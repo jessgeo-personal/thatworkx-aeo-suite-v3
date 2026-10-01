@@ -1,6 +1,6 @@
 const jobs = new Map();
 
-function createJob(jobId, totalQueued, initialPagesCompleted = 0, initialResults = []) {
+export function createJob(jobId, totalQueued, initialPagesCompleted = 0, initialResults = []) {
   const job = {
     jobId,
     status: 'pending',
@@ -12,11 +12,11 @@ function createJob(jobId, totalQueued, initialPagesCompleted = 0, initialResults
   return job;
 }
 
-function getJobStatus(jobId) {
+export function getJobStatus(jobId) {
   return jobs.get(jobId);
 }
 
-function updateJobProgress(jobId, pagesCompleted, additionalResults = []) {
+export function updateJobProgress(jobId, pagesCompleted, additionalResults = []) {
   const job = jobs.get(jobId);
   if (job) {
     job.pagesCompleted = pagesCompleted;
@@ -30,7 +30,7 @@ function updateJobProgress(jobId, pagesCompleted, additionalResults = []) {
   return job;
 }
 
-function failJob(jobId, errorMsg) {
+export function failJob(jobId, errorMsg) {
   const job = jobs.get(jobId);
   if (job) {
     job.status = 'failed';
@@ -39,7 +39,9 @@ function failJob(jobId, errorMsg) {
   return job;
 }
 
-module.exports = {
+export { jobs };
+
+export default {
   createJob,
   getJobStatus,
   updateJobProgress,

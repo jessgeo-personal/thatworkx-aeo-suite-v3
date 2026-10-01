@@ -40,10 +40,11 @@
 	---------------------------------  --------------------------------------------------
 	----------------------------------------------------------------------------------------------------------------------------------------------------
 	1. Can AI see your website?  (Gateway and Access)
-	- Are flags on your site blocking AI from reading your site 🟢 (?) - learn more about X-Robots-Tag 🟢
-	- Is your firewall blocking AI-bots from reading your site 🟢 (?) - learn more about CDN/Edge Firewall blocking
-	- Is your provider blocking AI-bots from reading your site 🟢 (?) - learn more about hosting provider managed files like robots.txt, and if they are blocking AI-bots from reading your site (Check DIY for more details)
+	- Is your server blocking AI? 🟢 (?) - learn more about X-Robots-Tag 🟢 (Go to DIY to fix)
+	- Is your hosting provider blocking AI? 🟢 (?) - learn more about hosting provider managed files like robots.txt, and if they are blocking AI-bots from reading your site ((Go to DIY to fix))
+	- Does your site have a machine-readable sitemap? (?) sitemap.xml (Go to DIY to fix)
 	
+	If your firewall is blocking AI-bots from reading your site 🟢 (?) - learn more about CDN/Edge Firewall blocking - <Upgrade to AI Optimize Pro to fix!>
 	----------------------------------------------------------------------------------------------------------------------------------------------------
 	2. What can AI see on your website (?) - take a look and see if the brand message that AI sees matches what you intended to communicate. 
 		- ai-bot readable content from actual website [current code box that shows content of scraped website split by webpages and formatted according to html tags that have been stripped]
@@ -59,9 +60,9 @@
 	----------------------------------------------------------------------------------------------------------------------------------------------------
 	| Scanned/Discovered webpages(Crawled 1 of 1 pages discovered)  |  	
 	| 																|
-	| Route Path	Words		Token load(?)		Hidden from AI(?)	InSitemap(?)	IsEssentialPage(?)	Action			|                  |
-	| /			  205 words		100 tokens	No					No				Yes🔴 			Missing	Fix ↗       |  	
-	| /about	   20 words		5 tokens	No					Yes				Yes🔴 			Missing	Fix ↗       |  |
+	| Route Path	Words		Token load(?)	Hidden from AI(?)	InSitemap(?)	IsEssentialPage(?)	Action			|                  |
+	| /			  205 words		100 tokens		No					No				Yes🔴 			Missing	Fix ↗       |  	
+	| /about	   20 words		5 tokens		No					Yes				Yes🔴 			Missing	Fix ↗       |  |
 	|																|  
 	|																|           
     ----------------------------------------------------------------------------------------------------------------------------------------------------

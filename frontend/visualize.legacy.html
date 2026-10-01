@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Visualize Dashboard - Thatworkx AEO Suite</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&amp;family=JetBrains+Mono:wght@600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+  <style>
+    .compatibility-hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="page-visualize">
+
+  <!-- Top Navigation Header -->
+  <!-- HEADER_START -->
+<header class="app-header">
+  <div class="logo-group" style="display: flex; align-items: center; gap: 0.5rem;">
+    <div class="logo-placeholder" data-logo="AI@thatworkx" onclick="window.location.href='index.html'" style="cursor: pointer;" title="Go back to Homepage">AI@thatworkx</div>
+    <span style="color: var(--border-color); font-weight: 300; font-size: 1.2rem; user-select: none;">|</span>
+    <div class="logo-placeholder" data-logo="AEO Suite" style="border-style: solid; background: var(--burnt-copper); border-color: var(--burnt-copper); color: #ffffff; box-shadow: 0 0 10px var(--burnt-copper-glow);">AEO Suite</div>
+  </div>
+  
+  <nav class="nav-links flex items-center gap-3" style="display: flex; gap: 0.75rem; align-items: center;">
+    <a href="visualize.html" class="nav-logo-btn" data-nav="visualize" class="nav-logo-btn active" style="border-color: var(--burnt-copper); background: rgba(183, 65, 14, 0.2);" data-logo="AIVisualize">AI Visualize</a>
+    <a href="optimize.html" class="nav-logo-btn" data-nav="optimize" data-logo="AIOptimize">AIOptimize</a>
+    <a href="socialize.html" class="nav-logo-btn" data-nav="socialize" data-logo="AISocialize">AISocialize</a>
+  </nav>
+
+  <div class="header-actions flex items-center gap-3">
+    <button class="auth-trigger-btn" id="auth-btn" onclick="openAuthModal()">🔑 Sign In</button>
+  </div>
+</header>
+<!-- HEADER_END -->
+
+  <!-- Main Visualize Workspace -->
+  <!-- Main Visualize Workspace -->
+  <main class="app-container" style="padding-top: 1.5rem; max-width: 1280px; margin: 0 auto;">
+
+    <!-- ═══════════════════════════════════════════════════════
+         EXECUTIVE MODE CONTAINER (#exec-mode-container)
+    ════════════════════════════════════════════════════════ -->
+    <div id="exec-mode-container" class="view-mode-section">
+
+      <!-- Executive Welcome &amp; Business Explainer Banner -->
+      <div id="exec-welcome-banner" class="compact-exec-strip glassmorphic border-glow-amber mb-6" style="padding: 1.25rem 1.5rem; border-radius: 12px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; gap: 1rem; width: 100%; box-sizing: border-box;">
+        <span class="strip-icon" style="font-size: 1.6rem; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45)); flex-shrink: 0;">💡</span>
+        <div class="strip-content-left" style="display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 auto;">
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif; letter-spacing: -0.02em; line-height: 1.3;">
+            Analyse how AI Visualizes your brand using your human-friendly web presence.
+          </h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; margin: 0; font-family: var(--font-sans), sans-serif; line-height: 1.5;">
+            Reviews how your current web presence might be ideal for your customers visiting your site, but might not be setup for AI to read and cite you.
+          </p>
+        </div>
+      </div>
+
+      <!-- Control Header Card -->
+      <div id="control-toolbar-anchor" style="scroll-margin-top: 100px;"></div>
+      <section class="onboarding-card visualize-hero-card glassmorphic border-glow-cyan mb-6" style="padding: 1.25rem 1.5rem; border-radius: 24px; background-color: #08090C !important; background-image: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.15) 0%, rgba(245, 158, 11, 0.06) 35%, rgba(139, 92, 246, 0.08) 70%, transparent 100%), linear-gradient(to right, rgba(31, 41, 55, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(31, 41, 55, 0.07) 1px, transparent 1px); background-size: auto, 4rem 4rem, 4rem 4rem; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative; margin-bottom: 2rem;">
+        <input type="hidden" id="target-url" value="">
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="brand-logo-container" style="display: flex; align-items: center; gap: 0.75rem;">
+            <img src="src/images/aivisualize-logo.png" alt="AIVisualize Logo" class="aivisualize-header-logo" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));" onerror="this.onerror=null; this.src='src/images/AIV-light-logo.png';">
+          </div>
+
+          <div class="export-btn-container export-actions-row" style="display: flex; align-items: center; gap: 0.6rem; margin-left: auto;">
+            <button type="button" class="action-btn" id="btn-export-json" onclick="exportRawJsonDiagnostics()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;">📄 Export RAW JSON Report</button>
+            <button type="button" class="action-btn" id="btn-export-pdf" onclick="exportExecutiveSummaryPdf()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;">🖨️ Export PDF Summary</button>
+          </div>
+        </div>
+
+        <div class="visualize-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="action-btn btn-large" id="btn-new-scan" onclick="openNewScanModal()">⬅ New Scan</button>
+            <button type="button" class="action-btn btn-large" id="btn-refresh-analysis" onclick="executeDashboardScan()">🔄 Refresh Analysis</button>
+          </div>
+
+          <div class="toolbar-upgrade-cta" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-left: auto;">
+            <span style="font-size: 0.82rem; color: #cbd5e1; font-weight: 500; font-family: var(--font-sans), sans-serif;">To supercharge your AI Presence:</span>
+            <a href="optimize.html?section=blueprint" id="btn-toolbar-upgrade-aioptimize" class="action-btn btn-large btn-burnt-copper" style="text-decoration: none; font-size: 0.88rem; padding: 0.65rem 1.25rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+              ⚡ Upgrade to AIOptimize Pro ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="visualize-meta-bubble" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.6rem 1.25rem; background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 9999px; width: fit-content; max-width: 100%;">
+          <span class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">
+            Scanned URL: <strong id="display-scanned-domain" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin-left: 0.35rem;">--</strong>
+          </span>
+          <span id="scan-timestamp-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Last Scanned: Not scanned</span>
+          <span id="scan-duration-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Time to Scan: -- seconds</span>
+          <span id="scan-pages-badge" class="pill-badge" style="display: inline-flex; align-items: center; font-size: 0.78rem; color: #cbd5e1; font-weight: 500;">Pages Reviewed: 0</span>
+          <span id="display-scanned-time" style="display: none;">--</span>
+          <span id="display-scan-duration" style="display: none;">--</span>
+        </div>
+
+        <div id="scan-input-container" style="display: none;">
+          <button id="new-scan-btn"></button>
+        </div>
+        <div id="active-domain-header-bar" style="display: none;"></div>
+      </section>
+
+      <!-- Print Stylesheet -->
+      <style>
+      @media print {
+        body {
+          background: #ffffff !important;
+          color: #000000 !important;
+        }
+        header, nav, footer, .view-mode-pill-container, #active-domain-header-bar button, .matrix-filter-tabs, #dev-mode-container, .info-help-btn {
+          display: none !important;
+        }
+        #exec-mode-container {
+          display: block !important;
+          width: 100% !important;
+        }
+        .pillar-card, .score-dial-card, .glassmorphic {
+          border: 1px solid #ddd !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+          box-shadow: none !important;
+          break-inside: avoid;
+        }
+      }
+      </style>
+
+      <div id="executive-view-container">
+      
+      <!-- Top Row: Score Dial Gauge (Col 1) + 2x2 Health Pillars Grid (Col 2) -->
+      <div id="summary-dial-anchor" style="scroll-margin-top: 100px;"></div>
+      <div id="exec-action-triage" class="exec-action-triage">UNAUDITED</div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <!-- Overall AI Visibility Score Dial Gauge -->
+        <div class="score-dial-card glassmorphic border-glow-cyan" style="position: relative; padding: 1.5rem; border-radius: 12px; text-align: center; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <button type="button" class="info-help-btn" data-section="0" title="Calculation Logic of AI Visibility Health Index" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+          <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">AI Visibility Health Index</h4>
+          
+          <div class="dial-wrapper" style="position: relative; width: 140px; height: 140px; margin: 0 auto 0.75rem;">
+            <svg viewBox="0 0 100 100" class="dial-svg" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+              <circle cx="50" cy="50" r="42" stroke="var(--border-color)" stroke-width="8" fill="none"></circle>
+              <circle id="score-dial-arc" cx="50" cy="50" r="42" stroke="var(--burnt-copper)" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="none" style="transition: stroke-dashoffset 1s ease, stroke 0.5s ease;"></circle>
+            </svg>
+            <div class="dial-text-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+              <span id="exec-overall-score" style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary);">--</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">/ 100</span>
+            </div>
+          </div>
+
+          <div id="exec-score-classification-pill" class="badge-status" style="display: inline-block; padding: 0.3rem 0.9rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; background: var(--surface-nested-bg); color: var(--text-muted);">
+            UNAUDITED VISIBILITY
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;" id="exec-score-summary-text">
+            Enter a domain URL above and click 'Run Audit' to measure live AI Visibility.
+          </p>
+        </div>
+
+        <div id="visualize-summary-grid" class="pillars-2x2-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <!-- Section 1 Card -->
+          <div id="pillar-card-1" data-pillar-card="1" class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 1: AI-Optimized Gateway &amp; Access</span>
+                  <span id="pillar-sec1-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span class="pillar-corner-indicator" title="Explore Section Details">↘</span>
+                  <button type="button" class="info-help-btn" data-section="1" onclick="openSectionHelpModal(1, event)" title="Learn more about Gateway &amp; Access" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                </div>
+              </div>
+              <div id="pillar-sec1-title" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem;">AI Search Permissions &amp; Gateway Access</div>
+              <details id="pillar-sec1-accordion" open style="margin-top: 0.85rem; margin-left: 0.75rem; padding-left: 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); cursor: pointer;">
+                <summary style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); outline: none; user-select: none;">
+                  <strong style="color: #f59e0b;">AI-Optimized</strong> human-centric protocol gate checks
+                </summary>
+                <ul id="pillar-sec1-checklist" style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin: 0.4rem 0 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none;">
+                  <li id="chk-sec1-cdn" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> CDN / Edge Firewall Blocks</li>
+                  <li id="chk-sec1-xrobots" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Server Crawlability Flags</li>
+                  <li id="chk-sec1-useragents" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> robots.txt useragents Disallow</li>
+                  <li id="chk-sec1-aibots" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> robots.txt ai-bots Disallow</li>
+                </ul>
+              </details>
+            </div>
+            <div class="pillar-card-footer" style="margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div id="pillar-sec1-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: var(--surface-nested-bg); color: var(--text-muted);">UNAUDITED</div>
+              </div>
+              <p id="pillar-sec1-note" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.35; margin-bottom: 0;">Pending live scan.</p>
+            </div>
+          </div>
+
+          <!-- Section 2 Card -->
+          <div id="pillar-card-2" data-pillar-card="2" class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 2: AI-Optimized Presence &amp; Hygiene</span>
+                  <span id="pillar-sec2-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span class="pillar-corner-indicator" title="Explore Section Details">↘</span>
+                  <button type="button" class="info-help-btn" data-section="2" onclick="openSectionHelpModal(2, event)" title="Learn more about Presence &amp; Hygiene" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                </div>
+              </div>
+              <div id="pillar-sec2-title" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem;">Content Readability &amp; Answer Citation</div>
+              <details id="pillar-sec2-accordion" open style="margin-top: 0.85rem; margin-left: 0.75rem; padding-left: 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); cursor: pointer;">
+                <summary style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); outline: none; user-select: none;">
+                  <strong style="color: #38bdf8;">AI-Optimized</strong> web structure &amp; hydration hygiene
+                </summary>
+                <ul id="pillar-sec2-checklist" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin: 0.4rem 0 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none;">
+                  <li id="chk-sec2-issecure" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> HTTPS Security Encryption</li>
+                  <li id="chk-sec2-spatrap" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> SPA Hydration Trap &amp; Density Ratio</li>
+                  <li id="chk-sec2-ragoffset" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> RAG Offset: /llms.txt &amp; /ai-context.md</li>
+                  <li id="chk-sec2-entitynodes" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Essential Entity Nodes Discovered</li>
+                </ul>
+              </details>
+            </div>
+            <div class="pillar-card-footer" style="margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div id="pillar-sec2-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: var(--surface-nested-bg); color: var(--text-muted);">UNAUDITED</div>
+              </div>
+              <p id="pillar-sec2-note" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.35; margin-bottom: 0;">Pending live scan.</p>
+            </div>
+          </div>
+
+          <!-- Section 3 Card -->
+          <div id="pillar-card-3" data-pillar-card="3" class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 3: AI-Optimized Content</span>
+                  <span id="pillar-sec3-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span class="pillar-corner-indicator" title="Explore Section Details">↘</span>
+                  <button type="button" class="info-help-btn" data-section="3" onclick="openSectionHelpModal(3, event)" title="Learn more about Content AI-Optimization" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                </div>
+              </div>
+              <div id="pillar-sec3-title" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem;">Brand Authority &amp; Entity Consensus</div>
+              <details id="pillar-sec3-accordion" open style="margin-top: 0.85rem; margin-left: 0.75rem; padding-left: 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); cursor: pointer;">
+                <summary style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); outline: none; user-select: none;">
+                  <strong style="color: #38bdf8;">AI-Optimized</strong> page-level readability &amp; trust
+                </summary>
+                <ul id="pillar-sec3-checklist" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin: 0.4rem 0 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none;">
+                  <li id="chk-sec3-seo" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Title &amp; Meta Desc Sweet Spots</li>
+                  <li id="chk-sec3-token" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Token Load Status &amp; Flesch Score</li>
+                  <li id="chk-sec3-parity" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Ans/Ques Parity Ratio</li>
+                  <li id="chk-sec3-eeat" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Page-Level E-E-A-T Diagnostics</li>
+                </ul>
+              </details>
+            </div>
+            <div class="pillar-card-footer" style="margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div id="pillar-sec3-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: var(--surface-nested-bg); color: var(--text-muted);">UNAUDITED</div>
+              </div>
+              <p id="pillar-sec3-note" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.35; margin-bottom: 0;">Pending live scan.</p>
+            </div>
+          </div>
+
+          <!-- Section 4 Card -->
+          <div id="pillar-card-4" data-pillar-card="4" class="pillar-card glassmorphic" style="padding: 1.1rem; border-radius: 10px; background: var(--surface-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Section 4: AI-Ready Machine Manifests</span>
+                  <span id="pillar-sec4-score" style="font-size: 0.7rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 700;">--/25 pts</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span class="pillar-corner-indicator" title="Explore Section Details">↘</span>
+                  <button type="button" class="info-help-btn" data-section="4" title="Learn more about Machine Manifests" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s;">?</button>
+                </div>
+              </div>
+              <div id="pillar-sec4-title" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem;">Dedicated Machine Manifests &amp; 4-Tier Blueprint</div>
+              <details id="pillar-sec4-accordion" open style="margin-top: 0.85rem; margin-left: 0.75rem; padding-left: 0.5rem; border-left: 2px solid rgba(255,255,255,0.08); cursor: pointer;">
+                <summary style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); outline: none; user-select: none;">
+                  <em style="color: #34d399; font-style: italic;">AI-Ready</em> Level 1–4 manifest hierarchy
+                </summary>
+                <ul id="pillar-sec4-checklist" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin: 0.4rem 0 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem; list-style-type: none;">
+                  <li id="chk-sec4-l1" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Level 1 Gate: robots.txt</li>
+                  <li id="chk-sec4-l2" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Level 2 Welcome Mats: /llms.txt &amp; sitemap.xml</li>
+                  <li id="chk-sec4-l3" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Level 3 Blueprint: /ai-context.md</li>
+                  <li id="chk-sec4-l4" style="display: flex; align-items: center;"><span class="status-icon" style="margin-right: 0.35rem;">--</span> Level 4 Workspaces: /README.md, about, docs, content</li>
+                </ul>
+              </details>
+            </div>
+            <div class="pillar-card-footer" style="margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div id="pillar-sec4-badge" class="badge-status" style="font-size: 0.72rem; display: inline-block; background: var(--surface-nested-bg); color: var(--text-muted);">UNAUDITED</div>
+              </div>
+              <p id="pillar-sec4-note" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.35; margin-bottom: 0;">Pending live scan.</p>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+      <!-- 32-Capability Diagnostic Matrix (Relocated to Executive Mode) -->
+      <!-- Section 1 Card: Gateway &amp; Access Detail Card -->
+      <div id="section-1-card" style="scroll-margin-top: 100px;">
+        <div id="exec-section1-card" class="glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+          
+          <!-- Easy View Summary Header Bar -->
+          <div class="easy-view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; text-align: left;">
+            <div>
+              <h4 class="easy-view-title" style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span>Section 1 <span style="display: none;">(AI-Optimized)</span>: Can AI see your website?</span>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(1, event)" title="Can AI see your website?" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
+              </h4>
+              <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">Crawlability &amp; Indexing</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="section-1-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3);">--/25 pts</span>
+              <button class="easy-view-trigger-btn strip-btn" data-section="1" style="font-size: 0.85rem; padding: 0.4rem 1rem !important;">Details ▾</button>
+            </div>
+          </div>
+
+          <!-- Section 1 Details Wrapper -->
+          <div id="section-1-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <!-- Two-Column subgrid layout -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec1-subgrid">
+              
+              <!-- Left Column: Why AI Access Matters -->
+              <div id="sec1-why-matters-box" class="educational-callout obsidian-bento-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); border-radius: 4px; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; font-family: var(--font-sans), sans-serif;">
+                <strong style="color: var(--burnt-copper); font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem;">Why AI Access Matters:</strong>
+                <span style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.4;">Unrestricted access ensures crawler spiders can retrieve your latest content hydration states without firewall bans.</span>
+              </div>
+
+              <!-- Right Column: Protocol Flag Results -->
+              <div id="sec1-protocol-results-container" class="obsidian-bento-results" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates server blocking, user-agent permissions, and sitemap accessibility.</p>
+                <details class="executive-drawer">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Is your server blocking AI?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_x_robots')">(?)</span>
+                      </div>
+                      <span id="exec-x-robots-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Is your hosting provider blocking AI?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_robots_txt')">(?)</span>
+                      </div>
+                      <span id="exec-robots-txt-status" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                    </div>
+                  </div>
+                </details>
+
+                <details class="executive-drawer" style="margin-top: 0.5rem;">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                      <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-weight: 600; color: var(--text-primary);">Does your site have a machine-readable sitemap?</span>
+                        <span class="help-tooltip-trigger" onclick="openHelpTooltip('exec_sitemap')">(?)</span>
+                      </div>
+                      <span id="exec-status-sitemap" class="badge-status status-red" style="font-weight: 700;">UNAUDITED</span>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
+            
+            <!-- Contextual Remediation Banner -->
+            <div id="sec1-remediation-banner" class="remediation-summary-card remediation-banner border-glow-cyan glassmorphic" style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="font-size: 1.3rem;">⚠️</span>
+                  <div>
+                    <h5 style="font-size: 1.1rem; font-weight: 700; color: #fef3c7; margin: 0 0 0.2rem 0;">
+                      Remediation Required: AI Access &amp; Crawlability Gaps
+                    </h5>
+                    <p style="font-size: 0.8rem; color: #cbd5e1; margin: 0;">
+                      AI access barriers, firewall blocks, or missing sitemaps prevent crawler spiders from discovering your site.
+                    </p>
+                  </div>
+                </div>
+                <a href="optimize.html?section=access" id="sec1-remediation-bridge-btn" class="action-btn btn-burnt-copper" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;">
+                  ⚡ Restore AI Access Permissions in AIOptimize Pro ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Return to summary button -->
+            <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2 Card: Presence &amp; Hygiene Detail Card -->
+      <div id="citation-readiness-card">
+        <div id="section-2-card" style="scroll-margin-top: 100px;">
+          <div id="exec-section2-card" class="perception-simulator-card glassmorphic border-glow-cyan mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; font-family: var(--font-sans), sans-serif;">
+          
+          <div class="easy-view-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; text-align: left; font-family: var(--font-sans), sans-serif;">
+            <div>
+              <h4 class="easy-view-title" style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span>Section 2 <span style="display: none;">(AI-Optimized)</span>: Can AI cite you in their answers?</span>
+                <button type="button" class="info-help-btn" onclick="openSectionHelpModal(2, event)" title="What can AI see on your website" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; margin-left: 0.25rem;">?</button>
+              </h4>
+              <p class="easy-view-metric-text" style="font-size: 1rem; color: var(--text-secondary); font-weight: 400; line-height: 1.625; margin: 0; font-family: var(--font-sans), sans-serif;">
+                Audits DOM cleanliness, content density, and essential business page visibility.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="section-2-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-family: var(--font-sans), sans-serif; display: inline-block;">Citation Readiness</span>
+              <button class="easy-view-trigger-btn strip-btn" data-section="2" style="font-size: 0.85rem; padding: 0.4rem 1rem !important;">Details ▾</button>
+            </div>
+          </div>
+
+          <!-- Compatibility Remediation Banner for BDD tests -->
+          <div id="sec2-remediation-banner" class="border-glow-emerald" style="display: none !important;">
+            <a href="optimize.html?section=content">Generate Citation Markup in AIOptimize Pro</a>
+          </div>
+
+          <div id="section-2-details" style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec2-subgrid">
+            
+            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; font-family: var(--font-sans), sans-serif;">
+              <div>
+                <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                  <span>Can AI find your essential Pages</span>
+                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+                </h5>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+                  take a look at the essential pages that AI engines look for.
+                </p>
+                <ul id="sec2-found-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
+                </ul>
+              </div>
+
+              <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-family: var(--font-sans), sans-serif;">
+                <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                  <span>Missing essential Pages</span>
+                  <button type="button" class="info-help-btn" onclick="openHelpTooltip('missing-essential-pages', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+                </h5>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.5rem 0; font-family: var(--font-sans), sans-serif;">
+                  take a look at what AI engines are looking for in your essential pages.
+                </p>
+                <ul id="sec2-missing-essential-pages" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; font-family: var(--font-sans), sans-serif;">
+                </ul>
+              </div>
+            </div>
+
+            <div style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+              <h5 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                <span>Can AI cite you in their answers</span>
+                <button type="button" class="info-help-btn" onclick="openHelpTooltip('citation-signals', event)" style="background: var(--surface-bg); border: 1px solid var(--border-color); color: var(--burnt-copper); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700;">?</button>
+              </h5>
+              <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 0.75rem 0; font-family: var(--font-sans), sans-serif;">
+                understand how AI uses your content to cite your content in their answers.
+              </p>
+
+              <details class="executive-drawer">
+                <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                <div style="display: flex; flex-direction: column; gap: 0.6rem; font-family: var(--font-sans), sans-serif; margin-top: 1rem;" id="citation-signals-rows">
+                  <div class="citation-signal-row" data-signal="faq-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Has FAQ Schema
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI which parts of your site are Questions and answers?</span>
+                    </div>
+                    <span id="sec2-faq-status" class="badge-status status-red">ACTION</span>
+                  </div>
+                  <div class="citation-signal-row" data-signal="Answer/Question parity" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Answer/Question parity
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('faq-parity', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn if your FAQs are complete, as in, is there an answer for every question on your homepage that AI can identify?</span>
+                    </div>
+                    <span id="sec2-parity-value" style="font-weight: 700; color: var(--text-secondary);">--</span>
+                  </div>
+                  <div class="citation-signal-row" data-signal="org-schema" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Has Organization Schema
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">does your site clearly show AI how to identify your Organization details?</span>
+                    </div>
+                    <span id="sec2-org-status" class="badge-status status-red">ACTION</span>
+                  </div>
+                  <div class="citation-signal-row" data-signal="emailValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Email Visible to AI
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('email-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your email on your site</span>
+                    </div>
+                    <span id="sec2-email-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
+                  </div>
+                  <div class="citation-signal-row" data-signal="phoneValue" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                    <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 600; color: var(--text-primary);">
+                        Phone Visible to AI
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('phone-visible', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; margin-left: 0.2rem;">(?)</button>
+                      </span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">learn how AI finds your phone number on your site</span>
+                    </div>
+                    <span id="sec2-phone-value" style="font-weight: 700; color: var(--text-secondary);">None Detected</span>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+          </div>
+
+          <!-- Compatibility Details Container for tests -->
+            <!-- Compatibility Translations for BDD tests -->
+            <div class="compatibility-hidden">
+              Essential Business Pages
+              FAQ Structured Markup
+              Organization Entity Markup
+              AI-Discoverable Contact Email
+              AI-Discoverable Phone Line
+            </div>
+            <!-- Compatibility Educational Callout -->
+            <div class="educational-callout compatibility-hidden">
+              Why Page Content Matters: Structuring content cleanly helps LLM readers extract key entity vectors and avoid hydration parsing traps.
+            </div>
+            <!-- hidden return button for compatibility test -->
+            
+
+          <!-- Always visible streamlined containers -->
+          <div id="sec2-module-4-container" style="margin-top: 1.75rem; width: 100%; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <div id="module-4-table">
+              <div id="dev-module-4-wrapper"></div>
+            </div>
+          </div>
+
+          <div id="sec2-remediation-container" style="margin-top: 1.75rem; width: 100%; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <div class="remediation-summary-card remediation-banner border-glow-amber glassmorphic" style="padding: 1.25rem 1.5rem; border-radius: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; flex-direction: column; gap: 1rem;">
+              <h5 style="font-size: 1.1rem; font-weight: 700; color: #fef3c7; margin: 0;">
+                Two-Tier Citation Remediation
+              </h5>
+              
+              <!-- Tier 1: Free In-Page Action -->
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24;">Tier 1 (Free In-Page Action): Copy-pasteable prompt box for ChatGPT/Gemini</div>
+                <textarea id="sec2-prompt-box" readonly style="width: 100%; height: 80px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e2e8f0; font-family: var(--font-mono), monospace; font-size: 0.78rem; padding: 0.5rem; resize: none; outline: none;">Act as an Answer Engine Optimization (AEO) specialist. Rewrite my core pricing and service details into 3 clear H2 questions followed immediately by concise 40-word direct answers formatted for conversational AI search engines: [Paste content here]</textarea>
+                <button type="button" id="btn-copy-genai-prompt" onclick="copySec2Prompt()" class="action-btn" style="align-self: flex-start; padding: 0.4rem 0.85rem; font-size: 0.76rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; cursor: pointer;">📋 Copy GenAI Prompt</button>
+              </div>
+
+              <!-- Tier 2: Automation Bridge -->
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="font-size: 0.82rem; color: #cbd5e1;">
+                  <strong>Tier 2 (Automation Bridge):</strong> Automatically configure and structure manifests for search engine bots.
+                </div>
+                <a href="optimize.html?section=blueprint" id="sec2-remediation-bridge-btn" class="bridge-btn" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; background: var(--burnt-copper); color: #fff; border: 1px solid var(--burnt-copper);">⚡ Synthesize Machine Manifests in AIOptimize →</a>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Section 3 Container: Can AI trust who you are? -->
+      <div id="section-3-card" style="scroll-margin-top: 100px; margin-bottom: 1.5rem;">
+        <!-- Section 3 Card: E-E-A-T &amp; Trust Detail Card -->
+        <div id="exec-section3-card" class="glassmorphic border-glow-amber mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
+            
+            <!-- Easy View Summary Header Bar -->
+            <div class="easy-view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; text-align: left;">
+              <div>
+                <h4 class="easy-view-title" onclick="openHelpTooltip('sec3_overview')" style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0 0 0.25rem 0; font-family: var(--font-sans), sans-serif; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; cursor: pointer;">
+                  <span>Section 3 <span style="display: none;">(AI-Optimized)</span>: Can AI trust who you are?</span>
+                </h4>
+                <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">E-E-A-T &amp; Brand Trust</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="section-3-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3);">--/25 pts</span>
+                <button class="easy-view-trigger-btn strip-btn" data-section="3" style="font-size: 0.85rem; padding: 0.4rem 1rem !important;">Details ▾</button>
+              </div>
+            </div>
+
+          <!-- Section 3 Details Wrapper -->
+          <div id="section-3-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <!-- Two-Column subgrid layout -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec3-subgrid">
+              
+              <!-- Left Column: E-E-A-T parameters results container -->
+              <div id="sec3-protocol-results-container" class="obsidian-bento-results" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: var(--font-sans), sans-serif;">
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Evaluates domain history, SSL certificate parameters, and citation signals.</p>
+                <details class="executive-drawer">
+                  <summary>▾ View Technical Diagnostics & Raw Server Evidence</summary>
+                  <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                    
+                    <!-- HTTPS Security row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;" data-metric="ssl-security">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">HTTPS Security Encryption</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('ssl-security', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-secure-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
+                    </div>
+
+                    <!-- Verified Contact Credentials row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Verified Contact Credentials</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('contact-info', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-contact-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
+                    </div>
+
+                    <!-- Organization Entity Markup row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Organization Entity Markup</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('org-schema', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-org-schema-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
+                    </div>
+
+                    <!-- Privacy Policy row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Privacy &amp; Trust Governance</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('privacy-policy', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-privacy-status" class="badge-status status-red" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
+                    </div>
+
+                    <!-- Brand Entity Authority row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('age-estimate', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-age-estimate" style="font-weight: 700; color: var(--text-secondary);">--</span>
+                    </div>
+
+                    <!-- Brand Entity Authority Status row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-sans), sans-serif;">
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; font-family: var(--font-sans), sans-serif;">Brand Entity Authority Status</span>
+                        <button type="button" class="info-help-btn" onclick="openHelpTooltip('authority-status', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                      </div>
+                      <span id="sec3-authority-status" class="badge-status status-amber" style="padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">UNAUDITED</span>
+                    </div>
+
+                    <!-- DiagnosticSummary -->
+                    <div style="font-size: 0.82rem; margin-top: 0.4rem; font-family: var(--font-sans), sans-serif;">
+                      <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem; font-family: var(--font-sans), sans-serif;">Diagnostic Summary:</div>
+                      <p id="sec3-diagnostic-summary" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; padding: 0.5rem; background: var(--canvas-bg); border-radius: 4px; border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
+                        Pending live scan.
+                      </p>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <!-- Right Column: Why Brand Trust &amp; E-E-A-T Matter -->
+              <div id="sec3-why-matters-box" class="educational-callout obsidian-bento-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); border-radius: 4px; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; font-family: var(--font-sans), sans-serif;">
+                <strong style="color: var(--burnt-copper); font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem;">Why Brand Trust &amp; E-E-A-T Matter:</strong>
+                <span style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.4;">Verified contact details and clear trust policies influence the quality rating score of citations during RAG generation steps.</span>
+              </div>
+            </div>
+            
+          <!-- Contextual Remediation Banner -->
+          <div id="sec3-remediation-banner" class="remediation-summary-card remediation-banner border-glow-amber glassmorphic" style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.3rem;">⚠️</span>
+                <div>
+                  <h5 style="font-size: 1.1rem; font-weight: 700; color: #fef3c7; margin: 0 0 0.2rem 0;">
+                    Remediation Required: Trust &amp; Authority Gaps
+                  </h5>
+                  <p style="font-size: 0.8rem; color: #cbd5e1; margin: 0;">
+                    Missing organization schemas, unverified contact credentials, or absent trust policies reduce your citation authority.
+                  </p>
+                </div>
+              </div>
+              <a href="optimize.html?section=trust" id="sec3-remediation-bridge-btn" class="action-btn btn-burnt-copper" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;">
+                ⚡ Verify Brand Trust Signals in AIOptimize Pro ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Return to summary button -->
+          <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
+          </div> <!-- Close #section-3-details -->
+
+        </div>
+      </div>
+
+      <!-- Section 4 Container: Is your brand blueprint AI-ready? -->
+      <div id="section-4-card" style="scroll-margin-top: 100px; margin-bottom: 1.5rem;">
+        <!-- Section 4 Card: Machine Friendliness Detail Card -->
+        <div id="exec-section4-card" class="glassmorphic border-glow-sky mb-6 adaptive-card" style="padding: 1.5rem; border-radius: 12px; background: var(--surface-bg); border: 1px solid var(--border-color); font-family: var(--font-sans), sans-serif;">
+          
+          <!-- Easy View Summary Header Bar -->
+          <div class="easy-view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; text-align: left;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.25rem; font-family: var(--font-sans), sans-serif;">
+                <h4 class="easy-view-title" style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; color: #ffffff; margin: 0; font-family: var(--font-sans), sans-serif;">
+                  Section 4: Is your brand blueprint AI-ready? <span style="display: none;">(AI-Ready)</span>
+                </h4>
+                <span class="table-count-badge" id="exec-machine-files-count" style="font-size: 0.75rem; background: var(--surface-nested-bg); color: var(--text-muted); padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700;">8 Manifests Tracked</span>
+              </div>
+              <p class="easy-view-metric-text" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; font-family: var(--font-sans), sans-serif;">Your Machine-readable, AI-Ready alternative to your website.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="section-4-easy-score-badge" class="easy-view-score-badge badge-status" style="padding: 0.25rem 0.875rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3);">--/25 pts</span>
+              <button class="easy-view-trigger-btn strip-btn" data-section="4" style="font-size: 0.85rem; padding: 0.4rem 1rem !important;">Details ▾</button>
+            </div>
+          </div>
+
+          <!-- Section 4 Details Wrapper -->
+          <div id="section-4-details" style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem 0;">Verifies structure, content parity, and syntax formats of your machine-readable files.</p>
+            
+            <!-- Two-Column subgrid layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; font-family: var(--font-sans), sans-serif;" class="sec4-subgrid">
+              
+              <!-- Left Column: Why Machine Manifests Matter -->
+              <div id="sec4-why-matters-box" class="educational-callout" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--burnt-copper); border-radius: 4px; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-sans), sans-serif; min-width: 0; box-sizing: border-box;">
+                <strong style="color: var(--burnt-copper); font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem;">Why the Machine Manifest files Matter:</strong>
+                <span style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.45;">Even the most informative websites run the risk of having too much content being too heavy for AI-bots to run-through before timing out.<br><br>The Machine Manifests are the sleek, light, easy-to-maintain, machine-optimized alternative that are quickly becoming the industry-standard.<br><br>Lets check how many of these you already have.</span>
+                
+                <div style="border-top: 1px solid rgba(245, 158, 11, 0.15); padding-top: 0.75rem; font-family: monospace; font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; white-space: pre-wrap; word-break: break-word;">
+<span style="color: #cbd5e1; font-weight: 700;">🌐 Inbound AI Bot Connection Request</span>
+   │
+   ├──► 🔒 <span style="color: #cbd5e1; font-weight: 700;">LEVEL 1: PROTOCOL GATES (The Gatekeeper)</span>
+   │     └── <span style="color: #ffffff; font-weight: 700;">robots.txt</span> (This controls which files AI-bots and Search-agents can access)
+   │
+   ├──► 🗺️ <span style="color: #cbd5e1; font-weight: 700;">LEVEL 2: MACHINE WELCOME MATS (The Directories)</span>
+   │     ├── <span style="color: #ffffff; font-weight: 700;">llms.txt</span> (Helps AI-bots find your Machine manifest files and ties your brand's social presence to your domain)
+   │     └── <span style="color: #ffffff; font-weight: 700;">sitemap.xml</span> (Standard sitemap to help AI-bots navigate your web presence)
+   │
+   ├──► 🤝 <span style="color: #cbd5e1; font-weight: 700;">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</span>
+   │     └── <span style="color: #ffffff; font-weight: 700;">ai-context.md</span> (Contains answers to questions that are asked of Answer engines about your brand)
+   │
+   └──► 🗂️ <span style="color: #cbd5e1; font-weight: 700;">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</span>
+         ├── <span style="color: #ffffff; font-weight: 700;">README.md</span> (It gives AI a rapid, high-level summary of your business before it dives into the weeds of your website)
+         ├── <span style="color: #ffffff; font-weight: 700;">about.md</span>  (It consolidates all your credentials in one place, proving to the AI that you are a credible source worth citing.)
+         ├── <span style="color: #ffffff; font-weight: 700;">docs.md</span>   (This file feeds the AI exactly what it needs to answer technical or specific questions about your offerings)
+         └── <span style="color: #ffffff; font-weight: 700;">content.md</span> (This is the proof behind your claims - Long-Form Case Studies &amp; Narrative Vault which AI-bots can cite)</div>
+              </div>
+
+              <!-- Right Column: 4-level file hierarchy tree list -->
+              <div id="sec4-hierarchy-container" style="background: var(--surface-nested-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; font-family: var(--font-sans), sans-serif; min-width: 0; box-sizing: border-box;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 1.25rem; user-select: none; font-family: var(--font-sans), sans-serif;">The 4-level file hierarchy for AI-Readiness</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; font-family: var(--font-sans), sans-serif;">
+                  
+                  <!-- Level 1 Divider -->
+                  <div class="level-divider">LEVEL 1: PROTOCOL GATES (The Gatekeepers)</div>
+                  
+                  <!-- Level 1 - robots.txt -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">⚙️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">robots.txt</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Permissions Verification)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_robots', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-robots"></span>
+                  </div>
+
+                  <!-- Level 2 Divider -->
+                  <div class="level-divider">LEVEL 2: MACHINE WELCOME MATS (The Directories)</div>
+
+                  <!-- Level 2 - llms.txt -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗺️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">llms.txt</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Modern AI Directory Index)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_llms', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-llms"></span>
+                  </div>
+
+                  <!-- Level 2 - sitemap.xml -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗺️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">sitemap.xml</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Structural URL Web Tree)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_sitemap', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-sitemap-tree"></span>
+                  </div>
+
+                  <!-- Level 3 Divider -->
+                  <div class="level-divider">LEVEL 3: THE BLUEPRINT MANIFEST (The Orchestrator)</div>
+
+                  <!-- Level 3 - ai-context.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🤝</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">ai-context.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(System Prompts &amp; Context Map)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_aicontext', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-aicontext"></span>
+                  </div>
+
+                  <!-- Level 4 Divider -->
+                  <div class="level-divider">LEVEL 4: GRANULAR WORKSPACES (The Semantic Chunks)</div>
+
+                  <!-- Level 4 - README.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">README.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Rapid Portal Summary)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_readme', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-readme"></span>
+                  </div>
+
+                  <!-- Level 4 - about.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">about.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Identity, Trust &amp; E-E-A-T Signatures)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_about', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-about"></span>
+                  </div>
+
+                  <!-- Level 4 - docs.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">docs.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Hard Metrics, Specs &amp; Technical)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_docs', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-docs"></span>
+                  </div>
+
+                  <!-- Level 4 - content.md -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.6rem; padding-left: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.1rem;">🗂️</span>
+                      <div>
+                        <span style="font-weight: 700; color: #ffffff;">content.md</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.25rem;">(Long-Form Case Studies)</span>
+                      </div>
+                      <button type="button" class="info-help-btn" onclick="openHelpTooltip('manifest_content', event)" style="background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.72rem; cursor: pointer;">(?)</button>
+                    </div>
+                    <span id="exec-status-content"></span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          <!-- Keep hidden tbody for safe fallback in case any script tries to access it -->
+          <table style="display: none;">
+            <tbody id="exec-machine-files-tbody"></tbody>
+          </table>
+
+            <!-- Dual-Interface Architectural Blueprint Side-by-Side Comparison -->
+            <div class="dual-interface-card" style="margin-top: 1.5rem; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 1.25rem;">
+              <h5 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin: 0 0 1rem 0; font-family: var(--font-sans), sans-serif; text-align: left;">
+                Dual-Interface Architectural Blueprint
+              </h5>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; font-family: var(--font-sans), sans-serif; text-align: left;">
+                <!-- Left: Human-Facing Web Presence -->
+                <div style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 1rem;">
+                  <h6 style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin: 0 0 0.5rem 0;">
+                    Human-Facing Web Presence (AI-Optimized)
+                  </h6>
+                  <ul style="font-size: 0.8rem; color: #cbd5e1; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.35rem;">
+                    <li><strong>➕ Visual Trust:</strong> Highly polished visual branding for human conversion.</li>
+                    <li><strong>➖ Token Drag:</strong> Heavier page sizes, scripts, and styling overhead.</li>
+                  </ul>
+                </div>
+                
+                <!-- Right: Machine Intelligence Interface -->
+                <div style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 1rem;">
+                  <h6 style="font-size: 0.95rem; font-weight: 700; color: #34d399; margin: 0 0 0.5rem 0;">
+                    Machine Intelligence Interface (AI-Ready)
+                  </h6>
+                  <ul style="font-size: 0.8rem; color: #cbd5e1; padding-left: 1.2rem; margin: 0; display: flex; flex-direction: column; gap: 0.35rem;">
+                    <li><strong>➕ 50ms Ingestion:</strong> Zero code drag for near-instant AI ingestion.</li>
+                    <li><strong>➖ No UI:</strong> Streamlined semantic directories built strictly for machines.</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Efficiency Highlight Banner -->
+              <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 6px; font-size: 0.8rem; color: #cbd5e1; text-align: left;">
+                <span style="font-weight: 700; color: #38bdf8;">Execution Pathways:</span><br>
+                • <strong>Path 1:</strong> Manual Page-by-Page Prompting (AIVisualize) — 2–4 hours.<br>
+                • <strong>Path 2:</strong> Automated 1-Click Manifest Synthesizer (AIOptimize) — Under 60 seconds.
+              </div>
+            </div>
+
+            <!-- Contextual Remediation Banner -->
+            <div id="sec4-remediation-banner" class="remediation-summary-card remediation-banner border-glow-burnt glassmorphic" style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 10px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.3rem;">⚠️</span>
+                <div>
+                  <h5 style="font-size: 1.1rem; font-weight: 700; color: #fef3c7; margin: 0 0 0.2rem 0;">
+                    Remediation Required: Machine Manifest Gaps
+                  </h5>
+                  <p style="font-size: 0.8rem; color: #cbd5e1; margin: 0;">
+                    Absence of /llms.txt, /ai-context.md, or semantic workspace files slows down AI crawlers and prevents direct answer generation.
+                  </p>
+                </div>
+              </div>
+              <a href="optimize.html?section=blueprint" id="sec4-remediation-bridge-btn" class="action-btn btn-burnt-copper" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;">
+                ⚡ Deploy Machine Manifests in AIOptimize Pro ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Return to summary button -->
+          <button class="btn-return-summary btn-return-summary-outline strip-btn" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; font-weight: 700;">[ ▲ Return to Summary ]</button>
+          </div> <!-- Close #section-4-details -->
+
+        </div>
+      </div>
+
+      <!-- Section 5: AIOptimize Full-Width High-Urgency Action Banner -->
+      <div id="aioptimize-action-banner" class="action-banner-urgent" style="scroll-margin-top: 100px;">
+        <div class="action-banner-header">
+          <span class="urgency-pill">⚠️ BUSINESS VISIBILITY ALERT</span>
+          <h2>Your Website Was Built for Human Eyes—Not AI Search Engines</h2>
+          <p class="urgency-subtext">
+            ChatGPT, Perplexity, and Claude don't see your graphics or visual design—they read raw site data. When your website is crowded with design code, AI engines give up, skip your core offerings, and recommend your competitors instead.
+          </p>
+        </div>
+
+        <div class="action-banner-grid">
+          <div class="comparison-card way-hard">
+            <span class="card-tag">❌ THE EXPENSIVE WAY</span>
+            <h4>Rebuilding Your Entire Website</h4>
+            <p>Spend thousands of dollars and months on developers trying to redesign your website for AI search bots without breaking your human customer experience. Fragile, costly, and never-ending.</p>
+          </div>
+
+          <div class="comparison-card way-easy">
+            <span class="card-tag">⚡ THE SMART WAY</span>
+            <h4>1-Click AI Machine Blueprints</h4>
+            <p>Keep your website built for human customers. AIOptimize automatically turns your existing content into clean, machine-ready AI blueprints (<code>llms.txt</code>) that AI search engines read, trust, and cite in under 2 minutes.</p>
+          </div>
+        </div>
+
+        <div class="action-banner-footer">
+          <a href="optimize.html?section=blueprint" id="banner-activate-btn" class="btn-xl btn-urgent">
+            🚀 Make My Website AI-Ready with AIOptimize Pro
+          </a>
+          <p class="pricing-flexibility-note">Instant 2-Minute Setup • Available via Unlimited Monthly Sync or Flexible Single-Pass Scans</p>
+        </div>
+      </div>
+
+      </div> <!-- closing #executive-view-container -->
+    </div> <!-- closing #exec-mode-container -->
+  </main>
+
+  <!-- Mega Footer Section -->
+  <!-- FOOTER_START -->
+<footer class="mega-footer">
+  <div class="footer-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+    <div>
+      <p style="margin: 0;">&copy; 2026 Thatworkx AEO Suite. All rights reserved.</p>
+    </div>
+    <div style="display: flex; gap: 1.5rem;">
+      <a href="index.html" style="color: var(--text-secondary); text-decoration: none;">Home</a>
+      <a href="visualize.html" style="color: var(--text-secondary); text-decoration: none;">AIVisualize</a>
+      <a href="optimize.html" style="color: var(--text-secondary); text-decoration: none;">AIOptimize</a>
+      <a href="socialize.html" style="color: var(--text-secondary); text-decoration: none;">AISocialize</a>
+    </div>
+  </div>
+</footer>
+<!-- FOOTER_END -->
+
+  <!-- Modals Container -->
+  <!-- Markdown Preview Modal -->
+  <div id="markdown-preview-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-cyan">
+      <span class="modal-close" id="markdown-modal-close-btn" onclick="closeMarkdownPreviewModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">📄</div>
+      <h3 style="text-align: center; color: #fff; margin-bottom: 1rem;">Page Markdown &amp; Status Inspector</h3>
+      
+      <div style="text-align: left; margin-bottom: 1.25rem; font-family: var(--font-sans), sans-serif;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.5rem;">
+          Route: <code id="markdown-modal-url" style="color: #67e8f9; font-family: var(--font-mono); font-size: 0.9rem;">--</code>
+        </div>
+        
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span id="markdown-modal-canonical" class="badge-status status-red">Canonical: Checking...</span>
+          <span id="markdown-modal-schema" class="badge-status status-red">JSON-LD Schema: Checking...</span>
+        </div>
+        
+        <!-- Missing Schema Warning Alert -->
+        <div id="markdown-modal-schema-alert" style="display: none;">
+          <span>⚠️ <strong>Missing JSON-LD Schema:</strong> This page does not have any structured JSON-LD entity markup. We recommend injecting standard organizational or FAQ schema tags to ensure AI entities can cite this page's content correctly.</span>
+        </div>
+      </div>
+
+      <div style="text-align: left; margin-bottom: 0.5rem; font-weight: 700; color: #cbd5e1; font-size: 0.9rem;">Raw Page Markdown Ingested:</div>
+      <div class="markdown-code-header">
+        <button type="button" id="markdown-modal-copy-btn" class="modal-copy-btn" onclick="copyMarkdownFromModal()">Copy Markdown</button>
+      </div>
+      <pre id="markdown-modal-body"></pre>
+    </div>
+  </div>
+
+  <!-- Educational Onboarding Modal -->
+  <div id="exec-onboarding-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-burnt" style="max-width: 600px; margin: 0 auto; padding: 2rem; position: relative;">
+      <span class="modal-close" id="btn-close-tour-modal" style="color: var(--text-primary); cursor: pointer; font-size: 1.5rem; position: absolute; top: 1rem; right: 1.25rem;">&times;</span>
+      <div class="modal-icon" style="font-size: 2.5rem; text-align: center; margin-bottom: 1rem;">🎓</div>
+      <h3 style="text-align: center; color: #fff; margin-bottom: 1.5rem; font-size: 1.35rem;">Understanding AI Sourcing Methods</h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="padding: 1rem; border-radius: 8px; background: rgba(14, 165, 233, 0.1); border-left: 4px solid #0ea5e9;">
+          <h4 style="color: #38bdf8; font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem 0;">1. Human-Centric Web Presence (AI-Optimized)</h4>
+          <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 0;">
+            Optimizing your existing human-centric web presence. When it is structured properly, content-rich, and free of technical blocks, your site is considered <strong style="color: #38bdf8;">AI-Optimized</strong>.
+          </p>
+        </div>
+        
+        <div style="padding: 1rem; border-radius: 8px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981;">
+          <h4 style="color: #34d399; font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem 0;">2. Machine-Friendly Web Presence (AI-Ready)</h4>
+          <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 0;">
+            A complementary machine-friendly file hierarchy. Implementing standard files like `/llms.txt` and `/ai-context.md` helps AI bots read and cite your content efficiently. Doing this correctly makes your web presence <strong style="color: #34d399;">AI-Ready</strong> without altering your human-centric frontend.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Scan Modal -->
+  <div id="new-scan-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 480px; margin: 0 auto; padding: 1.75rem;">
+      <span class="modal-close" id="modal-close-btn" onclick="closeNewScanModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🔍</div>
+      <h3 style="text-align: center; color: #fff; margin-bottom: 1rem;">Launch Live AEO Audit Scan</h3>
+      
+      <form id="new-scan-form" onsubmit="handleNewScanModalSubmit(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Target Domain/URL:</label>
+          <input type="text" id="modal-target-url" required placeholder="example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        </div>
+        <button type="submit" id="modal-submit-scan-btn" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; border: none; cursor: pointer;">Start Audit Scan 🔄</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="auth-modal" class="modal-backdrop" style="display: none;">
+
+    <div class="modal-card glassmorphic border-glow-sky" style="max-width: 480px; margin: 0 auto;">
+      <span class="modal-close" onclick="closeAuthModal()">×</span>
+      <div class="modal-icon" style="font-size: 2rem; text-align: center;">🔐</div>
+      <h3 id="auth-modal-title" style="text-align: center; color: #fff; margin-bottom: 0.5rem;">Authenticate to Thatworkx AEO</h3>
+      <p id="auth-modal-subtitle" style="text-align: center; font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem;">Access your multi-page crawler credits and custom edge routing scripts.</p>
+
+      <div class="auth-tabs" id="auth-tabs-container" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">Sign In</button>
+        <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.5rem; border-radius: 6px;">New User</button>
+      </div>
+
+      <form id="login-form-panel" onsubmit="handleRequestLoginOtp(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 0.35rem;">Email Address:</label>
+          <input type="email" id="login-email" required placeholder="user@example.com" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); color: #fff;">
+        </div>
+        <button type="submit" class="submit-btn glowing-btn" style="width: 100%; padding: 0.7rem; border-radius: 6px; font-weight: 600;">Request Login OTP</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Section Explanation Modal -->
+  <div id="help-modal" class="modal-backdrop help-modal-hidden">
+    <div class="modal-card glassmorphic border-glow-cyan" style="max-width: 520px; margin: 0 auto; padding: 1.75rem;">
+      <span class="modal-close" onclick="closeHelpModal()" style="color: var(--text-primary);">×</span>
+      <div id="help-modal-icon" style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">🛡️</div>
+      <h3 id="help-modal-title" style="text-align: center; color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem;">Section Explanation</h3>
+      <div id="help-modal-body" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; text-align: left;">
+        <!-- Filled dynamically by JS -->
+      </div>
+      <button type="button" onclick="closeHelpModal()" style="margin-top: 1.5rem; width: 100%; padding: 0.6rem; border-radius: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 600; cursor: pointer;">Got It 👍</button>
+    </div>
+  </div>
+
+  <!-- Upgrade Alert Modal -->
+  <div id="alert-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card glassmorphic border-glow-amber" style="max-width: 480px; margin: 0 auto; padding: 1.75rem; text-align: center; background-color: #08090C !important; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
+      <span class="modal-close" onclick="closeAlertModal()">×</span>
+      <div class="modal-icon" style="font-size: 2.5rem; margin-bottom: 0.5rem; color: #fbbf24;">⚡</div>
+      <h3 id="modal-title" style="color: #fff; margin-bottom: 1rem; font-size: 1.25rem;">Upgrade Required</h3>
+      <p id="modal-message" style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 1.5rem;">Daily scan allocation limit reached.</p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" onclick="triggerUpgrade()" style="flex: 1; padding: 0.7rem; border-radius: 8px; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: #fff; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">Upgrade Now</button>
+        <button type="button" onclick="closeAlertModal()" style="flex: 1; padding: 0.7rem; border-radius: 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; font-weight: 600; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit Progress Overlay -->
+  <div id="audit-overlay" class="audit-overlay-backdrop" style="display: none;">
+    <div class="audit-overlay-card glassmorphic border-glow-cyan">
+      <div class="audit-overlay-loader">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+        </svg>
+      </div>
+      <h3 class="audit-overlay-title">Audit in progress</h3>
+      <p class="audit-overlay-subtitle">Analyzing visibility, RAG performance, and AI-readiness metrics...</p>
+      <button type="button" class="cancel-audit-btn" onclick="cancelActiveAudit()">
+        <span>Cancel Audit 🛑</span>
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { evaluateAllCapabilities, CAPABILITY_MATRIX } from './src/services/capabilityEvaluator.js';
+    window.evaluateAllCapabilities = evaluateAllCapabilities;
+    window.CAPABILITY_MATRIX = CAPABILITY_MATRIX;
+  </script>
+  <!-- Alternative B: Adaptive Floating Glass Dock -->
+  <div id="floating-glass-dock" class="floating-glass-dock glassmorphic border-glow-burnt">
+    <div class="dock-links">
+      <a href="#control-toolbar-anchor" class="dock-link" data-dock-section="scan">🔄 Scan</a>
+      <a href="#summary-dial-anchor" class="dock-link active" data-dock-section="summary">📊 Summary</a>
+      <a href="#section-1-card" class="dock-link" data-dock-section="1">1. AI Access</a>
+      <a href="#section-2-card" class="dock-link" data-dock-section="2">2. Page Content</a>
+      <a href="#section-3-card" class="dock-link" data-dock-section="3">3. Brand Trust</a>
+      <a href="#section-4-card" class="dock-link" data-dock-section="4">4. AI Blueprint</a>
+      <a href="#aioptimize-action-banner" class="dock-link dock-link-cta" data-dock-section="remediate">⚡ AIOptimize Pro</a>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

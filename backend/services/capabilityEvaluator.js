@@ -8,6 +8,75 @@
  * Use "AI-Optimized" for core site checks and "AI-Ready" for machine manifest checks.
  */
 
+/**
+ * Path prefix pattern supporting optional language/locale codes and legal/policy subdirectories
+ * Examples: /en-us/, /de/, /fr-ca/, /legal/, /en-us/legal/, /policies/
+ */
+const PATH_PREFIX = '(?:\\/(?:[a-z]{2,3}(?:[-_][a-z0-9]{2,4})?|legal|policies|policy))*';
+
+const ESSENTIAL_ANCHOR_DEFINITIONS = [
+  {
+    canonical: '/about',
+    patterns: [
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(about(?:-?us)?|company)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(about(?:-?us)?|company)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(about(?:-?us)?|company)$/i
+    ]
+  },
+  {
+    canonical: '/contact',
+    patterns: [
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(contact(?:-?us)?|get-in-touch)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(contact(?:-?us)?|get-in-touch)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(contact(?:-?us)?|get-in-touch)$/i
+    ]
+  },
+  {
+    canonical: '/pricing',
+    patterns: [
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(pricing(?:-?plans)?|plans)(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(pricing(?:-?plans)?|plans|store|buy|compare)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(pricing(?:-?plans)?|plans|store|buy|compare)$/i
+    ]
+  },
+  {
+    canonical: '/privacy-policy',
+    patterns: [
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:\\/|\\.html)?$`, 'i'),
+      /(?:\/|\/#|#)(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(privacy(?:-?(?:policy|statement|notice))?|privacystatement|privacypolicy|data-?(?:privacy|policy))$/i
+    ]
+  },
+  {
+    canonical: '/terms-of-service',
+    patterns: [
+      new RegExp(`^${PATH_PREFIX}(?:\\/|\\/#|#)?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:\\/|\\.html)?$`, 'i'),
+      /(?:terms[-_]conditions|terms[-_]and[-_]conditions|terms[-_]of[-_]service|terms[-_]of[-_]use|services[-_]?agreement|service[-_]?agreement|user[-_]?agreement)/i,
+      /(?:\/|\/#|#)(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)(?:[\/?#]|$)/i,
+      /^#?(?:\/)?#?(terms(?:-(?:and-conditions|of-service|of-use))?|terms(?:andconditions|ofservice|ofuse)|usage-?terms|limits|tos|services-?agreement|service-?agreement|user-?agreement)$/i
+    ]
+  }
+];
+
+/**
+ * Normalizes a URL, route, or hash for resilient matching.
+ */
+function extractPathForEvaluation(item) {
+  if (!item) return '';
+  const raw = typeof item === 'string' ? item : (item.url || item.path || item.route || '');
+  if (!raw) return '';
+  try {
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      const parsed = new URL(raw);
+      const cleanPath = parsed.pathname.replace(/\/$/, '') || '';
+      return parsed.hash ? `${cleanPath}/${parsed.hash.toLowerCase()}` : (cleanPath || '/');
+    }
+    return raw.split('?')[0].replace(/\/$/, '') || '/';
+  } catch {
+    return raw.replace(/\/$/, '') || '/';
+  }
+}
+
 const CAPABILITY_MATRIX = [
   // ═════════════════════════════════════════════════════════════════════════
   // SECTION 1: Can AI see your website? (Bot Gateway & Access Control - 3)
@@ -21,6 +90,22 @@ const CAPABILITY_MATRIX = [
     description: 'Cloudflare WAF / Crowdstrike Falcon challenge rule evaluation for AI bots.',
     impact: 'Edge firewalls and WAF challenges prevent AI bots from connecting to your domain.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'Edge firewalls and WAF challenges prevent AI bots from connecting to your domain.',
+          recommendation: 'Configure Cloudflare WAF / Crowdstrike Falcon exceptions for GPTBot, PerplexityBot, and ClaudeBot.'
+        };
+      }
+
       const isBlocked = data.sec1?.cdnBlocked || data.status?.gatewayBadge === 'Total AI Blindness';
       return {
         status: isBlocked ? 'critical' : 'active',
@@ -41,6 +126,22 @@ const CAPABILITY_MATRIX = [
     description: 'HTTP response header checks (noindex / nofollow) per page.',
     impact: 'HTTP X-Robots-Tag noindex headers instruct search AI agents not to record your content.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'HTTP X-Robots-Tag noindex headers instruct search AI agents not to record your content.',
+          recommendation: 'Remove noindex/none directives from HTTP response headers for public pages.'
+        };
+      }
+
       const noIndex = data.sec1?.xRobotsNoIndex || (data.status?.xRobotsIndexable === false);
       return {
         status: noIndex ? 'warning' : 'active',
@@ -61,6 +162,22 @@ const CAPABILITY_MATRIX = [
     description: 'Blanket Disallow directives vs bot-specific rules for GPTBot, PerplexityBot, ClaudeBot, Google-Extended.',
     impact: 'Blanket robots.txt disallows completely blind generative search crawlers from reading your site.',
     evaluate: (data = {}) => {
+      const status = data.status || {};
+      const sec1 = data.sec1 || {};
+      const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || (data.executiveSections?.section1?.blocked === true);
+      const statusCode = status.statusCode || status.wafStatusCode || sec1.wafStatusCode || data.statusCode;
+
+      if (isWafBlocked || statusCode === 403 || statusCode === 429) {
+        return {
+          status: 'BLOCKED',
+          score: 0,
+          details: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          deductionReason: 'Automated Bot Traffic Rejected (HTTP 403) — Security Shield Active',
+          impact: 'Blanket robots.txt disallows completely blind generative search crawlers from reading your site.',
+          recommendation: 'Replace blanket Disallow: / with granular bot rules permitting search crawlers.'
+        };
+      }
+
       const isBlind = data.sec1?.disallowAll || (data.status?.robotsTxtExists === false);
       return {
         status: isBlind ? 'critical' : 'active',
@@ -82,18 +199,18 @@ const CAPABILITY_MATRIX = [
     sectionName: 'Presence & Hygiene',
     name: 'Essential Pages Index Coverage',
     category: 'Hygiene',
-    description: 'Verifies presence of /about, /contact, and /privacy-policy.',
+    description: 'Verifies presence of /about, /contact, /pricing, /privacy-policy, and /terms-of-service.',
     impact: 'Missing core identity pages weakens domain trust signals evaluated by AI search engines.',
     evaluate: (data = {}) => {
-      const found = data.sec2?.essentialPagesFound ?? (data.status?.aboutTxtExists ? 3 : 2);
-      const score = Math.min(100, (found / 3) * 100);
+      const found = data.sec2?.essentialPagesFound ?? 0;
+      const score = Math.min(100, (found / 5) * 100);
       return {
-        status: found >= 3 ? 'active' : 'warning',
+        status: found >= 5 ? 'active' : 'warning',
         score,
-        details: `Found ${found}/3 essential trust pages (/about, /contact, /privacy-policy)`,
-        deductionReason: found < 3 ? `Missing ${3 - found} essential trust page(s) penalizes hygiene (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
+        details: `Found ${found}/5 essential trust pages (/about, /contact, /pricing, /privacy-policy, /terms-of-service)`,
+        deductionReason: found < 5 ? `Missing ${5 - found} essential trust page(s) penalizes hygiene (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
         impact: 'Missing core identity pages weakens domain trust signals evaluated by AI search engines.',
-        recommendation: 'Publish and index dedicated /about, /contact, and /privacy-policy pages.'
+        recommendation: 'Publish and index dedicated /about, /contact, /pricing, /privacy-policy, and /terms-of-service pages.'
       };
     }
   },
@@ -107,7 +224,8 @@ const CAPABILITY_MATRIX = [
     impact: 'Heavy single-page app (SPA) JavaScript containers cause crawler timeouts resulting in empty page text.',
     evaluate: (data = {}) => {
       const isHeavy = data.sec2?.isHeavyJs || (data.status?.spaTrapDetected === true);
-      const isZeroText = (data.status?.wordCount ?? 500) === 0;
+      const words = data.status?.wordCount ?? data.sec2?.wordCount ?? 0;
+      const isZeroText = words === 0;
       const hasHandshake = data.status?.llmsTxtExists || data.status?.aiContextExists;
 
       if (isZeroText && hasHandshake) {
@@ -165,7 +283,7 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Ensure main content is server-side rendered as clean HTML text.'
         };
       }
-      const tokens = words ? Math.round(words * 1.3) : (data.sec2?.estimatedTokens ?? 1250);
+      const tokens = words ? Math.round(words * 1.3) : (data.sec2?.estimatedTokens ?? 0);
       const isOver = tokens > 4000;
       return {
         status: isOver ? 'warning' : 'active',
@@ -188,7 +306,7 @@ const CAPABILITY_MATRIX = [
     evaluate: (data = {}) => ({
       status: 'active',
       score: 100,
-      details: `${data.sec2?.externalLinkCount ?? 14} external outbound domain citations identified`,
+      details: `${data.sec2?.externalLinkCount ?? 0} external outbound domain citations identified`,
       deductionReason: '🟢 No deductions — All protocols clean.',
       impact: 'Authoritative outbound citations demonstrate factual verification and link graph authority.',
       recommendation: 'Maintain authoritative outbound link citations for E-E-A-T trust signals.'
@@ -288,7 +406,7 @@ const CAPABILITY_MATRIX = [
     description: 'Inbound/outbound internal linkage structure.',
     impact: 'Orphaned pages without internal links are ignored by topic-cluster AI models.',
     evaluate: (data = {}) => {
-      const linkCount = data.sec3?.internalLinkCount ?? 18;
+      const linkCount = data.sec3?.internalLinkCount ?? 0;
       const isOk = linkCount > 5;
       return {
         status: isOk ? 'active' : 'warning',
@@ -309,8 +427,8 @@ const CAPABILITY_MATRIX = [
     description: 'Title tag presence, length (30-60 chars), and meta description density.',
     impact: 'Poor metadata length causes AI models to hallucinate or summarize incorrect page titles.',
     evaluate: (data = {}) => {
-      const isOptimalTitle = data.status?.seoOptimalTitle ?? true;
-      const isOptimalDesc = data.status?.seoOptimalDesc ?? true;
+      const isOptimalTitle = data.status?.seoOptimalTitle ?? false;
+      const isOptimalDesc = data.status?.seoOptimalDesc ?? false;
       const isOk = isOptimalTitle && isOptimalDesc;
       return {
         status: isOk ? 'active' : 'warning',
@@ -355,7 +473,7 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Provide readable static text content for LLM parsing.'
         };
       }
-      const flesch = data.sec3?.fleschScore ?? 68;
+      const flesch = data.sec3?.fleschScore ?? 0;
       const isGood = flesch >= 50;
       return {
         status: isGood ? 'active' : 'warning',
@@ -400,8 +518,8 @@ const CAPABILITY_MATRIX = [
           recommendation: 'Break content into clear paragraph blocks under 80 words.'
         };
       }
-      const avgWords = data.sec3?.avgWordsPerP ?? 54;
-      const isOk = avgWords <= 80;
+      const avgWords = data.sec3?.avgWordsPerP ?? 0;
+      const isOk = avgWords > 0 && avgWords <= 80;
       return {
         status: isOk ? 'active' : 'warning',
         score: isOk ? 100 : 60,
@@ -421,9 +539,9 @@ const CAPABILITY_MATRIX = [
     description: 'JSON-LD FAQ validation, Question Count, Answer Count, and 1:1 Parity Ratio.',
     impact: 'Structured FAQ schema allows AI engines to quote direct answers to user queries.',
     evaluate: (data = {}) => {
-      const q = data.sec3?.faqQuestions ?? 4;
-      const a = data.sec3?.faqAnswers ?? 4;
-      const hasSchema = data.status?.jsonLdExists ?? data.sec3?.hasFaqSchema ?? true;
+      const q = data.sec3?.faqQuestions ?? 0;
+      const a = data.sec3?.faqAnswers ?? 0;
+      const hasSchema = data.status?.jsonLdExists ?? data.sec3?.hasFaqSchema ?? false;
       const isParity = q > 0 && q === a;
       const isOk = isParity && hasSchema;
       return {
@@ -445,7 +563,7 @@ const CAPABILITY_MATRIX = [
     description: 'Presence of <article>, <section>, <header>, <nav>, <main>.',
     impact: 'Semantic tags guide LLM parsers to identify primary body content vs navigation noise.',
     evaluate: (data = {}) => {
-      const count = data.sec3?.semanticCount ?? 4;
+      const count = data.sec3?.semanticCount ?? 0;
       const score = Math.min(100, count * 20);
       return {
         status: count >= 4 ? 'active' : 'warning',
@@ -466,7 +584,7 @@ const CAPABILITY_MATRIX = [
     description: 'Single H1 enforcement flag, H2 / H3 sequential hierarchy check.',
     impact: 'Broken heading hierarchies cause LLMs to fail outline parsing and topic chunk extraction.',
     evaluate: (data = {}) => {
-      const isProper = data.status?.hasProperHierarchy ?? true;
+      const isProper = data.status?.hasProperHierarchy ?? false;
       return {
         status: isProper ? 'active' : 'warning',
         score: isProper ? 100 : 50,
@@ -487,11 +605,12 @@ const CAPABILITY_MATRIX = [
     impact: 'Missing alt text prevents multimodal vision AI models from understanding page graphics.',
     evaluate: (data = {}) => {
       const missingCount = data.sec3?.missingAltCount ?? 0;
-      const score = Math.max(0, 100 - missingCount * 15);
+      const totalImages = data.sec3?.totalImages ?? 0;
+      const score = totalImages === 0 ? 100 : Math.max(0, 100 - missingCount * 15);
       return {
         status: missingCount === 0 ? 'active' : 'warning',
         score,
-        details: `Total images: ${data.sec3?.totalImages ?? 8} | Missing alt attribute: ${missingCount}`,
+        details: `Total images: ${totalImages} | Missing alt attribute: ${missingCount}`,
         deductionReason: missingCount > 0 ? `${missingCount} image(s) missing descriptive alt attributes (-${100 - score} pts)` : '🟢 No deductions — All protocols clean.',
         impact: 'Missing alt text prevents multimodal vision AI models from understanding page graphics.',
         recommendation: 'Add descriptive alt text attributes to all content images for vision & multi-modal AI models.'
@@ -533,7 +652,7 @@ const CAPABILITY_MATRIX = [
     description: 'Availability, bot directive review, sample template generator.',
     impact: 'Root /robots.txt defines legal and procedural crawling boundaries for AI bots.',
     evaluate: (data = {}) => {
-      const exists = data.status?.robotsTxtExists ?? data.sec4?.robotsTxtFound ?? true;
+      const exists = data.status?.robotsTxtExists ?? data.sec4?.robotsTxtFound ?? false;
       return {
         status: exists ? 'active' : 'critical',
         score: exists ? 100 : 0,
@@ -613,7 +732,7 @@ const CAPABILITY_MATRIX = [
     description: 'Per-page availability and missing schema warning.',
     impact: 'Structured entity schemas allow LLMs to build knowledge graph nodes for your brand.',
     evaluate: (data = {}) => {
-      const exists = data.status?.jsonLdExists ?? data.sec4?.jsonLdFound ?? true;
+      const exists = data.status?.jsonLdExists ?? data.sec4?.jsonLdFound ?? false;
       return {
         status: exists ? 'active' : 'warning',
         score: exists ? 100 : 40,
@@ -752,14 +871,21 @@ const CAPABILITY_MATRIX = [
     category: 'Manifests',
     description: 'Page path coverage comparison against discovered routes.',
     impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
-    evaluate: (data = {}) => ({
-      status: 'active',
-      score: 95,
-      details: 'Discovered routes match sitemap index entries',
-      deductionReason: '🟢 No deductions — All protocols clean.',
-      impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
-      recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
-    })
+    evaluate: (data = {}) => {
+      const discovered = data.discoveredRoutes || data.pages || [];
+      const totalDiscovered = discovered.length;
+      const matched = discovered.filter(r => r.inSitemap === true).length;
+      const score = totalDiscovered > 0 ? Math.round((matched / totalDiscovered) * 100) : 0;
+      const isOk = score >= 80;
+      return {
+        status: isOk ? 'active' : 'warning',
+        score,
+        details: totalDiscovered > 0 ? `${matched}/${totalDiscovered} discovered routes indexed in sitemap.xml` : 'No discovered routes matched in sitemap index',
+        deductionReason: isOk ? '🟢 No deductions — All protocols clean.' : `Sitemap path coverage (${score}%) below target (-${100 - score} pts)`,
+        impact: 'Full sitemap path coverage ensures AI crawlers reach all secondary and deep route nodes.',
+        recommendation: 'Keep XML sitemaps synchronized with dynamic web routes.'
+      };
+    }
   }
 ];
 
@@ -788,13 +914,19 @@ function evaluateCapabilities(crawledData = {}) {
   // Evaluate ONLY robots.txt, WAF/CDN blocks, and X-Robots-Tag headers. NO sitemap penalties!
   let p1Score = 25;
   let p1Deductions = [];
-  const robotsTxtExists = status.robotsTxtExists ?? sec1.robotsTxtExists ?? sec4.robotsTxtFound ?? true;
+  const robotsTxtExists = status.robotsTxtExists ?? sec1.robotsTxtExists ?? sec4.robotsTxtFound ?? false;
   const isDisallowed = status.xRobotsIndexable === false || sec1.disallowAll === true || (!robotsTxtExists);
   const cdnBlocked = sec1.cdnBlocked === true;
   const botPermissions = status.botPermissions || {};
   const blockedBotCount = Object.values(botPermissions).filter(allowed => allowed === false).length;
 
-  if (isDisallowed) {
+  const isWafBlocked = status.isWafBlocked === true || sec1.blocked === true || crawledData.executiveSections?.section1?.blocked === true || status.statusCode === 403 || status.statusCode === 429 || crawledData.statusCode === 403 || crawledData.statusCode === 429;
+  const wafStatusCode = status.wafStatusCode || status.statusCode || crawledData.statusCode || sec1.wafStatusCode || crawledData.executiveSections?.section1?.wafStatusCode || 403;
+
+  if (isWafBlocked) {
+    p1Score = 0;
+    p1Deductions.push(`Automated Bot Traffic Rejected (HTTP ${wafStatusCode}) — Security Shield Active`);
+  } else if (isDisallowed) {
     p1Score -= 25;
     p1Deductions.push('Blanket Disallow: / or missing robots.txt causes Total AI Blindness (-25 pts)');
   } else {
@@ -838,7 +970,7 @@ function evaluateCapabilities(crawledData = {}) {
     p2Deductions.push('Heavy Client-Side SPA JS trap detected (-5 pts)');
   }
 
-  const essentialPagesFound = sec2.essentialPagesFound ?? (status.aboutTxtExists ? 3 : 2);
+  const essentialPagesFound = sec2.essentialPagesFound ?? 0;
   if (essentialPagesFound < 3) {
     p2Score -= 5;
     p2Deductions.push(`Missing ${3 - essentialPagesFound} essential trust page(s) (-5 pts)`);
@@ -850,26 +982,26 @@ function evaluateCapabilities(crawledData = {}) {
   // Evaluate title tag length, meta descriptions, heading trees, Flesch readability.
   let p3Score = 25;
   let p3Deductions = [];
-  const seoOptimalTitle = status.seoOptimalTitle ?? sec3.seoOptimalTitle ?? true;
+  const seoOptimalTitle = status.seoOptimalTitle ?? sec3.seoOptimalTitle ?? false;
   if (!seoOptimalTitle) {
     p3Score -= 5;
     p3Deductions.push('Title tag outside optimal recommended character length (-5 pts)');
   }
 
-  const seoOptimalDesc = status.seoOptimalDesc ?? sec3.seoOptimalDesc ?? true;
+  const seoOptimalDesc = status.seoOptimalDesc ?? sec3.seoOptimalDesc ?? false;
   if (!seoOptimalDesc) {
     p3Score -= 5;
     p3Deductions.push('Meta description outside optimal recommended character length (-5 pts)');
   }
 
-  const hasProperHierarchy = status.hasProperHierarchy ?? sec3.hasProperHierarchy ?? true;
+  const hasProperHierarchy = status.hasProperHierarchy ?? sec3.hasProperHierarchy ?? false;
   if (!hasProperHierarchy) {
     p3Score -= 10;
     p3Deductions.push('Heading hierarchy violated (Multiple H1s or skipped sub-heading levels) (-10 pts)');
   }
 
-  const wordCount = status.wordCount ?? sec3.wordCount ?? 800;
-  const fleschScore = sec3.fleschScore ?? 68;
+  const wordCount = status.wordCount ?? sec3.wordCount ?? 0;
+  const fleschScore = sec3.fleschScore ?? 0;
   if (wordCount < 500) {
     p3Score -= 5;
     p3Deductions.push('Page word count under 500 words data starvation risk (-5 pts)');
@@ -919,6 +1051,15 @@ function evaluateCapabilities(crawledData = {}) {
     p4Score = 0;
   }
 
+  // Unscanned / empty crawl handling
+  const isUnscanned = !crawledData || Object.keys(crawledData).length === 0 || (!crawledData.url && (!crawledData.status || Object.keys(crawledData.status).length === 0) && (!crawledData.pages || crawledData.pages.length === 0) && (!crawledData.discoveredRoutes || crawledData.discoveredRoutes.length === 0));
+  if (isUnscanned) {
+    p1Score = 0;
+    p2Score = 0;
+    p3Score = 0;
+    p4Score = 0;
+  }
+
   // overallScore is exact sum of P1 + P2 + P3 + P4
   const overallScore = p1Score + p2Score + p3Score + p4Score;
 
@@ -929,12 +1070,14 @@ function evaluateCapabilities(crawledData = {}) {
       category: 'Gateway & Access',
       score: p1Score,
       max: 25,
-      status: getStatusFromScore(p1Score, 25),
+      status: isWafBlocked ? 'BLOCKED' : getStatusFromScore(p1Score, 25),
       deductions: p1Deductions,
-      deductionReason: p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason),
+      deductionReason: isWafBlocked ? `Automated Bot Traffic Rejected (HTTP ${wafStatusCode}) — Security Shield Active` : (p1Score === 25 ? '🟢 No deductions — All protocols clean.' : (isBlanketBlock ? 'Blanket Disallow: / active in robots.txt (-25 pts)' : p1DeductionReason)),
       impact: 'Determines whether edge firewalls, robots.txt, or HTTP headers block search crawlers and AI bots from accessing your domain.',
-      xRobotsIndexable: status.xRobotsIndexable !== false && sec1.xRobotsNoIndex !== true,
-      robotsTxtExists: robotsTxtExists && sec1.disallowAll !== true
+      xRobotsIndexable: isWafBlocked ? false : (status.xRobotsIndexable !== false && sec1.xRobotsNoIndex !== true),
+      robotsTxtExists: isWafBlocked ? false : (robotsTxtExists && sec1.disallowAll !== true),
+      blocked: isWafBlocked,
+      wafStatusCode: wafStatusCode
     },
     section2: {
       title: 'What can AI see?',
@@ -993,7 +1136,7 @@ function evaluateCapabilities(crawledData = {}) {
   const scanMetrics = {
     scanTimeSeconds: typeof crawledData.scanMetrics?.scanTimeSeconds === 'number'
       ? crawledData.scanMetrics.scanTimeSeconds
-      : (typeof crawledData.scanTimeSeconds === 'number' ? crawledData.scanTimeSeconds : 1.8),
+      : (typeof crawledData.scanTimeSeconds === 'number' ? crawledData.scanTimeSeconds : null),
     lastScanned: crawledData.scanMetrics?.lastScanned || crawledData.lastScanned || new Date().toISOString()
   };
 
@@ -1197,66 +1340,47 @@ function evaluateCapabilities(crawledData = {}) {
       };
     });
   } else {
-    const rootWords = status.wordCount ?? sec2.wordCount ?? 205;
-    const baseUrl = crawledData.url ? crawledData.url.replace(/\/$/, '') : '';
-    discoveredRoutes = [
-      {
-        path: '/',
-        wordCount: rootWords,
-        tokenLoad: Math.round(rootWords / 2),
-        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
-        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
-        isEssential: true,
-        missingStatus: rootWords === 0 ? 'Missing' : 'Active',
-        actionUrl: baseUrl ? `${baseUrl}/` : '/',
-        canonicalTag: false,
-        headingHierarchy: false,
-        isMobileFriendly: false,
-        hasSemanticTags: false,
-        imagesWithoutAlt: 0,
-        lastUpdated: "Unknown"
-      },
-      {
-        path: '/about',
-        wordCount: status.aboutTxtExists ? 350 : 0,
-        tokenLoad: status.aboutTxtExists ? Math.round(350 / 2) : 0,
-        hiddenFromAi: status.xRobotsIndexable === false || sec1.disallowAll === true,
-        inSitemap: Boolean(status.sitemapExists || sec2.sitemapExists),
-        isEssential: true,
-        missingStatus: status.aboutTxtExists ? 'Active' : 'Missing',
-        actionUrl: baseUrl ? `${baseUrl}/about` : '/about',
-        canonicalTag: false,
-        headingHierarchy: false,
-        isMobileFriendly: false,
-        hasSemanticTags: false,
-        imagesWithoutAlt: 0,
-        lastUpdated: "Unknown"
-      }
-    ];
+    discoveredRoutes = [];
   }
 
   // c) Missing Essential Pages Array
-  const essentialPagesList = ['/about', '/contact', '/privacy', '/terms'];
-  const detectedRoutes = new Set(discoveredRoutes.map(r => r.path || r.route || '/'));
-  const missingEssentialPages = essentialPagesList.filter(route => !detectedRoutes.has(route));
+  const pagesList = Array.isArray(crawledData.pages) ? crawledData.pages : [];
+  const inPageAnchors = Array.isArray(crawledData.inPageAnchors) ? crawledData.inPageAnchors : [];
+  const discoveredRoutesInput = Array.isArray(crawledData.discoveredRoutes) ? crawledData.discoveredRoutes : [];
+
+  const candidatePaths = [
+    ...pagesList.map(extractPathForEvaluation),
+    ...discoveredRoutesInput.map(extractPathForEvaluation),
+    ...inPageAnchors.map(a => String(a).trim().toLowerCase())
+  ].filter(Boolean);
+
+  const missingEssentialPages = [];
+  const foundEssentialPages = [];
+
+  for (const anchorDef of ESSENTIAL_ANCHOR_DEFINITIONS) {
+    const isFound = candidatePaths.some(path => 
+      anchorDef.patterns.some(pattern => pattern.test(path))
+    );
+
+    if (isFound) {
+      foundEssentialPages.push(anchorDef.canonical);
+    } else {
+      missingEssentialPages.push(anchorDef.canonical);
+    }
+  }
 
   // d) Domain Trust & EEAT Payload
   const isSecure = typeof crawledData.eeatMetrics?.isSecure === 'boolean'
     ? crawledData.eeatMetrics.isSecure
     : (sec2.isHttps !== false && (!targetUrl || targetUrl.startsWith('https')));
 
-  const hasContactInfo = typeof crawledData.eeatMetrics?.hasContactInfo === 'boolean'
-    ? crawledData.eeatMetrics.hasContactInfo
-    : (sec3.hasContactInfo !== false);
+  const hasContactPage = foundEssentialPages.includes('/contact');
+  const hasPrivacyPage = foundEssentialPages.includes('/privacy-policy');
 
-  const hasPrivacyPolicy = typeof crawledData.eeatMetrics?.hasPrivacyPolicy === 'boolean'
-    ? crawledData.eeatMetrics.hasPrivacyPolicy
-    : (sec3.hasPrivacyPolicy !== false);
+  const hasContactInfo = Boolean(crawledData.eeatMetrics?.hasContactInfo || sec3.hasContactInfo || hasContactPage || emailValue !== 'None Detected' || phoneValue !== 'None Detected');
+  const hasPrivacyPolicy = Boolean(crawledData.eeatMetrics?.hasPrivacyPolicy || sec3.hasPrivacyPolicy || hasPrivacyPage);
 
-  const results = crawledData;
-  const ageEstimate = results.eeatMetrics?.ageEstimate || sec3.ageEstimate || results.domainAge || "Pending WHOIS Integration";
-
-  let authorityStatus = results.eeatMetrics?.authorityStatus || results.authorityStatus || "Requires Ahrefs/Moz API";
+  let authorityStatus = crawledData.eeatMetrics?.authorityStatus || crawledData.authorityStatus || "Free Third-Party Check Available";
 
   let diagnosticSummary = crawledData.eeatMetrics?.diagnosticSummary;
   if (!diagnosticSummary) {
@@ -1264,13 +1388,18 @@ function evaluateCapabilities(crawledData = {}) {
       diagnosticSummary = 'Domain exhibits strong E-E-A-T trust signals with valid SSL security, verified contact information, active privacy policy, and established domain age authority.';
     } else if (authorityStatus === 'Information Isolation') {
       diagnosticSummary = 'Domain shows partial E-E-A-T trust credentials. Essential contact or privacy policies are partially isolated from search AI crawlers.';
-    } else if (authorityStatus === 'Requires Ahrefs/Moz API') {
-      diagnosticSummary = 'Domain authority status evaluation is pending Ahrefs/Moz API integration.';
+    } else if (authorityStatus === 'Free Third-Party Check Available') {
+      diagnosticSummary = 'Domain authority status evaluation is available via free third-party checks.';
     } else {
       diagnosticSummary = 'Domain presents E-E-A-T abstention risk. Security protocols or total AI disallow rules prevent LLMs from trusting entity authority.';
     }
   }
 
+
+  const ageEstimate = crawledData.domainAge || 
+    crawledData.eeatMetrics?.domainAge || 
+    crawledData.eeatMetrics?.ageEstimate || 
+    (crawledData.registrationDate ? 'Verified Domain Age' : '--');
 
   const eeatMetrics = {
     isSecure,
@@ -1281,13 +1410,306 @@ function evaluateCapabilities(crawledData = {}) {
     diagnosticSummary
   };
 
+  // Canonical 6-Stage Diagnostic Pipeline Calculation
+  const botPermissionsMap = status.botPermissions || {};
+  const stage1TotalCount = Object.keys(botPermissionsMap).length || 20;
+  const stage1AllowedCount = isWafBlocked ? 0 : Object.values(botPermissionsMap).filter(v => v === true || v === 'Allowed' || v === 'PASS' || v === 'allowed' || v === 'pass').length;
+  const stage1ScoreNum = isWafBlocked ? 0 : Math.round((stage1AllowedCount / stage1TotalCount) * 100);
+  const stage1Score = `${stage1ScoreNum}%`;
+  const stage1Status = isWafBlocked || stage1ScoreNum < 70 ? 'FAIL' : (stage1ScoreNum === 100 ? 'PASS' : 'WARN');
+  const stage1Summary = `Bot Access: ${stage1AllowedCount}/${stage1TotalCount} Verified Unblocked`;
+  const stage1Obj = {
+    title: 'AI Bot Blocks & Gateway Permissions',
+    allowedCount: stage1AllowedCount,
+    totalCount: stage1TotalCount,
+    score: stage1Score,
+    scoreNum: stage1ScoreNum,
+    status: stage1Status,
+    summaryText: stage1Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const stage2FoundCount = 5 - missingEssentialPages.length;
+  const stage2MissingCount = missingEssentialPages.length;
+  const stage2ScoreNum = Math.round((stage2FoundCount / 5) * 100);
+  const stage2Score = `${stage2ScoreNum}%`;
+  const stage2Status = stage2FoundCount === 5 ? 'PASS' : (stage2FoundCount >= 3 ? 'WARN' : 'FAIL');
+  const stage2Summary = stage2FoundCount === 5
+    ? 'All 5 Essential Content Pages Discovered'
+    : `Essential Pages: ${stage2FoundCount} Found, ${stage2MissingCount} Missing (${missingEssentialPages.join(', ')})`;
+  const stage2Obj = {
+    title: 'Identifiable Essential Pages & Anchors',
+    foundCount: stage2FoundCount,
+    missingCount: stage2MissingCount,
+    missingRoutes: missingEssentialPages,
+    score: stage2Score,
+    scoreNum: stage2ScoreNum,
+    status: stage2Status,
+    summaryText: stage2Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const rawPagesList = Array.isArray(crawledData.pages) ? crawledData.pages : [];
+  const validPages = rawPagesList.filter(p => 
+    p && typeof p === 'object' && 
+    p.statusCode !== 404 && 
+    p.status !== 404 && 
+    p.is404 !== true && 
+    p.isMissing !== true && 
+    p.isCrawled !== false
+  );
+  const highExtractabilityPages = validPages.filter(p => {
+    const rawR = p.contentDensityRatio ?? p.textDensityRatio ?? p.textCodeRatio ?? p.ratio ?? p.textRatio ?? 0;
+    const ratio = (rawR > 0 && rawR <= 1) ? rawR * 100 : Number(rawR);
+    const wc = p.wordCount ?? p.words ?? 0;
+    return ratio >= 25 && wc >= 250;
+  }).length;
+  const totalValidPages = validPages.length;
+  const stage3ScoreNum = totalValidPages > 0 ? Math.round((highExtractabilityPages / totalValidPages) * 100) : 0;
+  const stage3Score = `${stage3ScoreNum}%`;
+  const stage3Status = totalValidPages === 0 ? 'FAIL' : (stage3ScoreNum >= 75 ? 'PASS' : (stage3ScoreNum >= 50 ? 'WARN' : 'FAIL'));
+  const stage3Summary = `Citation Readability: ${highExtractabilityPages}/${totalValidPages} High Extractability`;
+  const stage3Obj = {
+    title: 'Content Availability & Semantic Text Density',
+    totalValidPages,
+    highExtractabilityCount: highExtractabilityPages,
+    score: stage3Score,
+    scoreNum: stage3ScoreNum,
+    status: stage3Status,
+    summaryText: stage3Summary,
+    classification: 'AI-Optimized'
+  };
+
+  const isHtmlRoute = (routeOrUrl) => {
+    if (!routeOrUrl || typeof routeOrUrl !== 'string') return false;
+    const clean = routeOrUrl.split('?')[0].split('#')[0].toLowerCase();
+    if (/\.(txt|md|xml|json|png|jpg|jpeg|gif|svg|pdf|css|js|woff|woff2)$/i.test(clean)) return false;
+    if (['/robots.txt', '/llms.txt', '/llms-full.txt', '/ai-context.md', '/about.md', '/docs.md', '/content.md', '/sitemap.xml'].includes(clean)) return false;
+    return true;
+  };
+
+  const validHtmlPages = validPages.filter(p => isHtmlRoute(p.route || p.path || p.url || ''));
+
+  // Card 1: Schema Details Calculation
+  const detectedSchemaTypesSet = new Set();
+  let pagesWithSchema = 0;
+  const missingRoutes = [];
+
+  validHtmlPages.forEach(p => {
+    const schemas = Array.isArray(p.schemas) 
+      ? p.schemas 
+      : (p.schema && Array.isArray(p.schema.rawJsonLd) ? p.schema.rawJsonLd : []);
+
+    const typesFromP = (Array.isArray(p.schemaTypes) && p.schemaTypes.length > 0)
+      ? p.schemaTypes
+      : (Array.isArray(p.schema?.detectedTypes) 
+          ? p.schema.detectedTypes 
+          : schemas.map(s => s && (s['@type'] || s.type)).filter(Boolean));
+
+    typesFromP.forEach(t => {
+      if (Array.isArray(t)) t.forEach(sub => sub && detectedSchemaTypesSet.add(sub));
+      else if (t) detectedSchemaTypesSet.add(t);
+    });
+
+    const hasPageSchema = Boolean(
+      p.hasSchema === true || 
+      typesFromP.length > 0 || 
+      schemas.length > 0 ||
+      (p.schema && Object.keys(p.schema).length > 0 && p.schema.detectedTypes?.length)
+    );
+
+    if (hasPageSchema) {
+      pagesWithSchema++;
+    } else {
+      missingRoutes.push(p.route || p.path || p.url || '/');
+    }
+  });
+
+  // Fallback to top-level status.jsonLdTypes if present
+  if (Array.isArray(status.jsonLdTypes)) {
+    status.jsonLdTypes.forEach(t => t && detectedSchemaTypesSet.add(t));
+  }
+
+  if (pagesWithSchema === 0 && (status.jsonLdExists || (Array.isArray(status.jsonLdTypes) && status.jsonLdTypes.length > 0))) {
+    pagesWithSchema = 1;
+    // remove homepage from missingRoutes if present
+    const homeIdx = missingRoutes.indexOf('/');
+    if (homeIdx !== -1) missingRoutes.splice(homeIdx, 1);
+  }
+
+  const detectedTypes = Array.from(detectedSchemaTypesSet);
+  const totalPages = validHtmlPages.length;
+  const pagesWithSchemaCount = pagesWithSchema;
+  const pagesMissingSchemaCount = Math.max(0, totalPages - pagesWithSchemaCount);
+  const coveragePercent = totalPages > 0 ? Math.round((pagesWithSchemaCount / totalPages) * 100) : 0;
+
+  let schemaStatus = 'PASS';
+  let severityBadge = '100% COVERAGE (PASS)';
+  if (detectedTypes.length === 0 && pagesWithSchemaCount === 0) {
+    schemaStatus = 'CRITICAL';
+    severityBadge = 'CRITICAL: 0% COVERAGE';
+  } else if (pagesWithSchemaCount > 0 && pagesMissingSchemaCount > 0) {
+    schemaStatus = 'WARN';
+    severityBadge = `${pagesWithSchemaCount}/${totalPages} PAGES WITH SCHEMA (${coveragePercent}%)`;
+  } else if (pagesMissingSchemaCount === 0 && totalPages > 0) {
+    schemaStatus = 'PASS';
+    severityBadge = '100% COVERAGE (PASS)';
+  } else {
+    schemaStatus = 'CRITICAL';
+    severityBadge = 'CRITICAL: 0% COVERAGE';
+  }
+
+  const schemaDetails = {
+    detectedTypes,
+    totalPages,
+    pagesWithSchemaCount,
+    pagesMissingSchemaCount,
+    missingRoutes,
+    coveragePercent,
+    status: schemaStatus,
+    severityBadge
+  };
+
+  // Card 2: Author Person E-E-A-T Calculation
+  const uniqueAuthorsMap = new Map();
+  validPages.forEach(p => {
+    if (Array.isArray(p.authors)) {
+      p.authors.forEach(a => {
+        if (a && a.name) {
+          const key = a.name.toLowerCase().trim();
+          if (!uniqueAuthorsMap.has(key)) {
+            uniqueAuthorsMap.set(key, { ...a });
+          } else {
+            // Merge sameAs links
+            const existing = uniqueAuthorsMap.get(key);
+            if (Array.isArray(a.sameAs)) {
+              existing.sameAs = [...new Set([...(existing.sameAs || []), ...a.sameAs])];
+            }
+          }
+        }
+      });
+    }
+  });
+
+  const authors = Array.from(uniqueAuthorsMap.values());
+  const authorCount = authors.length;
+  const authorStatus = authorCount > 0 ? 'PASS' : 'CRITICAL';
+  const authorSeverityBadge = authorCount > 0 ? `${authorCount} AUTHOR(S) VERIFIED` : 'CRITICAL: 0 AUTHORS DETECTED';
+
+  const authorDetails = {
+    authors,
+    authorCount,
+    status: authorStatus,
+    severityBadge: authorSeverityBadge
+  };
+
+  // Card 3: Authority & Domain Age Details Calculation
+  let targetDomain = '';
+  try {
+    const rawUrl = crawledData.url || crawledData.targetUrl || '';
+    if (rawUrl) {
+      targetDomain = new URL(rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`).hostname.replace(/^www\./i, '');
+    }
+  } catch (_) {
+    targetDomain = '';
+  }
+
+  const domainAge = crawledData.domainAge || 
+                    crawledData.eeatMetrics?.domainAge || 
+                    crawledData.eeatMetrics?.ageEstimate || 
+                    (crawledData.registrationDate ? 'Verified Domain Age' : '--');
+
+  const registrationDate = crawledData.registrationDate || crawledData.eeatMetrics?.registrationDate || null;
+  const isAgeVerified = Boolean(registrationDate || (domainAge && domainAge !== '--' && !domainAge.includes('Unresolved') && !domainAge.includes('Pending')));
+
+  const externalCheckerUrl = targetDomain
+    ? `https://ahrefs.com/website-authority-checker/?input=${encodeURIComponent(targetDomain)}`
+    : null;
+
+  const authorityDetails = {
+    domainAge: isAgeVerified ? domainAge : (domainAge.includes('Pending') ? domainAge : '--'),
+    registrationDate,
+    externalCheckerUrl,
+    authorityStatus: "Free Third-Party Check Available",
+    status: isAgeVerified ? 'PASS' : 'PENDING'
+  };
+
+  const stage4ScoreNum = Math.round((p3Score / 25) * 100);
+  const stage4Score = `${stage4ScoreNum}%`;
+  const stage4Status = stage4ScoreNum >= 80 ? 'PASS' : (stage4ScoreNum >= 50 ? 'WARN' : 'FAIL');
+  const stage4Summary = stage4ScoreNum >= 80 ? 'Trust & E-E-A-T: Schema & Entity Validated' : 'Trust & E-E-A-T: Entity Authority Gaps Detected';
+  const stage4Obj = {
+    title: 'Trust & E-E-A-T',
+    score: stage4Score,
+    scoreNum: stage4ScoreNum,
+    status: stage4Status,
+    summaryText: stage4Summary,
+    classification: 'AI-Optimized',
+    schemaDetails,
+    authorDetails,
+    authorityDetails
+  };
+
+  const manifestChecks = {
+    robotsTxt: Boolean(status.robotsTxtExists ?? sec4.robotsTxtFound),
+    sitemapXml: Boolean(status.sitemapExists ?? sec4.sitemapFound),
+    llmsTxt: Boolean(status.llmsTxtExists ?? sec4.llmsTxtFound),
+    aiContextMd: Boolean(status.aiContextExists ?? sec4.aiContextFound),
+    aboutMd: Boolean(status.aboutTxtExists ?? sec4.aboutMdFound),
+    docsMd: Boolean(status.docsTxtExists ?? sec4.docsMdFound),
+    contentMd: Boolean(status.contentTxtExists ?? sec4.contentMdFound)
+  };
+  const totalManifests = 7;
+  const manifestsFound = Object.values(manifestChecks).filter(Boolean).length;
+  const stage5ScoreNum = Math.round((manifestsFound / 7) * 100);
+  const stage5Score = `${stage5ScoreNum}%`;
+  const stage5Status = manifestsFound === 7 ? 'PASS' : (manifestsFound >= 3 ? 'WARN' : 'FAIL');
+  const stage5Summary = `AI-Ready Files: ${manifestsFound}/7 Manifests Active`;
+  const stage5Obj = {
+    title: 'Machine Manifest Protocols',
+    governanceGate: 'AI-Ready',
+    manifestsFound,
+    totalManifests,
+    manifestChecks,
+    score: stage5Score,
+    scoreNum: stage5ScoreNum,
+    status: stage5Status,
+    summaryText: stage5Summary,
+    classification: 'AI-Ready'
+  };
+
+  const humanWebReadiness = Math.round(((p1Score + p2Score + p3Score) / 75) * 100);
+  const machineWebReadiness = Math.round((p4Score / 25) * 100);
+  const stage6Status = overallScore >= 80 ? 'OPTIMIZED' : (overallScore >= 50 ? 'NEEDS IMPROVEMENT' : 'CRITICAL');
+  const stage6Obj = {
+    title: 'Executive Boardroom & Action Triage',
+    score: `${overallScore}%`,
+    healthIndex: overallScore,
+    status: stage6Status,
+    humanWebReadiness,
+    machineWebReadiness,
+    summaryText: `Boardroom Summary: Overall AEO Health Index ${overallScore}/100`,
+    classification: 'Executive Boardroom'
+  };
+
+  const stages = {
+    stage1: stage1Obj,
+    stage2: stage2Obj,
+    stage3: stage3Obj,
+    stage4: stage4Obj,
+    stage5: stage5Obj,
+    stage6: stage6Obj
+  };
+
   // Mutate crawledData in place to ensure these fields get returned in response JSON
   crawledData.discoveredRoutes = discoveredRoutes;
   crawledData.eeatMetrics = eeatMetrics;
   crawledData.emailValue = emailValue;
   crawledData.phoneValue = phoneValue;
   crawledData.missingEssentialPages = missingEssentialPages;
+  crawledData.discoveredEssentialPages = foundEssentialPages;
   crawledData.scrapedContentPreview = scrapedContentPreview;
+  crawledData.stages = stages;
 
   // Map trust and E-E-A-T metrics into executiveSections.section3 and executiveSections[2] (Section 3)
   if (executiveSections && executiveSections.section3) {
@@ -1318,6 +1740,7 @@ function evaluateCapabilities(crawledData = {}) {
     },
     executiveSections,
     capabilityMatrix,
+    stages,
     scanMetrics,
     scrapedContentPreview,
     manifestPreviews,
@@ -1325,7 +1748,8 @@ function evaluateCapabilities(crawledData = {}) {
     eeatMetrics,
     emailValue,
     phoneValue,
-    missingEssentialPages
+    missingEssentialPages,
+    discoveredEssentialPages: foundEssentialPages
   };
 }
 
@@ -1339,6 +1763,7 @@ function evaluateAllCapabilities(scanData = {}) {
     overallScore: evalResult.overallScore,
     pillarScores: evalResult.pillarScores,
     executiveSections: evalResult.executiveSections,
+    stages: evalResult.stages,
     totalCapabilities: evalResult.capabilityMatrix.length,
     sectionScores: {
       section1: evalResult.pillarScores.P1,
@@ -1357,11 +1782,18 @@ function evaluateAllCapabilities(scanData = {}) {
     eeatMetrics: evalResult.eeatMetrics,
     emailValue: evalResult.emailValue,
     phoneValue: evalResult.phoneValue,
-    missingEssentialPages: evalResult.missingEssentialPages
+    missingEssentialPages: evalResult.missingEssentialPages,
+    discoveredEssentialPages: evalResult.discoveredEssentialPages
   };
 }
 
-module.exports = {
+export {
+  evaluateCapabilities,
+  evaluateAllCapabilities,
+  CAPABILITY_MATRIX
+};
+
+export default {
   evaluateCapabilities,
   evaluateAllCapabilities,
   CAPABILITY_MATRIX

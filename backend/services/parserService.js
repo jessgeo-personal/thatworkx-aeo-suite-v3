@@ -1,9 +1,9 @@
-const cheerio = require('cheerio');
+import * as cheerio from 'cheerio';
 
 /**
  * Level 2 Parser Service: DOM Noise Stripping, Content Density, SPA Trap Detection & JSON-LD Extraction
  */
-const parseHtmlMetrics = (htmlContent) => {
+export const parseHtmlMetrics = (htmlContent) => {
   if (!htmlContent || typeof htmlContent !== 'string') {
     return {
       rawText: '',
@@ -83,4 +83,4 @@ const parseHtmlMetrics = (htmlContent) => {
   };
 };
 
-module.exports = { parseHtmlMetrics };
+export default { parseHtmlMetrics };
