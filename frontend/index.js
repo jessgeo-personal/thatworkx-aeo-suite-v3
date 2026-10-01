@@ -1040,7 +1040,8 @@ function switchProduct(productName) {
   document.getElementById(`panel-${productName}`).classList.add('active');
 
   // Display/Hide headless execution controls depending on the active product and tier
-  const tier = document.getElementById('user-tier-selector').value;
+  const tierSelector = document.getElementById('user-tier-selector');
+  const tier = tierSelector ? tierSelector.value : '';
   const isAio = productName === 'optimize' || productName === 'visualize';
   const headlessControls = document.getElementById('headless-checkbox-wrapper');
   
@@ -6314,4 +6315,27 @@ if (typeof document !== 'undefined') {
 }
 
 
-
+
+function toggleSidebar(isOpen) {
+  const sidebar = document.getElementById('main-terminal-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar) {
+    if (isOpen) {
+      sidebar.classList.remove('-translate-x-full');
+      sidebar.classList.add('translate-x-0');
+    } else {
+      sidebar.classList.remove('translate-x-0');
+      sidebar.classList.add('-translate-x-full');
+    }
+  }
+  if (backdrop) {
+    if (isOpen) {
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    } else {
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+    }
+  }
+}
+window.toggleSidebar = toggleSidebar;

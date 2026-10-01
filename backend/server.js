@@ -1,22 +1,15 @@
-const path = require('path');
-const fs = require('fs');
-if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
-  const devEnv = path.join(__dirname, '../.env.development');
-  const defaultEnv = path.join(__dirname, '../.env');
-  if (fs.existsSync(devEnv)) {
-    require('dotenv').config({ path: devEnv });
-  } else if (fs.existsSync(defaultEnv)) {
-    require('dotenv').config({ path: defaultEnv });
-  }
-}
-const express = require('express');
-const cors = require('cors');
-const queueService = require('./services/queueService');
-const mongoose = require('mongoose');
-const { checkTierLimits } = require('./middleware/rateLimiter');
-const { analyzeUrl } = require('./services/crawlerService');
-const { evaluateCapabilities } = require('./services/capabilityEvaluator');
-const {
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import queueService from './services/queueService.js';
+import mongoose from 'mongoose';
+import { checkTierLimits } from './middleware/rateLimiter.js';
+import { analyzeUrl } from './services/crawlerService.js';
+import { evaluateCapabilities } from './services/capabilityEvaluator.js';
+import {
   generateLlmsTxt,
   generateAiContextMd,
   generateCloudflareWorkerJs,
@@ -26,13 +19,26 @@ const {
   generateDocsMd,
   generateContentMd,
   generateSitemapXml
-} = require('./services/generatorService');
-const { registerUser, loginUser, getCurrentUser, verifyOtp } = require('./controllers/authController');
-const User = require('./models/User');
-const ScanLog = require('./models/ScanLog');
-const DomainProfile = require('./models/DomainProfile');
-const BetaSignup = require('./models/BetaSignup');
-const url = require('url');
+} from './services/generatorService.js';
+import { registerUser, loginUser, getCurrentUser, verifyOtp, sendOtp } from './controllers/authController.js';
+import User from './models/User.js';
+import ScanLog from './models/ScanLog.js';
+import DomainProfile from './models/DomainProfile.js';
+import BetaSignup from './models/BetaSignup.js';
+import url from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
+  const devEnv = path.join(__dirname, '../.env.development');
+  const defaultEnv = path.join(__dirname, '../.env');
+  if (fs.existsSync(devEnv)) {
+    dotenv.config({ path: devEnv });
+  } else if (fs.existsSync(defaultEnv)) {
+    dotenv.config({ path: defaultEnv });
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -157,6 +163,16 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     // Pass partialSyncLimit = 25
     const scanResults = await analyzeUrl(targetUrl, req.userLimits || { maxPages: 25 }, singlePagePath, 25);
 
+    // If the crawler failed to resolve or connect to the target domain, return HTTP 422
+    if (scanResults.status === 'failed' || scanResults.error) {
+      return res.status(422).json({
+        targetUrl,
+        status: 'failed',
+        error: scanResults.error || 'Target domain could not be resolved or reached.',
+        results: scanResults
+      });
+    }
+
     if (singlePagePath) {
       return res.status(200).json({
         success: true,
@@ -170,6 +186,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     user.daily_scans_performed += 1;
 
@@ -259,6 +276,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
           tier: user.subscription_tier
         },
         results: scanResults,
+        stages: evaluation.stages,
         overallScore: evaluation.overallScore,
         pillarScores: evaluation.pillarScores,
         executiveSections: evaluation.executiveSections,
@@ -276,6 +294,7 @@ app.post('/api/scan', checkTierLimits, async (req, res) => {
         tier: user.subscription_tier
       },
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,
@@ -294,16 +313,6 @@ app.get('/api/scan/status/:jobId', (req, res) => {
   const job = queueService.getJobStatus(jobId);
   
   if (!job) {
-    // Fallback for tests or standard mock jobs
-    if (jobId === 'mock-job-id-123') {
-      return res.json({
-        jobId,
-        status: 'processing',
-        pagesCompleted: 30,
-        totalQueued: 40,
-        results: []
-      });
-    }
     return res.status(404).json({ error: 'Job not found' });
   }
 
@@ -340,9 +349,10 @@ app.post('/api/user/tier', async (req, res) => {
 });
 
 // Authentication & Session Routes
+app.post('/api/auth/send-otp', sendOtp);
+app.post('/api/auth/verify-otp', verifyOtp);
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
-app.post('/api/auth/verify-otp', verifyOtp);
 app.get('/api/auth/me', getCurrentUser);
 
 // Beta Signup Route
@@ -383,6 +393,17 @@ app.post('/api/beta-signup', async (req, res) => {
   } catch (error) {
     console.error('Beta Signup Route Error:', error);
     return res.status(500).json({ error: 'Failed to process beta registration' });
+  }
+});
+
+// Endpoint for AI Optimize Pro Waitlist Submissions
+app.post('/api/waitlist', async (req, res) => {
+  try {
+    const { handleWaitlistSubmission } = await import('./controllers/waitlistController.js');
+    return handleWaitlistSubmission(req, res);
+  } catch (err) {
+    console.error('Waitlist route error:', err);
+    return res.status(500).json({ success: false, error: 'Internal server error processing waitlist registration.' });
   }
 });
 
@@ -451,12 +472,14 @@ app.get('/api/v1/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     res.json({
       success: true,
       api_version: 'v1',
       target_url: targetUrl,
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,
@@ -485,12 +508,14 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
     scanResults.pillarScores = evaluation.pillarScores;
     scanResults.executiveSections = evaluation.executiveSections;
     scanResults.capabilityMatrix = evaluation.capabilityMatrix;
+    scanResults.stages = evaluation.stages;
 
     res.json({
       success: true,
       api_version: 'v1',
       target_url: target,
       results: scanResults,
+      stages: evaluation.stages,
       overallScore: evaluation.overallScore,
       pillarScores: evaluation.pillarScores,
       executiveSections: evaluation.executiveSections,
@@ -502,6 +527,107 @@ app.post('/api/v1/scan', checkTierLimits, async (req, res) => {
   }
 });
 
+app.post('/api/test/crawler', async (req, res) => {
+  let targetUrl = req.body?.targetUrl;
+  try {
+    if (!targetUrl) {
+      return res.status(422).json({
+        success: false,
+        service: 'crawlerService',
+        error: 'targetUrl is required',
+        data: null
+      });
+    }
+
+    targetUrl = targetUrl.trim();
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
+    const maxPages = req.body?.maxPages ? Number(req.body.maxPages) : 25;
+    const scanResults = await analyzeUrl(targetUrl, { maxPages, tier: 'test' });
+
+    if (scanResults.status === 'failed' || scanResults.error) {
+      return res.status(422).json({
+        success: false,
+        service: 'crawlerService',
+        error: scanResults.error || 'Crawler probe failed',
+        data: scanResults
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      service: 'crawlerService',
+      targetUrl,
+      data: scanResults
+    });
+  } catch (err) {
+    return res.status(422).json({
+      success: false,
+      service: 'crawlerService',
+      error: err.message || 'Internal crawler probe error',
+      data: null
+    });
+  }
+});
+
+app.post('/api/test/evaluator', async (req, res) => {
+  let targetUrl = req.body?.targetUrl;
+  const crawlPayload = req.body?.crawlPayload;
+
+  try {
+    let scanResults;
+    if (crawlPayload && typeof crawlPayload === 'object') {
+      scanResults = crawlPayload;
+      targetUrl = targetUrl || scanResults.url || 'https://example.com';
+    } else {
+      if (!targetUrl) {
+        return res.status(422).json({
+          success: false,
+          service: 'capabilityEvaluator',
+          error: 'targetUrl or crawlPayload is required',
+          data: null
+        });
+      }
+
+      targetUrl = targetUrl.trim();
+      if (!/^https?:\/\//i.test(targetUrl)) {
+        targetUrl = 'https://' + targetUrl;
+      }
+
+      const maxPages = req.body?.maxPages ? Number(req.body.maxPages) : 25;
+      scanResults = await analyzeUrl(targetUrl, { maxPages, tier: 'test' });
+
+      if (scanResults.status === 'failed' || scanResults.error) {
+        return res.status(422).json({
+          success: false,
+          service: 'capabilityEvaluator',
+          error: scanResults.error || 'Target domain could not be reached',
+          data: scanResults
+        });
+      }
+    }
+
+    const evaluation = evaluateCapabilities(scanResults);
+
+    return res.status(200).json({
+      success: true,
+      service: 'capabilityEvaluator',
+      targetUrl,
+      crawlData: scanResults,
+      evaluationData: evaluation
+    });
+  } catch (err) {
+    return res.status(422).json({
+      success: false,
+      service: 'capabilityEvaluator',
+      error: err.message || 'Capability evaluation probe failed',
+      data: null
+    });
+  }
+});
+
 // Serve frontend assets — disable cache in dev so JS/CSS changes are instant
 app.use(express.static(path.join(__dirname, '../frontend'), {
   etag: false,
@@ -510,6 +636,22 @@ app.use(express.static(path.join(__dirname, '../frontend'), {
     res.setHeader('Cache-Control', 'no-store');
   }
 }));
+
+app.get('/test-crawler', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-crawler.html'));
+});
+
+app.get('/test-evaluator', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-evaluator.html'));
+});
+
+app.get('/test-server', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-server.html'));
+});
+
+app.get('/test-adapter', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/test-adapter.html'));
+});
 
 app.get('/visualize', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/visualize.html'));
@@ -531,5 +673,6 @@ app.listen(PORT, () => {
   console.log(`Thatworkx AEO Suite backend running on http://localhost:${PORT}`);
 });
 
-module.exports = app;
+export { app };
+export default app;
 

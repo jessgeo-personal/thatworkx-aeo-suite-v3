@@ -1,8 +1,49 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const url = require('url');
-const { parseHtmlMetrics } = require('./parserService');
-const { evaluateCapabilities } = require('./capabilityEvaluator');
+import axios from 'axios';
+import * as cheerio from 'cheerio';
+import url from 'url';
+import { parseHtmlMetrics } from './parserService.js';
+import { evaluateCapabilities } from './capabilityEvaluator.js';
+import whois from 'whois-json';
+
+// ============================================================================
+// CENTRAL CRAWLER TIMEOUT & CONCURRENCY CONFIGURATION
+// You can adjust these values here or override them via your .env file.
+// ============================================================================
+const CRAWLER_CONFIG = {
+  // Timeout for proactive essential route probes (supports multi-hop enterprise redirects)
+  PROBE_TIMEOUT_MS: parseInt(process.env.PROBE_TIMEOUT_MS, 10) || 7500, // 7.5 seconds default
+
+  // Timeout for individual page crawls in the main BFS queue
+  PAGE_FETCH_TIMEOUT_MS: parseInt(process.env.PAGE_FETCH_TIMEOUT_MS, 10) || 6000, // 6.0 seconds default
+};
+
+const AI_CRAWLERS = [
+  { key: 'gptBot', name: 'GPTBot', pattern: /User-agent:\s*GPTBot\s*Disallow:\s*\//i },
+  { key: 'chatGptUser', name: 'ChatGPT-User', pattern: /User-agent:\s*ChatGPT-User\s*Disallow:\s*\//i },
+  { key: 'oaiSearchBot', name: 'OAI-SearchBot', pattern: /User-agent:\s*OAI-SearchBot\s*Disallow:\s*\//i },
+  { key: 'claudeBot', name: 'ClaudeBot', pattern: /User-agent:\s*(ClaudeBot|Claude-Web)\s*Disallow:\s*\//i },
+  { key: 'claudeWeb', name: 'Claude-Web', pattern: /User-agent:\s*Claude-Web\s*Disallow:\s*\//i },
+  { key: 'claudeSearchBot', name: 'Claude-SearchBot', pattern: /User-agent:\s*Claude-SearchBot\s*Disallow:\s*\//i },
+  { key: 'googleExtended', name: 'Google-Extended', pattern: /User-agent:\s*Google-Extended\s*Disallow:\s*\//i },
+  { key: 'googlebot', name: 'Googlebot', pattern: /User-agent:\s*Googlebot\s*Disallow:\s*\//i },
+  { key: 'bingbot', name: 'Bingbot', pattern: /User-agent:\s*Bingbot\s*Disallow:\s*\//i },
+  { key: 'perplexityBot', name: 'PerplexityBot', pattern: /User-agent:\s*PerplexityBot\s*Disallow:\s*\//i },
+  { key: 'applebotExtended', name: 'Applebot-Extended', pattern: /User-agent:\s*Applebot-Extended\s*Disallow:\s*\//i },
+  { key: 'metaExternalAgent', name: 'Meta-ExternalAgent', pattern: /User-agent:\s*Meta-ExternalAgent\s*Disallow:\s*\//i },
+  { key: 'metaWebIndexer', name: 'Meta-WebIndexer', pattern: /User-agent:\s*Meta-WebIndexer\s*Disallow:\s*\//i },
+  { key: 'amazonbot', name: 'Amazonbot', pattern: /User-agent:\s*Amazonbot\s*Disallow:\s*\//i },
+  { key: 'bytespider', name: 'Bytespider', pattern: /User-agent:\s*Bytespider\s*Disallow:\s*\//i },
+  { key: 'ccBot', name: 'CCBot', pattern: /User-agent:\s*CCBot\s*Disallow:\s*\//i },
+  { key: 'cohereAi', name: 'cohere-ai', pattern: /User-agent:\s*cohere-ai\s*Disallow:\s*\//i },
+  { key: 'mistralBot', name: 'MistralBot', pattern: /User-agent:\s*MistralBot\s*Disallow:\s*\//i },
+  { key: 'qwenBot', name: 'QwenBot', pattern: /User-agent:\s*QwenBot\s*Disallow:\s*\//i },
+  { key: 'baiduAnsur', name: 'Baidu-Ansur', pattern: /User-agent:\s*Baidu-Ansur\s*Disallow:\s*\//i }
+];
+
+const defaultBotPermissions = () => AI_CRAWLERS.reduce((acc, bot) => {
+  acc[bot.key] = true;
+  return acc;
+}, {});
 
 const fetchPageWithTimeout = async (pageUrl) => {
   const controller = new AbortController();
@@ -13,28 +54,386 @@ const fetchPageWithTimeout = async (pageUrl) => {
       timeout: 3500
     });
     clearTimeout(timeoutId);
-    return { success: true, data: pageRes.data };
+    return { success: true, data: pageRes.data, headers: pageRes.headers, status: pageRes.status, statusCode: pageRes.status };
   } catch (error) {
     clearTimeout(timeoutId);
     const isTimeout = error.name === 'AbortError' || error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'));
+    const status = error.response ? error.response.status : (isTimeout ? 408 : null);
     return {
       success: false,
+      status,
+      statusCode: status,
       error: isTimeout ? 'heavy_page_timeout' : error.message
     };
   }
 };
 
-const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
+/**
+ * Equates apex and organizational subdomains (e.g., support.microsoft.com is part of microsoft.com).
+ * Rejects third parties (google.com) and lookalikes (support-microsoft.com).
+ */
+function isSameDomainOrSubdomain(targetUrl, candidateUrl) {
+  try {
+    const h1 = new URL(targetUrl).hostname.toLowerCase().replace(/^www\./, '');
+    const h2 = new URL(candidateUrl).hostname.toLowerCase().replace(/^www\./, '');
+
+    if (h1 === h2) return true;
+    if (h2.endsWith('.' + h1)) return true;
+    if (h1.endsWith('.' + h2)) return true;
+
+    const getApex = (host) => {
+      const parts = host.split('.');
+      if (parts.length <= 2) return host;
+      const secondLevel = parts[parts.length - 2];
+      const topLevel = parts[parts.length - 1];
+      if (['co', 'com', 'org', 'net', 'edu', 'gov'].includes(secondLevel) && topLevel.length === 2) {
+        return parts.slice(-3).join('.');
+      }
+      return parts.slice(-2).join('.');
+    };
+
+    const apex1 = getApex(h1);
+    const apex2 = getApex(h2);
+
+    if (apex1 && apex1 === apex2) {
+      if (h2 === apex1 || h2.endsWith('.' + apex1)) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Validates if candidate URL belongs to target domain or an organizational subdomain.
+ * Excludes noisy/auth redirect subdomains (login, account, appsource, sso, etc.)
+ */
+function isInternalLink(candidateUrl, baseUrl) {
+  if (!candidateUrl || !baseUrl) return false;
+  try {
+    const candidateObj = new URL(candidateUrl, baseUrl);
+    if (!['http:', 'https:'].includes(candidateObj.protocol)) return false;
+
+    if (!isSameDomainOrSubdomain(baseUrl, candidateObj.href)) return false;
+
+    const candidateHost = candidateObj.hostname.toLowerCase();
+    const baseHost = new URL(baseUrl).hostname.toLowerCase().replace(/^www\./, '');
+
+    // Reject authentication, profile, marketplace, and portal subdomains prone to redirect loops
+    const NOISY_SUBDOMAIN_PREFIXES = [
+      'login.', 'account.', 'accounts.', 'appsource.', 'auth.',
+      'signin.', 'signup.', 'sso.', 'admin.', 'billing.',
+      'myaccount.', 'identity.', 'portal.', 'secure.'
+    ];
+
+    if (NOISY_SUBDOMAIN_PREFIXES.some(prefix => candidateHost === prefix.slice(0, -1) + '.' + baseHost || candidateHost.startsWith(prefix))) {
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Concurrently probes the 5 essential route categories in parallel with central timeout.
+ * Skips categories already found in BFS crawl to preserve bandwidth and avoid WAF rate-limiting.
+ */
+async function probeEssentialRoutes(
+  targetUrl, 
+  pages = [], 
+  discoveredRoutes = [], 
+  fetchFn = fetch, 
+  timeoutMs = CRAWLER_CONFIG.PROBE_TIMEOUT_MS
+) {
+  const ESSENTIAL_PROBE_GROUPS = [
+    {
+      category: 'about',
+      paths: ['/about', '/about-us', '/aboutus']
+    },
+    {
+      category: 'contact',
+      paths: ['/contact', '/contact-us', '/contactus']
+    },
+    {
+      category: 'pricing',
+      paths: ['/pricing', '/store', '/buy']
+    },
+    {
+      category: 'privacy',
+      paths: ['/privacy', '/privacy-policy', '/privacystatement', '/privacy-statement']
+    },
+    {
+      category: 'terms',
+      paths: ['/terms', '/terms-of-service', '/terms-of-use', '/terms-and-conditions', '/servicesagreement', '/services-agreement']
+    }
+  ];
+
+  // Identify which categories still require probing
+  const pathsToProbe = [];
+  for (const group of ESSENTIAL_PROBE_GROUPS) {
+    const alreadyFound = pages.some(p => {
+      try {
+        const path = (new URL(p.url, targetUrl).pathname || '').toLowerCase();
+        return group.paths.some(gp => path.includes(gp.replace(/^\//, '')));
+      } catch {
+        return false;
+      }
+    });
+
+    if (!alreadyFound) {
+      pathsToProbe.push(...group.paths);
+    }
+  }
+
+  // Execute all required probes concurrently using the central timeout
+  const probeTasks = pathsToProbe.map(async (probePath) => {
+    let signal;
+    let timer;
+
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+      signal = AbortSignal.timeout(timeoutMs);
+    } else {
+      const controller = new AbortController();
+      timer = setTimeout(() => controller.abort(), timeoutMs);
+      signal = controller.signal;
+    }
+
+    try {
+      const probeTarget = new URL(probePath, targetUrl).href;
+      const probeRes = await fetchFn(probeTarget, {
+        method: 'GET',
+        redirect: 'follow',
+        signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 (compatible; AIO-Diagnostic-Crawler/3.0)'
+        }
+      });
+
+      if (timer) clearTimeout(timer);
+
+      if (probeRes && probeRes.ok) {
+        const finalUrl = probeRes.url || probeTarget;
+        if (isSameDomainOrSubdomain(targetUrl, finalUrl)) {
+          const rawHtml = typeof probeRes.text === 'function' ? await probeRes.text() : '';
+          pages.push({
+            url: finalUrl,
+            statusCode: probeRes.status,
+            content: rawHtml,
+            wordCount: rawHtml.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length,
+            isCrawled: true
+          });
+
+          if (Array.isArray(discoveredRoutes) && !discoveredRoutes.includes(finalUrl)) {
+            discoveredRoutes.push(finalUrl);
+          } else if (discoveredRoutes && typeof discoveredRoutes.add === 'function') {
+            discoveredRoutes.add(finalUrl);
+          }
+        }
+      }
+    } catch (err) {
+      // Abort timeouts or 403/404s skipped cleanly
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  });
+
+  await Promise.allSettled(probeTasks);
+  return pages;
+}
+
+function formatDomainAgeResult(createdDate) {
+  if (!createdDate || isNaN(createdDate.getTime())) {
+    return {
+      registrationDate: null,
+      domainAge: 'Lookup Pending / Unresolved',
+      ageEstimate: 'Lookup Pending / Unresolved'
+    };
+  }
+  const now = new Date();
+  const diffYears = (now - createdDate) / (1000 * 60 * 60 * 24 * 365.25);
+  const ageYears = Math.floor(diffYears);
+  const ageMonths = Math.floor((diffYears - ageYears) * 12);
+
+  let ageString = `${ageYears} Year${ageYears === 1 ? '' : 's'}`;
+  if (ageMonths > 0) ageString += `, ${ageMonths} Month${ageMonths === 1 ? '' : 's'}`;
+
+  const isoDate = createdDate.toISOString().split('T')[0];
+  return {
+    registrationDate: isoDate,
+    domainAge: ageString,
+    ageEstimate: ageString
+  };
+}
+
+const fetchDomainAge = async (targetUrl) => {
+  let hostname = '';
+  try {
+    const parsed = new url.URL(targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`);
+    hostname = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+  } catch (_) {
+    return {
+      registrationDate: null,
+      domainAge: 'Lookup Pending / Unresolved',
+      ageEstimate: 'Lookup Pending / Unresolved'
+    };
+  }
+
+  // 1. Primary Strategy: Fast RDAP HTTP Query
+  try {
+    const rdapRes = await axios.get(`https://rdap.org/domain/${hostname}`, { timeout: 2500 });
+    const events = rdapRes.data?.events || [];
+    const regEvent = events.find(e => e.eventAction === 'registration');
+    if (regEvent && regEvent.eventDate) {
+      const regDate = new Date(regEvent.eventDate);
+      const res = formatDomainAgeResult(regDate);
+      if (res.registrationDate) return res;
+    }
+  } catch (_) {
+    // Proceed to WHOIS fallback
+  }
+
+  // 2. Fallback Strategy: whois-json (from siteLevelEEAT.js pattern)
+  let whoisClient = whois;
+  if (!whoisClient) {
+    try {
+      whoisClient = require('whois-json');
+    } catch (_) {
+      whoisClient = null;
+    }
+  }
+
+  if (whoisClient) {
+    try {
+      const fn = typeof whoisClient === 'function' ? whoisClient : (whoisClient.default || whoisClient);
+      const whoisData = await Promise.race([
+        fn(hostname),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 4000))
+      ]);
+
+      const rawDate = whoisData?.creationDate || whoisData?.created || whoisData?.registered;
+      if (rawDate) {
+        const createdDate = new Date(rawDate);
+        const res = formatDomainAgeResult(createdDate);
+        if (res.registrationDate) return res;
+      }
+    } catch (_) {
+      // Lookup unresolved
+    }
+  }
+
+  return {
+    registrationDate: null,
+    domainAge: 'Lookup Pending / Unresolved',
+    ageEstimate: 'Lookup Pending / Unresolved'
+  };
+};
+
+/**
+ * Extracts international phone numbers, emails, and physical addresses from the DOM.
+ * @param {import('cheerio').CheerioAPI} $ - Loaded Cheerio instance of the page
+ * @returns {{ emails: string[], phones: string[], address: string|null }}
+ */
+function extractContactAnchors($) {
+  const emails = [];
+  const phones = [];
+  let address = null;
+
+  // 1. Extract direct mailto: links
+  $('a[href^="mailto:"]').each((_, el) => {
+    const href = $(el).attr('href');
+    if (href) {
+      const clean = href.replace(/^mailto:/i, '').split('?')[0].trim();
+      if (clean && !emails.includes(clean)) emails.push(clean);
+    }
+  });
+
+  // 2. Extract direct tel: links (preserve E.164 international format, strip spaces)
+  $('a[href^="tel:"]').each((_, el) => {
+    const href = $(el).attr('href');
+    if (href) {
+      const clean = href.replace(/^tel:/i, '').replace(/\s+/g, '').trim();
+      if (clean && !phones.includes(clean)) phones.push(clean);
+    }
+  });
+
+  // 3. Extract physical address from semantic <address> elements
+  const addressEl = $('address').first();
+  if (addressEl.length > 0) {
+    const clone = addressEl.clone();
+    clone.find('br').replaceWith(', ');
+    const text = clone.text().replace(/\s+/g, ' ').replace(/,\s*,/g, ',').trim();
+    if (text) address = text;
+  }
+
+  // 4. Extract physical address from Microdata Schema.org PostalAddress
+  if (!address) {
+    const microdataEl = $('[itemtype*="schema.org/PostalAddress"]').first();
+    if (microdataEl.length > 0) {
+      const parts = [];
+      const street = microdataEl.find('[itemprop="streetAddress"]').text().trim();
+      const locality = microdataEl.find('[itemprop="addressLocality"]').text().trim();
+      const region = microdataEl.find('[itemprop="addressRegion"]').text().trim();
+      const postalCode = microdataEl.find('[itemprop="postalCode"]').text().trim();
+      const country = microdataEl.find('[itemprop="addressCountry"]').text().trim();
+
+      if (street) parts.push(street);
+      if (locality) parts.push(locality);
+      if (region) parts.push(region);
+      if (postalCode) parts.push(postalCode);
+      if (country) parts.push(country);
+
+      if (parts.length > 0) {
+        address = parts.join(', ');
+      } else {
+        const text = microdataEl.text().replace(/\s+/g, ' ').trim();
+        if (text) address = text;
+      }
+    }
+  }
+
+  return {
+    emails,
+    phones,
+    address: address || null
+  };
+}
+
+const parsePageHtml = (htmlContent, pageUrl, pageRoute, responseHeaders = null) => {
   if (!htmlContent) {
     return {
       route: pageRoute,
       wordCount: 0,
+      rawText: '',
+      content: '',
+      html: '',
+      bodySnippet: '',
+      bodyTextSnippet: '',
+      headings: [],
       hasTitle: false,
       titleLength: 0,
       hasDescription: false,
       headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false },
       hasCanonical: false,
-      canonicalUrl: ''
+      canonicalUrl: '',
+      canonicalTag: '',
+      textCodeRatio: 0,
+      contentDensityRatio: 0,
+      textDensityRatio: 0,
+      hasSchema: false,
+      schemas: [],
+      schemaTypes: [],
+      lastUpdated: null,
+      lastModified: null,
+      semanticTags: { header: false, nav: false, main: false, footer: false, article: false, section: false },
+      missingAltCount: 0,
+      missingAltList: [],
+      authors: [],
+      hasAuthorBio: false
     };
   }
 
@@ -49,6 +448,13 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
   const cleanHtml = ($clean('body').length > 0 ? $clean('body').html() : $clean.html()) || '';
   const wordCount = rawText ? rawText.split(/\s+/).filter(Boolean).length : 0;
 
+  // 1. Text Density Calculations
+  const textCodeRatio = cleanHtml.length > 0 
+    ? Number((rawText.length / cleanHtml.length).toFixed(4)) 
+    : 0;
+  const textDensityRatio = Math.round(textCodeRatio * 100);
+
+  // 2. Headings Parsing
   const headings = [];
   $('h1, h2, h3, h4').each((_, el) => {
     const tag = el.tagName.toLowerCase();
@@ -65,12 +471,90 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
                            (h3Count === 0 || h2Count > 0) && 
                            (h4Count === 0 || h3Count > 0);
 
+  // 3. Canonical URL
   const canonicalUrl = $('link[rel="canonical"]').attr('href') || '';
 
+  // 4. Clean Body Snippet
   const words = rawText.split(/\s+/).filter(Boolean);
   const bodySnippet = words.slice(0, 180).join(' ') + (words.length > 180 ? '...' : '');
 
-  return {
+  // ---------------------------------------------------------------------------
+  // 1. ROBUST JSON-LD & @graph SCHEMA EXTRACTION
+  // ---------------------------------------------------------------------------
+  const schemas = [];
+  $('script[type*="ld+json"]').each((_, el) => {
+    try {
+      const raw = $(el).text() || $(el).html();
+      if (!raw || !raw.trim()) return;
+      const parsed = JSON.parse(raw.trim());
+
+      if (Array.isArray(parsed)) {
+        schemas.push(...parsed);
+      } else if (parsed && typeof parsed === 'object') {
+        // Unpack modern WordPress / Yoast / Next.js @graph wrappers
+        if (Array.isArray(parsed['@graph'])) {
+          schemas.push(...parsed['@graph']);
+        } else {
+          schemas.push(parsed);
+        }
+      }
+    } catch (_) {}
+  });
+
+  const schemaTypes = schemas
+    .map(s => s && s['@type'])
+    .filter(Boolean)
+    .flatMap(t => Array.isArray(t) ? t : [t]);
+
+  const hasSchema = schemaTypes.length > 0;
+
+  // ---------------------------------------------------------------------------
+  // 2. FRESHNESS / REVISION DATE EXTRACTION (META + SCHEMA + HEADERS)
+  // ---------------------------------------------------------------------------
+  let lastUpdated = $('meta[property="article:modified_time"]').attr('content')
+    || $('meta[property="og:updated_time"]').attr('content')
+    || $('meta[name="last-modified"]').attr('content')
+    || $('meta[name="date"]').attr('content')
+    || $('time[datetime]').attr('datetime')
+    || $('time').first().text().trim()
+    || null;
+
+  // Fallback to JSON-LD dateModified / datePublished if meta tags are absent
+  if (!lastUpdated && schemas.length > 0) {
+    for (const s of schemas) {
+      if (s && (s.dateModified || s.datePublished)) {
+        lastUpdated = s.dateModified || s.datePublished;
+        break;
+      }
+    }
+  }
+
+  // Fallback to HTTP response headers if available in scope
+  if (!lastUpdated && typeof responseHeaders === 'object' && responseHeaders) {
+    lastUpdated = responseHeaders['last-modified'] || null;
+  }
+
+  // 7. Image Alt Audit
+  const missingAltList = [];
+  $('img').each((_, el) => {
+    const src = $(el).attr('src') || '';
+    const alt = $(el).attr('alt');
+    if ((alt === undefined || alt.trim() === '') && src) {
+      missingAltList.push({ src, suggestedAlt: `${titleText || 'Page'} visual asset` });
+    }
+  });
+
+  // 8. Semantic HTML5 Tags Verification
+  const semanticTags = {
+    header: $('header').length > 0,
+    nav: $('nav').length > 0,
+    main: $('main').length > 0,
+    footer: $('footer').length > 0,
+    article: $('article').length > 0,
+    section: $('section').length > 0
+  };
+
+  const pageObj = {
     route: pageRoute,
     title: titleText || `Page ${pageRoute}`,
     metaDescription: descText,
@@ -79,6 +563,7 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
     content: cleanHtml,
     html: cleanHtml,
     bodySnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
+    bodyTextSnippet: bodySnippet || descText || rawText || 'No body paragraph content found on this page.',
     headings,
     hasTitle: titleText.length > 0,
     titleLength: titleText.length,
@@ -91,8 +576,110 @@ const parsePageHtml = (htmlContent, pageUrl, pageRoute) => {
       isHierarchyValid
     },
     hasCanonical: canonicalUrl.length > 0,
-    canonicalUrl
+    canonicalUrl,
+    canonicalTag: canonicalUrl,
+    textCodeRatio,
+    contentDensityRatio: textCodeRatio,
+    textDensityRatio,
+    hasSchema: hasSchema,
+    schemas,
+    schemaTypes,
+    lastUpdated,
+    lastModified: lastUpdated,
+    semanticTags,
+    missingAltCount: missingAltList.length,
+    missingAltList
   };
+
+  // ---------------------------------------------------------------------------
+  // 3. AUTHOR & PERSON E-E-A-T ENTITY EXTRACTION
+  // ---------------------------------------------------------------------------
+  const authors = [];
+  const seenAuthorNames = new Set();
+
+  // 1. Scan JSON-LD schemas for Person or author entities
+  schemas.forEach(s => {
+    if (!s || typeof s !== 'object') return;
+    const isPerson = s['@type'] === 'Person' || (Array.isArray(s['@type']) && s['@type'].includes('Person'));
+    if (isPerson && s.name) {
+      const cleanName = String(s.name).trim();
+      if (cleanName && !seenAuthorNames.has(cleanName.toLowerCase())) {
+        seenAuthorNames.add(cleanName.toLowerCase());
+        authors.push({
+          name: cleanName,
+          jobTitle: s.jobTitle || s.role || '',
+          worksFor: s.worksFor?.name || '',
+          sameAs: Array.isArray(s.sameAs) ? s.sameAs : (s.sameAs ? [s.sameAs] : [])
+        });
+      }
+    }
+
+    // Nested author inside Article, BlogPosting, or WebPage
+    const authorObj = s.author || s.creator;
+    if (authorObj) {
+      const list = Array.isArray(authorObj) ? authorObj : [authorObj];
+      list.forEach(a => {
+        if (a && typeof a === 'object' && a.name) {
+          const cleanName = String(a.name).trim();
+          if (cleanName && !seenAuthorNames.has(cleanName.toLowerCase())) {
+            seenAuthorNames.add(cleanName.toLowerCase());
+            authors.push({
+              name: cleanName,
+              jobTitle: a.jobTitle || a.role || '',
+              worksFor: a.worksFor?.name || '',
+              sameAs: Array.isArray(a.sameAs) ? a.sameAs : (a.sameAs ? [a.sameAs] : [])
+            });
+          }
+        } else if (typeof a === 'string' && a.trim() && !seenAuthorNames.has(a.trim().toLowerCase())) {
+          seenAuthorNames.add(a.trim().toLowerCase());
+          authors.push({ name: a.trim(), jobTitle: '', worksFor: '', sameAs: [] });
+        }
+      });
+    }
+  });
+
+  // 2. Scan HTML meta tags & rel="author" anchors
+  const metaAuthor = $('meta[name="author"]').attr('content') || $('meta[property="article:author"]').attr('content');
+  if (metaAuthor && metaAuthor.trim()) {
+    const cleanName = metaAuthor.trim();
+    if (!seenAuthorNames.has(cleanName.toLowerCase())) {
+      seenAuthorNames.add(cleanName.toLowerCase());
+      authors.push({ name: cleanName, jobTitle: '', worksFor: '', sameAs: [] });
+    }
+  }
+
+  $('a[rel="author"]').each((_, el) => {
+    const name = $(el).text().trim();
+    const href = $(el).attr('href') || '';
+    if (name && !seenAuthorNames.has(name.toLowerCase())) {
+      seenAuthorNames.add(name.toLowerCase());
+      authors.push({ name, jobTitle: '', worksFor: '', sameAs: href ? [href] : [] });
+    }
+  });
+
+  pageObj.authors = authors;
+  pageObj.hasAuthorBio = authors.length > 0;
+
+  if (pageRoute === '/') {
+    pageObj.inPageSections = {
+      about: $('#about, #about-us, [id*="about"]').length > 0,
+      contact: $('#contact, #contact-us, [id*="contact"]').length > 0,
+      pricing: $('#pricing, #plans, [id*="pricing"]').length > 0,
+      privacy: $('#privacy, #privacy-policy, [id*="privacy"]').length > 0,
+      terms: $('#terms, #terms-of-service, [id*="terms"]').length > 0
+    };
+  }
+
+  const contactAnchors = extractContactAnchors($);
+  pageObj.contactAnchors = contactAnchors;
+  pageObj.addressText = contactAnchors.address;
+  pageObj.links = [
+    ...(pageObj.links || []),
+    ...contactAnchors.emails.map(e => `mailto:${e}`),
+    ...contactAnchors.phones.map(p => `tel:${p}`)
+  ];
+
+  return pageObj;
 };
 
 const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialSyncLimit = null) => {
@@ -112,6 +699,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     };
   }
 
+  const scanStartTime = Date.now();
   const result = {
     url: targetUrl,
     tier: userLimits.tier,
@@ -119,6 +707,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     totalPagesFound: 1, // Simulated total domain size
     status: {
       robotsTxtExists: false,
+      robotsFetchMs: null,
       llmsTxtExists: false,
       aiContextExists: false,
       aboutTxtExists: false,
@@ -128,7 +717,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       xRobotsIndexable: true,
       hasProperHierarchy: true,
       experienceScore: 0,
-      readabilityRating: 'Good',
+      readabilityRating: 'UNAUDITED',
       seoOptimalTitle: false,
       seoOptimalDesc: false,
       gatewayBadge: 'Hidden Assets',
@@ -137,12 +726,7 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       jsonLdExists: false,
       jsonLdTypes: [],
       machinePreview: '',
-      botPermissions: {
-        gptBot: true,
-        perplexityBot: true,
-        claudeBot: true,
-        googleExtended: true
-      }
+      botPermissions: defaultBotPermissions()
     },
     alerts: [],
     scoreCard: {
@@ -162,9 +746,20 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     const parsedUrl = new url.URL(targetUrl);
     const domainOrigin = parsedUrl.origin;
 
-    // 1. Fetch robots.txt and machine manifests in parallel
+    // 1. Fetch robots.txt and machine manifests in parallel with socket latency measurement
+    const robotsStartTime = Date.now();
+    const robotsPromise = axios.get(`${domainOrigin}/robots.txt`, { timeout: 2500 })
+      .then(res => {
+        result.status.robotsFetchMs = Date.now() - robotsStartTime;
+        return res;
+      })
+      .catch(err => {
+        result.status.robotsFetchMs = Date.now() - robotsStartTime;
+        throw err;
+      });
+
     const [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled] = await Promise.allSettled([
-      axios.get(`${domainOrigin}/robots.txt`, { timeout: 2500 }),
+      robotsPromise,
       axios.get(`${domainOrigin}/llms.txt`, { timeout: 2000 }),
       axios.get(`${domainOrigin}/ai-context.md`, { timeout: 2000 }),
       axios.get(`${domainOrigin}/about.md`, { timeout: 2000 }),
@@ -176,8 +771,10 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     let robotsContent = '';
     let sitemapContent = '';
     if (robotsSettled.status === 'fulfilled' && robotsSettled.value.data) {
-      robotsContent = robotsSettled.value.data;
+      robotsContent = typeof robotsSettled.value.data === 'string' ? robotsSettled.value.data : JSON.stringify(robotsSettled.value.data);
       result.status.robotsTxtExists = true;
+      result.status.robotsTxtContent = robotsContent;
+      result.status.robotsTxtStatusCode = robotsSettled.value?.status || 200;
     }
 
     if (llmsSettled.status === 'fulfilled' && llmsSettled.value.status === 200 && llmsSettled.value.data) {
@@ -203,6 +800,8 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     if (sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data) {
       result.status.sitemapExists = true;
       sitemapContent = typeof sitemapSettled.value.data === 'string' ? sitemapSettled.value.data : JSON.stringify(sitemapSettled.value.data);
+      result.status.sitemapContent = sitemapContent;
+      result.status.sitemapStatusCode = sitemapSettled.value?.status || 200;
     }
 
     const failedWithWaf = [robotsSettled, llmsSettled, aiContextSettled, aboutSettled, docsSettled, contentSettled, sitemapSettled].find(
@@ -236,13 +835,16 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         result.scoreCard.classification = 'Ugly';
       }
 
-      // Specific AI Bot Disallow Check
-      result.status.botPermissions = {
-        gptBot: !/User-agent:\s*GPTBot\s*Disallow:\s*\//i.test(robotsContent),
-        perplexityBot: !/User-agent:\s*PerplexityBot\s*Disallow:\s*\//i.test(robotsContent),
-        claudeBot: !/User-agent:\s*(ClaudeBot|Claude-Web)\s*Disallow:\s*\//i.test(robotsContent),
-        googleExtended: !/User-agent:\s*Google-Extended\s*Disallow:\s*\//i.test(robotsContent)
-      };
+      // Specific AI Bot Disallow Check across all 20 AI Crawlers
+      const botPermissions = {};
+      AI_CRAWLERS.forEach(bot => {
+        if (blanketDisallowMatch) {
+          botPermissions[bot.key] = false;
+        } else {
+          botPermissions[bot.key] = !bot.pattern.test(robotsContent);
+        }
+      });
+      result.status.botPermissions = botPermissions;
 
       if (!blanketDisallowMatch) {
         const blockedBots = Object.entries(result.status.botPermissions)
@@ -269,23 +871,54 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
 
     // 3. Fetch targetUrl HTML content & parse Level 2 Metrics
     let htmlContent = '';
+    let mainHeaders = null;
     try {
       const mainRes = await axios.get(targetUrl, { timeout: 4000 });
       htmlContent = mainRes.data;
+      mainHeaders = mainRes.headers;
     } catch (e) {
-      htmlContent = '';
-      result.alerts.push({
-        type: 'FETCH_ERROR',
-        severity: 'critical',
-        message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
-      });
-      if (e.response && (e.response.status === 403 || e.response.status === 429)) {
-        result.status.isWafBlocked = true;
-        result.status.wafStatusCode = e.response.status;
-        result.status.statusCode = e.response.status;
-        result.status.gateState = 'BLOCKED';
-        result.status.disallowCount = -1;
-      }
+      // ZERO-FALLBACK ENFORCEMENT:
+      // If the root domain cannot be resolved or reached, abort the entire audit immediately.
+      // Zero fabricated pages, zero default bot allowances, zero capability evaluation.
+      return {
+        url: targetUrl,
+        tier: userLimits ? userLimits.tier : 'free',
+        status: 'failed',
+        error: `HTTP fetch failed for ${targetUrl}: ${e.message}`,
+        pageDepthCrawled: 0,
+        totalPagesFound: 0,
+        pages: [],
+        discoveredRoutes: [],
+        missingEssentialPages: ['/about', '/contact', '/pricing', '/privacy-policy', '/terms-of-service'],
+        alerts: [{
+          type: 'FETCH_ERROR',
+          severity: 'critical',
+          message: `HTTP fetch failed for ${targetUrl}: ${e.message}`
+        }],
+        scoreCard: {
+          overallScore: 0,
+          classification: 'UNAUDITED',
+          pillars: {
+            p1: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p2: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p3: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message },
+            p4: { score: 0, max: 25, badge: 'UNAUDITED', note: e.message }
+          }
+        },
+        overallScore: 0,
+        pillarScores: { P1: 0, P2: 0, P3: 0, P4: 0 },
+        capabilities: {
+          crawlerAccess: {},
+          manifests: {},
+          schema: { detected: [], authorCredentials: false },
+          scores: { aiOptimized: 0, aiReady: 0, compositeHealth: 0 },
+          triage: [`HTTP fetch failed for ${targetUrl}: ${e.message}`]
+        },
+        scanMetrics: {
+          scanTimeSeconds: Number(((Date.now() - scanStartTime) / 1000).toFixed(2)),
+          lastScanned: new Date().toISOString()
+        }
+      };
     }
 
     // Run Level 2 Parser Service
@@ -340,7 +973,8 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     }
 
     // Ingest sitemap link
-    result.status.sitemapExists = robotsContent.toLowerCase().includes('sitemap:');
+    result.status.sitemapExists = Boolean(sitemapSettled.status === 'fulfilled' && sitemapSettled.value.status === 200 && sitemapSettled.value.data);
+    result.status.sitemapInRobots = robotsContent.toLowerCase().includes('sitemap:');
 
     // Extract actual internal links discovered on the crawled landing page HTML
     const discoveredLinks = new Set();
@@ -427,7 +1061,11 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
       let pageHtml = '';
       if (i === 0) {
         pageHtml = htmlContent;
-        const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute);
+        const parsedPage = parsePageHtml(pageHtml, pageUrl, pageRoute, mainHeaders);
+        if (result.status.jsonLdExists && (!parsedPage.hasSchema || parsedPage.schemaTypes.length === 0)) {
+          parsedPage.hasSchema = true;
+          parsedPage.schemaTypes = [...result.status.jsonLdTypes];
+        }
         result.pages.push(parsedPage);
       } else {
         if (process.env.NODE_ENV !== 'test') {
@@ -435,18 +1073,125 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
         }
         const fetchRes = await fetchPageWithTimeout(pageUrl);
         if (fetchRes.success) {
-          const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute);
+          const parsedPage = parsePageHtml(fetchRes.data, pageUrl, pageRoute, fetchRes.headers);
           result.pages.push(parsedPage);
+        } else if (fetchRes.status === 404 || fetchRes.statusCode === 404) {
+          result.pages.push({
+            url: pageUrl,
+            route: pageRoute,
+            statusCode: 404,
+            status: 404,
+            isCrawled: false,
+            is404: true,
+            isMissing: true,
+            wordCount: 0,
+            textCodeRatio: 0,
+            contentDensityRatio: 0,
+            textDensityRatio: 0,
+            cleanHtml: '',
+            rawText: '',
+            schemas: [],
+            schemaTypes: [],
+            headings: [],
+            headingAudit: { h1: 0, h2: 0, h3: 0, h4: 0, isHierarchyValid: false },
+            hasCanonical: false,
+            canonicalUrl: '',
+            hasSchema: false,
+            lastUpdated: null,
+            semanticTags: { header: false, nav: false, main: false, footer: false, article: false, section: false },
+            missingAltCount: 0,
+            missingAltList: []
+          });
         } else {
           result.pages.push({
             url: pageUrl,
             route: pageRoute,
+            statusCode: fetchRes.status || 500,
             status: 'failed',
+            isCrawled: false,
+            is404: false,
             error: fetchRes.error === 'heavy_page_timeout' ? 'heavy_page_timeout' : 'fetch_error'
           });
         }
       }
     }
+
+    // Check inPageSections on homepage and push available in-page sections as discovered virtual routes
+    const homepage = result.pages.find(p => p.route === '/');
+    if (homepage && homepage.inPageSections) {
+      const sectionToVirtualRoute = [
+        { key: 'about', route: '/#about', prefixes: ['/about', '/about-us'] },
+        { key: 'contact', route: '/#contact', prefixes: ['/contact', '/contact-us'] },
+        { key: 'pricing', route: '/#pricing', prefixes: ['/pricing', '/plans'] },
+        { key: 'privacy', route: '/#privacy', prefixes: ['/privacy', '/privacy-policy'] },
+        { key: 'terms', route: '/#terms', prefixes: ['/terms', '/terms-of-service'] }
+      ];
+
+      for (const { key, route, prefixes } of sectionToVirtualRoute) {
+        if (homepage.inPageSections[key]) {
+          const hasDistinct = result.pages.some(p => prefixes.includes(p.route));
+          if (!hasDistinct && !result.pages.some(p => p.route === route)) {
+            result.pages.push({
+              route,
+              url: `${targetUrl.replace(/\/$/, '')}${route}`,
+              title: `${homepage.title || 'Home'} - ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+              metaDescription: homepage.metaDescription || '',
+              wordCount: Math.round(homepage.wordCount / 4) || 100,
+              rawText: homepage.rawText || '',
+              content: homepage.content || '',
+              html: homepage.html || '',
+              bodySnippet: `In-page section ${route} detected on single-page homepage.`,
+              bodyTextSnippet: `In-page section ${route} detected on single-page homepage.`,
+              headings: [],
+              hasTitle: true,
+              titleLength: homepage.titleLength || 0,
+              hasDescription: homepage.hasDescription || false,
+              headingAudit: { h1: 1, h2: 1, h3: 0, h4: 0, isHierarchyValid: true },
+              hasCanonical: homepage.hasCanonical || false,
+              canonicalUrl: homepage.canonicalUrl || '',
+              canonicalTag: homepage.canonicalUrl || '',
+              textCodeRatio: homepage.textCodeRatio || 0,
+              contentDensityRatio: homepage.contentDensityRatio || 0,
+              textDensityRatio: homepage.textDensityRatio || 0,
+              hasSchema: homepage.hasSchema || false,
+              schemas: homepage.schemas || [],
+              schemaTypes: homepage.schemaTypes || [],
+              lastUpdated: homepage.lastUpdated || null,
+              lastModified: homepage.lastModified || null,
+              semanticTags: homepage.semanticTags || { header: true, nav: true, main: true, footer: true, article: false, section: true },
+              missingAltCount: 0,
+              missingAltList: []
+            });
+          }
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Proactive Probe for 5 Essential Routes (Overcomes crawl budget exhaustion)
+    // ---------------------------------------------------------------------------
+    const pages = result.pages || [];
+    const discoveredRoutes = result.discoveredRoutes || [];
+
+    // Replace legacy sequential probe loop with concurrent safe prober:
+    await probeEssentialRoutes(targetUrl, pages, discoveredRoutes, fetch);
+
+    result.scanMetrics = {
+      scanTimeSeconds: Number(((Date.now() - scanStartTime) / 1000).toFixed(2)),
+      lastScanned: new Date().toISOString()
+    };
+
+    // Fetch verified domain age via RDAP
+    const domainAgeInfo = await fetchDomainAge(targetUrl);
+    result.registrationDate = domainAgeInfo.registrationDate;
+    result.domainAge = domainAgeInfo.domainAge;
+    result.ageEstimate = domainAgeInfo.ageEstimate;
+    result.eeatMetrics = {
+      ...(result.eeatMetrics || {}),
+      registrationDate: domainAgeInfo.registrationDate,
+      domainAge: domainAgeInfo.domainAge,
+      ageEstimate: domainAgeInfo.ageEstimate
+    };
 
     // Compute dynamic AI Visibility Health Index (0-100) with 4-Pillar Sub-Scores via capabilityEvaluator
     const evaluation = evaluateCapabilities(result);
@@ -460,7 +1205,13 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
     result.scrapedContentPreview = evaluation.scrapedContentPreview;
     result.manifestPreviews = evaluation.manifestPreviews;
     result.discoveredRoutes = evaluation.discoveredRoutes;
-    result.eeatMetrics = evaluation.eeatMetrics;
+    result.eeatMetrics = {
+      ...(result.eeatMetrics || {}),
+      ...(evaluation.eeatMetrics || {}),
+      registrationDate: domainAgeInfo.registrationDate,
+      domainAge: domainAgeInfo.domainAge,
+      ageEstimate: domainAgeInfo.ageEstimate
+    };
 
     result.scoreCard = {
       overallScore: totalOverallScore,
@@ -480,4 +1231,31 @@ const analyzeUrl = async (targetUrl, userLimits, singlePagePath = null, partialS
   return result;
 };
 
-module.exports = { analyzeUrl, parsePageHtml, fetchPageWithTimeout };
+export {
+  analyzeUrl,
+  parsePageHtml,
+  fetchPageWithTimeout,
+  fetchDomainAge,
+  formatDomainAgeResult,
+  extractContactAnchors,
+  isSameDomainOrSubdomain,
+  isInternalLink,
+  probeEssentialRoutes,
+  CRAWLER_CONFIG,
+  AI_CRAWLERS
+};
+
+export default {
+  analyzeUrl,
+  parsePageHtml,
+  fetchPageWithTimeout,
+  fetchDomainAge,
+  formatDomainAgeResult,
+  extractContactAnchors,
+  isSameDomainOrSubdomain,
+  isInternalLink,
+  probeEssentialRoutes,
+  CRAWLER_CONFIG,
+  AI_CRAWLERS
+};
+

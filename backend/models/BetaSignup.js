@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const BetaSignupSchema = new mongoose.Schema({
   email: {
@@ -18,4 +18,5 @@ const BetaSignupSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('BetaSignup', BetaSignupSchema);
+const BetaSignup = mongoose.models.BetaSignup || mongoose.model('BetaSignup', BetaSignupSchema);
+export default BetaSignup;

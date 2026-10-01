@@ -25,6 +25,9 @@ describe('Server-Side Diagnostic Scoring & Categorization Fix (BDD Phase 1)', ()
         hasProperHierarchy: true,
         spaTrapDetected: false,
         wordCount: 1000
+      },
+      sec2: {
+        essentialPagesFound: 3
       }
     };
 

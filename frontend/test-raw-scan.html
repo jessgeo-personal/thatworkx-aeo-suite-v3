@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AEO Diagnostic Cockpit - Raw Scan Inspection Harness</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #111827;
+      --card-alt: #162032;
+      --border: #1f2937;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --code-bg: #030712;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    #raw-inspector-app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      color: #fff;
+    }
+    p.subtitle {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    #scan-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    #target-url-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 12px 22px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: opacity 0.2s ease;
+    }
+    #fetch-scan-btn {
+      background: var(--accent);
+      color: #000;
+    }
+    #rescan-btn {
+      background: #374151;
+      color: #fff;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    #error-notification-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .stage-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .stage-section h2 {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    pre, .output-block {
+      background: var(--code-bg);
+      padding: 14px;
+      border-radius: 6px;
+      border: 1px solid #111827;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.88rem;
+      color: #e5e7eb;
+    }
+    details {
+      margin-top: 14px;
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    summary:hover {
+      color: var(--accent);
+    }
+    details pre {
+      margin-top: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    #error-log-console {
+      margin-top: 36px;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+    #error-log-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.85rem;
+      color: #f87171;
+    }
+    .error-log-entry {
+      padding: 8px 0;
+      border-bottom: 1px solid #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div id="raw-inspector-app">
+    <header>
+      <h1>AEO Diagnostic Cockpit: Raw Scan Data Harness</h1>
+      <p class="subtitle">Live backend inspection for analyzers, evaluators, crawlers, and manifest pipelines with zero mock fallbacks.</p>
+    </header>
+
+    <section id="scan-controls">
+      <input type="text" id="target-url-input" placeholder="https://example.com" />
+      <button id="fetch-scan-btn">Fetch Live Scan</button>
+      <button id="rescan-btn" disabled>Rescan Domain</button>
+    </section>
+
+    <div id="error-notification-banner" class="hidden" role="alert"></div>
+
+    <main id="raw-output-display">
+      <div class="stage-section">
+        <h2>0. Metadata & Scan Telemetry</h2>
+        <div id="meta-telemetry-output" class="output-block">--</div>
+        <details>
+          <summary>View Meta & Stats Raw JSON</summary>
+          <pre id="meta-telemetry-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 1: AI Crawler Bot Permissions (Crawler Service)</h2>
+        <div id="stage1-crawlers-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 1 Crawlers Raw JSON</summary>
+          <pre id="stage1-crawlers-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 2: Canonical Routes (Discovered vs Missing Essential)</h2>
+        <div id="stage2-routes-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 2 Routes Raw JSON</summary>
+          <pre id="stage2-routes-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 3: Crawled Pages, Scraped Text & LLM Markdown</h2>
+        <div id="stage3-pages-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 3 Pages Raw JSON</summary>
+          <pre id="stage3-pages-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 4: Schema.org Graph & E-E-A-T Trust Signals</h2>
+        <div id="stage4-schema-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 4 Schema & EEAT Raw JSON</summary>
+          <pre id="stage4-schema-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 5: Machine Manifest Hierarchy (AI-Ready Directives)</h2>
+        <div id="stage5-manifests-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 5 Manifests Raw JSON</summary>
+          <pre id="stage5-manifests-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Stage 6: Capability Evaluator, Scores & 32-Capability Matrix</h2>
+        <div id="stage6-scores-output" class="output-block">--</div>
+        <details>
+          <summary>View Stage 6 Capability Matrix & Scores Raw JSON</summary>
+          <pre id="stage6-scores-json">--</pre>
+        </details>
+      </div>
+
+      <div class="stage-section">
+        <h2>Complete Backend POST /api/scan JSON Envelope</h2>
+        <pre id="raw-json-dump">--</pre>
+      </div>
+    </main>
+
+    <section id="error-log-console">
+      <h3>Internal Quality & Tracking Error Log</h3>
+      <ul id="error-log-list"></ul>
+    </section>
+  </div>
+
+  <script type="module" src="./test-raw-scan.js"></script>
+</body>
+</html>

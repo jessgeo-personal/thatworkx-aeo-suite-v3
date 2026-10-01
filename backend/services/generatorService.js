@@ -209,7 +209,19 @@ const generateSitemapXml = (domainName = 'example.com') => {
 `;
 };
 
-module.exports = {
+export {
+  generateLlmsTxt,
+  generateAiContextMd,
+  generateCloudflareWorkerJs,
+  generateShopifyLiquid,
+  generateHtaccess,
+  generateAboutMd,
+  generateDocsMd,
+  generateContentMd,
+  generateSitemapXml
+};
+
+export default {
   generateLlmsTxt,
   generateAiContextMd,
   generateCloudflareWorkerJs,
