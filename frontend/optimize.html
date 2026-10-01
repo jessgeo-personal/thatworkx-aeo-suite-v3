@@ -10,25 +10,114 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&amp;family=JetBrains+Mono:wght@600;700&amp;display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="visualize.css">
 </head>
 <body class="page-optimize">
 
+    <!-- ======================================================== -->
+  <!-- 3D OVERLAY BACKDROP (Clicking outside closes the drawer) -->
+  <!-- ======================================================== -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/80 backdrop-blur-md z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+  <!-- ======================================================== -->
+  <!-- ZONE B: 3D OVERLAY ELEVATED SIDEBAR (TOP-TO-BOTTOM)      -->
+  <!-- ======================================================== -->
+  <aside id="main-terminal-sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-80 sm:w-96 xl:w-[420px] bg-[#1f1f1f]/95 backdrop-blur-2xl border-r border-[#3c4043] flex flex-col flex-shrink-0 h-full transform -translate-x-full transition-transform duration-300 drawer-3d-overlay">
+    
+    <!-- Sidebar Header: Brand Lockup & Close (✕) Button -->
+    <div class="h-16 px-5 border-b border-[#3c4043] bg-[#1a1a1a] flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center space-x-3 truncate">
+        <img src="src/images/aioptimize-logo.svg" alt="AIOptimize Logo" class="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+        <span class="text-[10px] px-2 py-0.5 rounded bg-[#f59e0b]/20 border border-[#f59e0b]/50 text-[#f59e0b] font-mono font-bold">REMEDIATION COCKPIT</span>
+      </div>
+
+      <button onclick="toggleSidebar(false)" class="p-2 rounded-xl bg-[#121212] hover:bg-[#2a2a2a] border border-[#3c4043] text-[#bdc1c6] hover:text-white transition shadow-sm flex items-center justify-center" title="Close Drawer (Esc)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- 1. Active Manifest Compiler Capsule -->
+    <div class="p-5 border-b border-[#3c4043] bg-[#1a1a1a]/80 relative overflow-hidden flex-shrink-0">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="text-xs font-mono uppercase tracking-wider text-[#bdc1c6] flex items-center space-x-2">
+          <span id="sidebar-beacon-dot" class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] inline-block animate-ping"></span>
+          <span class="font-bold">Active Manifest Compiler</span>
+        </span>
+        <span id="sidebar-stage-pill" class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#f59e0b]/20 border border-[#f59e0b]/40 text-[#f59e0b] font-bold">
+          TRACK 1 & 2 READY
+        </span>
+      </div>
+      <div id="sidebar-verbose-copy" class="text-xs sm:text-sm text-[#e8eaed] font-medium leading-relaxed italic bg-[#121212] border border-[#3c4043] rounded-2xl p-4 shadow-inner">
+        Compiling one-click code fixes, Edge routing workers, and 4-layer machine manifests for target domain...
+      </div>
+    </div>
+
+    <!-- 2. Progressive Section Summaries -->
+    <div class="p-5 border-b border-[#3c4043] bg-[#1f1f1f] space-y-3 flex-shrink-0">
+      <div class="flex items-center justify-between px-1">
+        <span class="text-xs font-black text-white uppercase tracking-wider font-headline">Manifest Blueprint Manifests</span>
+        <span id="milestones-count" class="text-xs font-mono text-[#38bdf8] font-bold">6/6 Available</span>
+      </div>
+      <div id="sidebar-milestones-list" class="space-y-2 max-h-52 overflow-y-auto pr-0.5">
+        <div class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] flex items-center justify-between text-xs font-mono">
+          <span class="text-[#cbd5e1]">/robots.txt (AI Bot Allow Rules)</span>
+          <span class="text-[#10b981] font-bold">✓ Ready</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] flex items-center justify-between text-xs font-mono">
+          <span class="text-[#cbd5e1]">/llms.txt (Welcome Mat Directory)</span>
+          <span class="text-[#10b981] font-bold">✓ Ready</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] flex items-center justify-between text-xs font-mono">
+          <span class="text-[#cbd5e1]">/ai-context.md (Entity Ontology)</span>
+          <span class="text-[#10b981] font-bold">✓ Ready</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] flex items-center justify-between text-xs font-mono">
+          <span class="text-[#cbd5e1]">Cloudflare Edge Worker Script</span>
+          <span class="text-[#f59e0b] font-bold">⚡ Compiled</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Live Compiler Telemetry -->
+    <div class="p-3.5 border-b border-[#3c4043] bg-[#181818] flex items-center justify-between flex-shrink-0">
+      <span class="text-xs font-mono uppercase text-[#bdc1c6] font-bold">Live Compiler Activity</span>
+      <span class="w-2.5 h-2.5 rounded-full bg-[#10b981]"></span>
+    </div>
+    <div class="flex-1 p-4 overflow-y-auto font-mono text-xs space-y-2 bg-[#121212]" id="sidebar-telemetry-stream">
+      <div class="text-[#94a3b8]">> Initializing AIOptimize remediation pipeline...</div>
+      <div class="text-[#38bdf8]">> Verified domain schema against Schema.org 2026 spec.</div>
+      <div class="text-[#10b981]">> Edge Worker bundle compiled for Cloudflare V8 runtime.</div>
+    </div>
+
+    <!-- 4. Failure & Quota Monitor (Bottom) -->
+    <div id="sidebar-quota-monitor" class="p-4 border-t border-[#3c4043] bg-[#1a1a1a] flex items-center justify-between text-xs transition-all flex-shrink-0">
+      <div class="flex items-center space-x-2">
+        <div id="system-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>
+        <span class="text-[#bdc1c6] font-mono text-xs">System Status: <strong id="system-status-label" class="text-white font-bold">OK</strong></span>
+      </div>
+      <div class="text-right">
+        <span id="quota-tag" class="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#b7410e]/20 border border-[#b7410e]/40 text-[#d45d2a]">
+          Manifest Quota: UNLIMITED
+        </span>
+      </div>
+    </div>
+  </aside>
+
   <!-- Top Navigation Header -->
   <!-- HEADER_START -->
-  <header class="app-header">
-    <div class="w-full bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
+  <header class="w-full bg-[#1f1f1f]/95 backdrop-blur-md border-b border-[#3c4043] shadow-2xl flex-shrink-0 z-30">
       
       <!-- Header Container (Max 1200px) -->
       <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-3.5 space-y-3">
         
-        <!-- Line 1: Logo on Left + Input, + Action & Session Controls on Right -->
+        <!-- Line 1: 3-Lines Drawer Toggle on Left + Input, + Action & Session Controls on Right -->
         <div class="flex items-center justify-between gap-3">
           
-          <!-- Left: Home / Navigation Trigger & Logo -->
+          <!-- Left: 3-Lines Drawer Button & Logo -->
           <div class="flex items-center space-x-3">
-            <a href="index.html" class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] text-[#d45d2a] hover:text-white transition flex items-center justify-center shadow-md active:scale-95" title="Go back to Homepage">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            </a>
+            <button id="btn-toggle-sidebar" onclick="toggleSidebar(true)" class="p-2.5 rounded-xl bg-[#121212] border border-[#3c4043] hover:border-[#b7410e] text-[#d45d2a] hover:text-white transition flex items-center justify-center shadow-md active:scale-95" title="Open Remediation Activity (3D Drawer)">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
 
             <div class="flex items-center space-x-3">
               <a href="optimize.html">
@@ -136,7 +225,6 @@
           </nav>
         </div>
       </div>
-    </div>
   </header>
   <!-- HEADER_END -->
 
