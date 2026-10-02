@@ -1,0 +1,353 @@
+# AEO Suite V3: AIOptimize Phase 1 Architecture, Manifest Specifications & Execution Plan
+
+## 1. Executive Baseline & Governance Enforcement
+
+* **Repository Active Branch**: `feature/ai-optimize` (branched from `dev` following the completed staging refactor of AI-Visualize).
+
+
+* **Core File Protection Gate (Strict Freeze)**: Under zero circumstances may any task in Phase 1 modify `frontend/optimize.html`, `frontend/visualize.html`, `frontend/visualize.js`, `frontend/visualize.css`, `frontend/index.html`, `frontend/index.js`, or `frontend/index.css`. All Phase 1 capabilities must be engineered through backend services, API controllers, and isolated testing harnesses (`frontend/test-optimize-*.html` / `frontend/test-optimize-*.js`).
+
+
+* **"AI-Optimized" Gate**: Applied strictly and exclusively to human-centric web presence, crawlability, and citation audits (`AIVisualize`).
+
+
+* **"AI-Ready" Gate**: Applied strictly and exclusively to machine manifest hierarchies (`/robots.txt`, `/llms.txt`, `/ai-context.md`, and Level 1–4 files in `AIOptimize`).
+
+
+* **Banned Terms Gate**: Complete and absolute ban on the term "AI-first" across all templates, comments, code, stylesheets, and test files.
+
+
+* **Data Integrity & Zero-Fallback Gate**: Pre-scan inputs and state displays must show graceful defaults (`"--"`, `"UNAUDITED"`). Under no circumstances will synthetic mock fallbacks, static dummy payloads, or synthetic fallback data be injected into a user-requested output. Any extraction or crawl failure must surface an explicit error notification in the UI/dashboard and require user authorization to trigger a rescan.
+
+
+* **DOM Pre-rendering Gate**: All educational copy, FAQ answers, and manifest cards must be pre-rendered in static HTML for LLM/bot crawlability.
+
+
+
+---
+
+## 2. Current Codebase Audit & Gap Analysis
+
+```
+thatworkx-aeo-suite-v3 (feature/ai-optimize)
+├── backend/
+│   ├── controllers/authController.js, waitlistController.js
+│   ├── middleware/rateLimiter.js
+│   ├── models/User.js, DomainProfile.js, ScanLog.js, Otp.js, BetaSignup.js, WaitlistSignup.js
+│   ├── services/
+│   │   ├── crawlerService.js (requires headlessToggle logic for Trial vs. Pro/Enterprise)
+│   │   ├── parserService.js (requires multi-source parsing: web, GitHub, local docs)
+│   │   ├── generatorService.js (requires all 8 machine manifest generators)
+│   │   ├── capabilityEvaluator.js, queueService.js, emailService.js
+│   └── tests/ (Vitest suites for backend services, controllers, BDD gating)
+├── docs/ (4-levelheirarchy, AEO-API-Lists.md, AEO_README_Boilerplate.md, AEO_About_Boilerplate.md)
+├── _context/ (Strategy docs, scoring models, design tokens, view specs)
+└── frontend/
+    ├── optimize.html (LOCKED - must not be touched)
+    ├── visualize.html, visualize.js, visualize.css (LOCKED - must not be touched)
+    ├── index.html, index.js, index.css (LOCKED - must not be touched)
+    ├── test-*.html / test-*.js (Existing isolated testing harnesses)
+    └── tests/ (Vitest BDD unit and integration suites)
+
+```
+
+### Gap Analysis & Implementation Targets
+
+* **Subscription & Access Control**: Need a dedicated service (`backend/services/subscriptionGateService.js`) to handle Trial (headless access switched off), Pro (domain-bound with multiple subscriptions supported), and Enterprise (multi-domain seat with a Contact Sales flow).
+
+
+* **API Credential Management**: Need models and endpoints (`backend/models/ApiCredential.js`, `backend/controllers/apiCredentialController.js`) to issue, scope, and revoke API keys (`ak_live_...`).
+
+
+* **Multi-Source Extraction Pipeline**: Need unified ingestion for Website URLs, GitHub repositories, and local documents in `backend/services/parserService.js` and `backend/services/crawlerService.js`.
+
+
+* **Machine Manifest Generators**: Implement deterministic generation of all 8 files in `backend/services/generatorService.js`.
+
+
+* **Testing Harness**: Construct `frontend/test-optimize.html` and `frontend/test-optimize.js` for end-to-end verification without touching `optimize.html`.
+
+
+
+---
+
+## 3. Comprehensive Machine Manifest Specification & Multi-Source Extraction Matrix
+
+Every file in the **AI-Ready** 4-Level Machine Manifest Hierarchy pulls exclusively from verified source data. If any mandatory source field is missing or unreachable, the system halts generation for that module, displays an error notification, and prompts the user for a rescan or manual input.
+
+| Level & Manifest | AI-Bot Role & Primary Intent | Required Structure & Content Rules | Website Ingestion Channel | GitHub Repository Channel | Local File / Document Channel |
+| --- | --- | --- | --- | --- | --- |
+| **Level 1: `/robots.txt**`<br> | **Gateway Access Control**: Directs AI bots (`GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended`, `OAI-SearchBot`) to allowed routes and machine manifests.
+
+ | • Bot-specific `User-agent` directives.<br>
+
+<br>• Explicit `Allow` / `Disallow` paths.<br>
+
+<br>• `Sitemap:` canonical URL.<br>
+
+<br>• Pointers to `/llms.txt` and `/ai-context.md`.
+
+ | Existing live `/robots.txt` audit, sitemap reference, and canonical root routing from `crawlerService.js`.
+
+ | Route configs (`next.config.js`, `vercel.json`, `public/robots.txt`). | User-supplied routing rules or existing `robots.txt` upload.
+
+ |
+| **Level 1: `/sitemap.xml**`<br> | **Canonical Inventory**: Guides deterministic indexing, priority, and `<lastmod>` freshness so LLM search bots do not exhaust crawl budgets.
+
+ | • Valid XML `<urlset>` namespace.<br>
+
+<br>• Canonical `<loc>` URLs (HTTP 200 only).<br>
+
+<br>• ISO-8601 `<lastmod>` timestamps.<br>
+
+<br>• Dynamic `<changefreq>` and `<priority>`.
+
+ | Live internal URL crawl, `<link rel="canonical">`, HTTP `Last-Modified`, and article metadata.
+
+ | Static/dynamic page tree (`pages/`, `app/`, `src/routes/`, `docs/`).
+
+ | Uploaded URL inventory (CSV, TXT, JSON route map).
+
+ |
+| **Level 2: `/llms.txt**`<br> | **Executive Machine Directory**: Root-level Markdown index providing LLMs an immediate overview of the entity and direct links to deep manifests.
+
+ | • `# [Entity Name]`<br>
+
+<br>• `> [1-2 sentence core value summary]`<br>
+
+<br>• Entity metadata (Domain, Verified Contact).<br>
+
+<br>• `## Core Manifests` links (`about.md`, `docs.md`, etc.).<br>
+
+<br>• `## Priority Routes` with 1-line descriptions.
+
+ | Homepage `<title>`, `<meta name="description">`, JSON-LD `Organization` / `WebSite`, Stage 2/3 Essential Pages.
+
+ | Root `README.md` title + lead blockquote, `package.json` description, `/docs` directory.
+
+ | Brand summary, company fact sheet, or executive overview doc.
+
+ |
+| **Level 2: `/ai-context.md**`<br> | **Semantic & Entity Graph Context**: Grounding manifest to eliminate hallucinations, enforce canonical terminology, and define entity relationships.
+
+ | • `# AI Context & Canonical Entity Graph`<br>
+
+<br>• Identity & Disambiguation (What entity is & is not).<br>
+
+<br>• Core Capabilities Matrix.<br>
+
+<br>• Terminology & Glossary.<br>
+
+<br>• Citation & Attribution Directives.
+
+ | JSON-LD entity graphs (`Organization`, `Product`, `FAQPage`), semantic H1–H3 structures, and contact records.
+
+ | `ARCHITECTURE.md`, schema definitions, OpenAPI/GraphQL definitions, feature lists.
+
+ | Product specifications, whitepapers, positioning guidelines, glossaries.
+
+ |
+| **Level 3: `/README.md**`<br> | **Technical Entrypoint**: Structured per `docs/AEO_README_Boilerplate.md` for developer bots and code-aware AI search engines.
+
+ | • Product Title & Status Badges.<br>
+
+<br>• Overview & Problem Solved.<br>
+
+<br>• Architecture & Key Features.<br>
+
+<br>• Quickstart & Integration.<br>
+
+<br>• API Reference & Licensing.
+
+ | Developer portal, `/features`, `/integrations`, and `/getting-started` HTML converted to clean Markdown.
+
+ | Existing repo `README.md`, `package.json` scripts, workflow configs, and directory trees.
+
+ | Technical specification or installation/setup manual.
+
+ |
+| **Level 3: `/about.md**`<br> | **E-E-A-T & Authority Manifest**: Structured per `docs/AEO_About_Boilerplate.md` to establish verifiable organizational trust, leadership, and physical presence.
+
+ | • `# About [Organization Name]`<br>
+
+<br>• Mission, Vision & Domain Authority.<br>
+
+<br>• Corporate Facts (Founding, Headquarters).<br>
+
+<br>• Leadership & Author Credentials.<br>
+
+<br>• Verified Contacts & Trust Policies (`/privacy`, `/terms`, `/security`).
+
+ | Crawled `/about`, `/team`, `/contact`, `/privacy`, `/terms` pages + physical address extraction.
+
+ | `MAINTAINERS.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `package.json` author fields.
+
+ | Corporate fact sheet, leadership bios, legal entity registrations.
+
+ |
+| **Level 4: `/docs.md**`<br> | **Consolidated Documentation**: High-density Markdown compilation of technical manuals, APIs, and troubleshooting guides.
+
+ | • `# Technical Documentation & Reference`<br>
+
+<br>• Categorized Documentation Index.<br>
+
+<br>• API / Function Specifications.<br>
+
+<br>• Configuration Parameters & Code Examples.<br>
+
+<br>• Troubleshooting & Technical FAQs.
+
+ | Crawled `/docs/*`, `/api/*`, `/developers/*` pages stripped of navigation headers and footers.
+
+ | `/docs/**.md`, inline code docstrings, OpenAPI/Swagger specifications (`openapi.json`/`yaml`).
+
+ | Uploaded API docs, user manuals, markdown/PDF help center exports.
+
+ |
+| **Level 4: `/content.md**`<br> | **Core Knowledge Corpus**: Synthesis of high-density pillar articles, case studies, and FAQ pairs formatted for direct LLM synthesis and citation.
+
+ | • `# Canonical Content & Knowledge Corpus`<br>
+
+<br>• Pillar Topic Clusters.<br>
+
+<br>• Key Claims, Statistics & Data Tables.<br>
+
+<br>• Comprehensive Q&A / FAQ Pairs.<br>
+
+<br>• Canonical Source URL Attribution.
+
+ | High-density content routes (`/blog/*`, `/resources/*`, `/faq`) prioritized by word count and entity depth.
+
+ | `/content/**`, `/articles/**`, MDX files in repository.
+
+ | Whitepapers, research studies, marketing articles, compiled FAQs.
+
+ |
+
+---
+
+## 4. Subscription Tiering, Domain Scoping & Headless Gate Architecture
+
+```
+                  ┌──────────────────────────────────────────────┐
+                  │          AIOptimize Request Entry            │
+                  └──────────────────────┬───────────────────────┘
+                                         │
+                         [ Check User Subscription Tier ]
+                                         │
+        ┌────────────────────────────────┼────────────────────────────────┐
+        ▼                                ▼                                ▼
+┌───────────────┐              ┌──────────────────┐             ┌──────────────────┐
+│  TRIAL TIER   │              │     PRO TIER     │             │ ENTERPRISE TIER  │
+└───────┬───────┘              └────────┬─────────┘             └────────┬─────────┘
+        │                               │                                │
+• Pre-purchase trial            • Single-domain binding         • Multi-domain seat
+• Headless access: OFF          • Multiple subscriptions        • Headless access: ON
+  (Static HTTP fetch only)        supported (1 per domain)      • Custom contract
+• Scan Mode: STATIC_ONLY        • Headless access: ON           • "Contact Sales"
+• Zero synthetic fallbacks      • Scan Mode: HEADLESS_ENABLED     workflow trigger
+        │                               │                                │
+        └───────────────────────────────┼────────────────────────────────┘
+                                        ▼
+                       ┌─────────────────────────────────┐
+                       │   Crawler Engine Execution      │
+                       │ (crawlerService.js + Headless)  │
+                       └─────────────────────────────────┘
+
+```
+
+1. **Trial Tier (Free / Pre-purchase)**:
+* Headless browser access is strictly **switched OFF**.
+
+
+* The crawler operates in static HTTP fetch mode only.
+
+
+* Evaluates manifest readiness without generating synthetic mock fallback data.
+
+
+
+
+2. **Pro Tier (Standard Paid Subscription)**:
+* Bounded to a **single specific domain** (`domain`).
+
+
+* Users can acquire **multiple Pro subscriptions**, one for each verified domain they own.
+
+
+* Headless browser review is strictly **switched ON** for the licensed domain(s).
+
+
+* Rejects unbonded domains with `DOMAIN_SUBSCRIPTION_REQUIRED`.
+
+
+
+
+3. **Enterprise / Team Tier (Custom Plan)**:
+* Single account login manages and audits **multiple domains** across the enterprise.
+
+
+* Headless browser review is strictly **switched ON** across all covered domains.
+
+
+* Includes custom routing, team seats, and a dedicated **"Contact Sales"** trigger payload.
+
+
+
+
+4. **API Credential System**:
+* Users can generate live API keys (`ak_live_[a-f0-9]{32}`).
+
+
+* Keys are domain-scoped to the user's active Pro or Enterprise subscriptions.
+
+
+* Instant revocation capability with audit timestamping.
+
+
+
+
+
+---
+
+## 5. Phased Implementation Roadmap (6 Testable Slices)
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ Slice 1: Subscription Tiers, Domain Binding & Headless Browser Gate   │
+│ • Unit tests for TRIAL, PRO (multi-sub), ENTERPRISE (multi-domain)    │
+│ • Enforce headless switch (OFF for Trial, ON for Pro/Enterprise)      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ Slice 2: API Credential Lifecycle & Scoped Authentication              │
+│ • Generate, list, and revoke API credentials                           │
+│ • Domain-scoped API authentication middleware                         │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ Slice 3: Multi-Source Content Ingestion Engine + Zero-Fallback Gate    │
+│ • Web crawler (with headless toggle) + GitHub API + Local Doc parser   │
+│ • Zero mock fallbacks: return explicit errors & rescan authorization   │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ Slice 4: Level 1 & Level 2 Manifest Generators                         │
+│ • robots.txt, sitemap.xml, llms.txt, ai-context.md                     │
+│ • Strict schema and link integrity validation                         │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ Slice 5: Level 3 & Level 4 Manifest Generators & Change-Sync API       │
+│ • README.md, about.md, docs.md, content.md                            │
+│ • Webhook sync & manifest download/copy endpoints                      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ Slice 6: Isolated AIOptimize Testing Harness                           │
+│ • Build frontend/test-optimize.html and frontend/test-optimize.js     │
+│ • Complete interactive testing UI without touching optimize.html       │
+└────────────────────────────────────────────────────────────────────────┘
+
+```
+
